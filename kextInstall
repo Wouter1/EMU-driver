@@ -1,0 +1,20 @@
+#
+#
+echo "hi there"
+echo "plz to turn off your device for loading of kext, you have 3 seconds to do so"
+sleep 3
+sudo kextunload /System/Library/Extensions/EMUUSBAudio.kext
+echo "deleting old kext"
+sudo rm -r /System/Library/Extensions/EMUUSBAudio.kext
+echo "moving things"
+cd /System/Library/Extensions
+echo "copying things"
+sudo cp -r ~/EMUUSBAudio.kext .
+echo "doing permissions stuff"
+sudo chgrp -R wheel EMUUSBAudio.kext
+echo "loading new kext"
+sudo kextload EMUUSBAudio.kext
+#cd ~/
+#echo "cleaning up"
+#sudo rm -r ~/tmp
+echo "so long"
