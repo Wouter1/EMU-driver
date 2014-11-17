@@ -42,3 +42,15 @@ Usage
 2. Select the EMU input in your favourite tool (e.g., Audacity)
 3. Make your recording
 
+
+Building
+======
+
+1. Open the project in Xcode
+2. Select Product/Build menu item
+3. Select View/Navigators/Project Navigator menu item
+4. right click on the  EMUUSBAudio.kext and click "Show in finder"
+5. Copy the kext into the directory where the kextInstall script is
+
+After that the kExtInstall script is ready for use (see Installation)
+
