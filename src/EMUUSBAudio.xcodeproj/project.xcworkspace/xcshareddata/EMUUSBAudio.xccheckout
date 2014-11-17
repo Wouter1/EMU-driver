@@ -5,7 +5,7 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>B89B6C7A-6D24-4713-B1E6-52C6A5C3FC77</string>
+	<string>90DB363D-7FD7-4228-8B8B-271AC46760B5</string>
 	<key>IDESourceControlProjectName</key>
 	<string>EMUUSBAudio</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
@@ -14,11 +14,11 @@
 		<string>https://github.com/Wouter1/EMU-driver</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>EMUUSBAudio.xcodeproj/project.xcworkspace</string>
+	<string>src/EMUUSBAudio.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>539B4522-8EBF-4F31-A830-36ABBD1E44BA</key>
-		<string>../..</string>
+		<string>../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/Wouter1/EMU-driver</string>
