@@ -1,22 +1,22 @@
 /*
-   This file is part of the EMU CA0189 USB Audio Driver.
-
-   Copyright (C) 2008 EMU Systems/Creative Technology Ltd. 
-
-   This driver is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
-
-   This driver is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library.   If not, a copy of the GNU Lesser General Public 
-   License can be found at <http://www.gnu.org/licenses/>.
-*/
+ This file is part of the EMU CA0189 USB Audio Driver.
+ 
+ Copyright (C) 2008 EMU Systems/Creative Technology Ltd.
+ 
+ This driver is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Library General Public
+ License as published by the Free Software Foundation; either
+ version 2 of the License, or (at your option) any later version.
+ 
+ This driver is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Library General Public License for more details.
+ 
+ You should have received a copy of the GNU Library General Public License
+ along with this library.   If not, a copy of the GNU Lesser General Public
+ License can be found at <http://www.gnu.org/licenses/>.
+ */
 //--------------------------------------------------------------------------------
 //	File:		EMUHALPlugin.cpp
 //	Contains:	HAL Plugin code for the custom properties exposed through CoreAudio
@@ -40,12 +40,12 @@ enum {
 #define NUM_CLOCK_SOURCES	2
 
 /*
-typedef struct {
-	io_object_t			engine;
-	io_object_t			device;
-	UInt32				deviceID;
-} PluginInfo, *PluginInfoPtr;
-*/
+ typedef struct {
+ io_object_t			engine;
+ io_object_t			device;
+ UInt32				deviceID;
+ } PluginInfo, *PluginInfoPtr;
+ */
 
 typedef AudioDriverPlugInHostInfo	PluginInfo;
 typedef AudioDriverPlugInHostInfo	*PluginInfoPtr;
@@ -89,7 +89,7 @@ static void HALPluginCallback(CFMachPortRef, void *msg, CFIndex size, void *info
 		debugIOLog("kClockSourceController");
 		propertyID = kClockSourceController;
 	} else if (callbackInfo->service == gEMUDigIOSampleRateController) {
-		debugIOLog("kDigIOSampleRateController");	
+		debugIOLog("kDigIOSampleRateController");
 		propertyID = kDigIOSampleRateController;
 	} else {
 		debugIOLog("unrecognized service");
@@ -118,9 +118,9 @@ static void RegisterCallback (io_connect_t  service, PluginInfoPtr info) {
 			if (connection) {
 				debugIOLog("service opened");
 				result = IOConnectSetNotificationPort(connection,
-																	0, //unused per IOAudioControlUserClient
-																	port,
-																	0);
+                                                      0, //unused per IOAudioControlUserClient
+                                                      port,
+                                                      0);
 				if (KERN_SUCCESS == result) {
 					debugIOLog("SetNotificationPort successful");
 					CallbackInfo *callbackInfo = new CallbackInfo;
@@ -146,7 +146,7 @@ static void RegisterCallback (io_connect_t  service, PluginInfoPtr info) {
 					}
 				} else {
 					debugIOLog("SetNotificationPort failed with error %x",err_get_code(result));
-				}				
+				}
 			} else {
 				debugIOLog("could not open service");
 			}
@@ -166,10 +166,10 @@ static void CreateControlEntries(PluginInfoPtr pluginInfo) {
 	
 	// Create iterator
 	error = IORegistryEntryCreateIterator(pluginInfo->mIOAudioDevice,	// The root entry
-														kIOServicePlane,		// IOService plane
-														kIORegistryIterateRecursively, 
-														&iterator );
-
+                                          kIOServicePlane,		// IOService plane
+                                          kIORegistryIterateRecursively,
+                                          &iterator );
+    
 #if DEBUG_PRINT
 	debugIOLog("attempting to create the iterator %x\n", error);
 #endif
@@ -180,7 +180,7 @@ static void CreateControlEntries(PluginInfoPtr pluginInfo) {
 		debugIOLog("connectRef is %x\n", connectRef);
 #endif
 		while (connectRef) {
-
+            
 			// ***********************************************************************
 			// criteria we use to find the appropriate controls
 			// if(IOObjectConformsTo(gControlReference, "IOAudioLevelControl"))
@@ -189,40 +189,40 @@ static void CreateControlEntries(PluginInfoPtr pluginInfo) {
 				AudioDevicePropertyID	LcPropertyID;
 				size = sizeof(LcPropertyID);
 				result = IORegistryEntryGetProperty(connectRef, "IOAudioControlID", (char *)&LcPropertyID,
-														&size );
+                                                    &size );
 #if DEBUG_PRINT
 				debugIOLog("getting IOAudioControlID result %x propertyID %x\n", result, LcPropertyID);
 #endif
 				switch (LcPropertyID) {
 					case kXUChangeNotifier:
 #if DEBUG_PRINT
-
-					debugIOLog("XUChangeNotifier connected\n");
+                        
+                        debugIOLog("XUChangeNotifier connected\n");
 #endif
 						gEMUXUNotifier = connectRef;
 						RegisterCallback(gEMUXUNotifier,pluginInfo);
 						break;
 					case kDigIOSampleRateController:
-					debugIOLog("DigIOSampleRateController\n");
+                        debugIOLog("DigIOSampleRateController\n");
 						gEMUDigIOSampleRateController = connectRef;
 						RegisterCallback(gEMUDigIOSampleRateController,pluginInfo);
 						break;
 					case kDigIOSyncSrcController:
 #if DEBUG_PRINT
-					debugIOLog("kDigIOSyncSrcController\n");
+                        debugIOLog("kDigIOSyncSrcController\n");
 #endif
 						gEMUDigIOSyncSrcController = connectRef;
 						RegisterCallback(gEMUDigIOSyncSrcController,pluginInfo);
 						break;
 					case kDigIOAsyncSrcController:
 #if DEBUG_PRINT
-					debugIOLog("kDigIOAsyncSrcController\n");
+                        debugIOLog("kDigIOAsyncSrcController\n");
 #endif
-					gEMUDigIOAsyncSrcController = connectRef;
+                        gEMUDigIOAsyncSrcController = connectRef;
 						break;
 					case kDigIOSPDIFController:
 #if DEBUG_PRINT
-					debugIOLog("kDigIOSPDIFController\n");
+                        debugIOLog("kDigIOSPDIFController\n");
 #endif
 						gEMUDigIOSPDIFController = connectRef;
 						break;
@@ -233,7 +233,7 @@ static void CreateControlEntries(PluginInfoPtr pluginInfo) {
 #endif
 						break;
 					case kClockSourceController:
-					debugIOLog("kClockSourceController\n");
+                        debugIOLog("kClockSourceController\n");
 						gEMUClockSourceController = connectRef;
 						RegisterCallback(gEMUClockSourceController,pluginInfo);
 						break;
@@ -247,13 +247,13 @@ static void CreateControlEntries(PluginInfoPtr pluginInfo) {
 #endif
 				}
 			}
-
+            
 			// Next control
 			connectRef = IOIteratorNext(iterator);
-
-		} 
+            
+		}
 	}
-
+    
 	// Release iterator
 	if(iterator)
 		IOObjectRelease(iterator);
@@ -268,7 +268,7 @@ static void CreateControlEntries(PluginInfoPtr pluginInfo) {
 OSStatus AudioDriverPlugInOpen( AudioDriverPlugInHostInfo* inHostInfo)
 {
     OSStatus		result = noErr;
-
+    
 #if DEBUG_PRINT
 	freopen("/dev/console","a",stdout);
     debugIOLog("%s() : **************************** \n", __FUNCTION__ );
@@ -276,7 +276,7 @@ OSStatus AudioDriverPlugInOpen( AudioDriverPlugInHostInfo* inHostInfo)
     debugIOLog("%s() : **************************** \n", __FUNCTION__ );
     //fflush(stdout);
 #endif
-	if (NULL == gPluginInfoArray) 
+	if (NULL == gPluginInfoArray)
 		gPluginInfoArray = CFArrayCreateMutable(NULL, 0, NULL);
 	
 	if (gPluginInfoArray) {
@@ -297,13 +297,13 @@ OSStatus AudioDriverPlugInOpen( AudioDriverPlugInHostInfo* inHostInfo)
 		
 		debugIOLog("mIOAudioEngine = %p",inHostInfo->mIOAudioEngine);
 		debugIOLog("mIOAudioDevice = %p",inHostInfo->mIOAudioDevice);
-	}	
+	}
     return result;
 }
 
 // AudioDriverPlugInClose
 OSStatus AudioDriverPlugInClose(AudioDeviceID inDeviceID){
-debugIOLog("HAL Plugin close\n");
+    debugIOLog("HAL Plugin close\n");
 	if (gEMUXUNotifier)
 		IOServiceClose(gEMUXUNotifier);
 	if (gEMUDigIOSampleRateController)
@@ -377,12 +377,12 @@ io_object_t GetDeviceForDeviceID(AudioDeviceID inDeviceID) {
 
 // AudioDriverPlugInDeviceGetPropertyInfo
 OSStatus AudioDriverPlugInDeviceGetPropertyInfo(AudioDeviceID inDeviceID, UInt32 inLine,
-								Boolean isInput, AudioDevicePropertyID inPropertyID,
-								UInt32 * outSize, Boolean * outWritable) {
+                                                Boolean isInput, AudioDevicePropertyID inPropertyID,
+                                                UInt32 * outSize, Boolean * outWritable) {
     OSStatus	result = kAudioHardwareUnknownPropertyError;
 #if DEBUG_PRINT
 	debugIOLog("+GetPropertyInfo \"%c%c%c%c\" \n", inPropertyID>>24, inPropertyID>>16, inPropertyID>>8, inPropertyID);
-#endif	
+#endif
     switch (inPropertyID) {
 		case kDigIOSyncSrcController:
 		case kDigIOAsyncSrcController:
@@ -395,9 +395,9 @@ OSStatus AudioDriverPlugInDeviceGetPropertyInfo(AudioDeviceID inDeviceID, UInt32
 		case kDirectMonOnOffController:
 #endif
             result = noErr;
-            if( outSize) 
+            if( outSize)
 				*outSize = sizeof(UInt32);
-            if( outWritable ) 
+            if( outWritable )
 				*outWritable = true;
 			break;
     }
@@ -409,9 +409,9 @@ OSStatus AudioDriverPlugInDeviceGetPropertyInfo(AudioDeviceID inDeviceID, UInt32
 // AudioDriverPlugInDeviceGetProperty
 // ****************************************************************************
 OSStatus AudioDriverPlugInDeviceGetProperty( AudioDeviceID	PmDevice,
-                                    UInt32	PmLine, Boolean	PmIsInput,
-                                    AudioDevicePropertyID	PmPropertyID,
-                                    UInt32*	PmPropertyDataSize, void*	PmPropertyData) {
+                                            UInt32	PmLine, Boolean	PmIsInput,
+                                            AudioDevicePropertyID	PmPropertyID,
+                                            UInt32*	PmPropertyDataSize, void*	PmPropertyData) {
     OSStatus	result = kAudioHardwareUnknownPropertyError;
     SInt32		LcSInt32Value;
     UInt32		* LcUInt32Ptr = (UInt32 *)PmPropertyData;
@@ -428,110 +428,110 @@ OSStatus AudioDriverPlugInDeviceGetProperty( AudioDeviceID	PmDevice,
 		case kXUChangeNotifier:
 			result = noErr;
 #if DEBUG_PRINT
-		debugIOLog("kXUChangeNotifier\n");
+            debugIOLog("kXUChangeNotifier\n");
 #endif
 			valueAsCFTypeRef = IORegistryEntryCreateCFProperty(gEMUXUNotifier, kControlValueRef, kCFAllocatorDefault, 0);
 			break;
 		case kDigIOSampleRateController:
-			result = noErr;            
+			result = noErr;
 #if DEBUG_PRINT
-		debugIOLog("kDigIOSampleRateController\n");
+            debugIOLog("kDigIOSampleRateController\n");
 #endif
 			valueAsCFTypeRef = IORegistryEntryCreateCFProperty(
-									gEMUDigIOSampleRateController, kControlValueRef, kCFAllocatorDefault, 0);
+                                                               gEMUDigIOSampleRateController, kControlValueRef, kCFAllocatorDefault, 0);
 			break;
-
+            
 		case kDigIOSyncSrcController:
 			result = noErr;
 #if DEBUG_PRINT
-		debugIOLog("kDigIOSyncSrcController\n");
+            debugIOLog("kDigIOSyncSrcController\n");
 #endif
 			valueAsCFTypeRef = IORegistryEntryCreateCFProperty (
-									gEMUDigIOSyncSrcController, kControlValueRef, kCFAllocatorDefault, 0);
+                                                                gEMUDigIOSyncSrcController, kControlValueRef, kCFAllocatorDefault, 0);
 			break;
-
+            
 		case kDigIOAsyncSrcController:
 			result = noErr;
 #if DEBUG_PRINT
-		debugIOLog("kDigIOAsyncSrcController\n");
+            debugIOLog("kDigIOAsyncSrcController\n");
 #endif
 			valueAsCFTypeRef = IORegistryEntryCreateCFProperty (
-									gEMUDigIOAsyncSrcController, kControlValueRef, kCFAllocatorDefault, 0);
+                                                                gEMUDigIOAsyncSrcController, kControlValueRef, kCFAllocatorDefault, 0);
 			break;
 		case kDigIOSPDIFController:
 			result = noErr;
 #if DEBUG_PRINT
-		debugIOLog("kDigIOSPDIFController\n");
+            debugIOLog("kDigIOSPDIFController\n");
 #endif
 			valueAsCFTypeRef = IORegistryEntryCreateCFProperty (
-									gEMUDigIOSPDIFController, kControlValueRef, kCFAllocatorDefault, 0);
+                                                                gEMUDigIOSPDIFController, kControlValueRef, kCFAllocatorDefault, 0);
 			break;
 		case kDevSoftLimitController:
 			result = noErr;
 #if DEBUG_PRINT
-		debugIOLog("kDevSoftLimitController\n");
+            debugIOLog("kDevSoftLimitController\n");
 #endif
 			valueAsCFTypeRef = IORegistryEntryCreateCFProperty (
-									gEMUDevSoftLimitController, kControlValueRef, kCFAllocatorDefault, 0);
+                                                                gEMUDevSoftLimitController, kControlValueRef, kCFAllocatorDefault, 0);
 			break;
-	
+            
 		case kClockSourceController:
 		case kAudioDevicePropertyClockSource:
 			result = noErr;
 #if DEBUG_PRINT
-		debugIOLog("kClockSourceController\n");
+            debugIOLog("kClockSourceController\n");
 #endif
 			valueAsCFTypeRef = IORegistryEntryCreateCFProperty (
-									gEMUClockSourceController, kControlValueRef, kCFAllocatorDefault, 0);
+                                                                gEMUClockSourceController, kControlValueRef, kCFAllocatorDefault, 0);
 			break;
 #if DIRECTMONITOR
 		case kDirectMonMonoStereoController:
 			result = noErr;
 			valueAsCFTypeRef = IORegistryEntryCreateCFProperty(
-									gEMUDirectMonMonoStereoController, kControlValueRef, kCFAllocatorDefault, 0);
+                                                               gEMUDirectMonMonoStereoController, kControlValueRef, kCFAllocatorDefault, 0);
 			break;
 		case kDirectMonOnOffController:
 			result = noErr;
 			valueAsCFTypeRef = IORegistryEntryCreateCFProperty (
-									gEMUDirectMonOnOffController, kControlValueRef, kCFAllocatorDefault, 0);			
+                                                                gEMUDirectMonOnOffController, kControlValueRef, kCFAllocatorDefault, 0);
 			break;
 #endif
-		//MOTU digital performer hack (I really don't like this, but not sure what else to do) [AC]
+            //MOTU digital performer hack (I really don't like this, but not sure what else to do) [AC]
 		case 'Mhta':
 			result = noErr;
 			break;
 		case kAudioDevicePropertyClockSourceNameForIDCFString:
 			debugIOLog("handling 'lcsn' (ClockSource name) message");
-			{				
-				AudioValueTranslation *avtrans = (AudioValueTranslation *) PmPropertyData;
-				UInt32 clockID = *((UInt32 *) avtrans->mInputData);
-				debugIOLog("clockID = %d, isInput=%d",clockID,PmIsInput);
-			}
+        {
+            AudioValueTranslation *avtrans = (AudioValueTranslation *) PmPropertyData;
+            UInt32 clockID = *((UInt32 *) avtrans->mInputData);
+            debugIOLog("clockID = %d, isInput=%d",clockID,PmIsInput);
+        }
 			break;
 			/*
-		case kAudioDevicePropertyClockSource:
-			debugIOLog("handling 'csrc' (ClockSource) message");
-			{				
-				AudioValueTranslation *avtrans = (AudioValueTranslation *) PmPropertyData;
-				//UInt32 clockID = *((UInt32 *) avtrans->mInputData);
-				//debugIOLog("clockID = %d, isInput=%d",clockID,PmIsInput);
-			}
-			break;		
-			*/
+             case kAudioDevicePropertyClockSource:
+             debugIOLog("handling 'csrc' (ClockSource) message");
+             {
+             AudioValueTranslation *avtrans = (AudioValueTranslation *) PmPropertyData;
+             //UInt32 clockID = *((UInt32 *) avtrans->mInputData);
+             //debugIOLog("clockID = %d, isInput=%d",clockID,PmIsInput);
+             }
+             break;
+             */
 		case kAudioDevicePropertyChannelNumberName:
 		case kAudioObjectPropertyElementCategoryName:
 			debugIOLog("handling 'lccn' (element/channel category name) message");
-			{
-				debugIOLog("channel# = %d, isInput=%d",PmLine,PmIsInput);
-			}
+        {
+            debugIOLog("channel# = %d, isInput=%d",PmLine,PmIsInput);
+        }
 			break;
 		default:
 			break;
-		}
+    }
 	if (valueAsCFTypeRef) {
-	debugIOLog("getting value\n");
+        debugIOLog("getting value\n");
 		CFNumberGetValue((CFNumberRef) valueAsCFTypeRef,
-						CFNumberGetType((const CFNumberRef) valueAsCFTypeRef), &LcSInt32Value);
+                         CFNumberGetType((const CFNumberRef) valueAsCFTypeRef), &LcSInt32Value);
 		CFRelease(valueAsCFTypeRef);
 		if (PmPropertyDataSize)
 			*PmPropertyDataSize = sizeof(LcSInt32Value);
@@ -539,15 +539,15 @@ OSStatus AudioDriverPlugInDeviceGetProperty( AudioDeviceID	PmDevice,
 			*LcUInt32Ptr = LcSInt32Value;
 	}
 	
-     return result;
-}                                            
+    return result;
+}
 
 // ****************************************************************************
 // AudioDriverPlugInDeviceSetProperty
 // ****************************************************************************
 OSStatus AudioDriverPlugInDeviceSetProperty( AudioDeviceID	inDevice, const AudioTimeStamp* inWhen,
-                                        UInt32	inLine, Boolean	isInput, AudioDevicePropertyID	inPropertyID,
-                                        UInt32	inPropertyDataSize, const void*	inPropertyData) {
+                                            UInt32	inLine, Boolean	isInput, AudioDevicePropertyID	inPropertyID,
+                                            UInt32	inPropertyDataSize, const void*	inPropertyData) {
     OSStatus	result = kAudioHardwareUnknownPropertyError;
 	debugIOLog("+AudioDriverPluginDeviceSetProperty");
     SInt32		LcSInt32  = *(SInt32*) inPropertyData;
@@ -555,71 +555,71 @@ OSStatus AudioDriverPlugInDeviceSetProperty( AudioDeviceID	inDevice, const Audio
 	if (LcCFNumberRef) {
 		switch (inPropertyID) {
 			case kDigIOSyncSrcController:
-					result = IORegistryEntrySetCFProperty(gEMUDigIOSyncSrcController, kControlValueRef, LcCFNumberRef );
+                result = IORegistryEntrySetCFProperty(gEMUDigIOSyncSrcController, kControlValueRef, LcCFNumberRef );
 #if DEBUG_PRINT
-					debugIOLog("kDigIOSyncSrcController %d", result);
+                debugIOLog("kDigIOSyncSrcController %d", result);
 #endif
-					break;
+                break;
 			case kDigIOAsyncSrcController:
-					result = IORegistryEntrySetCFProperty(gEMUDigIOAsyncSrcController, kControlValueRef, LcCFNumberRef );
+                result = IORegistryEntrySetCFProperty(gEMUDigIOAsyncSrcController, kControlValueRef, LcCFNumberRef );
 #if DEBUG_PRINT
-					debugIOLog("kDigIOAsyncSrcController %d", result);
+                debugIOLog("kDigIOAsyncSrcController %d", result);
 #endif
-					break;
+                break;
 			case kDigIOSPDIFController:
-					result = IORegistryEntrySetCFProperty(gEMUDigIOSPDIFController, kControlValueRef, LcCFNumberRef );
+                result = IORegistryEntrySetCFProperty(gEMUDigIOSPDIFController, kControlValueRef, LcCFNumberRef );
 #if DEBUG_PRINT
-					debugIOLog("kDigIOSPDIFController %d", result);
+                debugIOLog("kDigIOSPDIFController %d", result);
 #endif
-					CFRelease(LcCFNumberRef);
-					break;
+                CFRelease(LcCFNumberRef);
+                break;
 			case kDevSoftLimitController:
-					result = IORegistryEntrySetCFProperty(gEMUDevSoftLimitController, kControlValueRef, LcCFNumberRef );
-		#if DEBUG_PRINT
-					debugIOLog("kDevSoftLimitController controller is %d result is %x\n", gEMUDevSoftLimitController, result);
-		#endif
-					break;
+                result = IORegistryEntrySetCFProperty(gEMUDevSoftLimitController, kControlValueRef, LcCFNumberRef );
+#if DEBUG_PRINT
+                debugIOLog("kDevSoftLimitController controller is %d result is %x\n", gEMUDevSoftLimitController, result);
+#endif
+                break;
 			case kClockSourceController:
-					debugIOLog("kClockSourceController %d (%d)",LcSInt32, result);
-					result = IORegistryEntrySetCFProperty(gEMUClockSourceController, kControlValueRef, LcCFNumberRef );
-					break;
-		#if DIRECTMONITOR
+                debugIOLog("kClockSourceController %d (%d)",LcSInt32, result);
+                result = IORegistryEntrySetCFProperty(gEMUClockSourceController, kControlValueRef, LcCFNumberRef );
+                break;
+#if DIRECTMONITOR
 			case kDirectMonMonoStereoController:
-					result = IORegistryEntrySetCFProperty(gEMUDirectMonMonoStereoController, kControlValueRef, LcCFNumberRef );
-					break;
+                result = IORegistryEntrySetCFProperty(gEMUDirectMonMonoStereoController, kControlValueRef, LcCFNumberRef );
+                break;
 			case kDirectMonOnOffController:
-					result = IORegistryEntrySetCFProperty(gEMUDirectMonOnOffController, kControlValueRef, LcCFNumberRef );
-					break;
-		#endif
+                result = IORegistryEntrySetCFProperty(gEMUDirectMonOnOffController, kControlValueRef, LcCFNumberRef );
+                break;
+#endif
 		}	
 		CFRelease(LcCFNumberRef);
-     }
+    }
 	debugIOLog("-AudioDriverPluginDeviceSetProperty");
-
-     return result;
+    
+    return result;
 }
 
 #pragma mark -
 #pragma mark *********** STREAM PROPERTY FUNCTIONS ***********
 // AudioDriverPlugInStreamGetPropertyInfo
 OSStatus AudioDriverPlugInStreamGetPropertyInfo(AudioDeviceID PmDevice, io_object_t PmIOAudioStream,
-									UInt32 PmChannel, AudioDevicePropertyID	PmPropertyID,
-									UInt32*	PmSize, Boolean* PmWritable) {
+                                                UInt32 PmChannel, AudioDevicePropertyID	PmPropertyID,
+                                                UInt32*	PmSize, Boolean* PmWritable) {
     return kAudioHardwareUnknownPropertyError;
 }
 
 // AudioDriverPlugInStreamGetProperty
 OSStatus AudioDriverPlugInStreamGetProperty(AudioDeviceID PmDevice, io_object_t PmIOAudioStream,
-								UInt32 PmChannel, AudioDevicePropertyID PmPropertyID,
-								UInt32*	PmPropertyDataSize, void* PmPropertyData) {
+                                            UInt32 PmChannel, AudioDevicePropertyID PmPropertyID,
+                                            UInt32*	PmPropertyDataSize, void* PmPropertyData) {
     return kAudioHardwareUnknownPropertyError;
 }
 
 // AudioDriverPlugInStreamSetProperty
 OSStatus AudioDriverPlugInStreamSetProperty(AudioDeviceID PmDevice, io_object_t PmIOAudioStream,
-								const AudioTimeStamp* PmWhen, UInt32 PmChannel,
-								AudioDevicePropertyID PmPropertyID, UInt32 PmPropertyDataSize,
-								const void*	PmPropertyData) {
+                                            const AudioTimeStamp* PmWhen, UInt32 PmChannel,
+                                            AudioDevicePropertyID PmPropertyID, UInt32 PmPropertyDataSize,
+                                            const void*	PmPropertyData) {
     return kAudioHardwareUnknownPropertyError;
 }
 

@@ -1,36 +1,29 @@
-/*
-   This file is part of the EMU CA0189 USB Audio Driver.
+//
+//  EMUHALPlugin.h
+//  EMUUSBAudio
+//
+//  Created by Wouter Pasman on 06/10/14.
+//  Copyright (c) 2014 com.emu. All rights reserved.
+//
 
-   Copyright (C) 2008 EMU Systems/Creative Technology Ltd. 
-
-   This driver is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public
-   License as published by the Free Software Foundation; either
-   version 2 of the License, or (at your option) any later version.
-
-   This driver is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library.   If not, a copy of the GNU Lesser General Public 
-   License can be found at <http://www.gnu.org/licenses/>.
-*/
-#ifndef __EMUHALPLUGIN__
-#define __EMUHALPLUGIN__
+#ifndef __EMUUSBAudio__EMUHALPlugin__
+#define __EMUUSBAudio__EMUHALPlugin__
 
 
 #include "EMUUSBDeviceDefines.h"
+
+#include <IOKit/IOTypes.h>
+#include <IOKit/IOLib.h>
+
+#include "CoreAudio/CoreAudio.h"
 #include <CoreAudio/AudioHardware.h>
-#include <IOKit/IOKitLib.h>
-#if DEBUGLOGGING
-#include <FireLog.h>
-#endif
+//#if DEBUGLOGGING
+//#include <FireLog.h>
+//#endif
 
 
 
-#include <CoreFoundation/CoreFoundation.h>
+//#include <CoreFoundation/CoreFoundation.h>
 #define DEBUG_PRINT	1
 #define DIRECTMONITOR 0	// currently no direct monitor
 
@@ -42,19 +35,21 @@
 #endif
 
 #ifdef DEBUGLOGGING /* { */
-	#ifdef CONSOLELOGGING /* { */
-		#define debugIOLog( message... ) \
-			do {FireLog("%.0s" #message "\n", message); } while (0)
-	#elif defined (DEBUGLOG_TO_KPRINTF) /* }{ */
-			#define debugIOLog( message... ) \
-				do { printf ("HALPlugin: %.0s" #message "\n", message ); } while (0)
-	#else /* }{ */
-	#define debugIOLog( message... ) ;
-	#endif /* } */
+#ifdef CONSOLELOGGING /* { */
+#define debugIOLog( message... ) \
+do {FireLog("%.0s" #message "\n", message); } while (0)
+#elif defined (DEBUGLOG_TO_KPRINTF) /* }{ */
+#define debugIOLog( message... ) \
+do { printf ("HALPlugin: %.0s" #message "\n", message ); } while (0)
 #else /* }{ */
-	#define debugIOLog( message... ) ;
+#define debugIOLog( message... ) ;
+#endif /* } */
+#else /* }{ */
+#define debugIOLog( message... ) ;
 #endif /* } */
 
 void ReleasePluginInfo(AudioDeviceID deviceID);
 io_object_t GetDeviceForDeviceID(AudioDeviceID deviceID);
 #endif // __EMUHALPLUGIN__
+
+#endif /* defined(__EMUUSBAudio__EMUHALPlugin__) */
