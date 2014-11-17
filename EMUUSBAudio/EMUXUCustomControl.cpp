@@ -25,6 +25,9 @@
 #include "EMUXUCustomControl.h"
 #include "EMUUSBAudioDevice.h"
 #include "EMUUSBAudioCommon.h"
+#include "libkern/OSDebug.h"
+
+
 #define super IOAudioControl
 OSDefineMetaClassAndStructors(EMUXUCustomControl, IOAudioControl)
 
@@ -69,6 +72,8 @@ IOReturn EMUXUCustomControl::hardwareValueChanged(OSObject *newValue) {
 		}
 #endif
 		result = super::hardwareValueChanged(newValue);
+        debugIOLog("EMUXUCustomControl::hardwareValueChanged result %d", result);
+
 	}
 	return result;
 }
@@ -90,8 +95,11 @@ void EMUXUCustomControl::setValueChangeHandler(IntValueChangeHandler intValueCha
 	super::setValueChangeHandler(intValueChangeHandler, target);
 }
 
+
 IOReturn EMUXUCustomControl::addUserClient(IOAudioControlUserClient *newUserClient) {
 	IOReturn result =  super::addUserClient(newUserClient);
 	debugIOLog("EMUXUCustomControl::addUserClient %p, %d", newUserClient, result);
+    OSReportWithBacktrace("addUserClient");
+    
 	return result;
 }

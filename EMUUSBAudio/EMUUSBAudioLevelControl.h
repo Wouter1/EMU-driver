@@ -31,7 +31,7 @@ __END_DECLS
 #include <libkern/OSByteOrder.h>
 
 #include <IOKit/IOLib.h>
-#include <IOKit/IOPlatformExpert.h>
+//#include <IOKit/IOPlatformExpert.h>
 
 #include <IOKit/usb/USB.h>
 #include <IOKit/usb/IOUSBInterface.h>

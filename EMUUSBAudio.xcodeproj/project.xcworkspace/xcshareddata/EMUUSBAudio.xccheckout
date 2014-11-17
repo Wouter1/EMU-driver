@@ -5,19 +5,19 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>3672CD36-1CCD-41BB-ABAF-5660007668A5</string>
+	<string>B89B6C7A-6D24-4713-B1E6-52C6A5C3FC77</string>
 	<key>IDESourceControlProjectName</key>
 	<string>EMUUSBAudio</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>BF600386-9C28-4055-9322-C8D13281D00F</key>
+		<key>539B4522-8EBF-4F31-A830-36ABBD1E44BA</key>
 		<string>https://github.com/Wouter1/EMU-driver</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>EMUUSBAudio.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>BF600386-9C28-4055-9322-C8D13281D00F</key>
+		<key>539B4522-8EBF-4F31-A830-36ABBD1E44BA</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
@@ -25,14 +25,14 @@
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>BF600386-9C28-4055-9322-C8D13281D00F</string>
+	<string>539B4522-8EBF-4F31-A830-36ABBD1E44BA</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>BF600386-9C28-4055-9322-C8D13281D00F</string>
+			<string>539B4522-8EBF-4F31-A830-36ABBD1E44BA</string>
 			<key>IDESourceControlWCCName</key>
 			<string>EMU-driver</string>
 		</dict>

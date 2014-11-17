@@ -32,17 +32,16 @@
 
 #define LOCKING	1
 #define CONTIGUOUS 1
-#ifdef DEBUGLOGGING
-#define CONSOLELOGGING 1
-#define DEBUG_LEVEL 1
-#endif
+
+#include "EMUUSBLogging.h"
+
 #define	CUSTOMDEVICE	1
 #define PREPINPUT	0
 #define UHCISUPPORT 0
 #include <libkern/OSTypes.h>
 #if DEBUGLOGGING
 #include <IOKit/usb/IOUSBLog.h>
-#include <IOKit/firewire/IOFireLog.h>
+//#include <IOKit/firewire/IOFireLog.h>
 #endif
 enum {
 	kCtrlUsage      = 'Xtrl',
@@ -76,7 +75,7 @@ AbsoluteTime_to_scalar(t2)? (int)-1 : 0))
 (AbsoluteTime_to_scalar(t1) +=				\
 AbsoluteTime_to_scalar(t2))
 
-/* t1 -= t2 */
+/*! @abstract t1 -= t2 */
 #define SUB_ABSOLUTETIME(t1, t2)				\
 (AbsoluteTime_to_scalar(t1) -=				\
 AbsoluteTime_to_scalar(t2))
@@ -110,47 +109,7 @@ SoundAssertionFailed(cond, __FILE__, __LINE__, handler)		\
 goto handler;												\
 }
 
-//  -----------------------------------------------------------------
-//
-// System Logging or USB Prober Logging
-//
-//#define sleepTime 20
-#define sleepTime 0
-#if 1
-#ifdef DEBUGLOGGING /* { */
-#ifdef CONSOLELOGGING /* { */
-#define debugIOLog( message... ) \
-do {FireLog("%.0s" #message "\n", message); IOSleep(sleepTime);} while (0)
-#elif defined (DEBUGLOG_TO_KPRINTF) /* }{ */
-#define debugIOLog( message... ) \
-do { kprintf ( message ); kprintf ( "\n" ); } while (0)
-#else /* }{ */
-#define debugIOLog( message... ) ;
-#endif /* } */
-#else /* }{ */
-#define debugIOLog( message... ) ;
-#endif /* } */
-#else
-#define debugIOLog(message...) ;
-#endif
 
-#if 0
-#ifdef DEBUGLOGGING /* { */
-#ifdef CONSOLELOGGING /* { */
-#define debugIOLog2( message... ) \
-do {FireLog("%.0s" #message "\n", message); IOSleep(sleepTime);} while (0)
-#elif defined (DEBUGLOG_TO_KPRINTF) /* }{ */
-#define debugIOLog2( message... ) \
-do { kprintf ( message ); kprintf ( "\n" ); } while (0)
-#else /* }{ */
-#define debugIOLog2( message... ) ;
-#endif /* } */
-#else /* }{ */
-#define debugIOLog2( message... ) ;
-#endif /* } */
-#else
-#define debugIOLog2(message...) ;
-#endif
 
 
 #endif

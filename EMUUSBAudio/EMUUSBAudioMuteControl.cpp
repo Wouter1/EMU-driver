@@ -25,7 +25,7 @@ OSDefineMetaClassAndStructors(EMUUSBAudioMuteControl, IOAudioToggleControl)
 EMUUSBAudioMuteControl *EMUUSBAudioMuteControl::create (UInt8 theUnitID, UInt8 theInterfaceNumber, UInt8 theChannelNumber, USBDeviceRequest theUSBDeviceRequest, void *theCallerRefCon, UInt32 usage, UInt32 subType, UInt32 controlID) {
     EMUUSBAudioMuteControl 			*control;
     
-    debugIOLog ("+EMUUSBAudioMuteControl::create (%d, %d, %d, 0x%x, %lX, %lX)", theUnitID, theInterfaceNumber, theChannelNumber, theUSBDeviceRequest, usage, controlID);
+    debugIOLog ("+EMUUSBAudioMuteControl::create (%d, %d, %d, 0x%p, %x, %x)", theUnitID, theInterfaceNumber, theChannelNumber, theUSBDeviceRequest, usage, controlID);
     control = new EMUUSBAudioMuteControl;
     
     if (control) {
@@ -35,7 +35,7 @@ EMUUSBAudioMuteControl *EMUUSBAudioMuteControl::create (UInt8 theUnitID, UInt8 t
         }
     }
     
-    debugIOLog ("-EMUUSBAudioMuteControl[0x%x]::create (%d, %d, %d, 0x%x, %lX, %lX)", theUnitID, theInterfaceNumber, theChannelNumber, theUSBDeviceRequest, usage, controlID);
+    debugIOLog ("-EMUUSBAudioMuteControl::create (%d, %d, %d, 0x%p, %x, %x)", theUnitID, theInterfaceNumber, theChannelNumber, theUSBDeviceRequest, usage, controlID);
     return control;
 }
 
@@ -46,7 +46,7 @@ bool EMUUSBAudioMuteControl::init (UInt8 theUnitID, UInt8 theInterfaceNumber, UI
     Boolean								result;
     UInt8								theValue;
     
-    debugIOLog ("+EMUUSBAudioMuteControl[0x%x]::init (%d, %d, %d, 0x%x, 0x%x, %lX)", this, theUnitID, theInterfaceNumber, theChannelNumber, theUSBDeviceRequest, usage, properties);
+    debugIOLog ("+EMUUSBAudioMuteControl[0x%p]::init (%d, %d, %d, 0x%p, 0x%x, %p)", this, theUnitID, theInterfaceNumber, theChannelNumber, theUSBDeviceRequest, usage, properties);
     result = FALSE;
     FailIf (NULL == theUSBDeviceRequest, Exit);
     
@@ -89,19 +89,19 @@ bool EMUUSBAudioMuteControl::init (UInt8 theUnitID, UInt8 theInterfaceNumber, UI
     result = TRUE;
     
 Exit:
-    debugIOLog ("-EMUUSBAudioMuteControl[0x%x]::init (%d, %d, %d, 0x%x, 0x%x, %lX)", this, theUnitID, theInterfaceNumber, theChannelNumber, theUSBDeviceRequest, usage, properties);
+    debugIOLog ("-EMUUSBAudioMuteControl[0x%p]::init (%d, %d, %d, 0x%p, 0x%x, %p)", this, theUnitID, theInterfaceNumber, theChannelNumber, theUSBDeviceRequest, usage, properties);
     return result;
 }
 
 void EMUUSBAudioMuteControl::free () {
-    debugIOLog ("+EMUUSBAudioMuteControl[0x%x]::free ()", this);
+    debugIOLog ("+EMUUSBAudioMuteControl[0x%p]::free ()", this);
     
     if (setValueThreadCall) {
         thread_call_free (setValueThreadCall);
         setValueThreadCall = NULL;
     }
     
-    debugIOLog ("-EMUUSBAudioMuteControl[0x%x]::free ()", this);
+    debugIOLog ("-EMUUSBAudioMuteControl[0x%p]::free ()", this);
     super::free ();
 }
 
@@ -109,12 +109,12 @@ IOReturn EMUUSBAudioMuteControl::performValueChange (OSObject * newValue) {
 	OSNumber *					newValueAsNumber;
 	SInt32						newValueAsSInt32;
     
-    debugIOLog ("+EMUUSBAudioMuteControl[0x%x]::performValueChange (%d)", this, newValue);
+    debugIOLog ("+EMUUSBAudioMuteControl[0x%p]::performValueChange (%p)", this, newValue);
     
 	newValueAsNumber = OSDynamicCast (OSNumber, newValue);
 	FailIf (NULL == newValueAsNumber, Exit);
 	newValueAsSInt32 = newValueAsNumber->unsigned32BitValue ();
-	debugIOLog ("++EMUUSBAudioMuteControl[0x%x]::performValueChange (%ld)", this, newValueAsSInt32);
+	debugIOLog ("++EMUUSBAudioMuteControl[0x%p]::performValueChange (%d)", this, (unsigned int)newValueAsSInt32);
     
     // updateUSBValue ();
     // We should just be able to make an asynchronous deviceRequest, but for some reason that doesn't want to work
@@ -203,7 +203,7 @@ void EMUUSBAudioMuteControl::updateValueCallback (void *arg1, void *arg2) {
     EMUUSBAudioMuteControl 	*muteControl;
     UInt32						value;
     
-    debugIOLog ("+EMUUSBAudioMuteControl::updateValueCallback (%d, %d)", (UInt32*)arg1, (SInt64)arg2);
+    debugIOLog ("+EMUUSBAudioMuteControl::updateValueCallback (%p, %lld)", (UInt32*)arg1, (SInt64)arg2);
     muteControl = (EMUUSBAudioMuteControl *)arg1;
     value = (UInt32)(SInt64)arg2;
     
@@ -211,6 +211,6 @@ void EMUUSBAudioMuteControl::updateValueCallback (void *arg1, void *arg2) {
         muteControl->updateUSBValue (value);
     }
     
-    debugIOLog ("-EMUUSBAudioMuteControl::updateValueCallback (%d, %d)", (UInt32*)arg1, (SInt64)arg2);
+    debugIOLog ("-EMUUSBAudioMuteControl::updateValueCallback (%p, %lld)", (UInt32*)arg1, (SInt64)arg2);
 }
 

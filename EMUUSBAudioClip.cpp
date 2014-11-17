@@ -20,6 +20,20 @@
  along with this library.   If not, a copy of the GNU Lesser General Public
  License can be found at <http://www.gnu.org/licenses/>.
  */
+
+/*!
+ Wouter: this is constructed with the intention to have this a separate 
+ linked library. 
+ 
+ This is because of this (citing from "WritingAudioDrivers apple docu):
+ most I/O Kit code is compiled with floating-point emulation (the -msoft-float compiler flag). You must be very careful to ensure that code that needs to interact with actual floating-point samples does not get compiled with this compiler flag. This is described in more detail in the relevant sections.
+ 
+ Unfortunately XCode does not cooperate, it fails to
+ link this statically, everything seems fine but all calls to the library
+ result in a kernel panic even though the stacktrace SEEMS to be in the library.
+ */
+
+
 #include <libkern/OSTypes.h>
 #include <IOKit/IOReturn.h>
 //#include <IOKit/IOLib.h>
@@ -32,7 +46,7 @@ class IOMemoryDescriptor;
 //#include "EMUUSBAudioCommon.h"
 
 extern "C" {
-    //	floating point types
+    //	floating point types          
     typedef	float				Float32;
     typedef double				Float64;
     
@@ -43,6 +57,9 @@ extern "C" {
 #else
     Boolean CoeffsFilterOrder2Table (Float32 *Coeff, UInt32 samplingRate);
 #endif
+    
+    
+    
     void MonoFilter (Float32 *in, Float32 *low, Float32 *high, UInt32 frames, UInt32 samplingRate);
     void StereoFilter (Float32 *in, Float32 *low, Float32 *high, UInt32 frames, UInt32 samplingRate, PreviousValues *theValue);
     // aml 2.21.02 added new stereo filter
@@ -64,41 +81,7 @@ extern "C" {
         return (((((UInt32)inValue)<<24) & 0xFF000000) | ((((UInt32)inValue)<< 8) & 0x00FF0000) | ((((UInt32)inValue)>> 8) & 0x0000FF00) | ((((UInt32)inValue)>>24) & 0x000000FF));
     }
     
-#if	defined(__ppc__)
-    
-    // aml new routines [3034710]
-    
-    void Int8ToFloat32( SInt8 *src, float *dest, unsigned int count );
-    void NativeInt16ToFloat32( signed short *src, float *dest, unsigned int count, int bitDepth );
-    void SwapInt16ToFloat32( signed short *src, float *dest, unsigned int count, int bitDepth );
-    void NativeInt24ToFloat32( long *src, float *dest, unsigned int count, int bitDepth );
-    void SwapInt24ToFloat32( long *src, float *dest, unsigned int count, int bitDepth );
-    void NativeInt32ToFloat32( long *src, float *dest, unsigned int count, int bitDepth );
-    void SwapInt32ToFloat32( long *src, float *dest, unsigned int count, int bitDepth );
-    
-    void Float32ToInt8( float *src, SInt8 *dst, unsigned int count );
-    void Float32ToNativeInt16( float *src, signed short *dst, unsigned int count );
-    void Float32ToSwapInt16( float *src, signed short *dst, unsigned int count );
-    void Float32ToNativeInt24( float *src, signed long *dst, unsigned int count );
-    void Float32ToSwapInt24( float *src, signed long *dst, unsigned int count );
-    void Float32ToNativeInt32( float *src, signed long *dst, unsigned int count );
-    void Float32ToSwapInt32( float *src, signed long *dst, unsigned int count );
-    
-    
-    static inline SInt16	SInt16BigToNativeEndian(SInt16 inValue) { return inValue; }
-    static inline SInt16	SInt16NativeToBigEndian(SInt16 inValue) { return inValue; }
-    
-    static inline SInt16	SInt16LittleToNativeEndian(SInt16 inValue) { return Endian16_Swap(inValue); }
-    static inline SInt16	SInt16NativeToLittleEndian(SInt16 inValue) { return Endian16_Swap(inValue); }
-    
-    static inline SInt32	SInt32BigToNativeEndian(SInt32 inValue) { return inValue; }
-    static inline SInt32	SInt32NativeToBigEndian(SInt32 inValue) { return inValue; }
-    
-    static inline SInt32	SInt32LittleToNativeEndian(SInt32 inValue) { return Endian32_Swap(inValue); }
-    static inline SInt32	SInt32NativeToLittleEndian(SInt32 inValue) { return Endian32_Swap(inValue); }
-    
-#elif defined(__i386__)
-    
+    // these functions ARE used. Not clear why we have these warnings.
     static inline SInt16	SInt16BigToNativeEndian(SInt16 inValue) { return Endian16_Swap(inValue); }
     static inline SInt16	SInt16NativeToBigEndian(SInt16 inValue) { return Endian16_Swap(inValue); }
     
@@ -111,7 +94,6 @@ extern "C" {
     static inline SInt32	SInt32LittleToNativeEndian(SInt32 inValue) { return inValue; }
     static inline SInt32	SInt32NativeToLittleEndian(SInt32 inValue) { return inValue; }
     
-#endif
     
 #define	kMaxClipSInt8		0.9921875
 #define kFloat32ToSInt8		((Float32)0x80)
@@ -155,17 +137,17 @@ extern "C" {
     }
     
     //	Float32 -> SInt8
-#if defined(__i386__)
+#if defined(__i386__) || defined(__x86_64__)
     static void	ClipFloat32ToSInt8_4(const Float32* inInputBuffer, SInt8* outOutputBuffer, UInt32 inNumberSamples)
     {
-        register UInt32 theLeftOvers = inNumberSamples % 4;
+         UInt32 theLeftOvers = inNumberSamples % 4;
         
         while(inNumberSamples > theLeftOvers)
         {
-            register Float32 theFloat32Value1 = *(inInputBuffer + 0);
-            register Float32 theFloat32Value2 = *(inInputBuffer + 1);
-            register Float32 theFloat32Value3 = *(inInputBuffer + 2);
-            register Float32 theFloat32Value4 = *(inInputBuffer + 3);
+             Float32 theFloat32Value1 = *(inInputBuffer + 0);
+             Float32 theFloat32Value2 = *(inInputBuffer + 1);
+             Float32 theFloat32Value3 = *(inInputBuffer + 2);
+             Float32 theFloat32Value4 = *(inInputBuffer + 3);
             
             inInputBuffer += 4;
             
@@ -185,7 +167,7 @@ extern "C" {
         
         while(inNumberSamples > 0)
         {
-            register Float32	theFloat32Value = *inInputBuffer;
+             Float32	theFloat32Value = *inInputBuffer;
             
             ++inInputBuffer;
             
@@ -202,14 +184,14 @@ extern "C" {
     //	Float32 -> SInt16
     static void	ClipFloat32ToSInt16LE_4(const Float32* inInputBuffer, SInt16* outOutputBuffer, UInt32 inNumberSamples)
     {
-        register UInt32 theLeftOvers = inNumberSamples % 4;
+         UInt32 theLeftOvers = inNumberSamples % 4;
         
         while(inNumberSamples > theLeftOvers)
         {
-            register Float32 theFloat32Value1 = *(inInputBuffer + 0);
-            register Float32 theFloat32Value2 = *(inInputBuffer + 1);
-            register Float32 theFloat32Value3 = *(inInputBuffer + 2);
-            register Float32 theFloat32Value4 = *(inInputBuffer + 3);
+             Float32 theFloat32Value1 = *(inInputBuffer + 0);
+             Float32 theFloat32Value2 = *(inInputBuffer + 1);
+             Float32 theFloat32Value3 = *(inInputBuffer + 2);
+             Float32 theFloat32Value4 = *(inInputBuffer + 3);
             
             inInputBuffer += 4;
             
@@ -229,7 +211,7 @@ extern "C" {
         
         while(inNumberSamples > 0)
         {
-            register Float32	theFloat32Value = *inInputBuffer;
+             Float32	theFloat32Value = *inInputBuffer;
             
             ++inInputBuffer;
             
@@ -247,14 +229,14 @@ extern "C" {
     //	we use the MaxSInt32 value because of how we munge the data
     static void	ClipFloat32ToSInt24LE_4(const Float32* inInputBuffer, SInt32* outOutputBuffer, UInt32 inNumberSamples)
     {
-        register UInt32 theLeftOvers = inNumberSamples % 4;
+         UInt32 theLeftOvers = inNumberSamples % 4;
         
         while(inNumberSamples > theLeftOvers)
         {
-            register Float32 theFloat32Value1 = *(inInputBuffer + 0);
-            register Float32 theFloat32Value2 = *(inInputBuffer + 1);
-            register Float32 theFloat32Value3 = *(inInputBuffer + 2);
-            register Float32 theFloat32Value4 = *(inInputBuffer + 3);
+             Float32 theFloat32Value1 = *(inInputBuffer + 0);
+             Float32 theFloat32Value2 = *(inInputBuffer + 1);
+             Float32 theFloat32Value3 = *(inInputBuffer + 2);
+             Float32 theFloat32Value4 = *(inInputBuffer + 3);
             
             inInputBuffer += 4;
             
@@ -264,36 +246,21 @@ extern "C" {
             theFloat32Value4 = ClipFloat32ForSInt24(theFloat32Value4);
             
             // Multiply by kFloat32ToSInt32 instead of kFloat32toSInt24 to make the binary operations below work properly.
-            register UInt32 a = (UInt32)(SInt32)(theFloat32Value1 * kFloat32ToSInt32);
-            register UInt32 b = (UInt32)(SInt32)(theFloat32Value2 * kFloat32ToSInt32);
-            register UInt32 c = (UInt32)(SInt32)(theFloat32Value3 * kFloat32ToSInt32);
-            register UInt32 d = (UInt32)(SInt32)(theFloat32Value4 * kFloat32ToSInt32);
+             UInt32 a = (UInt32)(SInt32)(theFloat32Value1 * kFloat32ToSInt32);
+             UInt32 b = (UInt32)(SInt32)(theFloat32Value2 * kFloat32ToSInt32);
+             UInt32 c = (UInt32)(SInt32)(theFloat32Value3 * kFloat32ToSInt32);
+             UInt32 d = (UInt32)(SInt32)(theFloat32Value4 * kFloat32ToSInt32);
             
-#if	defined(__ppc__)
-            
-			//						a    b    c    d
-			//	IN REGISTER:		123X 456X 789X ABCX
-			//	OUT REGISTERS:		3216 5498 7CBA
-			//	OUT MEMORY:			3216 5498 7CBA
-            
-			//	each sample in the 4 registers looks like this: 123X, where X
-			//	is the unused byte we need to munge all four so that they look
-			//	like this in three registers: 3216 5498 7CBA. We want to avoid
-			//	any non-aligned memory writes if at all possible.
-			
-			register SInt32	theOutputValue1 = ((a << 16) & 0xFF000000) | (a & 0x00FF0000) | ((a >> 16) & 0x0000FF00) | ((b >> 8) & 0x000000FF);	// 3216
-			register SInt32	theOutputValue2 = ((b << 8) & 0xFF000000) | ((b >> 8) & 0x00FF0000) | (c & 0x0000FF00) | ((c >> 16) & 0x000000FF);
-			register SInt32	theOutputValue3 = (c & 0xFF000000) | ((d << 8) & 0x00FF0000) | ((d >> 8) & 0x0000FF00) | ((d >> 24) & 0x000000FF);
-			
-#elif defined(__i386__)
+#if defined(__i386__) || defined(__x86_64__)
+            // Wouter: removed al 'register' variables, register is deprecated and it clutters our warnings.
 			//						a    b    c    d					a    b    c    d
 			//	IN REGISTER:		123X 456X 789X ABCX					abc0 def0 ghi0 jkl0
 			//	OUT REGISTERS:		6123 8945 ABC7						fabc hide jklg
 			//	OUT MEMORY:			3216 5498 7CBA
             
-			register SInt32 theOutputValue1 = ((b << 16) & 0xFF000000) | (a >> 8);
-			register SInt32 theOutputValue2 = ((c << 8) & 0xFFFF0000) | ((b >> 16) & 0x0000FFFF);
-			register SInt32 theOutputValue3 = (d & 0xFFFFFF00) | ((c >> 24) & 0x000000FF);
+			 SInt32 theOutputValue1 = ((b << 16) & 0xFF000000) | (a >> 8);
+			 SInt32 theOutputValue2 = ((c << 8) & 0xFFFF0000) | ((b >> 16) & 0x0000FFFF);
+			 SInt32 theOutputValue3 = (d & 0xFFFFFF00) | ((c >> 24) & 0x000000FF);
             
 #endif
             
@@ -310,13 +277,13 @@ extern "C" {
         SInt8* theOutputBuffer = (SInt8*)outOutputBuffer;
         while(inNumberSamples > 0)
         {
-            register Float32 theFloat32Value = *inInputBuffer;
+             Float32 theFloat32Value = *inInputBuffer;
             ++inInputBuffer;
             
             theFloat32Value = ClipFloat32ForSInt24(theFloat32Value);
             
             // Multiply by kFloat32ToSInt32 instead of kFloat32toSInt24 to make the binary operations below work properly.
-            register SInt32 theSInt32Value = (SInt32)(theFloat32Value * kFloat32ToSInt32);
+             SInt32 theSInt32Value = (SInt32)(theFloat32Value * kFloat32ToSInt32);
             
             // Byte swapping will be handled automatically by the CPU if necessary.
             *(theOutputBuffer + 0) = (SInt8)((((UInt32)theSInt32Value) >> 8) & 0x000000FF);
@@ -332,14 +299,14 @@ extern "C" {
     //	Float32 -> SInt32
     static void	ClipFloat32ToSInt32LE_4(const Float32* inInputBuffer, SInt32* outOutputBuffer, UInt32 inNumberSamples)
     {
-        register UInt32 theLeftOvers = inNumberSamples % 4;
+         UInt32 theLeftOvers = inNumberSamples % 4;
         
         while(inNumberSamples > theLeftOvers)
         {
-            register Float32 theFloat32Value1 = *(inInputBuffer + 0);
-            register Float32 theFloat32Value2 = *(inInputBuffer + 1);
-            register Float32 theFloat32Value3 = *(inInputBuffer + 2);
-            register Float32 theFloat32Value4 = *(inInputBuffer + 3);
+             Float32 theFloat32Value1 = *(inInputBuffer + 0);
+             Float32 theFloat32Value2 = *(inInputBuffer + 1);
+             Float32 theFloat32Value3 = *(inInputBuffer + 2);
+             Float32 theFloat32Value4 = *(inInputBuffer + 3);
             
             inInputBuffer += 4;
             
@@ -359,7 +326,7 @@ extern "C" {
         
         while(inNumberSamples > 0)
         {
-            register Float32 theFloat32Value = *inInputBuffer;
+             Float32 theFloat32Value = *inInputBuffer;
             ++inInputBuffer;
             
             theFloat32Value = ClipFloat32ForSInt32(theFloat32Value);
@@ -390,9 +357,7 @@ extern "C" {
             case 8:
 			{
 				SInt8* theOutputBufferSInt8 = ((SInt8*)sampleBuf) + theFirstSample;
-#if	defined(__ppc__)
-                Float32ToInt8(theMixBuffer, theOutputBufferSInt8, theNumberSamples);
-#elif defined(__i386__)
+#if defined(__i386__) || defined(__x86_64__)
                 ClipFloat32ToSInt8_4(theMixBuffer, theOutputBufferSInt8, theNumberSamples);
 #endif
 				//ClipFloat32ToSInt8_4(theMixBuffer, theOutputBufferSInt8, theNumberSamples);
@@ -403,9 +368,7 @@ extern "C" {
 			{
 				SInt16* theOutputBufferSInt16 = ((SInt16*)sampleBuf) + theFirstSample;
                 
-#if	defined(__ppc__)
-                Float32ToSwapInt16(theMixBuffer, theOutputBufferSInt16, theNumberSamples);
-#elif defined(__i386__)
+#if defined(__i386__) || defined(__x86_64__)
                 ClipFloat32ToSInt16LE_4(theMixBuffer, theOutputBufferSInt16, theNumberSamples);
 #endif
 				//ClipFloat32ToSInt16LE_4(theMixBuffer, theOutputBufferSInt16, theNumberSamples);
@@ -417,9 +380,7 @@ extern "C" {
 			{
 				SInt32* theOutputBufferSInt24 = (SInt32*)(((UInt8*)sampleBuf) + (theFirstSample * 3));
                 
-#if	defined(__ppc__)
-                Float32ToSwapInt24(theMixBuffer, theOutputBufferSInt24, theNumberSamples);
-#elif defined(__i386__)
+#if defined(__i386__) || defined(__x86_64__)
                 ClipFloat32ToSInt24LE_4(theMixBuffer, theOutputBufferSInt24, theNumberSamples);
 #endif
 				//ClipFloat32ToSInt24LE_4(theMixBuffer, theOutputBufferSInt24, theNumberSamples);
@@ -430,9 +391,7 @@ extern "C" {
 			{
 				SInt32* theOutputBufferSInt32 = ((SInt32*)sampleBuf) + theFirstSample;
                 
-#if	defined(__ppc__)
-                Float32ToSwapInt32(theMixBuffer, theOutputBufferSInt32, theNumberSamples);
-#elif defined(__i386__)
+#if defined(__i386__) || defined(__x86_64__)
                 ClipFloat32ToSInt32LE_4(theMixBuffer, theOutputBufferSInt32, theNumberSamples);
 #endif
 				//ClipFloat32ToSInt32LE_4(theMixBuffer, theOutputBufferSInt32, theNumberSamples);
@@ -449,63 +408,56 @@ extern "C" {
     const float kOneOverMaxSInt24Value = 0.00000011920928955078125f;
     const float kOneOverMaxSInt32Value = 1.0/2147483648.0f;
     
+  
+    
     IOReturn convertFromEMUUSBAudioInputStreamNoWrap (const void *sampleBuf,
                                                       void *destBuf,
                                                       UInt32 firstSampleFrame,
                                                       UInt32 numSampleFrames,
                                                       const IOAudioStreamFormat *streamFormat) {
         UInt32	numSamplesLeft;
-        float 	*floatDestBuf;
+        Float32 	*floatDestBuf;
         
-        floatDestBuf = (float *)destBuf;
+        floatDestBuf = (Float32 *)destBuf;
+        
         numSamplesLeft = numSampleFrames * streamFormat->fNumChannels;
         
-        //	debugIOLog ("destBuf = %p, firstSampleFrame = %ld, numSampleFrames = %ld", destBuf, firstSampleFrame, numSampleFrames);
+        //debugIOLogR ("convertFromEMUUSBAudioInputStreamNoWrap destBuf = %p, firstSampleFrame = %ld, numSampleFrames = %ld", destBuf, firstSampleFrame, numSampleFrames);
         
         switch (streamFormat->fBitWidth)
         {
-            case 8:
+            case 8: //Int8ToFloat32
                 SInt8 *inputBuf8;
                 
                 inputBuf8 = &(((SInt8 *)sampleBuf)[firstSampleFrame * streamFormat->fNumChannels]);
-#if defined(__ppc__)
-				Int8ToFloat32(inputBuf8, floatDestBuf, numSamplesLeft);
-#elif defined(__i386__)
 				while (numSamplesLeft-- > 0)
 				{
 					*(floatDestBuf++) = (float)(*(inputBuf8++)) * kOneOverMaxSInt8Value;
 				}
-#endif
                 
                 break;
-            case 16:
+            case 16: //SwapInt16ToFloat32
                 SInt16 *inputBuf16;
                 
                 inputBuf16 = &(((SInt16 *)sampleBuf)[firstSampleFrame * streamFormat->fNumChannels]);
                 
-#if defined(__ppc__)
-				SwapInt16ToFloat32(inputBuf16, floatDestBuf, numSamplesLeft, 16);
-#elif defined(__i386__)
 				while (numSamplesLeft-- > 0)
 				{
 					*(floatDestBuf++) = (float)(*(inputBuf16++)) * kOneOverMaxSInt16Value;
 				}
-#endif
                 
                 break;
             case 20:
             case 24:
-                register SInt8 *inputBuf24;
+                 SInt8 *inputBuf24;
                 
                 // Multiply by 3 because 20 and 24 bit samples are packed into only three bytes, so we have to index bytes, not shorts or longs
-                inputBuf24 = &(((SInt8 *)sampleBuf)[firstSampleFrame * streamFormat->fNumChannels * 3]);
-                
-#if defined(__ppc__)
-				SwapInt24ToFloat32((long *)inputBuf24, floatDestBuf, numSamplesLeft, 24);
-#elif defined(__i386__)
-				register SInt32 inputSample;
+                //inputBuf24 = &(((SInt8 *)sampleBuf)[firstSampleFrame * streamFormat->fNumChannels * 3]);
+                inputBuf24 = (SInt8 *)sampleBuf+firstSampleFrame * streamFormat->fNumChannels * 3;
+				SInt32 inputSample;
 				
 				// [rdar://4311684] - Fixed 24-bit input convert routine. /thw
+                // this look does not work ok for last sample so we do that last one separately.
 				while (numSamplesLeft-- > 1)
 				{
 					inputSample = (* (UInt32 *)inputBuf24) & 0x00FFFFFF;
@@ -520,20 +472,15 @@ extern "C" {
 				// Convert last sample. The following line does the same work as above without going over the edge of the buffer.
 				inputSample = SInt32 ((UInt32 (*(UInt16 *) inputBuf24) & 0x0000FFFF) | (SInt32 (*(inputBuf24 + 2)) << 16));
 				*(floatDestBuf++) = (float)inputSample * kOneOverMaxSInt24Value;
-#endif
-                
                 break;
-            case 32:
-                register SInt32 *inputBuf32;
+
+            case 32: //SwapInt32ToFloat32
+                SInt32 *inputBuf32;
                 inputBuf32 = &(((SInt32 *)sampleBuf)[firstSampleFrame * streamFormat->fNumChannels]);
                 
-#if defined(__ppc__)
-				SwapInt32ToFloat32(inputBuf32, floatDestBuf, numSamplesLeft, 32);
-#elif defined(__i386__)
 				while (numSamplesLeft-- > 0) {
 					*(floatDestBuf++) = (float)(*(inputBuf32++)) * kOneOverMaxSInt32Value;
 				}
-#endif
                 
                 break;
         }
@@ -1625,6 +1572,7 @@ void SwapInt16ToFloat32( signed short *src, float *dest, unsigned int count, int
 		dest++;
 	}
 }
+
 
 void NativeInt24ToFloat32( long *src, float *dest, unsigned int count, int bitDepth )
 {

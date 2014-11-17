@@ -26,7 +26,7 @@ OSDefineMetaClassAndStructors(EMUUSBAudioLevelControl, IOAudioLevelControl)
 EMUUSBAudioLevelControl *EMUUSBAudioLevelControl::create (UInt8 theUnitID, UInt8 theInterfaceNumber, UInt8 theControlSelector, UInt8 theChannelNumber, Boolean shouldUpdatePRAM, USBDeviceRequest theUSBDeviceRequest, void *theCallerRefCon, UInt32 subType, UInt32 usage) {
     EMUUSBAudioLevelControl *			control;
     
-    debugIOLog ("+EMUUSBAudioLevelControl::create (%d, %d, %d, %d, %p, %lX, %lX)", theUnitID, theInterfaceNumber, theControlSelector, theChannelNumber, theUSBDeviceRequest, subType, usage);
+    debugIOLog ("+EMUUSBAudioLevelControl::create (%d, %d, %d, %d, %p, %lX, %lX)", theUnitID, theInterfaceNumber, theControlSelector, theChannelNumber, theUSBDeviceRequest, (unsigned long)subType, (unsigned long)usage);
     control = new EMUUSBAudioLevelControl;
     FailIf (NULL == control, Exit);
     
@@ -36,7 +36,7 @@ EMUUSBAudioLevelControl *EMUUSBAudioLevelControl::create (UInt8 theUnitID, UInt8
     }
     
 Exit:
-    debugIOLog ("-EMUUSBAudioLevelControl::create(%d, %d, %d, %d, %p, %lX, %lX)", theUnitID, theInterfaceNumber, theControlSelector, theChannelNumber, theUSBDeviceRequest, subType, usage);
+    debugIOLog ("-EMUUSBAudioLevelControl::create(%d, %d, %d, %d, %p, %lX, %lX)", theUnitID, theInterfaceNumber, theControlSelector, theChannelNumber, theUSBDeviceRequest, (unsigned long)subType, (unsigned long)usage);
     return control;
 }
 
@@ -65,6 +65,8 @@ bool EMUUSBAudioLevelControl::init (UInt8 theUnitID, UInt8 theInterfaceNumber, U
 	if (theControlSelector == 0xff) {
 		theControlSelector = VOLUME_CONTROL;
 		arePRAMControl = TRUE;
+        debugIOLog ("+EMUUSBAudioLevelControl NEEDS PRAM!!! ");
+
 	}
     
 	if (kIOAudioLevelControlSubTypeLFEVolume == subType) {
@@ -142,24 +144,25 @@ bool EMUUSBAudioLevelControl::init (UInt8 theUnitID, UInt8 theInterfaceNumber, U
 	fMinVolume = deviceMin + offset;
 	deviceMin = -1;
     
-	if (arePRAMControl) {
-		// If this is a 'pram' control then there is no need to call the hardware.
-		UInt8 						curPRAMVol;
-		IODTPlatformExpert * 		platform = NULL;
-        
-		curPRAMVol = 0;
-		platform = OSDynamicCast (IODTPlatformExpert, getPlatform ());
-		if (NULL != platform) {
-			platform->readXPRAM ((IOByteCount)kPRamVolumeAddr, &curPRAMVol, (IOByteCount)1);
-			curPRAMVol = (curPRAMVol & 0xF8);
-		}
-		currentValue = curPRAMVol;
-		deviceMin = 0;
-		deviceMax = 7;
-		subType = kIOAudioLevelControlSubTypePRAMVolume;
-		channelName = kIOAudioControlChannelNameAll;
-		theChannelNumber = 0;	// force it to the master channel even though we're piggy backing off of the channel 1 control
-	}
+// Wouter: disabled for now - There seems no IODTPlatformExpert available, linker problems.
+//	if (arePRAMControl) {
+//		// If this is a 'pram' control then there is no need to call the hardware.
+//		UInt8 						curPRAMVol;
+//		IODTPlatformExpert * 		platform = NULL;
+//
+//		curPRAMVol = 0;
+//		platform = OSDynamicCast (IODTPlatformExpert, getPlatform ());
+//		if (NULL != platform) {
+//			platform->readXPRAM ((IOByteCount)kPRamVolumeAddr, &curPRAMVol, (IOByteCount)1);
+//			curPRAMVol = (curPRAMVol & 0xF8);
+//		}
+//		currentValue = curPRAMVol;
+//		deviceMin = 0;
+//		deviceMax = 7;
+//		subType = kIOAudioLevelControlSubTypePRAMVolume;
+//		channelName = kIOAudioControlChannelNameAll;
+//		theChannelNumber = 0;	// force it to the master channel even though we're piggy backing off of the channel 1 control
+//	}
     
 	if (kIOAudioLevelControlSubTypeLFEVolume == subType) {
 		// The iSub controls are on channels 1 and 2, but we want to make them look like they're on channel 0 for the HAL
@@ -197,11 +200,11 @@ void EMUUSBAudioLevelControl::free () {
 IOReturn EMUUSBAudioLevelControl::performValueChange (OSObject * newValue) {
 	OSNumber *		newValueAsNumber = OSDynamicCast (OSNumber, newValue);
     SInt32		newValueAsSInt32;
-    debugIOLog ("+EMUUSBAudioLevelControl[%p]::performValueChange (%d)", this, newValue);
+    debugIOLog ("+EMUUSBAudioLevelControl[%p]::performValueChange (%p)", this, newValue);
     
 	FailIf (NULL == newValueAsNumber, Exit); // FIXED goto into protected scope.
 	newValueAsSInt32 = newValueAsNumber->unsigned32BitValue ();
-	debugIOLog ("++EMUUSBAudioLevelControl[%p]::performValueChange (%ld)", this, newValueAsSInt32);
+	debugIOLog ("++EMUUSBAudioLevelControl[%p]::performValueChange (%d)", this, newValueAsSInt32);
     
     if (NULL != setValueThreadCall) {
         // effectively calls updateValueCallback
@@ -376,27 +379,27 @@ void EMUUSBAudioLevelControl::updateValueCallback (void *arg1, void *arg2) {
     EMUUSBAudioLevelControl 		*levelControl = OSDynamicCast (EMUUSBAudioLevelControl, (OSObject*)arg1);
     SInt32							value = (SInt32)(SInt64)arg2;
     
-    debugIOLog ("+EMUUSBAudioLevelControl::updateValueCallback (%p, %p)", (UInt32*)arg1, (SInt64)arg2);
+    debugIOLog ("+EMUUSBAudioLevelControl::updateValueCallback (%p, %lld)", (UInt32*)arg1, (SInt64)arg2);
     
-    if (levelControl) {
-		UInt32	subType = levelControl->getSubType ();
-		
-		if (kIOAudioLevelControlSubTypePRAMVolume == subType) {
-			UInt8 						curPRAMVol;
-			IODTPlatformExpert * 		platform = NULL;
-            
-			platform = OSDynamicCast (IODTPlatformExpert, getPlatform ());
-			if (NULL != platform) {
-				platform->readXPRAM ((IOByteCount)kPRamVolumeAddr, &curPRAMVol, (IOByteCount)1);
-				curPRAMVol = (curPRAMVol & 0xF8) | value;
-				platform->writeXPRAM ((IOByteCount)kPRamVolumeAddr, &curPRAMVol, (IOByteCount)1);
-			}
-		} else {
-			levelControl->updateUSBValue (value);
-		}
-    }
+//    if (levelControl) {
+// Wouter: it seems there is no IODTPlatformExpert anymore. Removed the code, hoping it works...
+//		UInt32	subType = levelControl->getSubType ();
+//		if (kIOAudioLevelControlSubTypePRAMVolume == subType) {
+//			UInt8 						curPRAMVol;
+//			IODTPlatformExpert * 		platform = NULL;
+//
+//			platform = OSDynamicCast (IODTPlatformExpert, getPlatform ());
+//			if (NULL != platform) {
+//				platform->readXPRAM ((IOByteCount)kPRamVolumeAddr, &curPRAMVol, (IOByteCount)1);
+//				curPRAMVol = (curPRAMVol & 0xF8) | value;
+//				platform->writeXPRAM ((IOByteCount)kPRamVolumeAddr, &curPRAMVol, (IOByteCount)1);
+//			}
+//		} else {
+//			levelControl->updateUSBValue (value);
+//		}
+//    }
     
-    debugIOLog ("-EMUUSBAudioLevelControl::updateValueCallback (%p, %p)", (UInt32*)arg1, (SInt64)arg2);
+    debugIOLog ("-EMUUSBAudioLevelControl::updateValueCallback (%p, %lld)", (UInt32*)arg1, (SInt64)arg2);
 }
 
 // This is how the thing is defined in the USB Audio spec (section 5.2.2.4.3.2 for the curious).

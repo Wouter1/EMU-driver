@@ -19,7 +19,6 @@
  */
 
 
-// FIXME why are these outside the #ifndef??
 
 #include <libkern/c++/OSArray.h>
 #include <IOKit/usb/IOUSBInterface.h>
@@ -194,12 +193,13 @@ enum {
 	AC_HILO_SCALING_CONTROL					= 0x04
 };
 
+/*! Audio Class-specific endpoint descriptor subtypes */
 enum {
-    // Audio Class-specific endpoint descriptor subtypes
     DESCRIPTOR_UNDEFINED					= 0x00,
     EP_GENERAL								= 0x01
 };
 
+/*! requestType */
 enum {
     REQUEST_CODE_UNDEFINED					= 0x00,
     SET_CUR									= 0x01,
@@ -215,6 +215,7 @@ enum {
     GET_STAT								= 0xff
 };
 
+/*! controlSelectors.  */
 enum {
     FU_CONTROL_UNDEFINED					= 0x00,
     MUTE_CONTROL							= 0x01,
@@ -971,6 +972,8 @@ public:
 private:
 	EMUUSBAudioControlObject *			GetControlObject (UInt8 interfaceNum, UInt8 altInterfaceNum);
     EMUUSBAudioStreamObject *			GetStreamObject (UInt8 interfaceNum, UInt8 altInterfaceNum);
+    /*! his parses the configuration descriptor (memory block?) as it comes from the device?*/
+
     void							ParseConfigurationDescriptor (void);
     USBInterfaceDescriptorPtr		ParseInterfaceDescriptor (USBInterfaceDescriptorPtr theInterfacePtr, UInt8 * interfaceClass, UInt8 * interfaceSubClass);
 	void							DumpConfigMemoryToIOLog (void);

@@ -33,6 +33,8 @@
 #include <IOKit/IOLib.h>
 #include <IOSyncer.h>
 
+THIS FILE IS NOT UDESD???
+
 OSDefineMetaClassAndStructors(IOSyncer, OSObject)
 
 IOSyncer * IOSyncer::create(bool twoRetains)

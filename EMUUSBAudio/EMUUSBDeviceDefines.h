@@ -85,6 +85,7 @@ enum eDigitalFormat {
 	aes
 };
 
+/*! The extension unit ID */
 enum eExtensionUnitCode {
 	kClockRate			= 0xe301,
 	kClockSource		= 0xe302,
@@ -105,6 +106,7 @@ enum availableExtensionUnitSettinfs {
 	kXUDigitalSampleRate	= 0x80
 };
 
+/*!  The extension unit control selector  */
 enum extensionUnitControlSelector {
 	kEnableProcessing		= 0x01,
 	kClockRateSupport		= 0x02,	// clock rate support

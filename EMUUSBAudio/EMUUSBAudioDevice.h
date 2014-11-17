@@ -78,12 +78,7 @@ class EMUUSBAudioEngine;
 class EMUUSBUserClient;
 class EMUUSBAudioHardLevelControl;
 
-/*
- * @class EMUUSBAudioDevice
- * @abstract : universal Apple USB driver
- * @discussion : Current version of the driver deals with outputing stereo 16 bits data at 44100kHz
- * It's gonna create an EMUUSBAudioEngine, and a serie
- */
+
 
 #define kEngine							"engine"
 #define kInterface						"interface"
@@ -99,6 +94,15 @@ enum {
 	kStatusPacketSize	= 2	// the data packet size is 2
 };
 
+/*!
+ * This class is the EMU device controller, implementing the IOAudioDevice.
+ * It manages the inputs at a high level, like 
+ * detecting changes in volume or sample rate which goes through extension units (XUs). A little bit of communication goes on with EMU device here,
+ * this concerns only the control pipe.
+ * Actual work regarding this is done in the other classes, particularly
+ * AudioEngine for connecting to the device and reading and writing sample streams, converting them etc
+ * <XU>Control.cpp files: contain code to handle the <XU> control like volumelevel and mute.
+ */
 class EMUUSBAudioDevice : public IOAudioDevice {
 	friend class EMUUSBAudioEngine;
 	friend class EMUXUCustomControl;
@@ -108,12 +112,20 @@ public:
     IOUSBInterface *		mControlInterface;
     
 protected:
+    /*! average time between USB frames (units: 0.1ns ). Typical value is eg 10000009268  */
 	UInt64						mWallTimePerUSBCycle;
+    /*! a reference frame number, taken the first time updateWallTimePerUSBCycle is called. 
+     It is used to calculate the average USB frame rate in the jitter filter.*/
 	UInt64						mReferenceUSBFrame;
+    /*! wall time for the mReferenceUSBFrame.  */
 	AbsoluteTime				mReferenceWallTime;
+    /*! reference USB frame this frame is set to the current frame every mAnchorResetCount USB cycles */
 	UInt64						mNewReferenceUSBFrame;
+    /*! time associated with current mNewReferenceUSBFrame */
 	AbsoluteTime				mNewReferenceWallTime;
+    /*! last reference frame", last time we ran updateWallTimePerUSBCycle */
 	UInt64						mLastUSBFrame;
+    /*! the wall time for mLastUSBFrame */
 	UInt64						mLastWallTimeNanos;
     EMUUSBAudioConfigObject *	mUSBAudioConfig;
 	OSArray *				mControlGraph;
@@ -132,6 +144,7 @@ protected:
 	OSArray *				mRegisteredEngines;
 	UInt32					mAvailXUs;			// what extension unit features are available
 	EMUXUCustomControl *	mXUChanged;//IOAudioSelectorControl
+    /*! stores the selected clock source. 0= built-in 1=SPDif I think */
 	EMUXUCustomControl*		mClockSelector;// custom controls via XU the clock selector
 	EMUXUCustomControl*		mDigitalIOStatus;	// digital IO sample rate status
 	EMUXUCustomControl*		mDigitalIOSyncSrc;	// digital IO sync or not
@@ -149,11 +162,13 @@ protected:
 	DirectMonCtrlBlock		mCurDirMonSettings;
 #endif
 	UInt32					mNumEngines;
+    /*! counter for number of USB frames. When we hit kRefreshCount we refresh mNewReferenceUSBFrame */
 	UInt32					mAnchorResetCount;
     
-	UInt16*					mDeviceStatusBuffer;	// device status buffer NOT XU setting
+    /*! original doc: device status buffer NOT XU setting */
+	UInt16*					mDeviceStatusBuffer;
     
-	// slots for the various XUs
+	/*! original doc: slots for the various XUs */
 	UInt8					mClockRateXU;		// clock rate XU id
 	UInt8					mClockSrcXU;		// clock source XU id
 	UInt8					mDigitalIOXU;		// digital IO XU id
@@ -162,6 +177,8 @@ protected:
 	UInt8					mDirectMonXU;		// direct monitoring XU id
 #endif
 	
+    /*! indicator that we have built-in and SPDif clock controllers.
+     When the value is changed, controlChangedHandler is called. See doControlStuff */
 	IOAudioSelectorControl* mRealClockSelector;
 	
 	EMUUSBAudioEngine		*mAudioEngine;
@@ -176,15 +193,42 @@ protected:
     
 	Boolean					mDeviceIsInMonoMode;
 	Boolean					mTerminatingDriver;
+    
+    /*! Sets up a timer to call back to statusHandler.
+     find the feedback (USB) endpoint & start the feedback cycle going
+     @discussion (in original code): possible ways to do this
+      start a read of the interrupt endpoint
+      in the completion routine, schedule the next read or start the timer
+      OR - add a timer that will fire off
+      and start the checking as done below
+     */
 	void					setupStatusFeedback();
+    /*! called from TimerAction, scheduled as a timer */
 	void					doTimerAction(IOTimerEventSource * timer);
+    /*! get the extension unit unitID. Wouter: These are abbreviated with XU. FAIK these are software plugins */
+
 	UInt8					getExtensionUnitID(UInt16 extCode);
     
 	IOReturn				protectedXUChangeHandler(IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);
 	IOReturn				getAnchorFrameAndTimeStamp(UInt64 *frame, AbsoluteTime *time);
+    
+    /*! set the given frame number = current famenr of the USB bus, and time=current system time
+     @param frame ptr to memory where current frame nr has to be stored
+     @param time ptr to place where current time has to be stored
+     @return kIOReturnSuccess if mControlInterface is not null, else error.
+     */
 	IOReturn				getFrameAndTimeStamp(UInt64 *frame, AbsoluteTime *time);
 	UInt64					jitterFilter(UInt64 prev, UInt64 curr);
+    /*!  @abstrace updates the speed-estimation settings. Called from TimerAction
+     
+     @discussion These settings are used by getFrameAndTimeStamp. I think this mechanism is needed bcause we need to pass timestamps about the moment the read stream turned back in the ring buffer. But we are not processing this input data in real time.
+     @return true unless mControlInterface is null. */
 	bool					updateWallTimePerUSBCycle();
+    /*! 
+     @abstract this watchdog times the rate with which USB frames arrive.
+     @discussion This is called from the workloop, as a timer event. This then calls doTimerAction after a few basic checks.
+     This TimerAction runs at a period of kRefreshInterval ms (typically 128ms).
+     */
 	static void				TimerAction(OSObject * owner, IOTimerEventSource * sender);
 	void					checkUHCI();
     
@@ -223,12 +267,18 @@ public:
 	OSString *		getNameForPath (OSArray * arrayOfPathsFromOutputTerminal, UInt32 * pathIndex, UInt8 startingPoint);
 	OSString *		getNameForMixerPath (OSArray * arrayOfPathsFromOutputTerminal, UInt32 * pathIndex, UInt8 startingPoint);
     
+    /*! This is called when we receive a change in one of the user controls (level control, clock control, etc) */
 	static	IOReturn		controlChangedHandler (OSObject *target, IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);
 	static	IOReturn		deviceXUChangeHandler(OSObject *target, IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);
 	
+    /*! the actual code behind controlChangedHandler */
 	IOReturn		protectedControlChangedHandler (IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);
-	
-	// interface to getting/ setting the various extension unit settings
+	/*!
+     interface to getting/ setting the various extension unit settings
+     get the settings of some XU by eExtensionUnitCode
+     @param extCode the eExtensionUnitCode
+     @param controlSelector the extensionUnitControlSelector
+    */
 	IOReturn		getExtensionUnitSettings(UInt16 extCode, UInt8 controlSelector, void* setting, UInt32 length);
 	IOReturn		setExtensionUnitSettings(UInt16 extCode, UInt8 controlSelector, void* setting, UInt32 length);
 	IOReturn		getExtensionUnitSetting(UInt8 unitID, UInt8 controlSelector, void* setting, UInt32 length);
@@ -237,6 +287,16 @@ public:
 	UInt8			getSelectorSetting (UInt8 selectorID);
 	IOReturn		setSelectorSetting (UInt8 selectorID, UInt8 setting);
 	IOReturn		getFeatureUnitSetting (UInt8 controlSelector, UInt8 unitID, UInt8 channelNumber, UInt8 requestType, SInt16 * target);
+    
+    /*! prepares and sends a control command to USB device using deviceRequest.
+     VOLUME_CONTROL, device->mHardwareOutputVolumeID, kMasterVolumeIndex, SET_CUR, HostToUSBWord((SInt16)newValue), sizeof(UInt16)
+     @param controlSelector control selector, eg VOLUME_CONTROL
+     @param  unitID the unit ID. eg device->mHardwareOutputVolumeID
+     @param channelNumber eg kMasterVolumeIndex
+     @param requestType type of request, eg SET_CUR
+     @param newValue the value to set, an uint16
+     @param newValueLen bit weird, should always be 2??
+     */
 	IOReturn		setFeatureUnitSetting (UInt8 controlSelector, UInt8 unitID, UInt8 channelNumber, UInt8 requestType, UInt16 newValue, UInt16 newValueLen);
 	OSArray *		getPlaythroughPaths ();
 	UInt8			getBestFeatureUnitInPath (OSArray * thePath, UInt32 direction, UInt8 interfaceNum, UInt8 altSettingNum, UInt32 controlTypeWanted);
@@ -259,16 +319,23 @@ public:
 	UInt8			getHubSpeed ();
 	inline UInt32			getHardwareSampleRate() {return mCurSampleRate;}
 	inline void				setHardwareSampleRate(UInt32 inSampleRate) { mCurSampleRate = inSampleRate;}
-	virtual	IOReturn		deviceRequest (IOUSBDevRequest * request, IOUSBCompletion * completion = NULL);			// Depricated, don't use
+	//virtual	IOReturn		deviceRequest (IOUSBDevRequest * request, IOUSBCompletion * completion = NULL);			// Depricated, don't use
+    /*! // Pump a request to the USB device and get the result. */
 	virtual	IOReturn		deviceRequest (IOUSBDevRequestDesc * request, IOUSBCompletion * completion = NULL);
 	static	IOReturn		deviceRequest (IOUSBDevRequest * request, EMUUSBAudioDevice * self, IOUSBCompletion * completion = 0);
 	static void				StatusAction(OSObject *owner, IOTimerEventSource *sender);
+
+    /*! function that is attached to timer, to periodically get USB status. see also setupStatusFeedback */
 	static 	void			statusHandler(void* target, void* parameter, IOReturn result, UInt32 bytesLeft);
     
+    /*! original docu: Create and add the custom controls each time the default controls are removed.
+      This works better than the previous scheme where the custom controls were created just once
+      and added each time when the default controls were removed. */
 	void					addCustomAudioControls(IOAudioEngine* engine);
 	void					removeCustomAudioControls(IOAudioEngine* engine);
 	void					setOtherEngineSampleRate(EMUUSBAudioEngine* curEngine, UInt32 newSampleRate);
 	void					doStatusCheck(IOTimerEventSource* timer);
+    /*!  This seems to check if there were changes in the device: io status, sample rate, clock source, etc. */
 	void					queryXU();
 	virtual bool			matchPropertyTable (OSDictionary * table, SInt32 *score);
 	
@@ -280,6 +347,7 @@ public:
 	EMUUSBAudioEngine* GetEngine(void){ return mAudioEngine; }
 	
 	void	addHardVolumeControls(IOAudioEngine* audioEngine);
+    /*! This function is called from IOAudioControl::setValue when user changes volume. */
 	static	IOReturn hardwareVolumeChangedHandler (OSObject *target, IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);
 	static	IOReturn hardwareMuteChangedHandler (OSObject *target, IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);
 	

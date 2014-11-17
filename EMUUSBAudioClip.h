@@ -48,6 +48,19 @@ extern "C" {
                                                UInt32 numSampleFrames,
                                                const IOAudioStreamFormat *streamFormat);
     
+    /*!
+     Convert a block of data from our input stream into a destination buffer.
+     Assuming no wrap is needed for the source and destination.
+     Copies range [firstSampleFrame...firstSampleFrame+numSampleFrames> from sampleBuf to destbuf
+     also considering the source stream format. The dest format is always *float
+     This is normally the case for destination already when the kernel calls us
+     The input buffer may be different, this depends on our buffer sizes.
+     @param sampleBuf the start of the source buffer
+     @param destbuf the start of the dest buffer. This really is a float *.
+     @param firstSampleFrame first frame index in source buf that should be used (dest buf starts at index 0, it already was indexed in IOAudioStream who calls us).
+     @param numSampleFrames the num of frames that need conversion
+     @param streamFormat the IOAudioStreamFormat.
+     */
     IOReturn	convertFromEMUUSBAudioInputStreamNoWrap (const void *sampleBuf,
                                                          void *destBuf,
                                                          UInt32 firstSampleFrame,

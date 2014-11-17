@@ -22,6 +22,10 @@
 //
 //	File:		EMUUSBAudioDevice.cpp
 //
+// The IOAudioDevice provides the central coordination point for an audio driver
+// It must identify and create all IOAudioEngines that are not automatically created by the system (i.e. those
+// that are not matched and instantiated by IOKit directly).
+
 //	Contains:	Support for the USB Audio Class Control Interface.
 //			This includes support for exporting device controls
 //			to the Audio HAL such as Volume, Bass, Treble and
@@ -34,6 +38,9 @@
 //	Technology:	OS X
 //
 //--------------------------------------------------------------------------------
+
+
+
 #include <libkern/c++/OSCollectionIterator.h>
 
 #include <IOKit/IOLocks.h>
@@ -56,7 +63,7 @@
 OSDefineMetaClassAndStructors(EMUUSBAudioDevice, super)
 
 void EMUUSBAudioDevice::free() {
-    debugIOLog("+EMUUSBAudioDevice[%p]::free()", this);
+    debugIOLogC("+EMUUSBAudioDevice[%p]::free()", this);
     
     if(mInterfaceLock) {
         IORecursiveLockFree(mInterfaceLock);
@@ -98,7 +105,7 @@ void EMUUSBAudioDevice::free() {
 #endif
 	RELEASEOBJ(mMonoControlsArray);
 	super::free();
-    debugIOLog("-EMUUSBAudioDevice[%p]::free()", this);
+    debugIOLogC("-EMUUSBAudioDevice[%p]::free()", this);
 }
 
 bool EMUUSBAudioDevice::ControlsStreamNumber(UInt8 streamNumber) {
@@ -109,7 +116,7 @@ bool EMUUSBAudioDevice::ControlsStreamNumber(UInt8 streamNumber) {
 		UInt8	numStreams;
 		mUSBAudioConfig->GetControlledStreamNumbers(&streamNumbers, &numStreams);
 		for(UInt8 index = 0; index < numStreams; ++index) {
-			debugIOLog("Checking stream %d against controled stream %d", streamNumber, streamNumbers[index]);
+			debugIOLogC("Checking stream %d against controled stream %d", streamNumber, streamNumbers[index]);
 			if(streamNumber == streamNumbers[index]) {
 				return true;// exit the for loop
 			}
@@ -122,17 +129,17 @@ bool EMUUSBAudioDevice::ControlsStreamNumber(UInt8 streamNumber) {
 bool EMUUSBAudioDevice::start(IOService * provider) {
 	bool			result = FALSE;
 	
-    debugIOLog("+ EMUUSBAudioDevice[%p]::start(%p)", this, provider);
+    debugIOLogC("+ EMUUSBAudioDevice[%p]::start(%p)", this, provider);
 	mControlInterface = OSDynamicCast(IOUSBInterface, provider);
 	FailIf(FALSE == mControlInterface->open(this), Exit);
 	mCurSampleRate = mNumEngines = 0;
 	mInitHardwareThread = thread_call_allocate((thread_call_func_t)EMUUSBAudioDevice::initHardwareThread,(thread_call_param_t)this);
 	FailIf(NULL == mInitHardwareThread, Exit);
     
-    debugIOLog("- EMUUSBAudioDevice[%p]::start(%p)", this, provider);
+    debugIOLogC("- EMUUSBAudioDevice[%p]::start(%p)", this, provider);
     
 	result = super::start(provider);				// Causes our initHardware routine to be called.
-	debugIOLog("EMUUSBAudioDevice started about to registerService result is %d\n", result);
+	debugIOLogC("EMUUSBAudioDevice started about to registerService result is %d\n", result);
 Exit:
 	return result;
 }
@@ -173,13 +180,13 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
     IOReturn						resultCode = kIOReturnError;
 	UInt8 *							streamNumbers;
 	UInt8							numStreams;
-	debugIOLog("+EMUUSBAudioDevice[%p]::protectedInitHardware(%p)", this, provider);
+	debugIOLogC("+EMUUSBAudioDevice[%p]::protectedInitHardware(%p)", this, provider);
 	mTerminatingDriver = FALSE;
 	if (mControlInterface) {//FailIf(NULL == mControlInterface, Exit);
 		checkUHCI();// see whether we're attached via a UHCI controller
 		mInterfaceNum = mControlInterface->GetInterfaceNumber();
-		debugIOLog("There are %d configurations on this device", mControlInterface->GetDevice()->GetNumConfigurations());
-		debugIOLog("Our control interface number is %d", mInterfaceNum);
+		debugIOLogC("There are %d configurations on this device", mControlInterface->GetDevice()->GetNumConfigurations());
+		debugIOLogC("Our control interface number is %d", mInterfaceNum);
 		mUSBAudioConfig = EMUUSBAudioConfigObject::create(mControlInterface->GetDevice()->GetFullConfigurationDescriptor(0), mInterfaceNum);
 		FailIf(NULL == mUSBAudioConfig, Exit);
 		mQueryXU = 0;// initialized
@@ -189,8 +196,8 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
         
 		// Check to make sure that the control interface we loaded against has audio streaming interfaces and not just MIDI.
 		mUSBAudioConfig->GetControlledStreamNumbers(&streamNumbers, &numStreams);
-		debugIOLog("Num streams controlled = %d", numStreams);
-		debugIOLog("GetNumStreamInterfaces = %d", mUSBAudioConfig->GetNumStreamInterfaces());
+		debugIOLogC("Num streams controlled = %d", numStreams);
+		debugIOLogC("GetNumStreamInterfaces = %d", mUSBAudioConfig->GetNumStreamInterfaces());
 		FailIf(0 == numStreams, Exit);
         
 		// figure out the number of available extension units
@@ -214,11 +221,11 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 			UInt32	i = 0;
 			while (i < 2 && (kIOReturnSuccess != resultCode)) {
 				if(kIOReturnSuccess != (resultCode = device->GetStringDescriptor(stringIndex, string, kStringBufferSize))) {// try again
-					debugIOLog(" ++EMUUSBAudioDevice[%p]::protectedInitHardware - couldn't get string descriptor. Retrying ...", this);
+					debugIOLogC(" ++EMUUSBAudioDevice[%p]::protectedInitHardware - couldn't get string descriptor. Retrying ...", this);
 					if (kIOReturnSuccess != (resultCode = device->GetStringDescriptor(stringIndex, string, kStringBufferSize)) && (i< 1)) {
 						device->ResetDevice();
 						IOSleep(50);
-						debugIOLog("protectedInitHardware last retry\n");
+						debugIOLogC("protectedInitHardware last retry\n");
 					}
 				}
 				++i;
@@ -246,7 +253,12 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 		if (ttOverride && ttOverride->unsigned32BitValue()) {
 			setDeviceTransportType(kIOAudioDeviceTransportTypeOther);
 		} else {
+
 			setDeviceTransportType(kIOAudioDeviceTransportTypeUSB);
+            // HACK to find source of glitches you can manipulate this. see
+            //https://developer.apple.com/library/mac/documentation/DeviceDrivers/Conceptual/WritingAudioDrivers/ImplementDriver/ImplementDriver.html#//apple_ref/doc/uid/TP30000732-BAJEEGDG
+            //setDeviceTransportType(kIOAudioDeviceTransportTypeOther);
+
 		}
         
 		mInterfaceLock = IORecursiveLockAlloc();
@@ -286,7 +298,7 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 				}
 				++count;
 			}
-			debugIOLog("default sample rate is %d", newSampleRate);
+			debugIOLogC("default sample rate is %d", newSampleRate);
 			setHardwareSampleRate(newSampleRate);
 		}
 		resultCode = super::initHardware(provider);
@@ -296,9 +308,12 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 		mAnchorResetCount = kRefreshCount;
 		mUpdateTimer = IOTimerEventSource::timerEventSource(this, TimerAction);
 		FailIf(NULL == mUpdateTimer, Exit);
-		workLoop->addEventSource(mUpdateTimer);
+		// TURNED OFF HACK to turn off this update timer. 
+        //workLoop->addEventSource(mUpdateTimer);
 		TimerAction(this, mUpdateTimer);
-		setProperty(kIOAudioEngineCoreAudioPlugInKey, "EMUUSBAudio.kext/Contents/Plugins/EMUHALPlugin.bundle");	//"EMUUSBAudio.kext/Contents/Plugins/
+		
+        
+        setProperty(kIOAudioEngineCoreAudioPlugInKey, "EMUUSBAudio.kext/Contents/Plugins/EMUHALPlugin.bundle");	//"EMUUSBAudio.kext/Contents/Plugins/
 		IOService::registerService();
 		//<AC mod>
 		// init engine - see what happens
@@ -308,13 +323,13 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 			EMUUSBAudioEngine *audioEngine = NULL;
 			audioEngine = new EMUUSBAudioEngine;
 			FailIf(NULL == audioEngine->init(NULL), Exit);
-			debugIOLog("activate audio engine");
+			debugIOLogC("activate audio engine");
 			if (activateAudioEngine(audioEngine)) {
-				debugIOLog("failed to activate audio engine");
+				debugIOLogC("failed to activate audio engine");
 				resultCode = kIOReturnError;
 				goto Exit;
 			}
-			debugIOLog("done activating engine");
+			debugIOLogC("done activating engine");
 			audioEngine->release();
 			mAudioEngine = audioEngine; //used for releasing at end
 		}
@@ -322,7 +337,7 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 		//</AC mod>
 	}
 Exit:
-	debugIOLog("-EMUUSBAudioDevice[%p]::start(%p)", this, provider);
+	debugIOLogC("-EMUUSBAudioDevice[%p]::start(%p)", this, provider);
 	if (mInitHardwareThread) {
 		thread_call_free(mInitHardwareThread);
 		mInitHardwareThread = NULL;
@@ -338,66 +353,30 @@ void EMUUSBAudioDevice::checkUHCI() {
 		IORegistryEntry*	parent = device->getParentEntry(svcPlane);
 		if (parent) {// only anticipate iterating one level up - with the current IOKit
 			IOService*	currentEntry = OSDynamicCast(IOService, parent);
-			debugIOLog("checkUHCI currentEntry %x", currentEntry);
+			debugIOLogC("checkUHCI currentEntry %p", currentEntry);
 			if (currentEntry) {
 				mUHCI = !strcmp(currentEntry->getName(svcPlane), "AppleUSBUHCI");
 			}
-			debugIOLog("UHCI connection is %d", mUHCI);
+			debugIOLogC("UHCI connection is %d", mUHCI);
 		}
 	}
 }
 
-#if defined(ENABLE_TIMEBOMB)
-#warning "NOTE: Timebomb is enabled in the driver."
-// This method returns true if the driver has expired and
-// should be disabled.
-//
-bool
-EMUUSBAudioDevice::checkForTimebomb()
-{
-    uint32_t seconds, nanosecs;
-    clock_get_calendar_nanotime(&seconds, &nanosecs);
-    
-    // TIMEBOMB_TIME is specified in seconds since the beginning of the Unix
-    // Epoch (Jan 1, 1970).
-    if (seconds > TIMEBOMB_TIME)
-    {
-        // NOTE: This notice won't be visible if the user isn't
-        // logged in when this function is called.
-        KUNCUserNotificationDisplayNotice( 0,
-                                          0,
-                                          NULL,
-                                          NULL,
-                                          NULL,
-                                          "E-MU USB Driver Beta period has expired.",
-                                          "Please download a more recent version of the driver from www.emu.com.",
-                                          "OK" );
-        
-        return true;
-    }
-    else
-        return false;
-}
-#endif // ENABLE_TIMEBOMB
+// Wouter: removed time bomb. Why would anyone want this??
 
-// possible ways to do this
-// start a read of the interrupt endpoint
-// in the completion routine, schedule the next read or start the timer
-// OR - add a timer that will fire off
-// and start the checking as done below
 
-void EMUUSBAudioDevice::setupStatusFeedback() {// find the feedback endpoint & start the feedback cycle going
+void EMUUSBAudioDevice::setupStatusFeedback() {
 	IOUSBFindEndpointRequest	statusEndpoint;
 	
 	statusEndpoint.type = kUSBInterrupt;
 	statusEndpoint.direction = kUSBIn;
-	statusEndpoint.maxPacketSize = kStatusPacketSize;
+	statusEndpoint.maxPacketSize = kStatusPacketSize; // is this sizeof(UInt16)
 	statusEndpoint.interval = 0xFF;
     
 	mStatusPipe = mControlInterface->FindNextPipe(NULL, &statusEndpoint);
 	if (mStatusPipe) {// the endpoint exists
 		mStatusPipe->retain();// retain until tear down
-		mDeviceStatusBuffer = (UInt16*) IOMalloc(sizeof(UInt16));
+		mDeviceStatusBuffer = (UInt16*) IOMalloc(sizeof(UInt16)); // Is this kStatusPacketSize?
 		if (mDeviceStatusBuffer) {
 			mStatusBufferDesc = IOMemoryDescriptor::withAddress(mDeviceStatusBuffer, kStatusPacketSize, kIODirectionIn);
 			if (mStatusBufferDesc) {
@@ -413,13 +392,14 @@ void EMUUSBAudioDevice::setupStatusFeedback() {// find the feedback endpoint & s
 			}
 		}
 	}
+    debugIOLogC("-EMUUSBAudioDevice::setupStatusFeedback");
 }
 
 IOReturn EMUUSBAudioDevice::performPowerStateChange(IOAudioDevicePowerState oldPowerState, IOAudioDevicePowerState newPowerState, UInt32 *microSecsUntilComplete)
 {
 	IOReturn	result = super::performPowerStateChange(oldPowerState, newPowerState, microSecsUntilComplete);
     
-	debugIOLog("+EMUUSBAudioDevice[%p]::performPowerStateChange(%d, %d, %p)", this, oldPowerState, newPowerState, microSecsUntilComplete);
+	debugIOLogC("+EMUUSBAudioDevice[%p]::performPowerStateChange(%d, %d, %p)", this, oldPowerState, newPowerState, microSecsUntilComplete);
 	
     
 	// Ripped of from Apple USB reference (hey, it might actually work) [AC]
@@ -428,7 +408,7 @@ IOReturn EMUUSBAudioDevice::performPowerStateChange(IOAudioDevicePowerState oldP
          &&	(kIOAudioDeviceSleep == newPowerState))
 	{
 		// Stop the timer and reset the anchor.
-		debugIOLog ("? AppleUSBAudioDevice[%p]::performPowerStateChange () - Going to sleep - stopping the rate timer.", this);
+		debugIOLogC("? AppleUSBAudioDevice[%p]::performPowerStateChange () - Going to sleep - stopping the rate timer.", this);
 		mUpdateTimer->cancelTimeout ();
 		// mUpdateTimer->disable();
 		
@@ -450,16 +430,16 @@ IOReturn EMUUSBAudioDevice::performPowerStateChange(IOAudioDevicePowerState oldP
 		
 		// [rdar://4234453] Reset the device after waking from sleep just to be safe.
 		FailIf (NULL == mControlInterface, Exit);
-		debugIOLog ("? AppleUSBAudioDevice[%p]::performPowerStateChange () - Resetting port after wake from sleep ...", this);
+		debugIOLogC("? AppleUSBAudioDevice[%p]::performPowerStateChange () - Resetting port after wake from sleep ...", this);
 		mControlInterface->GetDevice()->ResetDevice();
 		IOSleep (10);
 		
 		// We need to restart the time stamp rate timer now
-		debugIOLog ("? AppleUSBAudioDevice[%p]::performPowerStateChange () - Waking from sleep - restarting the rate timer.", this);
+		debugIOLogC("? AppleUSBAudioDevice[%p]::performPowerStateChange () - Waking from sleep - restarting the rate timer.", this);
 		TimerAction ( this, mUpdateTimer);
         
         
-		//debugIOLog("Waking from sleep - flushing controls to the device.");
+		//debugIOLogC("Waking from sleep - flushing controls to the device.");
         //	-JH commented out cause it causes a crash when waking from sleep on 0202.  Theory is that it powers down during sleep which causes this to flail.
         //		flushAudioControls();
 	}
@@ -469,37 +449,37 @@ Exit:
 }
 
 void EMUUSBAudioDevice::stop(IOService *provider) {
-	debugIOLog("+EMUUSBAudioDevice[%p]::stop(%p) - audioEngines = %p - rc=%d", this, provider, audioEngines, getRetainCount());
+	debugIOLogC("+EMUUSBAudioDevice[%p]::stop(%p) - audioEngines = %p - rc=%d", this, provider, audioEngines, getRetainCount());
 	if (mStatusCheckTimer) {
-		debugIOLog("releasing the statusCheckTimer");
+		debugIOLogC("releasing the statusCheckTimer");
 		mStatusCheckTimer->cancelTimeout();
 		RELEASEOBJ(mStatusCheckTimer);
 	}
 	if (mUpdateTimer) {
-		debugIOLog("releasing the updateTimer");
+		debugIOLogC("releasing the updateTimer");
 		mUpdateTimer->cancelTimeout();
 		RELEASEOBJ(mUpdateTimer);
 	}
 	if (mStatusPipe) {
-		debugIOLog("releasing the status pipe");
+		debugIOLogC("releasing the status pipe");
 		RELEASEOBJ(mStatusPipe);
 	}
     
 	super::stop(provider);  // call the IOAudioDevice generic stop routine
     
-	debugIOLog("Terminating the engine");
+	debugIOLogC("Terminating the engine");
 	if (mAudioEngine && !mAudioEngine->isInactive()) {
 		mAudioEngine->terminate();
 	}
     
-	debugIOLog("about to close the control interface");
+	debugIOLogC("about to close the control interface");
 	if(mControlInterface) {
-		debugIOLog("closing control Interface");
+		debugIOLogC("closing control Interface");
         mControlInterface->close(this);
         mControlInterface = NULL;
     }
 	
-	debugIOLog("Release the XU controls");
+	debugIOLogC("Release the XU controls");
 	// release all allocated XU controls
 	RELEASEOBJ(mXUChanged);
 	RELEASEOBJ(mClockSelector);
@@ -509,41 +489,41 @@ void EMUUSBAudioDevice::stop(IOService *provider) {
 	RELEASEOBJ(mDigitalIOSPDIF);
 	RELEASEOBJ(mDevOptionCtrl);
 	
-	debugIOLog("Release the AudioConfig object");
+	debugIOLogC("Release the AudioConfig object");
 	RELEASEOBJ(mUSBAudioConfig);
     
-	debugIOLog("-EMUUSBAudioDevice[%p]::stop()", this);
+	debugIOLogC("-EMUUSBAudioDevice[%p]::stop()", this);
 }
 
 bool EMUUSBAudioDevice::terminate(IOOptionBits options) {
-	debugIOLog("terminating the EMUUSBAudioDevice");
+	debugIOLogC("terminating the EMUUSBAudioDevice");
 	return super::terminate(options);
 }
 
 void EMUUSBAudioDevice::detach(IOService *provider) {
-	debugIOLog("+EMUUSBAudioDevice[%p]: detaching %p, rc=%d",this,provider,getRetainCount());
+	debugIOLogC("+EMUUSBAudioDevice[%p]: detaching %p, rc=%d",this,provider,getRetainCount());
 	super::detach(provider);
-	debugIOLog("-EMUUSBAudioDevice[%p]: detaching %p, rc=%d",this,provider,getRetainCount());
+	debugIOLogC("-EMUUSBAudioDevice[%p]: detaching %p, rc=%d",this,provider,getRetainCount());
 	
 }
 
 void EMUUSBAudioDevice::close(IOService *forClient, IOOptionBits options) {
-	debugIOLog("EMUUSBAudioDevice[%p]: closing for %p",this,forClient);
+	debugIOLogC("EMUUSBAudioDevice[%p]: closing for %p",this,forClient);
 	super::close(forClient,options);
 }
 
 
 IOReturn EMUUSBAudioDevice::message(UInt32 type, IOService * provider, void * arg) {
-	debugIOLog("+EMUUSBAudioDevice[%p]::message(0x%x, %p) - rc=%d", this, type, provider, getRetainCount());
+	debugIOLogC("+EMUUSBAudioDevice[%p]::message(0x%x, %p) - rc=%d", this, type, provider, getRetainCount());
     
 	if ((kIOMessageServiceIsTerminated == type) || (kIOMessageServiceIsRequestingClose == type)) {
 		if (mStatusCheckTimer) {
-			debugIOLog("message releasing mStatusCheckTimer");
+			debugIOLogC("message releasing mStatusCheckTimer");
 			mStatusCheckTimer->cancelTimeout();
 			RELEASEOBJ(mStatusCheckTimer);
 		}
 		if (mUpdateTimer) {
-			debugIOLog("releasing the updateTimer");
+			debugIOLogC("releasing the updateTimer");
 			mUpdateTimer->cancelTimeout();
 			RELEASEOBJ(mUpdateTimer);
 		}
@@ -567,7 +547,7 @@ UInt8 EMUUSBAudioDevice::getHubSpeed() {
 			speed = usbDevice->GetSpeed();// look for 1st high speed hub
 			if(kUSBDeviceSpeedHigh == speed) {
 				// Must be connected via USB 2.0 hub
-				debugIOLog(" ++EMUUSBAudioDevice::getHubSpeed() = kUSBDeviceSpeedHigh");
+				debugIOLogC(" ++EMUUSBAudioDevice::getHubSpeed() = kUSBDeviceSpeedHigh");
 				break;// found the high speed device now break out of the loop
 			} else {
 				// Get parent in USB plane
@@ -614,7 +594,7 @@ IOReturn EMUUSBAudioDevice::GetVariousUnits(
     
 	UInt8						outputTerminalID = 0;
     
-	debugIOLog("+EMUUSBAudioDevice::GetVariousUnits()");
+	debugIOLogC("+EMUUSBAudioDevice::GetVariousUnits()");
     
     FailIf(NULL == mControlInterface, Exit);
     
@@ -670,7 +650,7 @@ IOReturn EMUUSBAudioDevice::GetVariousUnits(
 									
 									if (addFeatureUnit)
 									{
-										debugIOLog("EMUUSBAudioDevice::GetVariousUnits : output feature unit = %d", unitID);
+										debugIOLogC("EMUUSBAudioDevice::GetVariousUnits : output feature unit = %d", unitID);
                                         
 										outputFeatureUnitIDs[numberOfOutputFeatureUnits++] = unitID;
 									}
@@ -736,7 +716,7 @@ IOReturn EMUUSBAudioDevice::GetVariousUnits(
 							
 							if (addFeatureUnit)
 							{
-								debugIOLog("EMUUSBAudioDevice::GetVariousUnits : input feature unit = %d", unitID);
+								debugIOLogC("EMUUSBAudioDevice::GetVariousUnits : input feature unit = %d", unitID);
                                 
 								inputFeatureUnitIDs[numberOfInputFeatureUnits++] = unitID;
 							}
@@ -750,7 +730,7 @@ IOReturn EMUUSBAudioDevice::GetVariousUnits(
 	result = kIOReturnSuccess;
     
 Exit:
-	debugIOLog("-EMUUSBAudioDevice::GetVariousUnits()");
+	debugIOLogC("-EMUUSBAudioDevice::GetVariousUnits()");
 	return result;
 }
 
@@ -779,13 +759,13 @@ IOReturn EMUUSBAudioDevice::doControlStuff(IOAudioEngine *audioEngine, UInt8 int
 	UInt8						outputTerminalID = 0;
     SInt32	engineInfoIndex;
     OSDictionary*	storedEngineInfo;
-    UInt32 otIndex;
+    //UInt32 otIndex;
     UInt32 numOutputTerminalArrays;
     
-	debugIOLog("+EMUUSBAudioDevice::doControlStuff(0x%x, %d, %d)", audioEngine, interfaceNum, altSettingNum);
+	debugIOLogC("+EMUUSBAudioDevice::doControlStuff(0x%p, %d, %d)", audioEngine, interfaceNum, altSettingNum);
     
     FailIf(NULL == usbAudioEngine || NULL == mControlInterface, Exit);
-	debugIOLog("this usbAudioEngine = %p", usbAudioEngine);
+	debugIOLogC("this usbAudioEngine = %p", usbAudioEngine);
     
 	if(NULL == mRegisteredEngines) {
 		mRegisteredEngines = OSArray::withCapacity(1);
@@ -835,7 +815,7 @@ IOReturn EMUUSBAudioDevice::doControlStuff(IOAudioEngine *audioEngine, UInt8 int
                 if(unitID == outputTerminalID) {
                     featureUnitID = getBestFeatureUnitInPath(aPath, kIOAudioControlUsageOutput, interfaceNum, altSettingNum, kVolumeControl);
                     if(featureUnitID) {
-                        debugIOLog("----- Creating Output Gain Controls -----");// Create the output gain controls
+                        debugIOLogC("----- Creating Output Gain Controls -----");// Create the output gain controls
                         addVolumeControls(usbAudioEngine, featureUnitID, interfaceNum, altSettingNum, kIOAudioControlUsageOutput);
                     }
                     featureUnitID = getBestFeatureUnitInPath(aPath, kIOAudioControlUsageOutput, interfaceNum, altSettingNum, kMuteControl);
@@ -898,7 +878,7 @@ IOReturn EMUUSBAudioDevice::doControlStuff(IOAudioEngine *audioEngine, UInt8 int
                                 featureUnitID = getBestFeatureUnitInPath(aPath, kIOAudioC´ˆontrolUsageInput, interfaceNum, altSettingNum, kVolumeControl);
                                 if(featureUnitID) {
                                     // Create the input gain controls
-                                    debugIOLog("----- Creating Intput Gain Controls -----");
+                                    debugIOLogC("----- Creating Intput Gain Controls -----");
                                     addVolumeControls(usbAudioEngine, featureUnitID, interfaceNum, altSettingNum, kIOAudioControlUsageInput);
                                 }
                                 featureUnitID = getBestFeatureUnitInPath(aPath, kIOAudioControlUsageInput, interfaceNum, altSettingNum, kMuteControl);
@@ -952,10 +932,10 @@ IOReturn EMUUSBAudioDevice::doControlStuff(IOAudioEngine *audioEngine, UInt8 int
 #if 0
 		//sanity check
 		if (mRealClockSelector->valueExists(kClockSourceInternal)) {
-			debugIOLog("clockSource Internal value OK");
+			debugIOLogC("clockSource Internal value OK");
 		}
 		if (mRealClockSelector->valueExists(kClockSourceSpdifExternal)) {
-			debugIOLog("clockSource External SPDIF value OK");
+			debugIOLogC("clockSource External SPDIF value OK");
 		}
 #endif
         
@@ -973,7 +953,7 @@ IOReturn EMUUSBAudioDevice::doControlStuff(IOAudioEngine *audioEngine, UInt8 int
     
     
 Exit:
-	debugIOLog("-EMUUSBAudioDevice::doControlStuff(0x%x, %d, %d)", audioEngine, interfaceNum, altSettingNum);
+	debugIOLogC("-EMUUSBAudioDevice::doControlStuff(0x%p, %d, %d)", audioEngine, interfaceNum, altSettingNum);
 	return result;
 }
 
@@ -1182,7 +1162,7 @@ Exit:
 
 void EMUUSBAudioDevice::addVolumeControls(EMUUSBAudioEngine * usbAudioEngine, UInt8 featureUnitID, UInt8 interfaceNum, UInt8 altSettingNum, UInt32 usage)
 {
-	debugIOLog("EMUUSBAudioDevice::addVolumeControls(0x%x, %d, %d, %d, 0x%x)", usbAudioEngine, featureUnitID, interfaceNum, altSettingNum, usage);
+	debugIOLogC("EMUUSBAudioDevice::addVolumeControls(0x%p, %d, %d, %d, 0x%x)", usbAudioEngine, featureUnitID, interfaceNum, altSettingNum, usage);
 	
 #pragma unused (interfaceNum, altSettingNum)
 	SInt32		engineInfoIndex = getEngineInfoIndex(usbAudioEngine);
@@ -1225,7 +1205,7 @@ void EMUUSBAudioDevice::addVolumeControls(EMUUSBAudioEngine * usbAudioEngine, UI
 					// is negative infinity(not -128 dB), so -128 dB value must be handled as follows ((SInt16) 0x8000 * 256) << 8
 					// or we could avoid that by assigning 0x8001 instead.
 					
-					debugIOLog("************  original deviceMin is %d and original deviceMax is %d ***************\n", deviceMin, deviceMax);
+					debugIOLogC("************  original deviceMin is %d and original deviceMax is %d ***************\n", deviceMin, deviceMax);
                     
 					IOFixed	deviceMinDB = deviceMin * 256;
 					IOFixed	deviceMaxDB = deviceMax * 256;
@@ -1238,8 +1218,8 @@ void EMUUSBAudioDevice::addVolumeControls(EMUUSBAudioEngine * usbAudioEngine, UI
 					deviceMax = (((deviceMin + offset) + (deviceMax + offset)) / volRes);
 					deviceMin = -1;
 					
-					debugIOLog("************  deviceMin is %d and deviceMax is %d volRes= %d channelNum= %d  ***************\n", deviceMin, deviceMax,volRes,channelNum);
-					debugIOLog("************  deviceMinDB is %d and deviceMaxDB is %d ***************\n", deviceMinDB, deviceMaxDB);
+					debugIOLogC("************  deviceMin is %d and deviceMax is %d volRes= %d channelNum= %d  ***************\n", deviceMin, deviceMax,volRes,channelNum);
+					debugIOLogC("************  deviceMinDB is %d and deviceMaxDB is %d ***************\n", deviceMinDB, deviceMaxDB);
                     
 					levelControl = IOAudioLevelControl::createVolumeControl(deviceCur, deviceMin, deviceMax, deviceMinDB,
                                                                             deviceMaxDB, channelNum, 0, featureUnitID, usage);
@@ -1328,7 +1308,9 @@ void EMUUSBAudioDevice::addMuteControl(EMUUSBAudioEngine * usbAudioEngine, UInt8
 	}
 }
 
-// routine to return the extension unit unitID
+/*!
+ @param extCode the eExtensionUnitCode
+ */
 UInt8 EMUUSBAudioDevice::getExtensionUnitID(UInt16 extCode) {
 	UInt8	unitID = 0;
 	switch (extCode) {
@@ -1405,8 +1387,7 @@ IOReturn EMUUSBAudioDevice::setExtensionUnitSetting(UInt8 unitID, UInt8 controlS
 	IOBufferMemoryDescriptor*	settingDesc = IOBufferMemoryDescriptor::withOptions(kIODirectionOut, length);
 	if(NULL != settingDesc) {
 		IOUSBDevRequestDesc		devReq;
-		// Wouter: does not exist anymore. settingDesc->initWithBytes(settings, length, kIODirectionOut);
-        settingDesc -> appendBytes(settings, length);
+        settingDesc->withBytes(settings, length, kIODirectionOut);
 		devReq.bmRequestType = USBmakebmRequestType(kUSBOut, kUSBClass, kUSBInterface);
 		devReq.bRequest = SET_CUR;
 		devReq.wValue = controlSelector << 8;
@@ -1461,18 +1442,18 @@ IOReturn EMUUSBAudioDevice::setFeatureUnitSetting(UInt8 controlSelector, UInt8 u
 		IOBufferMemoryDescriptor*	settingDesc = NULL;
 		settingDesc = OSTypeAlloc(IOBufferMemoryDescriptor);
 		if (settingDesc) {
-			// Wouter: does not exist anymore
-            //settingDesc->initWithBytes(&newValue, newValueLen, kIODirectionIn);
-            settingDesc->appendBytes(&newValue, newValueLen);
-			devReq.bmRequestType = USBmakebmRequestType(kUSBOut, kUSBClass, kUSBInterface);
+			settingDesc->withBytes(&newValue, newValueLen, kIODirectionIn);
+ 			devReq.bmRequestType = USBmakebmRequestType(kUSBOut, kUSBClass, kUSBInterface);
 			devReq.bRequest = requestType;
 			devReq.wValue =(controlSelector << 8) | channelNumber;
 			devReq.wIndex =(0xFF00 &(unitID << 8)) |(0x00FF & mInterfaceNum);
 			devReq.wLength = newValueLen;
 			devReq.pData = settingDesc;
             
+            debugIOLogC("EMUUSBAudioDevice::setFeatureUnitSetting sending device request %d", requestType);
 			if (TRUE != isInactive())  	// In case we've been unplugged during sleep
 				result = deviceRequest(&devReq);
+            debugIOLogC("result= %d.", result);
 			settingDesc->release();
 		}
 	}
@@ -1506,7 +1487,7 @@ IOReturn EMUUSBAudioDevice::setCurVolume(UInt8 unitID, UInt8 channelNumber, SInt
 
 IOReturn EMUUSBAudioDevice::setCurMute(UInt8 unitID, UInt8 channelNumber, SInt16 mute)
 {
-	debugIOLog("+EMUUSBAudioDevice::setCurMute: unitID= %d mute= %d channelNumber= %d", unitID, mute, channelNumber);
+	debugIOLogC("+EMUUSBAudioDevice::setCurMute: unitID= %d mute= %d channelNumber= %d", unitID, mute, channelNumber);
 	
 	return setFeatureUnitSetting(MUTE_CONTROL, unitID, channelNumber, SET_CUR, mute, 1);
 }
@@ -1588,12 +1569,16 @@ void EMUUSBAudioDevice::addHardVolumeControls(
 
 IOReturn EMUUSBAudioDevice::hardwareVolumeChangedHandler(OSObject * target, IOAudioControl * audioControl, SInt32 oldValue, SInt32 newValue)
 {
+    debugIOLogC("+EMUUSBAudioDevice::hardwareVolumeChangedHandler");
     IOReturn				result = kIOReturnSuccess;
+    
+    return result; // HACK below crashes the audio device. Needs fixing.
 	EMUUSBAudioDevice *		device = OSDynamicCast(EMUUSBAudioDevice, target);
-	
+
+
 	if (audioControl->getUsage() == kIOAudioControlUsageOutput)
 	{
-		debugIOLog("EMUUSBAudioDevice::hardwareVolumeChangedHandler output %d: channel= %d oldValue= %d newValue= %d",
+		debugIOLogC("EMUUSBAudioDevice::hardwareVolumeChangedHandler output %d: channel= %d oldValue= %d newValue= %d",
                    device->mHardwareOutputVolumeID,
                    audioControl->getChannelID(), oldValue, newValue);
 		
@@ -1606,12 +1591,14 @@ IOReturn EMUUSBAudioDevice::hardwareVolumeChangedHandler(OSObject * target, IOAu
 			device->mUserClient->SendEventNotification(EMU_VOLUME_EVENT);
 		}
 	}
-	
+    debugIOLogC("-EMUUSBAudioDevice::hardwareVolumeChangedHandler");
+
 	return result;
 }
 
 IOReturn EMUUSBAudioDevice::hardwareMuteChangedHandler(OSObject * target, IOAudioControl * audioControl, SInt32 oldValue, SInt32 newValue)
 {
+    debugIOLogC("+EMUUSBAudioDevice::hardwareMuteChangedHandler");
 	EMUUSBAudioDevice* device = OSDynamicCast(EMUUSBAudioDevice, target);
     
 	if (audioControl->getUsage() == kIOAudioControlUsageOutput)
@@ -1624,6 +1611,7 @@ IOReturn EMUUSBAudioDevice::hardwareMuteChangedHandler(OSObject * target, IOAudi
 			device->mUserClient->SendEventNotification(EMU_MUTE_EVENT);
 		}
 	}
+    debugIOLogC("-EMUUSBAudioDevice::hardwareMuteChangedHandler");
     
 	return kIOReturnSuccess;
 }
@@ -1637,10 +1625,10 @@ IOReturn EMUUSBAudioDevice::controlChangedHandler(OSObject * target, IOAudioCont
 		device = OSDynamicCast(EMUUSBAudioDevice, target);
 	}
 	
-	debugIOLog("in controlChangeHandler");
+	debugIOLogC("in controlChangeHandler");
 	if (device && audioControl)
     {
-		debugIOLog("controlChangeHandler %d",newValue);
+		debugIOLogC("controlChangeHandler %d",newValue);
 		result = device->protectedControlChangedHandler(audioControl, oldValue, newValue);
     }
 	return result;
@@ -1650,9 +1638,9 @@ IOReturn EMUUSBAudioDevice::controlChangedHandler(OSObject * target, IOAudioCont
 IOReturn EMUUSBAudioDevice::deviceXUChangeHandler(OSObject *target, IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue) {
 	IOReturn				result = kIOReturnError;
 	EMUUSBAudioDevice *		device = OSDynamicCast(EMUUSBAudioDevice, target);
-	debugIOLog("in deviceXUChangeHandler");
+	debugIOLogC("in deviceXUChangeHandler");
 	if (device) {
-		debugIOLog("deviceXUChangeHandler %d", newValue);
+		debugIOLogC("deviceXUChangeHandler %d", newValue);
 		result = device->protectedXUChangeHandler(audioControl, oldValue, newValue);
 	}
     
@@ -1712,12 +1700,12 @@ IOReturn EMUUSBAudioDevice::doVolumeControlChange(IOAudioControl * audioControl,
 			newVolume = ((newValue - (newValue > 0)) * volRes) - offset;
 		}
         
-		debugIOLog("doVolumeControlChange: setting volume to 0x%x", newVolume);
+		debugIOLogC("doVolumeControlChange: setting volume to 0x%x", newVolume);
 		result = setCurVolume(unitID, channelNum, HostToUSBWord(newVolume));
         
 	} else {
 		FailIf(NULL == mMonoControlsArray, Exit);
-		debugIOLog("doVolumeControlChange: performing mono volume control change");
+		debugIOLogC("doVolumeControlChange: performing mono volume control change");
 		UInt8	total = mMonoControlsArray->getCount();
 		for(UInt8 i = 0; i < total; ++i) {
 			channelNum =((OSNumber *) mMonoControlsArray->getObject(i))->unsigned8BitValue();
@@ -1730,7 +1718,7 @@ IOReturn EMUUSBAudioDevice::doVolumeControlChange(IOAudioControl * audioControl,
 				newVolume = ((newValue - (newValue > 0)) * volRes) - offset;
 			}
 			result = setCurVolume(unitID, channelNum, HostToUSBWord(newVolume));
-			debugIOLog("doVolumeControlChange: set volume for channel %d to 0x%x = %d", channelNum, newVolume, result);
+			debugIOLogC("doVolumeControlChange: set volume for channel %d to 0x%x = %d", channelNum, newVolume, result);
 		}
 	}
 	
@@ -1985,9 +1973,8 @@ IOReturn EMUUSBAudioDevice::setSelectorSetting(UInt8 selectorID, UInt8 setting) 
 		IOBufferMemoryDescriptor*	settingDesc = OSTypeAlloc(IOBufferMemoryDescriptor);
 		if (settingDesc) {
 			IOUSBDevRequestDesc		devReq;
-			// Wouter: does not exist anymore. settingDesc->initWithBytes(&setting, 1, kIODirectionIn);
-            settingDesc->appendBytes(&setting, 1);
-			devReq.bmRequestType = USBmakebmRequestType(kUSBOut, kUSBClass, kUSBInterface);
+			settingDesc->withBytes(&setting, 1, kIODirectionIn);
+            devReq.bmRequestType = USBmakebmRequestType(kUSBOut, kUSBClass, kUSBInterface);
 			devReq.bRequest = SET_CUR;
 			devReq.wValue = 0;
 			devReq.wIndex =(0xFF00 &(selectorID << 8)) |(0x00FF & mInterfaceNum);
@@ -2007,7 +1994,7 @@ void EMUUSBAudioDevice::setMonoState(Boolean state) {
 
 IOReturn EMUUSBAudioDevice::createControlsForInterface(IOAudioEngine *audioEngine, UInt8 interfaceNum, UInt8 altSettingNum) {
     IOReturn		result = kIOReturnError;
-    debugIOLog("+EMUUSBAudioDevice[%p]::createControlsForInterface %d %d", this, interfaceNum, altSettingNum);
+    debugIOLogC("+EMUUSBAudioDevice[%p]::createControlsForInterface %d %d", this, interfaceNum, altSettingNum);
 	mTerminatingDriver = FALSE;
 	if (audioEngine)
 		result = doControlStuff(audioEngine, interfaceNum, altSettingNum);
@@ -2180,19 +2167,22 @@ IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequestDesc * request, IOUSBCo
 	IOReturn		result = kIOReturnSuccess;
     
 	if (mInterfaceLock) {
+        debugIOLogC("EMUUSBAudioDevice::deviceRequest locking");
 		IORecursiveLockLock(mInterfaceLock);
         
 		if(FALSE == mTerminatingDriver) {
 			UInt32	timeout = 5;
 			while(timeout && mControlInterface) {
+                debugIOLogC("EMUUSBAudioDevice::deviceRequest DeviceRequest");
 				result = mControlInterface->DeviceRequest(request, completion);
+                debugIOLogC("EMUUSBAudioDevice::deviceRequest result=%d",result);
 				if(result != kIOReturnSuccess) {
 					if (kIOUSBPipeStalled == result) {
 						IOUSBPipe*	pipe = mControlInterface->GetPipeObj(0);
 						if (pipe) {
 #ifdef DEBUGLOGGING
 							IOReturn pipeResult = pipe->ClearPipeStall(true);
-							debugIOLog("clearing pipe stall result %x", pipeResult);
+							debugIOLogC("clearing pipe stall result %x", pipeResult);
 #else
 							pipe->ClearPipeStall(true);
 #endif
@@ -2208,10 +2198,11 @@ IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequestDesc * request, IOUSBCo
 		}
 		IORecursiveLockUnlock(mInterfaceLock);
 	}
-	debugIOLog("++EMUUSBAudioDevice[%p]::deviceRequest(%p, %p) = %lx", this, request, completion, result);
+	debugIOLogC("++EMUUSBAudioDevice[%p]::deviceRequest(%p, %p) = %x", this, request, completion, result);
 	return result;
 }
 
+/* deprecated
 IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequest * request, IOUSBCompletion * completion) {
 	IOReturn	result = kIOReturnSuccess;
 	if (mInterfaceLock) {
@@ -2230,10 +2221,11 @@ IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequest * request, IOUSBComple
 		}
 		IORecursiveLockUnlock(mInterfaceLock);
         
-		debugIOLog("++EMUUSBAudioDevice[%p]::deviceRequest(%p, %p) = %lx", this, request, completion, result);
+		debugIOLogC("++EMUUSBAudioDevice[%p]::deviceRequest(%p, %p) = %x", this, request, completion, result);
 	}
 	return result;
 }
+ */
 
 IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequest *request, EMUUSBAudioDevice * self, IOUSBCompletion *completion) {
 	IOReturn		result = kIOReturnSuccess;
@@ -2254,13 +2246,13 @@ IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequest *request, EMUUSBAudioD
 		}
 		IORecursiveLockUnlock(self->mInterfaceLock);
 	}
-	debugIOLog("++EMUUSBAudioDevice[%p]::deviceRequest(%p, %p) = %lx", self, request, completion, result);
+	debugIOLogC("++EMUUSBAudioDevice[%p]::deviceRequest(%p, %p) = %x", self, request, completion, result);
     
 	return result;
 }
 
 bool EMUUSBAudioDevice::willTerminate(IOService * provider, IOOptionBits options) {
-	debugIOLog("+EMUUSBAudioDevice[%p]::willTerminate(%p)", this, provider);
+	debugIOLogC("+EMUUSBAudioDevice[%p]::willTerminate(%p)", this, provider);
 #if 0
 	if (mStatusCheckTimer) {
 		mStatusCheckTimer->cancelTimeout();
@@ -2274,7 +2266,7 @@ bool EMUUSBAudioDevice::willTerminate(IOService * provider, IOOptionBits options
 	if(mControlInterface == provider)
 		mTerminatingDriver = TRUE;
     
-	debugIOLog("-EMUUSBAudioDevice[%p]::willTerminate", this);
+	debugIOLogC("-EMUUSBAudioDevice[%p]::willTerminate", this);
     
 	return super::willTerminate(provider, options);
 }
@@ -2292,7 +2284,7 @@ bool EMUUSBAudioDevice::matchPropertyTable(OSDictionary * table, SInt32 *score) 
 		const OSSymbol * dictionaryEntry = NULL;
 		while (NULL != (dictionaryEntry = (const OSSymbol *)iter->getNextObject())) {
 			const char *str = dictionaryEntry->getCStringNoCopy();
-			debugIOLog("table entry: %s",str);
+			debugIOLogC("table entry: %s",str);
 		}
 	}
 	
@@ -2305,7 +2297,7 @@ bool EMUUSBAudioDevice::matchPropertyTable(OSDictionary * table, SInt32 *score) 
 		returnValue = super::matchPropertyTable(table, score);
 	}
 	
-	debugIOLog("++EMUUSBAudioDevice[%p]::matchPropertyTable(%p, %p) = %d(custom dictionary match)",
+	debugIOLogC("++EMUUSBAudioDevice[%p]::matchPropertyTable(%p, %p) = %d(custom dictionary match)",
                this, table, score, returnValue);
 	
 	return returnValue;
@@ -2314,6 +2306,7 @@ bool EMUUSBAudioDevice::matchPropertyTable(OSDictionary * table, SInt32 *score) 
 
 // routines to check the device status
 // mStatusPipe is assumed to exist before any of these routines are to be called
+//Wouter: this is attached to the mStatusCheckTimer and is called every 20ms.
 void EMUUSBAudioDevice::StatusAction(OSObject *owner, IOTimerEventSource *sender) {
 	if (owner) {
 		EMUUSBAudioDevice*	device = (EMUUSBAudioDevice*) owner;
@@ -2335,17 +2328,17 @@ void EMUUSBAudioDevice::queryXU() {
 	UInt32	dataLen = kStdDataLen;	// default standard data length
 	UInt8	selector = 0;
 	bool	clockSourceChange = (mQueryXU == mClockSrcXU);// change to clockSource XU
-	bool	devOptionsChange = (mQueryXU == mDeviceOptionsXU);// change to deviceOptions XU
+	//bool	devOptionsChange = (mQueryXU == mDeviceOptionsXU);// change to deviceOptions XU
 	bool	digitalChange = (mQueryXU == mDigitalIOXU);	// change to digitalIOXU
 	// set up the various parameters
-	debugIOLog("+EMUUSBAudioDevice[%p]::QueryXU",this);
+	debugIOLogC("+EMUUSBAudioDevice[%p]::QueryXU",this);
     
 	if (digitalChange) {
 		if (getProperty("bHasSPDIFClock")) {
-			debugIOLog("DigitalIOStatus changed");
+			debugIOLogC("DigitalIOStatus changed");
 			selector = kDigSampRateSel;
 			dataLen = kDigIOSampleRateLen;
-			debugIOLog("Digital IO SampleRate");
+			debugIOLogC("Digital IO SampleRate");
 			IOReturn	result = getExtensionUnitSetting(mQueryXU, selector, &setting, dataLen);
 			if (kIOReturnSuccess == result) {
 				setting = USBToHostLong(setting);
@@ -2359,7 +2352,7 @@ void EMUUSBAudioDevice::queryXU() {
 			selector = kDigitalFormat;
 			dataLen = kStdDataLen;
 			setting = 0;
-			debugIOLog("Digital IO Format");
+			debugIOLogC("Digital IO Format");
 			result = getExtensionUnitSetting(mQueryXU, selector, &setting, dataLen);
 			if (kIOReturnSuccess == result) {
 				//setting = USBToHostLong(setting);
@@ -2369,7 +2362,7 @@ void EMUUSBAudioDevice::queryXU() {
 					change->release();
 				}
 			}
-			debugIOLog("DigitalIOStatus changed");
+			debugIOLogC("DigitalIOStatus changed");
 #endif
 		}
 	} else if (clockSourceChange) {
@@ -2379,7 +2372,7 @@ void EMUUSBAudioDevice::queryXU() {
 		if (kIOReturnSuccess == result) {
 			setting = USBToHostLong(setting);
 			OSNumber*	change = OSNumber::withNumber(setting, 32);
-			debugIOLog("Clock Source Changed");
+			debugIOLogC("Clock Source Changed");
 			if (change && mClockSelector) {
 				mClockSelector->hardwareValueChanged(change);
 				change->release();
@@ -2389,7 +2382,7 @@ void EMUUSBAudioDevice::queryXU() {
 	if (digitalChange || clockSourceChange) {
 		if (getProperty("bHasSPDIFClock")) {
 			// get any changes to the digital sync lock state
-			debugIOLog("DigitalIO Sync Lock");
+			debugIOLogC("DigitalIO Sync Lock");
 			dataLen = kStdDataLen;
 			setting = 0;
 			IOReturn	result = getExtensionUnitSetting(mDigitalIOXU, kDigitalSyncLock, &setting, dataLen);
@@ -2403,7 +2396,7 @@ void EMUUSBAudioDevice::queryXU() {
 			}
 		}
 	}
-	debugIOLog("-EMUUSBAudioDevice[%p]::QueryXU",this);
+	debugIOLogC("-EMUUSBAudioDevice[%p]::QueryXU",this);
 }
 
 
@@ -2416,7 +2409,7 @@ EMUUSBAudioEngine*	EMUUSBAudioDevice::getOtherEngine(EMUUSBAudioEngine* curEngin
 			if (engineInfo) {
 				otherEngine = OSDynamicCast(EMUUSBAudioEngine, engineInfo->getObject(kEngine));
 				if (otherEngine && (curEngine != otherEngine)) {
-					debugIOLog("curEngine %x other engine %x", curEngine, otherEngine);
+					debugIOLogC("curEngine %p other engine %p", curEngine, otherEngine);
 					break;
 				}
 			}
@@ -2436,7 +2429,7 @@ void EMUUSBAudioDevice::setOtherEngineSampleRate(EMUUSBAudioEngine* curEngine, U
 					IOAudioSampleRate	newEngineSampleRate;
 					newEngineSampleRate.whole = newSampleRate;
 					newEngineSampleRate.fraction = 0;// always set this to zero
-					debugIOLog("setOtherEngineSampleRate");
+					debugIOLogC("setOtherEngineSampleRate");
 					engine->hardwareSampleRateChanged(&newEngineSampleRate);// signal the change
 					break;
 				}
@@ -2455,23 +2448,23 @@ void EMUUSBAudioDevice::statusHandler(void* target, void* parameter, IOReturn re
 #else
 			UInt8 unitID = ((*device->mDeviceStatusBuffer) & 0xff00) >> 8;
 #endif
-			debugIOLog("unitID %d", unitID);
+			debugIOLogC("unitID %d", unitID);
 			if (unitID && (kIOReturnSuccess == result))  {
 				device->mQueryXU = unitID;
 				OSNumber* change = NULL;
 				if (device->mDigitalIOXU == unitID) {
 					change = OSNumber::withNumber(kDigIOSyncSrcController, 32);
-					debugIOLog("mDigitalIOXU");
+					debugIOLogC("mDigitalIOXU");
 				} else if (device->mClockSrcXU == unitID) {
 					change = OSNumber::withNumber(kClockSourceController, 32);
-					debugIOLog("mClockSrcXU");
+					debugIOLogC("mClockSrcXU");
 				}
 #if 0
-				debugIOLog("Meow!");
+				debugIOLogC("Meow!");
 				if (change) {
-					debugIOLog("about to call hardware value changed");
+					debugIOLogC("about to call hardware value changed");
 					IOReturn myAns = device->mXUChanged->hardwareValueChanged(change);
-					debugIOLog("hardwareValueChanged %x", myAns);
+					debugIOLogC("hardwareValueChanged %x", myAns);
 					change->release();
 				}
 #endif
@@ -2491,7 +2484,7 @@ IOReturn EMUUSBAudioDevice::getAnchorFrameAndTimeStamp(UInt64 *frame, AbsoluteTi
 	
 	UInt64				thisFrame;
 	IOReturn			result = kIOReturnError;
-    //debugIOLog("getAnchorFrameAndTimeStamp");
+    //debugIOLogC("getAnchorFrameAndTimeStamp");
 	FailIf (NULL == mControlInterface, Exit);
 	nanoseconds_to_absolutetime(1100000, &offset);
 	clock_get_uptime(&finishTime);
@@ -2521,8 +2514,10 @@ IOReturn EMUUSBAudioDevice::getFrameAndTimeStamp(UInt64 *frame, AbsoluteTime *ti
 			*frame = mControlInterface->GetDevice()->GetBus()->GetFrameNumber();
 			clock_get_uptime (EmuAbsoluteTimePtr(time));
 		} while (*frame != mControlInterface->GetDevice()->GetBus()->GetFrameNumber());// get the frame number from the bus
+        // Wouter: why is this loop, we just SET *frame, why would it have changed?
 		result = kIOReturnSuccess;
 	}
+    //debugIOLogT ("getFrameAndTimeStamp frame %lld time %lld", *frame, *time);
 	return result;
 }
 
@@ -2532,7 +2527,7 @@ UInt64 EMUUSBAudioDevice::jitterFilter(UInt64 prev, UInt64 curr) {
 	// Execute a low pass filter on the new rate
 	filteredValue += kInvariantCoeffDiv2;
 	filteredValue /= kInvariantCoeff;
-    //	debugIOLog ("filtered value () = %llu", filteredValue);
+    //	debugIOLogI ("filtered value () = %llu", filteredValue);
 	return filteredValue;
 }
 
@@ -2542,7 +2537,7 @@ bool EMUUSBAudioDevice::updateWallTimePerUSBCycle() {
 	AbsoluteTime	time;
 	UInt64			time_nanos = 0;
 	bool			result = false;
-    //	debugIOLog("In EMUUSBAudioDevice::updateWallTimePerUSBCycle");
+    debugIOLogTT("In EMUUSBAudioDevice::updateWallTimePerUSBCycle");
 	
 	// Get wall time for the current USB frame
 	FailIf (kIOReturnSuccess != getFrameAndTimeStamp (&currentUSBFrame, &time), Exit);
@@ -2550,8 +2545,8 @@ bool EMUUSBAudioDevice::updateWallTimePerUSBCycle() {
 	if (0ull == mReferenceUSBFrame) {
 		mReferenceUSBFrame = currentUSBFrame;
 		mReferenceWallTime = time;
-        //		debugIOLog ("++NOTICE: reference frame = %llu", mReferenceUSBFrame);
-        //		debugIOLog ("++NOTICE: reference wall time = %llu", * ((UInt64 *) &mReferenceWallTime));
+        debugIOLogTT ("++NOTICE: reference frame = %llu", mReferenceUSBFrame);
+        debugIOLogTT ("++NOTICE: reference wall time = %llu", * ((UInt64 *) &mReferenceWallTime));
 	} else {
 		// Convert current time to nanoseconds
 		absolutetime_to_nanoseconds (EmuAbsoluteTime(time), &time_nanos);
@@ -2559,13 +2554,13 @@ bool EMUUSBAudioDevice::updateWallTimePerUSBCycle() {
 	
 	if (0ull == mLastUSBFrame) {
 		// Initialize last reference frame and time
-		debugIOLog ("initializing last USB frame and last wall time");
+		debugIOLogT ("initializing last USB frame and last wall time");
 		mLastUSBFrame = mReferenceUSBFrame;
 		absolutetime_to_nanoseconds (EmuAbsoluteTime(mReferenceWallTime), &mLastWallTimeNanos);
 	} else {
-		// Compute new slope
+		// Compute new slope (units: 0.1ps/frame )
 		newWallTimePerUSBCycle = (time_nanos - mLastWallTimeNanos) * kWallTimeExtraPrecision / (currentUSBFrame - mLastUSBFrame);
-        //		debugIOLog ("mWallTimePerUSBCycle = %llu, newWallTimePerUSBCycle = %llu", mWallTimePerUSBCycle, newWallTimePerUSBCycle);
+            debugIOLogTT ("mWallTimePerUSBCycle = %llu, newWallTimePerUSBCycle = %llu", mWallTimePerUSBCycle, newWallTimePerUSBCycle);
 		
 		if (0ull != mWallTimePerUSBCycle)
 			mWallTimePerUSBCycle = jitterFilter(mWallTimePerUSBCycle, newWallTimePerUSBCycle);
@@ -2578,7 +2573,8 @@ bool EMUUSBAudioDevice::updateWallTimePerUSBCycle() {
 		mLastWallTimeNanos = time_nanos;
 	}
 	result = true;
-    //	debugIOLog ("EMUUSBAudioDevice::updateWallTimePerUSBCycle () = %llu", mWallTimePerUSBCycle);
+    
+    debugIOLogTT ("EMUUSBAudioDevice::updateWallTimePerUSBCycle () = %llu", mWallTimePerUSBCycle);
 Exit:
 	return result;
 }
@@ -2592,7 +2588,7 @@ void EMUUSBAudioDevice::TimerAction(OSObject * owner, IOTimerEventSource * sende
 }
 
 void EMUUSBAudioDevice::doTimerAction(IOTimerEventSource * timer) {
-    //	debugIOLog("doTimerAction timer is %x\n", timer);
+    debugIOLogTT("doTimerAction timer is %x\n", timer);
 	if (timer) {
 		if (updateWallTimePerUSBCycle()) {
 			++mAnchorResetCount;
@@ -2613,7 +2609,7 @@ Exit:
 
 IOReturn EMUUSBAudioDevice::protectedXUChangeHandler(IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue) {
 	IOReturn		result = kIOReturnError;
-    debugIOLog("++protectedXUChangeHandler");
+    debugIOLogC("++protectedXUChangeHandler");
 	UInt32		controlID = audioControl->getSubType();
 	UInt8		xuUnitID = (UInt8) (controlID & 0xFF);// must never be zero
 	UInt16		xuSelector =(UInt16) (controlID >> 16);// the value extracted from the control ID must never be zero
@@ -2665,13 +2661,10 @@ IOReturn EMUUSBAudioDevice::protectedXUChangeHandler(IOAudioControl *audioContro
 			}
 		}
 	}
-	debugIOLog("protectedXUChangeHandler result %x", result);
+	debugIOLogC("protectedXUChangeHandler result %x", result);
 	return result;
 }
 
-// Create and add the custom controls each time the default controls are removed.
-// This works better than the previous scheme where the custom controls were created just once
-// and added each time when the default controls were removed.
 void EMUUSBAudioDevice::addCustomAudioControls(IOAudioEngine* engine) {
 	if (0 < mAvailXUs) {
 		mClockSrcXU = mUSBAudioConfig->FindExtensionUnitID(mInterfaceNum, kClockSource);
@@ -2680,7 +2673,7 @@ void EMUUSBAudioDevice::addCustomAudioControls(IOAudioEngine* engine) {
 			if (kIOReturnSuccess == getExtensionUnitSetting(mClockSrcXU, kClockSourceSelector, &setting, kStdDataLen))
 				setting = USBToHostLong(setting);
 			RELEASEOBJ(mClockSelector);
-			debugIOLog("ClockSelector created");
+			debugIOLogC("ClockSelector created");
 			mClockSelector = EMUXUCustomControl::create(setting, kIOAudioControlChannelIDAll, kIOAudioControlChannelNameAll,
                                                         kClockSourceController, (kClockSourceSelector << 16 | mClockSrcXU), kCtrlUsage);
 			if (mClockSelector) {
@@ -2690,7 +2683,8 @@ void EMUUSBAudioDevice::addCustomAudioControls(IOAudioEngine* engine) {
 			
             // mRealClockSelector is set to default to internal, so we need to do that here too.
 			UInt8 theValue = (UInt8) 0;
-			IOReturn result = setExtensionUnitSetting(mClockSrcXU, kClockSourceSelector, (void*) &theValue, kStdDataLen);
+			//IOReturn result =
+            setExtensionUnitSetting(mClockSrcXU, kClockSourceSelector, (void*) &theValue, kStdDataLen);
 		}
 		
 		mDigitalIOXU = mUSBAudioConfig->FindExtensionUnitID(mInterfaceNum, kDigitalIOStatus);
@@ -2702,7 +2696,7 @@ void EMUUSBAudioDevice::addCustomAudioControls(IOAudioEngine* engine) {
 			mDigitalIOStatus = EMUXUCustomControl::create(setting, kIOAudioControlChannelIDAll, kIOAudioControlChannelNameAll,
                                                           kDigIOSampleRateController, (kDigSampRateSel << 16 | mDigitalIOXU), kCtrlUsage);
 			if (mDigitalIOStatus) {
-				debugIOLog("DigitalIOStatus created");
+				debugIOLogC("DigitalIOStatus created");
 				mDigitalIOStatus->setValueChangeHandler((EMUXUCustomControl::IntValueChangeHandler)deviceXUChangeHandler, this);
 				engine->addDefaultAudioControl(mDigitalIOStatus);
 			}
@@ -2713,7 +2707,7 @@ void EMUUSBAudioDevice::addCustomAudioControls(IOAudioEngine* engine) {
 			mDigitalIOSyncSrc = EMUXUCustomControl::create(setting, kIOAudioControlChannelIDAll, kIOAudioControlChannelNameAll,
                                                            kDigIOSyncSrcController, (kDigitalSyncLock << 16 | mDigitalIOXU), kCtrlUsage);
 			if (mDigitalIOSyncSrc) {
-				debugIOLog("made kDigIOSyncSrcController");
+				debugIOLogC("made kDigIOSyncSrcController");
 				mDigitalIOSyncSrc->setValueChangeHandler((EMUXUCustomControl::IntValueChangeHandler)deviceXUChangeHandler, this);
 				engine->addDefaultAudioControl(mDigitalIOSyncSrc);
 			}
@@ -2724,7 +2718,7 @@ void EMUUSBAudioDevice::addCustomAudioControls(IOAudioEngine* engine) {
 			mDigitalIOAsyncSrc = EMUXUCustomControl::create(setting, kIOAudioControlChannelIDAll, kIOAudioControlChannelNameAll,
                                                             kDigIOAsyncSrcController, (kDigitalSRC << 16 | mDigitalIOXU), kCtrlUsage);
 			if (mDigitalIOAsyncSrc) {
-				debugIOLog("made kDigIOAsyncSrcController");
+				debugIOLogC("made kDigIOAsyncSrcController");
 				mDigitalIOAsyncSrc->setValueChangeHandler((EMUXUCustomControl::IntValueChangeHandler)deviceXUChangeHandler, this);
 				engine->addDefaultAudioControl(mDigitalIOAsyncSrc);
 			}
@@ -2737,7 +2731,7 @@ void EMUUSBAudioDevice::addCustomAudioControls(IOAudioEngine* engine) {
 			mDigitalIOSPDIF = EMUXUCustomControl::create(kSPDIFNone, kIOAudioControlChannelIDAll, kIOAudioControlChannelNameAll,
                                                          kDigIOSPDIFController, (kDigitalFormat << 16 | mDigitalIOXU), kCtrlUsage);
 			if (mDigitalIOSPDIF) {
-				debugIOLog("made kDigSPDIFController");
+				debugIOLogC("made kDigSPDIFController");
 				mDigitalIOSPDIF->setValueChangeHandler((EMUXUCustomControl::IntValueChangeHandler) deviceXUChangeHandler, this);
 				engine->addDefaultAudioControl(mDigitalIOSPDIF);
 			}
@@ -2745,14 +2739,14 @@ void EMUUSBAudioDevice::addCustomAudioControls(IOAudioEngine* engine) {
 		mDeviceOptionsXU = mUSBAudioConfig->FindExtensionUnitID(mInterfaceNum, kDeviceOptions);
 		if (mDeviceOptionsXU) {
 			UInt32 devOptSetting = 0;
-			debugIOLog("attempting to get the softlimit control");
+			debugIOLogC("attempting to get the softlimit control");
 			if (kIOReturnSuccess == getExtensionUnitSetting(mDeviceOptionsXU, kSoftLimitSelector, &devOptSetting, kStdDataLen)) 
 				devOptSetting = USBToHostLong(devOptSetting);
 			RELEASEOBJ(mDevOptionCtrl);
 			mDevOptionCtrl = EMUXUCustomControl::create(devOptSetting, kIOAudioControlChannelIDAll, kIOAudioControlChannelNameAll,
                                                         kDevSoftLimitController, (kSoftLimitSelector << 16 | mDeviceOptionsXU), kCtrlUsage);
 			if (mDevOptionCtrl) {
-				debugIOLog("made the softlimit control");
+				debugIOLogC("made the softlimit control");
 				mDevOptionCtrl->setValueChangeHandler((EMUXUCustomControl::IntValueChangeHandler)deviceXUChangeHandler, this);
 				engine->addDefaultAudioControl(mDevOptionCtrl);
 			}
@@ -2762,6 +2756,6 @@ void EMUUSBAudioDevice::addCustomAudioControls(IOAudioEngine* engine) {
 
 
 void EMUUSBAudioDevice::RegisterHALCallback(void * toRegister) {
-	debugIOLog("+RegisterHALCallback: %p",toRegister);
+	debugIOLogC("+RegisterHALCallback: %p",toRegister);
 	propertyChangedProc = toRegister;
 }

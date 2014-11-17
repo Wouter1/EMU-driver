@@ -199,6 +199,8 @@ IOExternalMethod *EMUUSBUserClient::getTargetAndMethodForIndex(IOService ** targ
     
     //D3 (("Dice1394: GetTargetMethodForIndex: %d, sizeof (EMU_CHANNEL_NAMES_INFO = %d)\n", (int)index, sizeof(EMU_CHANNEL_NAMES_INFO) ));
     
+    debugIOLog( "EMUUSBUserClient::GetTargetMethodForIndex: %d",index );
+
     // Make sure that the index of the function we're calling actually exists in the function table.
     if (index < (UInt32)kNumberOfMethods)
 	{
@@ -289,7 +291,8 @@ bool EMUUSBUserClient::start(IOService *provider)
 	mNumberOfInputFeatureUnits = 0;
 	mNumberOfOutputFeatureUnits = 0;
     
-	IOReturn result = mDevice->GetVariousUnits(mInputFeatureUnits,
+	//IOReturn result =
+    mDevice->GetVariousUnits(mInputFeatureUnits,
                                                mNumberOfInputFeatureUnits,
                                                mOutputFeatureUnits,
                                                mNumberOfOutputFeatureUnits,
@@ -298,12 +301,12 @@ bool EMUUSBUserClient::start(IOService *provider)
     
 	for (long i=0;i<mNumberOfInputFeatureUnits;i++)
 	{
-		debugIOLog ("EMUUSBUserClient:: mInputFeatureUnits[%d] = %d",i,mInputFeatureUnits[i]);
+		debugIOLog ("EMUUSBUserClient:: mInputFeatureUnits[%ld] = %d",i,mInputFeatureUnits[i]);
 	}
 	
 	for (long i=0;i<mNumberOfOutputFeatureUnits;i++)
 	{
-		debugIOLog ("EMUUSBUserClient:: mOutputFeatureUnits[%d] = %d",i,mOutputFeatureUnits[i]);
+		debugIOLog ("EMUUSBUserClient:: mOutputFeatureUnits[%ld] = %d",i,mOutputFeatureUnits[i]);
 	}
 	
 	debugIOLog ("EMUUSBUserClient::mMixerID = %d",mMixerID);
@@ -458,6 +461,8 @@ IOReturn EMUUSBUserClient::registerNotificationPort(
                                                     UInt32 type,
                                                     UInt32 refCon)
 {
+    debugIOLog( "EMUUSBUserClient::registerNotificationPort: %d",type );
+
 	IOReturn result = kIOReturnSuccess;
     
 	//Retain reference to mach notification port here.
@@ -489,6 +494,8 @@ IOReturn EMUUSBUserClient::RegisterClient(
                                           EMU_REGISTER_CLIENT* pRegisterClient,
                                           IOByteCount inStructSize)
 {
+    debugIOLog( "EMUUSBUserClient::RegisterClient" );
+
 	for (int currentEvent = EMU_VOLUME_EVENT; currentEvent < EMU_MAX_CLIENT_EVENTS; currentEvent++)
 	{
 		if (pRegisterClient->hDeviceEvents[currentEvent])
@@ -518,6 +525,8 @@ IOReturn EMUUSBUserClient::RegisterClient(
 void EMUUSBUserClient::SendEventNotification(
                                              EMU_CLIENT_EVENT eventType)
 {
+    debugIOLog( "EMUUSBUserClient::SendEventNotification" );
+
 	//Check if notification is registered and callback is set
 	if ((m_notificationRegistered) && (m_EventCallbackSet[eventType]))
 	{
@@ -547,7 +556,7 @@ void EMUUSBUserClient::SendEventNotification(
  *------------------------------------------------------------*/
 IOReturn EMUUSBUserClient::GetInterfaceVersion (unsigned long* pulVersion)
 {
-    //IOLog ("GetInterfaceVersion -> Welcome\n");
+    debugIOLog ("GetInterfaceVersion -> Welcome");
 	//	D2 (("Dice1394AudioUserClient::GetInterfaceVersion \n"));
 	//	*pulVersion = EMU1394_KEXT_INTERFACE_VERSION;
 	return kIOReturnSuccess;
@@ -555,6 +564,8 @@ IOReturn EMUUSBUserClient::GetInterfaceVersion (unsigned long* pulVersion)
 
 IOReturn EMUUSBUserClient::GetDriverVersion (PDRIVER_VERSION pDriverVersion, IOByteCount *pOutStructSize)
 {
+    debugIOLog ("EMUUSBUserClient::GetDriverVersion");
+
 	/*	if (m_pDiceInterfaceDevice)
      {
      *pOutStructSize = sizeof (EMU_DRIVER_VERSION);
@@ -582,6 +593,8 @@ IOReturn EMUUSBUserClient::GetClipData(
                                        IOByteCount inStructSize,
                                        IOByteCount *pOutStructSize)
 {
+    debugIOLog ("EMUUSBUserClient::GetClipData");
+
 	return kIOReturnSuccess;
 }
 
@@ -799,7 +812,7 @@ IOReturn EMUUSBUserClient::SetHeadPhoneSource(
                                          sizeof(UInt16));
 	}
 	else {
-		debugIOLog("ERROR: EMUUSBUserClient::SetHeadPhoneSource: mProcessingUnitID %d mDevice %d",mProcessingUnitID, mDevice);
+		debugIOLog("ERROR: EMUUSBUserClient::SetHeadPhoneSource: mProcessingUnitID %d mDevice %p",mProcessingUnitID, mDevice);
 		
 		return kIOReturnError;
 	}

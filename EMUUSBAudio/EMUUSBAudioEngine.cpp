@@ -30,14 +30,16 @@
 //	Technology:	Mac OS X
 //
 //--------------------------------------------------------------------------------
-#define DEBUGZEROTIME			FALSE
-#define DEBUGLOADING			FALSE
-#define DEBUGTIMESTAMPS			FALSE
+
 
 #include "EMUUSBAudioEngine.h"
 #include "EMUUSBAudioPlugin.h"
 #include "EMUUSBDeviceDefines.h"
 #include "EMUUSBUserClient.h"
+#include "EMUUSBLogging.h"
+
+// HACK where is math.h ??
+#define abs(x) ( (x)<0? -(x): x)
 
 #define super IOAudioEngine
 
@@ -198,7 +200,7 @@ bool EMUUSBAudioEngine::init (OSDictionary *properties) {
 #pragma unused (properties)
 	Boolean			result =FALSE;
     
-	debugIOLog("+EMUUSBAudioEngine[%p]::init ()", this);
+	debugIOLogC("+EMUUSBAudioEngine[%p]::init ()", this);
 	FailIf (FALSE == super::init (NULL), Exit);
     
 	// Change this to use defines from the IOAudioFamily when they are available
@@ -211,8 +213,10 @@ bool EMUUSBAudioEngine::init (OSDictionary *properties) {
 	neededSampleRateDescriptor = NULL;
 	mInput.usbCompletion = mOutput.usbCompletion= NULL;
 	mInput.usbIsocFrames = mOutput.usbIsocFrames = NULL;
+
+    
 Exit:
-	debugIOLog("EMUUSBAudioEngine[%p]::init ()", this);
+	debugIOLogC("EMUUSBAudioEngine[%p]::init ()", this);
 	return result;
 }
 
@@ -240,7 +244,7 @@ bool EMUUSBAudioEngine::start (IOService * provider) {
 	/*FailIf (NULL == streamInterface, Exit);
      ourInterfaceNumber = streamInterface->GetInterfaceNumber ();
      
-     debugIOLog("ourInterfaceNumber = %u\n", ourInterfaceNumber);*/
+     debugIOLogC("ourInterfaceNumber = %u\n", ourInterfaceNumber);*/
 	//</AC mod>
 	
 	matchingDictionary = serviceMatching ("EMUUSBAudioDevice");
@@ -270,16 +274,16 @@ bool EMUUSBAudioEngine::start (IOService * provider) {
 	//</AC mod>
     
 	FailIf (NULL == usbAudioDevice, Exit);
-	debugIOLog("GetUSBAudioConfigObject");
+	debugIOLogC("GetUSBAudioConfigObject");
 	usbAudio = usbAudioDevice->GetUSBAudioConfigObject ();
 	FailIf (NULL == usbAudio, Exit);
 	// This will cause the driver to not load on any device that has _only_ a low frequency effect output terminal
 	FailIf (usbAudio->GetNumOutputTerminals (0, 0) == 1 && usbAudio->GetIndexedOutputTerminalType (0, 0, 0) == OUTPUT_LOW_FREQUENCY_EFFECTS_SPEAKER, Exit);
     
-	debugIOLog("+IOAudioEngine::start");
+	debugIOLogC("+IOAudioEngine::start");
 	resultCode = super::start (provider, usbAudioDevice);
 	usbAudioDevice->release();
-	debugIOLog("-IOAudioEngine::start");
+	debugIOLogC("-IOAudioEngine::start");
 	debugIOLog ("-EMUUSBAudioEngine[%p]::start (%p) = %d", this, provider, resultCode);
     
 Exit:
@@ -287,7 +291,7 @@ Exit:
 }
 
 void EMUUSBAudioEngine::stop (IOService * provider) {
-    debugIOLog("+EMUUSBAudioEngine[%p]::stop (%p)", this, provider);
+    debugIOLogC("+EMUUSBAudioEngine[%p]::stop (%p)", this, provider);
     
 	if (NULL != mPluginNotification) {
 		mPluginNotification->remove ();
@@ -300,33 +304,33 @@ void EMUUSBAudioEngine::stop (IOService * provider) {
 	}
 	RELEASEOBJ(usbAudioDevice);
 	if (mInput.streamInterface && mInput.streamInterface->isOpen()) {
-		debugIOLog("closing stream");
+		debugIOLogC("closing stream");
 		mInput.streamInterface->close (this);
 		mInput.streamInterface = NULL;
 	}
 	if (mOutput.streamInterface && mOutput.streamInterface->isOpen()) {
-		debugIOLog("closing stream");
+		debugIOLogC("closing stream");
 		mOutput.streamInterface->close (this);
 		mOutput.streamInterface = NULL;
 	}
     
 	super::stop (provider);
     
-	debugIOLog ("-EMUUSBAudioEngine[%p]::stop (%p) - rc=%ld", this, provider, getRetainCount());
+	debugIOLog ("-EMUUSBAudioEngine[%p]::stop (%p) - rc=%d", this, provider, getRetainCount());
 }
 
 bool EMUUSBAudioEngine::terminate (IOOptionBits options) {
-	debugIOLog("terminating the EMUUSBAudioEngine\n");
+	debugIOLogC("terminating the EMUUSBAudioEngine\n");
 	return super::terminate(options);
 }
 
 void EMUUSBAudioEngine::detach(IOService *provider) {
-	debugIOLog("EMUUSBAudioEngine[%p]: detaching %p",this,provider);
+	debugIOLogC("EMUUSBAudioEngine[%p]: detaching %p",this,provider);
 	super::detach(provider);
 }
 
 void EMUUSBAudioEngine::close(IOService *forClient, IOOptionBits options) {
-	debugIOLog("EMUUSBAudioEngine[%p]: closing for %p",this,forClient);
+	debugIOLogC("EMUUSBAudioEngine[%p]: closing for %p",this,forClient);
 	super::close(forClient,options);
 }
 
@@ -354,7 +358,7 @@ IOReturn EMUUSBAudioEngine::AddAvailableFormatsFromDevice (EMUUSBAudioConfigObje
 		for (altSettingIndx = 1; altSettingIndx < numAltInterfaces; ++altSettingIndx) {
 			UInt32	direction = usbAudio->GetIsocEndpointDirection(ourInterfaceNumber, altSettingIndx);
 			UInt32	pollInterval = (UInt32) (1 << ((UInt32) usbAudio->GetEndpointPollInterval(ourInterfaceNumber, altSettingIndx, direction) -1));
-			debugIOLog("direction %d pollInterval %d", direction, pollInterval);
+			debugIOLogC("direction %d pollInterval %d", direction, pollInterval);
 			if ((1 == pollInterval) || (8 == pollInterval)) {// exclude all interfaces that use microframes for now
 				numSampleRates = usbAudio->GetNumSampleRates(ourInterfaceNumber, altSettingIndx);
 				sampleRates = usbAudio->GetSampleRates (ourInterfaceNumber, altSettingIndx);
@@ -550,7 +554,7 @@ IOReturn EMUUSBAudioEngine::CheckForAssociatedEndpoint (EMUUSBAudioConfigObject 
 #if !CUSTOMDEVICE
 	UInt8			address = usbAudio->GetIsocEndpointAddress (ourInterfaceNumber, alternateSettingID, mDirection);
  	UInt8			syncType = usbAudio->GetIsocEndpointSyncType (ourInterfaceNumber, alternateSettingID, address);
-	debugIOLog("CheckForAssociatedEndpoint address %d, syncType %d", address, syncType);
+	debugIOLogC("CheckForAssociatedEndpoint address %d, syncType %d", address, syncType);
 	if ((kAsynchSyncType == syncType)) {
 		IOUSBFindEndpointRequest	associatedEndpoint;
 		debugIOLog ("checking endpoint %d for an associated endpoint", address);
@@ -570,7 +574,7 @@ IOReturn EMUUSBAudioEngine::CheckForAssociatedEndpoint (EMUUSBAudioConfigObject 
 					mUSBIsocFrames = NULL;
 				}
 				if (!usbCompletion) {
-					debugIOLog("Disposing off current usbCompletion %p", usbCompletion);
+					debugIOLogC("Disposing off current usbCompletion %p", usbCompletion);
 					IOFree(usbCompletion, numUSBFrameLists * sizeof(IOUSBLowLatencyIsocCompletion));
 					usbCompletion = NULL;
 				}
@@ -579,7 +583,7 @@ IOReturn EMUUSBAudioEngine::CheckForAssociatedEndpoint (EMUUSBAudioConfigObject 
 				debugIOLog ("mUSBIsocFrames is now %p", mUSBIsocFrames);
 				FailIf (NULL == mUSBIsocFrames, Exit);
 				usbCompletion = (IOUSBLowLatencyIsocCompletion *)IOMalloc(numUSBFrameLists * sizeof(IOUSBLowLatencyIsocCompletion));
-				debugIOLog("usbCompletion is %p", usbCompletion);
+				debugIOLogC("usbCompletion is %p", usbCompletion);
 				FailIf(!usbCompletion, Exit);
 			}
 			associatedEndpoint.type = kUSBIsoc;
@@ -596,7 +600,7 @@ IOReturn EMUUSBAudioEngine::CheckForAssociatedEndpoint (EMUUSBAudioConfigObject 
 			}
             
 			if (NULL == neededSampleRateDescriptor) {
-				debugIOLog("allocating neededSampleRateDescriptor");
+				debugIOLogC("allocating neededSampleRateDescriptor");
 				aveSampleRateBuf = (UInt32 *)IOMalloc (sizeof (UInt32));
 				FailIf (NULL == aveSampleRateBuf, Exit);
 				bzero(aveSampleRateBuf, 4);
@@ -626,7 +630,7 @@ IOReturn EMUUSBAudioEngine::CheckForAssociatedEndpoint (EMUUSBAudioConfigObject 
 	IOUSBFindEndpointRequest	assocReq;
 #ifdef DEBUGLOGGING
 	UInt8						assocEndpoint = usbAudio->GetIsocEndpointAddress(ourInterfaceNumber, alternateSettingID, kIOAudioStreamDirectionOutput);
-	debugIOLog("assocEndpoint is %d", assocEndpoint);
+	debugIOLogC("assocEndpoint is %d", assocEndpoint);
 #endif
 	assocReq.type = kUSBIsoc;
 	assocReq.direction = kUSBIn;
@@ -642,10 +646,10 @@ IOReturn EMUUSBAudioEngine::CheckForAssociatedEndpoint (EMUUSBAudioConfigObject 
 	}
 	framesUntilRefresh = kEMURefreshRate;// hardcoded value
 	refreshInterval = 5;
-	debugIOLog("framesUntilRefresh %d", framesUntilRefresh);
-	debugIOLog("found sync endpoint");
+	debugIOLogC("framesUntilRefresh %d", framesUntilRefresh);
+	debugIOLogC("found sync endpoint");
 	if (NULL == neededSampleRateDescriptor) {
-		debugIOLog("allocating neededSampleRateDescriptor");
+		debugIOLogC("allocating neededSampleRateDescriptor");
 		aveSampleRateBuf = (UInt32 *)IOMalloc (sizeof (UInt32));
 		FailIf (NULL == aveSampleRateBuf, Exit);
 		bzero(aveSampleRateBuf, 4);
@@ -670,10 +674,13 @@ Exit:
 	return result;
 }
 
-// Part of the interface. copies a system audio sample buffer to our driver. The data is
-// clipped from 32bit float to integers in this proces.
 IOReturn EMUUSBAudioEngine::clipOutputSamples (const void *mixBuf, void *sampleBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream) {
+    
+    return kIOReturnSuccess; // HACK. we focus on input first.
+    
+    
 	IOReturn			result = kIOReturnError;
+    
     //	IOLockLock(mFormatLock);
     
 	
@@ -681,19 +688,19 @@ IOReturn EMUUSBAudioEngine::clipOutputSamples (const void *mixBuf, void *sampleB
 	debugIOLog2("clipOutputSamples firstSampleFrame=%u, numSampleFrames=%d, firstSampleFrame-offsetFrames =%d ",firstSampleFrame,numSampleFrames,firstSampleFrame-offsetFrames);
     
 	if (firstSampleFrame != nextExpectedOutputFrame) {
-		debugIOLog("**** Output Hiccup!! firstSampleFrame=%d, nextExpectedOutputFrame=%d",firstSampleFrame,nextExpectedOutputFrame);
+		debugIOLogC("**** Output Hiccup!! firstSampleFrame=%d, nextExpectedOutputFrame=%d",firstSampleFrame,nextExpectedOutputFrame);
 	}
 	nextExpectedOutputFrame = firstSampleFrame + numSampleFrames;
 	
 	if (firstSampleFrame > numSampleFrames) {
-		debugIOLog("> offset delta %d",firstSampleFrame-offsetFrames);
+		debugIOLogC("> offset delta %d",firstSampleFrame-offsetFrames);
 	}
 	if ((SInt32)firstSampleFrame - offsetFrames > 4000) {
-		debugIOLog("****** derail alert!");
+		debugIOLogC("****** derail alert!");
 	}
     
 	//if (offsetFrames > firstSampleFrame && firstSampleFrame > numSampleFrames) {
-	//	debugIOLog("*** offset ahead by %d",offsetFrames-firstSampleFrame);
+	//	debugIOLogC("*** offset ahead by %d",offsetFrames-firstSampleFrame);
 	//}
 	
 	if (0 == shouldStop && TRUE != inWriteCompletion) {
@@ -710,7 +717,7 @@ IOReturn EMUUSBAudioEngine::clipOutputSamples (const void *mixBuf, void *sampleB
                           &mOutput.usbIsocFrames[mOutput.currentFrameList * mOutput.numUSBFramesPerList]);
 		}
 	} else if (TRUE == inWriteCompletion) {
-		debugIOLog("**in completion");
+		debugIOLogC("**in completion");
 	}
 	
     // software volume
@@ -742,7 +749,7 @@ IOReturn EMUUSBAudioEngine::clipOutputSamples (const void *mixBuf, void *sampleB
 		}
 	}
 	
-	//debugIOLog("clipOutputSamples: numSampleFrames = %d",numSampleFrames);
+	//debugIOLogC("clipOutputSamples: numSampleFrames = %d",numSampleFrames);
 	if (TRUE == streamFormat->fIsMixable) {
 		if (mPlugin)
 			mPlugin->pluginProcess ((Float32*)mixBuf + (firstSampleFrame * streamFormat->fNumChannels), numSampleFrames, streamFormat->fNumChannels);
@@ -757,117 +764,195 @@ IOReturn EMUUSBAudioEngine::clipOutputSamples (const void *mixBuf, void *sampleB
     //	IOLockUnlock(mFormatLock);
 	return result;
 }
-// routine called by the frameHandler
-void EMUUSBAudioEngine::GatherInputSamples(IOUSBLowLatencyIsocFrame * pFrames) {
-	AbsoluteTime	time, timeOffset;
+
+
+
+IOReturn EMUUSBAudioEngine::GatherInputSamples(Boolean doTimeStamp) {
 	UInt32			numBytesToCopy = 0; // number of bytes to move the dest ptr by each time
-	UInt32			frameIndex = 0;
 	UInt8*			buffStart = (UInt8*) mInput.bufferPtr;
-	/*
-     #if LOCKING
-     IOLockLock(mLock);
-     #endif
-     */
-	if (mInput.bufferSize <= mInput.bufferOffset) // sanity checking to prevent going beyond the end of the allocated dest buffer
-		mInput.bufferOffset = 0;
-	
+    UInt32         totalreceived=0;
 	UInt8*			dest = buffStart + mInput.bufferOffset;
-	UInt8*			source = (UInt8*) readBuffer + (mInput.currentFrameList * readUSBFrameListSize);
-	if (kUSBDeviceSpeedHigh == mHubSpeed) {// USB 2.0 section
-		// iterate over 2 frames
-		debugIOLog2("GatherInputSamples %d",mInput.bufferOffset/mInput.multFactor);
-		while(frameIndex < RECORD_NUM_USB_FRAMES_PER_LIST && kUSBLowLatencyIsochTransferKey != pFrames[frameIndex].frStatus &&
-              -1 != pFrames[frameIndex].frStatus)
-		{
-			if (mDropStartingFrames <= 0)
-			{
-				UInt32	byteCount = pFrames[frameIndex].frActCount;
-				if (byteCount != lastInputSize) {
-					//debugIOLog("Happy Leap Sample!  new size = %d, current size = %d",byteCount,lastInputSize);
-					lastInputSize = byteCount;
-					lastInputFrames = byteCount / mInput.multFactor;
-				}
-				
-				runningInputCount += lastInputFrames;
-                //	debugIOLog("push %d",lastInputFrames);
-				// save the # of frames to the framesize queue so that we generate an appropriately sized output packet
-				PushFrameSize(lastInputFrames);
-				SInt32	numBytesToEnd = mInput.bufferSize - mInput.bufferOffset; // assumes that bufferOffset <= bufferSize
-				if (byteCount < numBytesToEnd) { // no wrap
-					memcpy(dest, source, byteCount);
-					mInput.bufferOffset += byteCount;
-					numBytesToCopy = byteCount;// number of bytes the dest ptr will be moved by
-				} else { // wrapping around - end up at bufferStart or bufferStart + an offset
-					UInt64	stampTime;
-					EmuTime systemTime;
-					memcpy(dest, source, numBytesToEnd); // copy data into the remaining portion of the dest buffer
-					dest = (UInt8*) buffStart;	// wrap around to the start
-					UInt32	overflow = byteCount - numBytesToEnd; // the excess
-					mInput.bufferOffset = overflow; // remember the location the dest ptr will be set to
-					if (overflow)	// copy the remaining bytes into the front of the dest buffer
-						memcpy(dest, source + numBytesToEnd, overflow);
-					time = generateTimeStamp(frameIndex, numBytesToEnd, byteCount);
-					takeTimeStamp (TRUE, &time);
-					clock_get_uptime(&systemTime);
-					stampTime = AbsoluteTime_to_scalar(&time);
-					debugIOLog2("GatherInputSamples frame %d stampTime %llu system time %llu byteCount %d", frameIndex, stampTime, systemTime,byteCount);
-					numBytesToCopy = overflow;
-				}
-			}
-			else if(pFrames[frameIndex].frActCount && mDropStartingFrames > 0) // first frames might have zero length
-			{
-				mDropStartingFrames--;
-			}
-			
-            //		debugIOLog("GatherInputSamples frameIndex is %d, numBytesToCopy %d", frameIndex, numBytesToCopy);
-			++frameIndex;
-			source += mInput.maxFrameSize; // each frame's frReqCount is set to maxFrameSize
-			dest += numBytesToCopy;
-		}
-		// why did we leave loop?
-#if 1
-		if (frameIndex != RECORD_NUM_USB_FRAMES_PER_LIST) {
-			if (kUSBLowLatencyIsochTransferKey == pFrames[frameIndex].frStatus ||
-				-1  == pFrames[frameIndex].frStatus) {
-				debugIOLog2("GatherInputSamples: Bad Frame Status [%d] 0x%x",frameIndex,pFrames[frameIndex].frStatus);
-			}
-		}
-#endif
-	} else {// usb 1.1 section - identical except for the computation of the time
-		while(frameIndex < RECORD_NUM_USB_FRAMES_PER_LIST && kUSBLowLatencyIsochTransferKey != pFrames[frameIndex].frStatus) {
-			UInt32	byteCount = pFrames[frameIndex].frActCount;
-			SInt32	numBytesToEnd = mInput.bufferSize - mInput.bufferOffset;// assumes that bufferOffset <= bufferSize
-			if (byteCount < numBytesToEnd) { // no wrapping
-				memcpy(dest, source, byteCount);
-				mInput.bufferOffset += byteCount;
-				numBytesToCopy = byteCount;
-			} else { // wrap around to either bufferStart or bufferStart + an offset
-				memcpy(dest, source, numBytesToEnd); // copy data into the tail end of the dest buffer
-				dest = (UInt8*) buffStart; // wrap around to the start
-				UInt32	overflow = byteCount - numBytesToEnd; // compute the excess
-				mInput.bufferOffset = overflow; // remember the position that the dest ptr will be set to
-				if (overflow) // copy the remaining data into the front of the dest buffer
-					memcpy(dest, source + numBytesToEnd, overflow);
-				numBytesToCopy = overflow;
-				// old method of generating the time used for time stamping
-				UInt64	nanos = 0;
-				time = pFrames[frameIndex].frTimeStamp;
-				nanos = numBytesToCopy * 1000000 / byteCount;
-				nanoseconds_to_absolutetime (nanos, EmuAbsoluteTimePtr(&timeOffset));
-				SUB_ABSOLUTETIME (&time, &timeOffset);
-				takeTimeStamp (TRUE, &time);
-			}
-			++frameIndex;
-			source += mInput.maxFrameSize;
-			dest += numBytesToCopy;
-		}
-	}
-	/*
-     #if LOCKING
-     IOLockUnlock(mLock);
-     #endif
-     */
+    
+    // for OVERRUN checks
+    UInt32 readHeadPos = nextExpectedFrame * mInput.multFactor;
+
+    debugIOLogR("+GatherInputSamples %d", mInput.bufferOffset / mInput.multFactor);
+    // check if we moved to the next frame. This is done when primary USB interrupt occurs.
+    
+    // handle outstanding wraps so that we have it available for this round
+    if (doTimeStamp && mInput.frameListWrapTimeStamp!=0) {
+        makeTimeStampFromWrap(mInput.frameListWrapTimeStamp);
+        mInput.frameListWrapTimeStamp = 0;
+    }
+    
+    if (mInput.previousFrameList != mInput.currentFrameList) {
+        debugIOLogR("GatherInputSamples going from framelist %d to %d. lastindex=%d",mInput.previousFrameList , mInput.currentFrameList,mInput.frameIndex);
+        if (mInput.frameIndex != RECORD_NUM_USB_FRAMES_PER_LIST) {
+            doLog("***** Previous framelist was not handled completely, only %d",mInput.frameIndex);
+        }
+        if (mInput.frameListWrapTimeStamp != 0) {
+            doLog("wrap         is still open!!"); // we can't erase, we would loose sync point....
+        }
+        mInput.previousFrameList = mInput.currentFrameList;
+        mInput.frameIndex=0;
+    }
+    
+    IOUSBLowLatencyIsocFrame * pFrames = &mInput.usbIsocFrames[mInput.currentFrameList * mInput.numUSBFramesPerList];
+	if (mInput.bufferSize <= mInput.bufferOffset) {
+        // sanity checking to prevent going beyond the end of the allocated dest buffer
+		mInput.bufferOffset = 0;
+        debugIOLogR("BUG EMUUSBAudioEngine::GatherInputSamples wrong offset");
+    }
+    
+    
+    
+
+    
+    while(mInput.frameIndex < RECORD_NUM_USB_FRAMES_PER_LIST
+          && -1 != pFrames[mInput.frameIndex].frStatus // no transport at all
+          && kUSBLowLatencyIsochTransferKey != pFrames[mInput.frameIndex].frStatus // partially transported
+          //&& (doTimeStamp || mInput.frameIndex < 33) // HACK for testing partial processing
+          )
+    {
+        UInt8*			source = (UInt8*) readBuffer + (mInput.currentFrameList * readUSBFrameListSize)
+                                + mInput.maxFrameSize * mInput.frameIndex;
+        if (mDropStartingFrames <= 0)
+        {
+            UInt32	byteCount = pFrames[mInput.frameIndex].frActCount;
+            if (byteCount != lastInputSize) {
+                debugIOLogR("Happy Leap Sample!  new size = %d, current size = %d",byteCount,lastInputSize);
+                lastInputSize = byteCount;
+                lastInputFrames = byteCount / mInput.multFactor;
+            }
+            totalreceived += byteCount;
+            
+            if (mInput.bufferOffset <  readHeadPos && mInput.bufferOffset + byteCount > readHeadPos) {
+                // this is not a water tight test but will catch most cases as
+                // the write head step sizes are small. Only when read head is at 0 we may miss.
+                doLog("****** OVERRUN: write head is overtaking read head!");
+            }
+            
+            runningInputCount += lastInputFrames;
+            //	debugIOLogC("push %d",lastInputFrames);
+            // save the # of frames to the framesize queue so that we generate an appropriately sized output packet
+            PushFrameSize(lastInputFrames);
+            SInt32	numBytesToEnd = mInput.bufferSize - mInput.bufferOffset; // assumes that bufferOffset <= bufferSize
+            if (byteCount < numBytesToEnd) { // no wrap
+                memcpy(dest, source, byteCount);
+                mInput.bufferOffset += byteCount;
+                numBytesToCopy = byteCount;// number of bytes the dest ptr will be moved by
+            } else { // wrapping around - end up at bufferStart or bufferStart + an offset
+                UInt32	overflow = byteCount - numBytesToEnd;
+                memcpy(dest, source, numBytesToEnd); // copy data into the remaining portion of the dest buffer
+                dest = (UInt8*) buffStart;	// wrap around to the start
+                mInput.bufferOffset = overflow; // remember the location the dest ptr will be set to
+                if (overflow)	// copy the remaining bytes into the front of the dest buffer
+                    memcpy(dest, source + numBytesToEnd, overflow);
+                mInput.frameListWrapTimeStamp = pFrames[mInput.frameIndex].frTimeStamp;
+
+                numBytesToCopy = overflow;
+            }
+        }
+        else if(pFrames[mInput.frameIndex].frActCount && mDropStartingFrames > 0) // first frames might have zero length
+        {
+            mDropStartingFrames--;
+        }
+        
+        //		debugIOLogC("GatherInputSamples frameIndex is %d, numBytesToCopy %d", frameIndex, numBytesToCopy);
+        mInput.frameIndex++;
+        //source += mInput.maxFrameSize; // each frame's frReqCount is set to maxFrameSize
+        dest += numBytesToCopy;
+    }
+
+    // now check, why did we leave loop? Was all normal or failure? log failures.
+    if (mInput.frameIndex != RECORD_NUM_USB_FRAMES_PER_LIST) {
+        return kIOReturnStillOpen; // caller has to decide what to do if this happens.
+    } else {
+         // reached end of list reached.
+        if (doTimeStamp && mInput.frameListWrapTimeStamp!=0) {
+            makeTimeStampFromWrap(mInput.frameListWrapTimeStamp);
+            mInput.frameListWrapTimeStamp=0;
+        }
+    }
+    debugIOLogR("-GatherInputSamples received %d first open frame=%d",totalreceived, mInput.frameIndex);
+    return kIOReturnSuccess;
 }
+
+
+//expected wrap time in ns.
+// HACK we need to do this more flexible. This depends on sample rate.
+#define EXPECTED_WRAP_TIME 128000000
+
+
+void EMUUSBAudioEngine::makeTimeStampFromWrap(AbsoluteTime wt) {
+    UInt64 wrapTimeNs;
+    absolutetime_to_nanoseconds(wt,&wrapTimeNs);
+
+    if (goodWraps >= 5) {
+        // regular operation after initial wraps. Mass-spring-damper filter.
+        takeTimeStampNs(filter(wrapTimeNs,FALSE),TRUE);
+    } else {
+        
+        // setting up the timer. Find good wraps.
+        if (goodWraps == 0) {
+            goodWraps++;
+        } else {
+            // check if previous wrap had correct spacing deltaT.
+            SInt64 deltaT = wrapTimeNs - previousfrTimestampNs - EXPECTED_WRAP_TIME;
+            UInt64 errorT = abs( deltaT );
+            
+            if (errorT < EXPECTED_WRAP_TIME/1000) {
+                goodWraps ++;
+                if (goodWraps == 5) {
+                    takeTimeStampNs(filter(wrapTimeNs,TRUE),FALSE);
+                    doLog("USB timer started");
+                 }
+            } else {
+                goodWraps = 0;
+                doLog("USB hick (%lld). timer re-syncing.",errorT);
+            }
+        }
+        previousfrTimestampNs = wrapTimeNs;
+    }
+}
+
+void EMUUSBAudioEngine::takeTimeStampNs(UInt64 timeStampNs, Boolean increment) {
+    AbsoluteTime t;
+    nanoseconds_to_absolutetime(timeStampNs, &t);
+    takeTimeStamp(increment, &t);
+
+}
+
+#define K 1     // spring constant for filter
+#define M 10000 // mass for the filter
+#define DA 200  // 2 Sqrt[M K] for critical damping.
+
+UInt64 EMUUSBAudioEngine::filter(UInt64 inputx, Boolean initialize) {
+    UInt64 xnext;
+    SInt64 unext,du,F;
+    
+    if (initialize) {
+        x = inputx;
+        dx = EXPECTED_WRAP_TIME;
+        u=0;
+        return inputx;
+    }
+    
+    xnext = x + dx ; // the next filtered output
+    unext = inputx - xnext; // error u
+    
+    du = unext - u; // change of the error, for damping
+    if (abs(du) < EXPECTED_WRAP_TIME/2000) {
+        F = K * unext + DA * du; // force on spring
+        dx = dx + F/M ;
+    }
+    x = xnext;
+    u= unext; // update the filter
+    
+    debugIOLogT("filter %lld -> %lld", inputx, x);
+    return x;
+}
+
 
 void EMUUSBAudioEngine::addSoftVolumeControls()
 {
@@ -961,7 +1046,7 @@ IOReturn EMUUSBAudioEngine::softwareVolumeChangedHandler(OSObject * target, IOAu
 	
 	if (audioControl->getUsage() == kIOAudioControlUsageOutput)
 	{
-		debugIOLog("EMUUSBAudioEngine::softwareVolumeChangedHandler output: channel= %d oldValue= %d newValue= %d", audioControl->getChannelID(), oldValue, newValue);
+		debugIOLogC("EMUUSBAudioEngine::softwareVolumeChangedHandler output: channel= %d oldValue= %d newValue= %d", audioControl->getChannelID(), oldValue, newValue);
 		
 		Float32 volume;
 		::GetDbToGainLookup(newValue, kSoftVolumeLookupRange, volume);
@@ -977,7 +1062,7 @@ IOReturn EMUUSBAudioEngine::softwareVolumeChangedHandler(OSObject * target, IOAu
 	}
 	else if (audioControl->getUsage() == kIOAudioControlUsageInput)
 	{
-		debugIOLog("EMUUSBAudioEngine::softwareVolumeChangedHandler input: channel= %d oldValue= %d newValue= %d", audioControl->getChannelID(), oldValue, newValue);
+		debugIOLogC("EMUUSBAudioEngine::softwareVolumeChangedHandler input: channel= %d oldValue= %d newValue= %d", audioControl->getChannelID(), oldValue, newValue);
 		
 		Float32 volume;
 		::GetDbToGainLookup(newValue, kSoftVolumeLookupRange, volume);
@@ -1031,169 +1116,54 @@ IOReturn EMUUSBAudioEngine::softwareMuteChangedHandler(OSObject * target, IOAudi
 	return kIOReturnSuccess;
 }
 
-void EMUUSBAudioEngine::CoalesceInputSamples(SInt32 numBytesToCoalesce, IOUSBLowLatencyIsocFrame * pFrames) {
-	// implicit assumptions
-	//	a. currentFrameList never exceeds RECORD_NUM_USB_FRAME_LISTS
-	//	b. bufferOffset never exceeds bufferSize
-#if LOCKING
-	IOLockLock(mLock);
-#endif
-	UInt32			frameLimit = (mInput.numUSBFramesPerList * mInput.numUSBFrameLists);// -1
-	UInt32			indexBase = mInput.currentFrameList * mInput.numUSBFramesPerList;
-	UInt32			usbFrameIndex = 0;
-	UInt32			numBytesToCopy = 0;// ultimately dependent on frActCount
-	SInt32			numBytesToEnd = 0;
-	UInt32			originalBufferOffset = mInput.bufferOffset;
-	UInt32			framesChecked = 0;
-	SInt32			numBytesLeft = numBytesToCoalesce;
-	//debugIOLog ("coalesce from %ld %ld bytes", originalBufferOffset, numBytesToCoalesce);
-	debugIOLog2 ("CoalesceInputSamples currentFrameList %ld numBytesToCoalesce %ld", mInput.currentFrameList, numBytesToCoalesce);
-    
-	UInt8*	buffStart = (UInt8*) mInput.bufferPtr;
-	if (mInput.bufferOffset >=  mInput.bufferSize)	// sanity checking
-		mInput.bufferOffset = 0;
-	UInt8*	dest = buffStart + mInput.bufferOffset;
-    
-	UInt8*	source = (UInt8 *)readBuffer + (mInput.currentFrameList * readUSBFrameListSize);
-	bool	looped = false;// flag to ensure we only go through the array of frames just 2x.
-    
-	while (framesChecked < frameLimit && kUSBLowLatencyIsochTransferKey != pFrames[usbFrameIndex].frStatus &&
-           -1 != pFrames[usbFrameIndex].frStatus) {
-		numBytesToEnd =  (SInt32) mInput.bufferSize - mInput.bufferOffset;
-		UInt32	byteCount = pFrames[usbFrameIndex].frActCount;
-		UInt32  inputSize = 0;
-        // save the # of frames to the framesize queue so that we generate an appropriately sized output packet
-		if (byteCount < numBytesToEnd) {// not wrapping
-			memcpy(dest, source, byteCount);
-			mInput.bufferOffset += byteCount;
-			numBytesToCopy = byteCount;
-		} else {// at least equal to or greater than numBytesToEnd
-			inputSize = numBytesToEnd;
-			UInt32	overflow = byteCount - numBytesToEnd;// the excess byte count past the bufferEnd
-			memcpy(dest, source, numBytesToEnd);// copy data right up to the buffer end
-			dest = (UInt8*) buffStart;// reset the destination to the start of the buffer
-			debugIOLog("wrapping!!! overflow is %d", overflow);
-			mInput.bufferOffset = overflow;
-			if (overflow) // time stamp only when wrapping
-			{
-				memcpy(dest, source + numBytesToEnd, overflow); // copy the remaining data into the buffer
-			}
-			debugIOLog("wrapping in CoalesceInputSamples");
-			numBytesToCopy = mInput.bufferOffset;// in sync with the bufferOffset
-		}
-        
-        //		debugIOLog("byteCount is %d, numBytesToCopy is %d, framesChecked is %d, usbFrameIndex is %d", byteCount, numBytesToCopy, framesChecked, usbFrameIndex);
-		numBytesLeft -= byteCount;
-		dest += numBytesToCopy;// advance destination
-		source += mInput.maxFrameSize;// @ frReqCount is set to maxFrameSize must never exceed numUSBFrameLists * readUSBFrameListSize
-		++usbFrameIndex;
-		++framesChecked;
-        
-		//debugIOLog("CoalesceInputSamples: numBytesToCopy %d",numBytesToCopy);
-        
-		if (0 >= numBytesLeft)// we're done
-			break;
-		
-		if ((usbFrameIndex + indexBase) >= frameLimit) {
-			/*
-             if (looped)// make sure we go through the frames just once more.
-             break;
-             looped = true;
-             */
-			pFrames = &mInput.usbIsocFrames[0]; // wrap around the frame list and keep trying to coalesce
-			usbFrameIndex = 0;
-			source = (UInt8 *)readBuffer;
-			debugIOLog ("wrapping coalesce numBytesToCoalesce = %d", numBytesToCoalesce);
-		}
-		
-	}
-	// why did we leave loop?
-#if 0
-	if (numBytesLeft > 0) {
-		debugIOLog("only coalesced %d bytes, left %d bytes uncoalesced :(",numBytesToCoalesce - numBytesLeft, numBytesLeft);
-		if (kUSBLowLatencyIsochTransferKey == pFrames[usbFrameIndex].frStatus ||
-			-1  == pFrames[usbFrameIndex].frStatus) {
-            debugIOLog("Bad Frame Status %d",pFrames[usbFrameIndex].frStatus);
-		} else if (framesChecked >= frameLimit) {
-			debugIOLog("exceeded frameLimit %d, framesChecked %d",frameLimit,framesChecked);
-		}
-	}
-#endif
-    
-	//debugIOLog("bufferOffset is %d originalBufferOffset %d", mInput.bufferOffset, originalBufferOffset);
-	mInput.bufferOffset = originalBufferOffset;
-#if LOCKING
-	IOLockUnlock(mLock);
-#endif
-}
+
 
 IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBuf, void *destBuf, UInt32 firstSampleFrame,
                                                  UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat,
                                                  IOAudioStream *audioStream) {
 	UInt32		lastSampleByte = (firstSampleFrame + numSampleFrames) * mInput.multFactor;// max number of bytes to get
-	UInt32		windowStartByte = 0;
-	UInt32		windowEndByte = 0;
 	IOReturn	result;
-	
-	debugIOLog2("convertInputSamples firstSampleFrame=%u, numSampleFrames=%d",firstSampleFrame,numSampleFrames);
+    
+    debugIOLogR("+convertInputSamples firstSampleFrame=%u, numSampleFrames=%d srcbuf=%p dest=%p byteorder=%d bitWidth=%d numchannels=%d",firstSampleFrame,numSampleFrames,sampleBuf,destBuf,streamFormat->fByteOrder,streamFormat->fBitWidth,streamFormat->fNumChannels);
+
+    if (startingEngine) {
+        return kIOReturnUnderrun;
+    }
+    
     
 	if (firstSampleFrame != nextExpectedFrame) {
-		debugIOLog("****** HICCUP firstSampleFrame=%d, nextExpectedFrame=%d",firstSampleFrame,nextExpectedFrame);
-	}
-	
-	if (!shouldStop && !inReadCompletion) {
-		UInt64	curInputUSBFrameNumber = mBus->GetFrameNumber();
-		SInt64	framesLeftInQueue = 0;
-		
-		if (mInput.usbFrameToQueueAt > curInputUSBFrameNumber)// Sanity check. Otherwise we'll be in trouble.
-		{
-			framesLeftInQueue = mInput.usbFrameToQueueAt - curInputUSBFrameNumber;
-		}
-		
-		if (framesLeftInQueue <  (mInput.numUSBTimeFrames * (mInput.numUSBFrameListsToQueue / 2)) / 2) {
-			SInt64	frameLimit = mInput.numUSBTimeFrames * (mInput.numUSBFrameListsToQueue -1);
-			while (framesLeftInQueue < frameLimit && !shouldStop) {
-				debugIOLog2 ("queue a read from convertInputSamples: framesLeftInQueue = %ld", (UInt32)framesLeftInQueue);
-				readHandler (this, mInput.usbCompletion[mInput.currentFrameList].parameter, kIOReturnSuccess,
-                             &mInput.usbIsocFrames[mInput.currentFrameList * mInput.numUSBFramesPerList]);
-				curInputUSBFrameNumber = mBus->GetFrameNumber();
-				framesLeftInQueue = mInput.usbFrameToQueueAt - curInputUSBFrameNumber;
-			}
-		}
-	}
+		debugIOLogC("****** HICCUP firstSampleFrame=%d, nextExpectedFrame=%d",firstSampleFrame,nextExpectedFrame);
+    }
+    UInt32 firstSampleByte =firstSampleFrame* mInput.multFactor;
+    debugIOLogTD("C %d %d",firstSampleByte, mInput.bufferOffset);
+
+    if (!startingEngine && !shouldStop) {
+        Boolean haveLock=IOLockTryLock(mLock);
+        if (haveLock) {
+            GatherInputSamples(false);
+            IOLockUnlock(mLock);
+        }
+    }
     
+    // current write head inside that range? Then this is going to cause serious distortion!
+    if (firstSampleByte<=mInput.bufferOffset && mInput.bufferOffset<lastSampleByte) {
+        doLog("****** STUTTER IOAudioEngine convertInputSamples is reading over the write head");
+        // do not return, keep going and hope we will get in sync.... If we return, everything will start throwing above us.
+    }
     
-	windowStartByte = (mInput.bufferOffset + 1) * ((mInput.bufferOffset + 1) <= mInput.bufferSize);// starting position
-	
-	windowEndByte = windowStartByte + (mInput.numUSBFrameListsToQueue * readUSBFrameListSize);// end position
-	windowEndByte -= mInput.bufferSize  * (windowEndByte > mInput.bufferSize);// MUST always be less than the end
-	if ((windowStartByte < lastSampleByte && windowEndByte > lastSampleByte) ||
-		(windowEndByte > lastSampleByte && windowStartByte > windowEndByte) ||
-		(windowStartByte < lastSampleByte && windowStartByte > windowEndByte && windowEndByte < lastSampleByte)) {
-        
-        //if ((windowEndByte > lastSampleByte) && (windowStartByte < lastSampleByte || windowStartByte > windowEndByte) ||
-        //	(windowStartByte < lastSampleByte && windowStartByte > windowEndByte && windowEndByte < lastSampleByte)) {
-		//debugIOLog ("firstSampleFrame %ld, numSampleFrames %ld, lastSampleByte %ld, currentFrameList %ld, bufferOffset %ld, windowStartByte %ld, windowEndByte %ld",
-		//			firstSampleFrame, numSampleFrames, lastSampleByte, mInput.currentFrameList, mInput.bufferOffset, windowStartByte, windowEndByte);
-        
-		SInt32	numBytesToCoalesce = lastSampleByte - mInput.bufferOffset;
-		numBytesToCoalesce += (mInput.bufferSize * (numBytesToCoalesce < 0));
-        //		debugIOLog("numBytesToCoalesce %d", numBytesToCoalesce);
-		if (numBytesToCoalesce > 0) {
-			CoalesceInputSamples(numBytesToCoalesce, &mInput.usbIsocFrames[mInput.currentFrameList * mInput.numUSBFramesPerList]);
-		}
-	}
+    // at this point, mInput should contain sufficient info to handle the request.
+    // It's the caller that "ensures" this using
+    // "sophisticated techniques and extremely accurate timing mechanisms".
+    // I don't like this black box approach but we have to live with it.
     
+    debugIOLog2("convertFromEMUUSBAudioInputStreamNoWrap destBuf = %p, firstSampleFrame = %d, numSampleFrames = %d", destBuf, firstSampleFrame, numSampleFrames);
     result = convertFromEMUUSBAudioInputStreamNoWrap (sampleBuf, destBuf, firstSampleFrame, numSampleFrames, streamFormat);
-    //debugIOLog("convertInputSamples after convertFromEMUUSBAudiomInput.audioStreamNoWrap %d", result);
 	if (mPlugin)
 		mPlugin->pluginProcessInput ((float *)destBuf + (firstSampleFrame * streamFormat->fNumChannels), numSampleFrames, streamFormat->fNumChannels);
-#if 0
-	lastInputFrames = numSampleFrames;
-	PushFrameSize(lastInputFrames);
-	runningInputCount += lastInputFrames;
-#endif
     
+
+    // set the expected starting point for the next read. IOAudioDevice may jump around depending on timestamps we feed it....
+    // FIXME
 	nextExpectedFrame = firstSampleFrame + numSampleFrames;
 	if (nextExpectedFrame*mInput.multFactor >= mInput.bufferSize) {
 		nextExpectedFrame -= mInput.bufferSize / mInput.multFactor;
@@ -1226,11 +1196,11 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBuf, void *de
                    usedNumberOfSamples);
 		}
 	}
-    
+    debugIOLogC("-convertInputSamples");
+
 	return result;
 }
 
-// NB  byteCount MUST never == 0. If this computation is incorrect, we will encounter audio artifacts
 AbsoluteTime EMUUSBAudioEngine::generateTimeStamp(UInt32 usbFrameIndex, UInt32 preWrapBytes, UInt32 byteCount) {
 	UInt64			time_nanos = 0;
 	AbsoluteTime	time = 0; //{0,0};
@@ -1243,7 +1213,7 @@ AbsoluteTime EMUUSBAudioEngine::generateTimeStamp(UInt32 usbFrameIndex, UInt32 p
 	
 	byteCount *= kNumberOfFramesPerMillisecond;
 	
-	debugIOLog2("**** generateTimeStamp usedFrameIndex %d byteCount %d",usedFrameIndex,byteCount);
+	//debugIOLogT("**** generateTimeStamp usbFrameIndex %d usedFrameIndex %d byteCount %d",usbFrameIndex,usedFrameIndex,byteCount);
 	
 	if (kIOReturnSuccess == getAnchor(&referenceFrame, &refWallTime)) {
 		bool	referenceAhead = referenceFrame > thisFrameNum;
@@ -1264,7 +1234,7 @@ AbsoluteTime EMUUSBAudioEngine::generateTimeStamp(UInt32 usbFrameIndex, UInt32 p
 		if (byteCount) {
 			time_nanos /= byteCount;// if byteCount is 0 PPC continues working (returns 0) but not i386 (obviously more correct)
 		} else {
-			debugIOLog("**** zero byteCount in generateTimeStamp ****");
+			//debugIOLogT("**** zero byteCount in generateTimeStamp ****");
 		}
 		absolutetime_to_nanoseconds(EmuAbsoluteTime(refWallTime), &referenceWallTime_nanos);
 		if (!referenceAhead)
@@ -1272,7 +1242,7 @@ AbsoluteTime EMUUSBAudioEngine::generateTimeStamp(UInt32 usbFrameIndex, UInt32 p
 		else
 			time_nanos = referenceWallTime_nanos - time_nanos;
 		time_nanos += (usbAudioDevice->mWallTimePerUSBCycle / kWallTimeExtraPrecision);
-        //		debugIOLog("stampTime is %llu", time_nanos);
+        debugIOLogT("stampTime is %llu", time_nanos);
 		nanoseconds_to_absolutetime(time_nanos, EmuAbsoluteTimePtr(&time));
 	}
 	return time;
@@ -1317,12 +1287,12 @@ IOReturn EMUUSBAudioEngine::GetDefaultSettings(IOUSBInterface  *streamInterface,
 		// first, figure out whether the stream is input or output
 		UInt8 direction = usbAudio->GetIsocEndpointDirection(ourInterfaceNumber, newAltSettingID);
 		if (direction == 0xFF) {
-			debugIOLog("can't resolve direction from endpoints, resorting to slimy hack instead");
+			debugIOLogC("can't resolve direction from endpoints, resorting to slimy hack instead");
 			// interface 1 is output and interface 2 is input in the current 0202USB and 0404USB devices
 			direction = (ourInterfaceNumber == 1) ? kUSBOut : kUSBIn;
 		}
 		
-		debugIOLog("direction of interface %d is %d (In=%d,Out=%d)",ourInterfaceNumber,direction,kUSBIn,kUSBOut);
+		debugIOLogC("direction of interface %d is %d (In=%d,Out=%d)",ourInterfaceNumber,direction,kUSBIn,kUSBOut);
 		
 		// reference the appropriate StreamInfo for input or output
 		StreamInfo &info = (direction == kUSBIn) ? mInput : mOutput;
@@ -1332,13 +1302,13 @@ IOReturn EMUUSBAudioEngine::GetDefaultSettings(IOUSBInterface  *streamInterface,
 		
 		newSampleRate.fraction = 0;
 		newSampleRate.whole = usbAudioDevice->getHardwareSampleRate();// get the sample rate the device was set to
-		debugIOLog("hardware sample rate is %d", newSampleRate.whole);
+		debugIOLogC("hardware sample rate is %d", newSampleRate.whole);
 		info.numChannels = kChannelCount_10;// try 4 channels first - uh... make that 10... uh... this is stupid.
 		mChannelWidth = kBitDepth_24bits;
 		UInt32	altChannelWidth = kBitDepth_16bits;
 		
 		while (!found && info.numChannels >= kChannelCount_STEREO) {// will never be a mono device
-			debugIOLog("Finding interface %d numChannels %d sampleRate %d", ourInterfaceNumber, info.numChannels, newSampleRate.whole);
+			debugIOLogC("Finding interface %d numChannels %d sampleRate %d", ourInterfaceNumber, info.numChannels, newSampleRate.whole);
 			newAltSettingID = usbAudio->FindAltInterfaceWithSettings (ourInterfaceNumber, info.numChannels, mChannelWidth, newSampleRate.whole);
 			if (255 == newAltSettingID) {// try finding 16 bit setting
 				newAltSettingID = usbAudio->FindAltInterfaceWithSettings(ourInterfaceNumber, info.numChannels, altChannelWidth, newSampleRate.whole);
@@ -1347,16 +1317,16 @@ IOReturn EMUUSBAudioEngine::GetDefaultSettings(IOUSBInterface  *streamInterface,
 			
 			if (255 != newAltSettingID) {
 #ifdef DEBUGLOGGING
-				debugIOLog("newAltSettingID %d", newAltSettingID);
+				debugIOLogC("newAltSettingID %d", newAltSettingID);
 				UInt16	format = usbAudio->GetFormat(ourInterfaceNumber, newAltSettingID);
-				debugIOLog("format is %d", format);
+				debugIOLogC("format is %d", format);
 #endif
                 
 				UInt32	pollInterval = (UInt32) usbAudio->GetEndpointPollInterval(ourInterfaceNumber, newAltSettingID, info.streamDirection);
 				mPollInterval = 1 << (pollInterval -1);
-				debugIOLog("direction is %d pollInterval is %d", info.streamDirection, mPollInterval);
+				debugIOLogC("direction is %d pollInterval is %d", info.streamDirection, mPollInterval);
 				if ((1 == mPollInterval) || (8 == mPollInterval)) {
-					debugIOLog("found channel count %d", info.numChannels);
+					debugIOLogC("found channel count %d", info.numChannels);
 					info.multFactor = 3 * info.numChannels;
 					found = true;
 					break;
@@ -1367,7 +1337,7 @@ IOReturn EMUUSBAudioEngine::GetDefaultSettings(IOUSBInterface  *streamInterface,
 		}
 		if (!found) {// last resort - get anything
 			mChannelWidth = kBitDepth_16bits;
-			debugIOLog("last resort in GetDefaultSettings");
+			debugIOLogC("last resort in GetDefaultSettings");
 			info.numChannels = kChannelCount_STEREO;
 			newAltSettingID = usbAudio->FindAltInterfaceWithSettings (ourInterfaceNumber, info.numChannels, mChannelWidth, newSampleRate.whole);
 			info.multFactor = kChannelCount_STEREO * 2;
@@ -1440,7 +1410,7 @@ OSString * EMUUSBAudioEngine::getGlobalUniqueID () {
 		usbLocation = OSDynamicCast (OSNumber, mInput.streamInterface->GetDevice()->getProperty (kUSBDevicePropertyLocationID));
 		if (NULL != usbLocation) {
 			locationID = usbLocation->unsigned32BitValue ();
-			sprintf (locationIDString, "%x", locationID);
+			snprintf (locationIDString,sizeof(locationIDString), "%x", locationID);
 		} else {
 			strncpy (locationIDString, "Unknown location",kStringBufferSize-1);
 		}
@@ -1452,7 +1422,7 @@ OSString * EMUUSBAudioEngine::getGlobalUniqueID () {
 	}
     
 	interfaceNumber = mInput.streamInterface->GetInterfaceNumber ();
-	sprintf (interfaceNumberString, "%d", interfaceNumber);
+	snprintf (interfaceNumberString, sizeof(interfaceNumberString),"%d", interfaceNumber);
 	uniqueIDSize += strlen (interfaceNumberString);
     
 	uniqueIDStr = (char *)IOMalloc (uniqueIDSize);
@@ -1461,9 +1431,9 @@ OSString * EMUUSBAudioEngine::getGlobalUniqueID () {
 		uniqueIDStr[0] = 0;
         
 		if (0 == serialNumberString[0]) {
-			sprintf (uniqueIDStr, "EMUUSBAudioEngine:%s:%s:%s:%s", manufacturerString, productString, locationIDString, interfaceNumberString);
+			snprintf (uniqueIDStr, sizeof(uniqueIDStr), "EMUUSBAudioEngine:%s:%s:%s:%s",manufacturerString, productString, locationIDString, interfaceNumberString);
 		} else {
-			sprintf (uniqueIDStr, "EMUUSBAudioEngine:%s:%s:%s:%s", manufacturerString, productString, serialNumberString, interfaceNumberString);
+			snprintf (uniqueIDStr, sizeof(uniqueIDStr),"EMUUSBAudioEngine:%s:%s:%s:%s", manufacturerString, productString, serialNumberString, interfaceNumberString);
 		}
         
 		uniqueID = OSString::withCString (uniqueIDStr);
@@ -1539,8 +1509,8 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
 		}
 	}
     
-	debugIOLog("input alternateID %d",mInput.alternateSettingID);
-	debugIOLog("output alternatID %d",mOutput.alternateSettingID);
+	debugIOLogC("input alternateID %d",mInput.alternateSettingID);
+	debugIOLogC("output alternatID %d",mOutput.alternateSettingID);
     
     
 	// setup input stream (AC)
@@ -1638,7 +1608,7 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
 	FailIf (kIOReturnSuccess != AddAvailableFormatsFromDevice (usbAudio,mInput.interfaceNumber), Exit);
 	FailIf (kIOReturnSuccess != AddAvailableFormatsFromDevice (usbAudio,mOutput.interfaceNumber), Exit);
 	beginConfigurationChange();
-	debugIOLog("sampleRate %d", sampleRate.whole);
+	debugIOLogC("sampleRate %d", sampleRate.whole);
 	
 	CalculateSamplesPerFrame (sampleRate.whole, &averageFrameSamples, &additionalSampleFrameFreq);
 	// this calcs (frame size, etc.) could probably be simplified, but I'm leaving them this way for now (AC)
@@ -1646,7 +1616,7 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
 	mOutput.multFactor = mOutput.numChannels * (mChannelWidth / 8);
 	mInput.maxFrameSize = (averageFrameSamples + 1) * mInput.multFactor;
 	mOutput.maxFrameSize = (averageFrameSamples + 1) * mOutput.multFactor;
-	debugIOLog("in initHardware about to call initBuffers");
+	debugIOLogC("in initHardware about to call initBuffers");
 	
 	initBuffers();
 	setSampleRate(&sampleRate);
@@ -1661,7 +1631,7 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
 	streamFormat.fAlignment = kIOAudioStreamAlignmentLowByte;
 	streamFormat.fByteOrder = kIOAudioStreamByteOrderLittleEndian;
 	streamFormat.fDriverTag = (mInput.interfaceNumber << 16) | mInput.alternateSettingID;
-	debugIOLog("initHardware input NumChannels %d, bitWidth, %d", streamFormat.fNumChannels, streamFormat.fBitWidth);
+	debugIOLogC("initHardware input NumChannels %d, bitWidth, %d", streamFormat.fNumChannels, streamFormat.fBitWidth);
 	switch (usbAudio->GetFormat (mInput.interfaceNumber, mInput.alternateSettingID)) {
 		case PCM:
 			streamFormat.fSampleFormat = kIOAudioStreamSampleFormatLinearPCM;
@@ -1686,12 +1656,12 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
 			FailMessage ("!!!!interface doesn't support a format that we can deal with!!!!\n", Exit);
 			break;
 	}
-	debugIOLog("opening input stream interface");
+	debugIOLogC("opening input stream interface");
 	FailIf (FALSE == mInput.streamInterface->open (this), Exit);		// Have to open the interface because calling setFormat will call performFormatChange, which expects the interface to be open.
-	debugIOLog("setting input format");
+	debugIOLogC("setting input format");
 	resultCode = mInput.audioStream->setFormat (&streamFormat);
 	//	FailIf (kIOReturnSuccess != resultCode, Exit);
-	debugIOLog("adding input audio stream");
+	debugIOLogC("adding input audio stream");
 	resultCode = addAudioStream (mInput.audioStream);
 	FailIf (kIOReturnSuccess != resultCode, Exit);
 	
@@ -1702,7 +1672,7 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
 	streamFormat.fAlignment = kIOAudioStreamAlignmentLowByte;
 	streamFormat.fByteOrder = kIOAudioStreamByteOrderLittleEndian;
 	streamFormat.fDriverTag = (mOutput.interfaceNumber << 16) | mOutput.alternateSettingID;
-	debugIOLog("initHardware output NumChannels %d, bitWidth, %d", streamFormat.fNumChannels, streamFormat.fBitWidth);
+	debugIOLogC("initHardware output NumChannels %d, bitWidth, %d", streamFormat.fNumChannels, streamFormat.fBitWidth);
 	switch (usbAudio->GetFormat (mOutput.interfaceNumber, mOutput.alternateSettingID)) {
 		case PCM:
 			streamFormat.fSampleFormat = kIOAudioStreamSampleFormatLinearPCM;
@@ -1747,7 +1717,7 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
     
 	startTimer = IOTimerEventSource::timerEventSource (this, waitForFirstUSBFrameCompletion);
 	FailIf (NULL == startTimer, Exit);
-	workLoop->addEventSource (startTimer);
+	//workLoop->addEventSource (startTimer); //HACK testing if this screws up our timing.
     
 	usbAudioDevice->doControlStuff(this, mOutput.interfaceNumber, mOutput.alternateSettingID);
 	usbAudioDevice->doControlStuff(this, mInput.interfaceNumber, mInput.alternateSettingID);
@@ -1756,8 +1726,8 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
     
     resultBool = TRUE;
     
-	sprintf (vendorIDCString, "0x%04X", mInput.streamInterface->GetDevice()->GetVendorID ());
-	sprintf (productIDCString, "0x%04X", mInput.streamInterface->GetDevice()->GetProductID ());
+	snprintf (vendorIDCString, sizeof(vendorIDCString),"0x%04X", mInput.streamInterface->GetDevice()->GetVendorID ());
+	snprintf (productIDCString, sizeof(productIDCString),"0x%04X", mInput.streamInterface->GetDevice()->GetProductID ());
 	
 	setupChannelNames();
     
@@ -1765,14 +1735,14 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
 	IOService::registerService ();
     
 Exit:
-    debugIOLog("EMUUSBAudioEngine[%p]::initHardware(%p), resultCode = %x, resultBool = %d", this, provider, resultCode, resultBool);
+    debugIOLogC("EMUUSBAudioEngine[%p]::initHardware(%p), resultCode = %x, resultBool = %d", this, provider, resultCode, resultBool);
     return resultBool;
 }
 
 void EMUUSBAudioEngine::registerPlugin (EMUUSBAudioPlugin * thePlugin) {
 	mPlugin = thePlugin;
 	mPluginInitThread = thread_call_allocate ((thread_call_func_t)pluginLoaded, (thread_call_param_t)this);
-    debugIOLog("EMUUSBAudioEngine::registerPlugin");
+    debugIOLogC("EMUUSBAudioEngine::registerPlugin");
 	if (NULL != mPluginInitThread) {
 		thread_call_enter (mPluginInitThread);
 	}
@@ -1822,42 +1792,42 @@ void EMUUSBAudioEngine::pluginSetConfigurationApp (const char * bundleID) {
 IOReturn EMUUSBAudioEngine::performAudioEngineStart () {
     IOReturn			resultCode = kIOReturnSuccess;
     
-#if defined(ENABLE_TIMEBOMB)
-    if (usbAudioDevice->checkForTimebomb())
-    {
-        return kIOReturnError;
-    }
-#endif // ENABLE_TIMEBOMB
+    // Wouter: removed timebomb.
     
     debugIOLog ("+EMUUSBAudioEngine[%p]::performAudioEngineStart ()", this);
 	// Reset timestamping mechanism
+    
+    //HACK to support another hack for timestamps.
+    previousfrTimestampNs = 0;
+    goodWraps = 0;
+
+    
 	if (mPlugin)  {
-		debugIOLog("starting plugin");
+		debugIOLogC("starting plugin");
 		mPlugin->pluginStart ();
 	}
     
     if (!usbStreamRunning) {
-		debugIOLog("about to start USB stream(s)");
+		debugIOLogC("about to start USB stream(s)");
         resultCode = startUSBStream();
 	}
     
-	debugIOLog("++EMUUSBAudioEngine[%p]::performEngineStart result is 0x%x direction %d", this, resultCode, mInput.streamDirection);
+	debugIOLogC("++EMUUSBAudioEngine[%p]::performEngineStart result is 0x%x direction %d", this, resultCode, mInput.streamDirection);
     return resultCode;
 }
 
 IOReturn EMUUSBAudioEngine::performAudioEngineStop() {
-    debugIOLog("+EMUUSBAudioEngine[%p]::performAudioEngineStop ()", this);
+    debugIOLogC("+EMUUSBAudioEngine[%p]::performAudioEngineStop ()", this);
 	if (mPlugin)
 		mPlugin->pluginStop ();
     
     if (usbStreamRunning)
         stopUSBStream ();
     
-    debugIOLog("-EMUUSBAudioEngine[%p]::performAudioEngineStop()", this);
+    debugIOLogC("-EMUUSBAudioEngine[%p]::performAudioEngineStop()", this);
     return kIOReturnSuccess;
 }
 
-// This gets called when the HAL wants to select one of the different formats that we made available via mainStream->addAvailableFormat
 IOReturn EMUUSBAudioEngine::performFormatChange (IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate) {
 	if (!newFormat)
 		return kIOReturnSuccess;
@@ -1868,17 +1838,17 @@ IOReturn EMUUSBAudioEngine::performFormatChange (IOAudioStream *audioStream, con
 	bool			needToRestartEngine = false;
 	
 	if (audioStream == mInput.audioStream) {
-		debugIOLog("new format from INPUT");
+		debugIOLogC("new format from INPUT");
 		streamDirection = mInput.streamDirection;
 	} else if (audioStream == mOutput.audioStream) {
-		debugIOLog("new format from OUTPUT");
+		debugIOLogC("new format from OUTPUT");
 		streamDirection = mOutput.streamDirection;
 	} else {
-		debugIOLog("unrecognized stream");
+		debugIOLogC("unrecognized stream");
 		goto Exit;
 	}
 	debugIOLog ("+EMUUSBAudioEngine::performFormatChange existing  sampleRate is %d direction %d", sampleRate.whole, streamDirection);
-	debugIOLog("newFormat->fBitDepth %d, newFormat->fNumChannels %d", newFormat->fBitDepth, newFormat->fNumChannels);
+	debugIOLogC("newFormat->fBitDepth %d, newFormat->fNumChannels %d", newFormat->fBitDepth, newFormat->fNumChannels);
 	FailIf(NULL == usbAudioDevice, Exit);
     
 	// stop the engine before doing nasty stuff to the buffers
@@ -1958,9 +1928,9 @@ IOReturn EMUUSBAudioEngine::performFormatChange (IOAudioStream *audioStream, con
             mInput.alternateSettingID = newAlternateSettingID;
             mChannelWidth = newFormat->fBitWidth;
             mInput.multFactor = mInput.numChannels * (mChannelWidth / 8);
-            debugIOLog("alternateFrameSize is %d", alternateFrameSize);
+            debugIOLogC("alternateFrameSize is %d", alternateFrameSize);
             if (mInput.maxFrameSize != alternateFrameSize) {
-                debugIOLog("maxFrameSize %d alternateFrameSize %d", mInput.maxFrameSize, alternateFrameSize);
+                debugIOLogC("maxFrameSize %d alternateFrameSize %d", mInput.maxFrameSize, alternateFrameSize);
                 mInput.maxFrameSize = alternateFrameSize;
                 needNewBuffers = true;
             }
@@ -1997,9 +1967,9 @@ IOReturn EMUUSBAudioEngine::performFormatChange (IOAudioStream *audioStream, con
             mOutput.alternateSettingID = newAlternateSettingID;
             mChannelWidth = newFormat->fBitWidth;
             mOutput.multFactor = mOutput.numChannels * (mChannelWidth / 8);
-            debugIOLog("alternateFrameSize is %d", alternateFrameSize);
+            debugIOLogC("alternateFrameSize is %d", alternateFrameSize);
             if (mOutput.maxFrameSize != alternateFrameSize) {
-                debugIOLog("maxFrameSize %d alternateFrameSize %d", mOutput.maxFrameSize, alternateFrameSize);
+                debugIOLogC("maxFrameSize %d alternateFrameSize %d", mOutput.maxFrameSize, alternateFrameSize);
                 mOutput.maxFrameSize = alternateFrameSize;
                 needNewBuffers = true;
                 
@@ -2012,7 +1982,7 @@ IOReturn EMUUSBAudioEngine::performFormatChange (IOAudioStream *audioStream, con
 		
 		if (needNewBuffers) {
 			if (kIOReturnSuccess!= initBuffers()) {
-				debugIOLog("problem with initBuffers in performFormatChange");
+				debugIOLogC("problem with initBuffers in performFormatChange");
 				goto Exit;
 			}
 		}
@@ -2033,7 +2003,7 @@ IOReturn EMUUSBAudioEngine::performFormatChange (IOAudioStream *audioStream, con
         
 		debugIOLog ("called setNumSampleFramesPerBuffer with %d", mInput.bufferSize / mInput.multFactor);
 		debugIOLog ("newFormat->fNumChannels = %d, newFormat->fBitWidth %d", newFormat->fNumChannels, newFormat->fBitWidth);
-		debugIOLog ("called setSampleOffset with %d", mInput.numUSBFramesPerList);
+		// debugIOLog ("called setSampleOffset with %d", mInput.numUSBFramesPerList);
 		completeConfigurationChange();
 		result = kIOReturnSuccess;
 	}
@@ -2048,6 +2018,8 @@ Exit:
 
 // called from writeFrameList
 IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 arrayIndex) {
+    debugIOLogW ("+EMUUSBAudioEngine::PrepareWriteFrameList");
+
 	IOReturn		result = kIOReturnError;// default
 	UInt32			sampleBufferSize = (mOutput.audioStream) ? mOutput.audioStream->getSampleBufferSize() : 0;
 	if (sampleBufferSize) {// sanity check just in-case we get a zero
@@ -2059,6 +2031,7 @@ IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 arrayIndex) {
 		bool			haveWrapped = false;
 		UInt16			integerSamplesInFrame, stockSamplesInFrame;
         
+
 		mOutput.usbCompletion[arrayIndex].target = (void *)this;
 		mOutput.usbCompletion[arrayIndex].action = writeHandler;
 		mOutput.usbCompletion[arrayIndex].parameter = 0;			// Set to number of bytes from the 0 wrap, 0 if this buffer didn't wrap
@@ -2068,15 +2041,15 @@ IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 arrayIndex) {
         
 		UInt16 contiguousZeroes = 0;
 		
-        //		debugIOLog("PrepareWriteFrameList stockSamplesInFrame %d numUSBFramesPerList %d", stockSamplesInFrame, numUSBFramesPerList);
+        debugIOLogW("PrepareWriteFrameList stockSamplesInFrame %d numUSBFramesPerList %d", stockSamplesInFrame, mOutput.numUSBFramesPerList);
 		for (UInt32 numUSBFramesPrepared = 0; numUSBFramesPrepared < mOutput.numUSBFramesPerList; ++numUSBFramesPrepared) {
 			integerSamplesInFrame = stockSamplesInFrame;// init to this stock value each time around
 			//integerSamplesInFrame = lastInputFrames; // init to # of input frames;
 			fractionalSamplesRemaining += averageSampleRate - (integerSamplesInFrame * 1000);
-            //		debugIOLog("PrepareWriteFrameList fractionalSamplesRemaining %d", fractionalSamplesRemaining);
+            debugIOLogW("PrepareWriteFrameList fractionalSamplesRemaining %d", fractionalSamplesRemaining);
 			if (fractionalSamplesRemaining >= 1000) {
 				++integerSamplesInFrame;
-                //			debugIOLog("inc integerSamplesInFrame");
+                debugIOLogW("inc integerSamplesInFrame");
 				fractionalSamplesRemaining -= 1000;
 			}
 			// get the size of the corresponding input packet (this will hopefully keep our sample counts in sync)
@@ -2090,17 +2063,17 @@ IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 arrayIndex) {
 			thisFrameSize = integerSamplesInFrame;
 #endif
 			runningOutputCount += thisFrameSize;
-			//debugIOLog("thisFrameSize %d",thisFrameSize);
+			//debugIOLogC("thisFrameSize %d",thisFrameSize);
 			thisFrameSize *= mOutput.multFactor;
-			//debugIOLog("PrepareWriteFrameList fractionalSamplesRemaining %d thisFrameSize %d", fractionalSamplesRemaining, thisFrameSize);
+			//debugIOLogC("PrepareWriteFrameList fractionalSamplesRemaining %d thisFrameSize %d", fractionalSamplesRemaining, thisFrameSize);
 			if (thisFrameSize >= numBytesToBufferEnd) {
-                //		debugIOLog("param has something %d", numUSBFramesPrepared);
+                //		debugIOLogC("param has something %d", numUSBFramesPrepared);
                 
 #if 0
 				//perform zero test
 				bool allZeroes = true;
 				for (int i = lastPreparedByte; i < lastPreparedByte + numBytesToBufferEnd; ++i) {
-                    //debugIOLog("%d",((Byte *) mOutput.bufferPtr)[i]);
+                    //debugIOLogC("%d",((Byte *) mOutput.bufferPtr)[i]);
                     if (((Byte *) mOutput.bufferPtr)[i] != 1) {
                         allZeroes = false;
                         break;
@@ -2108,12 +2081,12 @@ IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 arrayIndex) {
 				}
 				if (allZeroes) {
 					++contiguousZeroes;
-					//debugIOLog("*** detected all zeroes in write buffer %d ",numUSBFramesPrepared);
+					//debugIOLogC("*** detected all zeroes in write buffer %d ",numUSBFramesPrepared);
 				} else {
 					contiguousZeroes = 0;
-					//debugIOLog("*** non-zero buffer %d",mOutput.usbFrameToQueueAt+numUSBFramesPrepared);
+					//debugIOLogC("*** non-zero buffer %d",mOutput.usbFrameToQueueAt+numUSBFramesPrepared);
 					if (mOutput.usbFrameToQueueAt+numUSBFramesPrepared - lastNonZeroFrame > 1) {
-						debugIOLog("*** non-zero discontinuity at %d",mOutput.usbFrameToQueueAt+numUSBFramesPrepared);
+						debugIOLogW("*** non-zero discontinuity at %d",mOutput.usbFrameToQueueAt+numUSBFramesPrepared);
 					}
 					lastNonZeroFrame = mOutput.usbFrameToQueueAt+numUSBFramesPrepared;
 				}
@@ -2129,7 +2102,7 @@ IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 arrayIndex) {
 			    //perform zero test
 				bool allZeroes = true;
 				for (int i = lastPreparedByte; i < lastPreparedByte + thisFrameSize; ++i) {
-                    //debugIOLog("%d",((Byte *) mOutput.bufferPtr)[i]);
+                    //debugIOLogC("%d",((Byte *) mOutput.bufferPtr)[i]);
                     if (((Byte *) mOutput.bufferPtr)[i] != 1) {
                         allZeroes = false;
                         break;
@@ -2137,12 +2110,12 @@ IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 arrayIndex) {
 				}
 				if (allZeroes) {
 					++contiguousZeroes;
-					//debugIOLog("*** detected all zeroes in write buffer %d ",numUSBFramesPrepared);
+					//debugIOLogC("*** detected all zeroes in write buffer %d ",numUSBFramesPrepared);
 				} else {
 					contiguousZeroes = 0;
-					//debugIOLog("*** non-zero buffer %d",mOutput.usbFrameToQueueAt+numUSBFramesPrepared);
+					//debugIOLogC("*** non-zero buffer %d",mOutput.usbFrameToQueueAt+numUSBFramesPrepared);
 					if (mOutput.usbFrameToQueueAt+numUSBFramesPrepared - lastNonZeroFrame > 1) {
-						debugIOLog("*** non-zero discontinuity at %d --> %d",lastNonZeroFrame,mOutput.usbFrameToQueueAt+numUSBFramesPrepared);
+						debugIOLogW("*** non-zero discontinuity at %d --> %d",lastNonZeroFrame,mOutput.usbFrameToQueueAt+numUSBFramesPrepared);
 					}
 					lastNonZeroFrame = mOutput.usbFrameToQueueAt+numUSBFramesPrepared;
 				}
@@ -2150,14 +2123,14 @@ IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 arrayIndex) {
 				thisFrameListSize += thisFrameSize;
 				lastPreparedByte += thisFrameSize;
 				numBytesToBufferEnd -= thisFrameSize;
-                //			debugIOLog("no param");
+                //			debugIOLogC("no param");
 			}
 			mOutput.usbIsocFrames[firstFrame + numUSBFramesPrepared].frStatus = -1;
 			mOutput.usbIsocFrames[firstFrame + numUSBFramesPrepared].frActCount = 0;
 			mOutput.usbIsocFrames[firstFrame + numUSBFramesPrepared].frReqCount = thisFrameSize;
 		}
-        //	debugIOLog("Done with the numUSBFrames loop");
-		//debugIOLog("num actual data frames in list %d",mOutput.numUSBFramesPerList - contiguousZeroes);
+        //debugIOLogC("Done with the numUSBFrames loop");
+		debugIOLogW("num actual data frames in list %d",mOutput.numUSBFramesPerList - contiguousZeroes);
 		if (haveWrapped) {
 			needTimeStamps = TRUE;
 			theWrapDescriptors[1]->initSubRange (mOutput.usbBufferDescriptor, 0, lastPreparedByte, kIODirectionInOut);
@@ -2173,7 +2146,7 @@ IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 arrayIndex) {
 			FailIf (NULL == mOutput.bufferDescriptors[arrayIndex], Exit);
 		}
         
-		debugIOLog2("PrepareWriteFrameList: lastPrepareFrame %d safeToEraseTo %d",lastPreparedByte / mOutput.multFactor, safeToEraseTo / mOutput.multFactor);
+		debugIOLogW("PrepareWriteFrameList: lastPrepareFrame %d safeToEraseTo %d",lastPreparedByte / mOutput.multFactor, safeToEraseTo / mOutput.multFactor);
         
 		safeToEraseTo = lastSafeErasePoint;
 		lastSafeErasePoint = previouslyPreparedBufferOffset;
@@ -2184,35 +2157,48 @@ Exit:
 	return result;
 }
 
-IOReturn EMUUSBAudioEngine::readFrameList (UInt32 frameListNum) {// frameListNum must be in the valid range 0 - 126
+
+IOReturn EMUUSBAudioEngine::readFrameList (UInt32 frameListNum) {
+    debugIOLogR("+ read frameList %d ", frameListNum);
+    if (shouldStop) {
+        debugIOLog("*** Read should have stopped. Who is calling this? Canceling call")
+        return kIOReturnAborted;
+    }
+    
 	IOReturn	result = kIOReturnError;
 	if (mInput.pipe) {
 		UInt32		firstFrame = frameListNum * mInput.numUSBFramesPerList;
 		mInput.usbCompletion[frameListNum].target = (void*) this;
-		mInput.usbCompletion[frameListNum].action = readHandler;
+		mInput.usbCompletion[frameListNum].action = readCompleted;
 		mInput.usbCompletion[frameListNum].parameter = (void*) (UInt64)frameListNum; // remember the frameListNum
         
-
-#if 0
-		// unrolled for loop - numUSBFramesPerList is 4 (i have no idea why this was done [AC])
-		mInput.usbIsocFrames[firstFrame].frStatus = mInput.usbIsocFrames[firstFrame + 1].frStatus =
-		mInput.usbIsocFrames[firstFrame + 2].frStatus = mInput.usbIsocFrames[firstFrame + 3].frStatus = -1;
-		mInput.usbIsocFrames[firstFrame].frActCount = mInput.usbIsocFrames[firstFrame + 1].frActCount =
-		mInput.usbIsocFrames[firstFrame + 2].frActCount = mInput.usbIsocFrames[firstFrame + 3].frActCount = 0;
-		mInput.usbIsocFrames[firstFrame].frReqCount = mInput.usbIsocFrames[firstFrame + 1].frReqCount =
-		mInput.usbIsocFrames[firstFrame + 2].frReqCount = mInput.usbIsocFrames[firstFrame + 3].frReqCount = mInput.maxFrameSize;
-		*(UInt64 *)(&(mInput.usbIsocFrames[firstFrame].frTimeStamp)) = *(UInt64 *)(&(mInput.usbIsocFrames[firstFrame + 1].frTimeStamp)) =
-		*(UInt64 *)(&(mInput.usbIsocFrames[firstFrame + 2].frTimeStamp)) = *(UInt64 *)(&(mInput.usbIsocFrames[firstFrame + 3].frTimeStamp)) = 0ul;
-#else
-		// un-unrolled loop
 		for (int i = 0; i < mInput.numUSBFramesPerList; ++i) {
-			mInput.usbIsocFrames[firstFrame+i].frStatus = -1;
-			mInput.usbIsocFrames[firstFrame+i].frActCount = 0;
-			mInput.usbIsocFrames[firstFrame+i].frReqCount = mInput.maxFrameSize;
-			*(UInt64 *)(&(mInput.usbIsocFrames[firstFrame + i].frTimeStamp)) = 	0ul;
+			mInput.usbIsocFrames[firstFrame+i].frStatus = -1; // used to check if this frame was already received
+			mInput.usbIsocFrames[firstFrame+i].frActCount = 0; // actual #bytes transferred
+			mInput.usbIsocFrames[firstFrame+i].frReqCount = mInput.maxFrameSize; // #bytes to read.
+			*(UInt64 *)(&(mInput.usbIsocFrames[firstFrame + i].frTimeStamp)) = 	0ul; //time when frame was procesed
 		}
-#endif
-		result = mInput.pipe->Read(mInput.bufferDescriptors[frameListNum], mInput.usbFrameToQueueAt, mInput.numUSBFramesPerList, &mInput.usbIsocFrames[firstFrame], &mInput.usbCompletion[frameListNum], 1);//mPollInterval);
+        //debugIOLogC("read framelist : %d frames, %d bytes per frame",mInput.numUSBFramesPerList, mInput.maxFrameSize);
+        
+		//result = mInput.pipe->Read(mInput.bufferDescriptors[frameListNum], mInput.usbFrameToQueueAt, mInput.numUSBFramesPerList, &mInput.usbIsocFrames[firstFrame], &mInput.usbCompletion[frameListNum], 1);//mPollInterval);
+        
+        // HACK. Disabled the 'refresh of frame list'. We read only when read calls back
+        // HACK. always keep reading, instead of targeting explicit framenr - that seemed unreliable.
+        // we now prefer to keep reading instead of hanging on a bad USB frame nr.
+        // FIXME can we check somehow if we do not loose data on the USB stream this way?
+        
+        /*The updatefrequency is not so well documented. But in IOUSBInterfaceInterface192 I read:
+         Specifies how often, in milliseconds, the frame list data should be updated. Valid range is 0 - 8. If 0, it means that the framelist should be updated at the end of the transfer.
+         It appears that this number also has impact on the timing details in the frame list.
+         If you set this to 0, there happens an additional 8ms for a full framelist once in a 
+         few minutes in the timings.
+         If you set this to 1, this jump is 8x more often, about once 30 seconds, but is only 1ms.
+         We must keep these jumps small, to avoid timestamp errors and buffer overruns.
+         */
+		result = mInput.pipe->Read(mInput.bufferDescriptors[frameListNum], kAppleUSBSSIsocContinuousFrame, mInput.numUSBFramesPerList, &mInput.usbIsocFrames[firstFrame], &mInput.usbCompletion[frameListNum],1);
+        if (result!=kIOReturnSuccess) {
+            doLog("USB pipe READ error %x",result);
+        }
 		if (mInput.frameQueuedForList)
 			mInput.frameQueuedForList[frameListNum] = mInput.usbFrameToQueueAt;
         
@@ -2222,75 +2208,69 @@ IOReturn EMUUSBAudioEngine::readFrameList (UInt32 frameListNum) {// frameListNum
 	return result;
 }
 
-void EMUUSBAudioEngine::readHandler (void * object, void * parameter, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
-	EMUUSBAudioEngine *			engine = (EMUUSBAudioEngine *)object;
-#if LOCKING
-	IOLockLock(engine->mLock);
-#endif
+
+
+void EMUUSBAudioEngine::readCompleted (void * object, void * frameListNrPtr, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
+   
+	EMUUSBAudioEngine *	engine = (EMUUSBAudioEngine *)object;
+
+    // HACK we have numUSBFramesPerList frames, which one to check?? Print frame 0 info.
+    debugIOLogR("+ readCompleted framelist %d currentFrameList %d result %x frametime %lld systime %lld",
+                frameListnr, engine->mInput.currentFrameList, result, myFrames->frTimeStamp,systemTime);
+
+    // CHECK is this really used?
+//    if (TRUE == engine->startingEngine) {
+//        doLog("EMUUSBAudioEngine::readCompleted SERIOUS: engine still starting up. Exit readCompleted.");
+//        return; // wait till engine really started.
+//    }
+    engine->startingEngine = FALSE; // HACK if we turn off the timer to start the  thing...
+
     
-    UInt64	currentUSBFrameNumber;
-    UInt32	frameListToRead;
+    IOLockLock(engine->mLock);
+    // HACK we MUST have the lock now as we must restart reading the list.
+    // This means we may have to wait for GatherInputSamples to complete from a call from convertInputSamples.
+    // should be short.
+    // We must fix this problem.
     
-	FailIf (TRUE == engine->inReadCompletion, Exit);
-	engine->inReadCompletion = TRUE;
-	
-	FailIf (NULL == engine->mInput.streamInterface, Exit);
-    
-	//debugIOLog("+ readhandler");
-    
-	if (TRUE == engine->startingEngine)
-		engine->startingEngine = FALSE;	// The engine is fully started (it's no longer starting... it's running)
-    
-	currentUSBFrameNumber = engine->mBus->GetFrameNumber();
-    
-	if (0 == engine->shouldStop && (SInt64)(engine->mInput.usbFrameToQueueAt - currentUSBFrameNumber) > (SInt64)(engine->mInput.numUSBTimeFrames * (engine->mInput.numUSBFrameListsToQueue- 1))) {
-		// The frame list that this would have queued has already been queued by convertInputSamples
-        //#if DEBUGLOADING
-		debugIOLog2 ("Not queuing a frame list in readHandler (%ld)", (SInt32)(engine->mInput.usbFrameToQueueAt - currentUSBFrameNumber));
-        //#endif
-		goto Exit;
-	}
-	if (kIOReturnSuccess != result && kIOReturnAborted != result) {
-		// skip ahead and see if that helps
-		if (engine->mInput.usbFrameToQueueAt <= currentUSBFrameNumber) {// ensure that the usbFrameToQueueAt is at least > currentUSBFrameNumber
-			engine->mInput.usbFrameToQueueAt = currentUSBFrameNumber + engine->mInput.frameOffset;//kMinimumFrameOffset;
-			debugIOLog2("try adjusting the input frame number");
-		}
-	}
-    
+    /*An "underrun error" occurs when the UART transmitter has completed sending a character and the transmit buffer is empty. In asynchronous modes this is treated as an indication that no data remains to be transmitted, rather than an error, since additional stop bits can be appended. This error indication is commonly found in USARTs, since an underrun is more serious in synchronous systems.
+     */
+
 	if (kIOReturnAborted != result) {
-		engine->GatherInputSamples(&engine->mInput.usbIsocFrames[engine->mInput.currentFrameList * engine->mInput.numUSBFramesPerList]);
+        if (engine->GatherInputSamples(true) != kIOReturnSuccess) {
+            debugIOLog("***** EMUUSBAudioEngine::readCompleted failed to read all packets from USB stream!");
+        }
 	}
 	
+    // Wouter:  data collection from the USB read is complete.
+    // Now start the read on the next block.
 	if (!engine->shouldStop) {
-		// keep incrementing until limit of numUSBFrameLists - 1 is reached
-		engine->mInput.currentFrameList = (engine->mInput.currentFrameList + 1) * (engine->mInput.currentFrameList < RECORD_FRAME_LISTS_LIMIT);
-		frameListToRead = engine->mInput.currentFrameList - 1 + engine->mInput.numUSBFrameListsToQueue;
-		frameListToRead -= engine->mInput.numUSBFrameLists * (frameListToRead >= engine->mInput.numUSBFrameLists);// crop the number of framesToRead
-		
-		engine->readFrameList(frameListToRead);
-		
-		//call the write handler (hey, this might actually work!)
-		//engine->writeHandler(object,parameter,result,engine->mOutput.usbIsocFrames);
-		
-	} else  {// stop issued
-		debugIOLog("++EMUUSBAudioEngine::readHandler() - stopping: %d", engine->shouldStop);
+        UInt32	frameListToRead;
+		// (orig doc) keep incrementing until limit of numUSBFrameLists - 1 is reached.
+        // also, we can wonder if we want to do it this way. Why not just check what comes in instead
+        engine->mInput.currentFrameList =(engine->mInput.currentFrameList + 1) % RECORD_NUM_USB_FRAME_LISTS;
+
+        // now we have already numUSBFrameListsToQueue-1 other framelist queues running.
+        // We set our current list to the next one that is not yet running
+        
+        frameListToRead = engine->mInput.currentFrameList - 1 + engine->mInput.numUSBFrameListsToQueue;
+        frameListToRead -= engine->mInput.numUSBFrameLists * (frameListToRead >= engine->mInput.numUSBFrameLists);// crop the number of framesToRead
+        // seems something equal to frameListToRead = (frameListnr + engine->mInput.numUSBFrameListsToQueue) % engine->mInput.numUSBFrameLists;
+        engine->readFrameList(frameListToRead); // restart reading (but for different framelist).
+        
+	} else  {// stop issued FIX THIS CODE
+		debugIOLogR("++EMUUSBAudioEngine::readCompleted() - stopping: %d", engine->shouldStop);
 		++engine->shouldStop;
 		if (engine->shouldStop == (engine->mInput.numUSBFrameListsToQueue + 1) && TRUE == engine->terminatingDriver) {
 			engine->mInput.streamInterface->close(engine);
 			engine->mInput.streamInterface = NULL;
 		}
 	}
-    
-Exit:
-	engine->inReadCompletion = FALSE;
-	//debugIOLog("- readhandler");
-#if LOCKING
 	IOLockUnlock(engine->mLock);
-#endif
     
+	debugIOLogR("- readCompleted currentFrameList=%d",engine->mInput.currentFrameList);
 	return;
 }
+
 
 void EMUUSBAudioEngine::resetClipPosition (IOAudioStream *audioStream, UInt32 clipSampleFrame) {
 	if (mPlugin)
@@ -2418,7 +2398,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	// Make sure we have enough bandwidth (return unused bandwidth)
     //	FailIf(mUSBBufferDescriptor == NULL, Exit);
 	CalculateSamplesPerFrame(sampleRate.whole, &averageFrameSamples, &additionalSampleFrameFreq);
-	debugIOLog("averageFrameSamples=%d",averageFrameSamples);
+	debugIOLogC("averageFrameSamples=%d",averageFrameSamples);
     
 	// bit width should be the same for both input and output
     //	FailIf(inputFormat->fBitWidth != outputFormat->fBitWidth, Exit);
@@ -2431,6 +2411,8 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	
 	UInt32	altFrameSampleSize = averageFrameSamples + 1;
 	mInput.currentFrameList = mOutput.currentFrameList = 0;
+    mInput.previousFrameList = 3; //  different from currentFrameList.
+    
 	safeToEraseTo = 0;
 	lastSafeErasePoint = 0;
 	mInput.bufferOffset = mOutput.bufferOffset = 0;
@@ -2441,7 +2423,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     shouldStop = 0;
 	runningInputCount = runningOutputCount = 0;
 	lastDelta = 0;
-	debugIOLog("mInput.frameQueuedList");
+	debugIOLogC("mInput.frameQueuedList");
 	if (mInput.frameQueuedForList) {
 		bzero(mInput.frameQueuedForList, sizeof(UInt64) * mInput.numUSBFrameLists);
 	}
@@ -2449,7 +2431,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 		bzero(mOutput.frameQueuedForList, sizeof(UInt64) * mOutput.numUSBFrameLists);
 	}
     
-	debugIOLog("Isoc Frames / usbCompletions");
+	debugIOLogC("Isoc Frames / usbCompletions");
 	bzero(mInput.usbIsocFrames, mInput.numUSBFrameLists * mInput.numUSBFramesPerList * sizeof(IOUSBLowLatencyIsocFrame));
 	bzero(mInput.usbCompletion, mInput.numUSBFrameLists * sizeof(IOUSBLowLatencyIsocCompletion));
     FailIf ((mInput.numUSBFrameLists < mInput.numUSBFrameListsToQueue), Exit);
@@ -2464,18 +2446,21 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	
 	if (newInputMultFactor > mInput.multFactor || newOutputMultFactor > mOutput.multFactor
 		|| !mInput.usbBufferDescriptor || !mOutput.usbBufferDescriptor) {
-        debugIOLog("startUSBStream: about to re-init buffers, input factor=%d (now %d), output factor=%d (now %d)",
+        debugIOLogC("startUSBStream: about to re-init buffers, input factor=%d (now %d), output factor=%d (now %d)",
                    mInput.multFactor,newInputMultFactor,mOutput.multFactor,newOutputMultFactor);
         mInput.maxFrameSize = altFrameSampleSize * newInputMultFactor;
         mOutput.maxFrameSize = altFrameSampleSize * newOutputMultFactor;
         mInput.multFactor = newInputMultFactor;
         mOutput.multFactor = newOutputMultFactor;
-        debugIOLog("pre initBuffers");
+        debugIOLogC("pre initBuffers");
         beginConfigurationChange();
         initBuffers();
         completeConfigurationChange();
-        debugIOLog("post initBuffers");
+        debugIOLogC("post initBuffers");
 	}
+    
+    // Wouter: this is bad example of code duplication.
+    // Is it not possible to make this more modular?
     
 	//first do the input
     
@@ -2490,7 +2475,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	audioIsochEndpoint.direction = mInput.streamDirection;
 #if 1
 	{
-		debugIOLog("createInputPipe");
+		debugIOLogC("createInputPipe");
 		mInput.pipe = mInput.streamInterface->FindNextPipe (NULL, &audioIsochEndpoint);
 		FailIf (NULL == mInput.pipe, Exit);
 		mInput.pipe->retain ();
@@ -2510,7 +2495,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     // NB - From testing and observation this work around does not help and has therefore been deleted.
 	mInput.frameOffset = kMinimumFrameOffset + ((kUSBDeviceSpeedHigh == mHubSpeed) * kUSB2FrameOffset);
 	mInput.usbFrameToQueueAt = mBus->GetFrameNumber() + mInput.frameOffset;	// start on an offset usb frame
-    //	debugIOLog("usbFrameToQueueAt is %x\n", usbFrameToQueueAt);
+    //	debugIOLogC("usbFrameToQueueAt is %x\n", usbFrameToQueueAt);
 	
 	//IOLog("the buffers are %x and %x\n", buffers[0], buffers[1]);
 	
@@ -2518,32 +2503,39 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     
 	if (NULL != mInput.associatedPipe) {
 		nextSynchReadFrame = mInput.usbFrameToQueueAt;
-		debugIOLog("read from associated input pipe");
-		resultCode = mInput.associatedPipe->Read(neededSampleRateDescriptor, nextSynchReadFrame, 1,
-                                                 &(mSampleRateFrame), &sampleRateCompletion);
+		debugIOLogC("read from associated input pipe");
+		//resultCode = mInput.associatedPipe->Read(neededSampleRateDescriptor, nextSynchReadFrame, 1,&(mSampleRateFrame), &sampleRateCompletion);
+		resultCode = mInput.associatedPipe->Read(neededSampleRateDescriptor, kAppleUSBSSIsocContinuousFrame, 1,&(mSampleRateFrame), &sampleRateCompletion);
 	}
 #if PREPINPUT
 	prepInputPipe();
 #endif
+
+    // we start reading on all framelists. USB will figure it out and take the next one in order
+    // when it has data. We restart each framelist immediately in readCompleted when we get data.
 	for (UInt32 frameListNum = mInput.currentFrameList; frameListNum < mInput.numUSBFrameListsToQueue; ++frameListNum) {
-		debugIOLog("read frame list %d",frameListNum);
 		readFrameList(frameListNum);
 	}
+    
 #endif
 	
 	// and now the output
 	
 	resultCode = mOutput.streamInterface->SetAlternateInterface (this, mOutput.alternateSettingID);
 	FailIf (kIOReturnSuccess != resultCode, Exit);
+    
+    
+    
+#if 0
 	
-	debugIOLog("create output pipe");
+	debugIOLogC("create output pipe");
 	bzero(&audioIsochEndpoint,sizeof(audioIsochEndpoint));
 	audioIsochEndpoint.type = kUSBIsoc;
 	audioIsochEndpoint.direction = mOutput.streamDirection;
 	mOutput.pipe = mOutput.streamInterface->FindNextPipe (NULL, &audioIsochEndpoint);
 	FailIf (NULL == mOutput.pipe, Exit);
 	mOutput.pipe->retain ();
-	debugIOLog("check for associated endpoint");
+	debugIOLogC("check for associated endpoint");
 	CheckForAssociatedEndpoint (usbAudio,mOutput.interfaceNumber,mOutput.alternateSettingID);// result is ignored
     
 	address = usbAudio->GetIsocEndpointAddress(mOutput.interfaceNumber, mOutput.alternateSettingID, mOutput.streamDirection);
@@ -2564,16 +2556,16 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     
 	/*if (NULL != mOutput.associatedPipe) {
      nextSynchReadFrame = mOutput.usbFrameToQueueAt;
-     debugIOLog("read from associated output pipe");
+     debugIOLogC("read from associated output pipe");
      resultCode = mOutput.associatedPipe->Read(neededSampleRateDescriptor, nextSynchReadFrame, 1,
      &(mSampleRateFrame), &sampleRateCompletion);
      }*/
     
 	for (UInt32 frameListNum = mOutput.currentFrameList; frameListNum < mOutput.numUSBFrameListsToQueue; ++frameListNum)  {
-		debugIOLog("write frame list %d",frameListNum);
+		debugIOLogC("write frame list %d",frameListNum);
 		writeFrameList(frameListNum);
 	}
-    
+#endif
 	//don't know if this is useful or not
 	//setClockIsStable(FALSE);
     
@@ -2636,6 +2628,8 @@ IOReturn EMUUSBAudioEngine::getAnchor(UInt64* frame, AbsoluteTime*	time) {
 	IOReturn	result = kIOReturnError;// initialized to error
 	AbsoluteTime	theTime;
 	UInt32		attempts = kMaxAttempts;
+    // Wouter: why is this done so complex? What makes this different from
+    // just *frame = usbAudioDevice->mNewReferenceUSBFrame ?
 	if (usbAudioDevice) {
 		while(attempts && theFrame != usbAudioDevice->mNewReferenceUSBFrame) {
 			theFrame = usbAudioDevice->mNewReferenceUSBFrame;
@@ -2647,28 +2641,41 @@ IOReturn EMUUSBAudioEngine::getAnchor(UInt64* frame, AbsoluteTime*	time) {
 			*frame = theFrame;
 			*time = theTime;
 		}
-		//debugIOLog("getAnchor: frame %llu time %llu",theFrame,theTime);
+		debugIOLogT("getAnchor: frame %llu time %llu",theFrame,theTime);
 	}
 	return result;
 }
 
-// time off of read stream (??) [AC]
 void EMUUSBAudioEngine::waitForFirstUSBFrameCompletion (OSObject * owner, IOTimerEventSource * sender) {
+
+    // Why do we need this? Can we just start reading right away and get rid of this whole test with timers?
+    // Is this to avoid a hang-up and have some time out mechanism? Does USB not have any time-out options?
+    
+    // we're inside timer call. Maybe that's why we need to pass 'owner'?
 	EMUUSBAudioEngine *				usbAudioEngineObject  = OSDynamicCast (EMUUSBAudioEngine, owner);
     //	AbsoluteTime						timeOffset;
 	static UInt32					timeout = 60;
     
+    
 	FailIf ((NULL == usbAudioEngineObject) || (usbAudioEngineObject->isInactive()) || (0 != usbAudioEngineObject->shouldStop), Exit);
+    
+
+    
+    
 	if (0 == timeout || ( * (UInt64 *) ( & (usbAudioEngineObject->mInput.usbIsocFrames[0].frTimeStamp)) & 0xFFFFFFFF) != 0xFFFFFFFF) {
 		AbsoluteTime	timeOffset, uptime;
-        //	UInt64			systemTime;
 		AbsoluteTime	systemTime;
 		nanoseconds_to_absolutetime (kMinimumFrameOffset * kWallTimeConstant,EmuAbsoluteTimePtr(&timeOffset));
 		clock_get_uptime(EmuAbsoluteTimePtr(&uptime));
 		SUB_ABSOLUTETIME(&uptime, &timeOffset);
-		usbAudioEngineObject->takeTimeStamp(FALSE, &uptime);
+        // Init the time stamping in the audio engine.
+        // first arg is true if the loop count should be incremented.
+        // the 2nd arg is the AbsoluteTime.
+        
+        // HACK we now use previousfrTimesStamp.
+		//usbAudioEngineObject->takeTimeStamp(FALSE, &uptime);
 		clock_get_uptime(EmuAbsoluteTimePtr(&systemTime));
-		debugIOLog("first time stamp %llu systemTime %llu", uptime, systemTime);
+		debugIOLogT("Audio running. first time stamp %llu at systemTime %llu", uptime, systemTime);
         
 		usbAudioEngineObject->startingEngine = FALSE;			// It's started now.
 		usbAudioEngineObject->startTimer->cancelTimeout();
@@ -2677,7 +2684,7 @@ void EMUUSBAudioEngine::waitForFirstUSBFrameCompletion (OSObject * owner, IOTime
 		// Requeue timer to check for the first frame completing
 		usbAudioEngineObject->startTimer->setTimeoutUS (50);		// will call us back in 50 micoseconds
 		--timeout;
-        //	debugIOLog ("audio not running, requeuing timer (%ld)", timeout);
+        debugIOLogT ("AUDIO NOT RUNNING, time-out of get timer (%ld)", timeout);
 	}
     
 Exit:
@@ -2717,7 +2724,6 @@ bool EMUUSBAudioEngine::willTerminate (IOService * provider, IOOptionBits option
 	return super::willTerminate (provider, options);
 }
 
-// called from writeHandler
 IOReturn EMUUSBAudioEngine::writeFrameList (UInt32 frameListNum) {
 	IOReturn	result = kIOReturnError;
     if (mOutput.pipe) {
@@ -2743,12 +2749,8 @@ Exit:
 	return result;
 }
 
-// queue a write from clipOutputSamples
-// This is called from clipOutputSamples.
-// @param parameter the framelistnumber. Actually is a void * that is coming
-//   out of the StreamInfo struct in the kernel. This driver tries to put an UInt32 in it
-//   in a hacky way. probably to avoid memory allocation. Wouter: fixed this to UInt64, *  to UInt32 is KO on 64bit archi.
 void EMUUSBAudioEngine::writeHandler (void * object, void * parameter, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
+    
 	EMUUSBAudioEngine *	self = (EMUUSBAudioEngine*) object;
 	if (!self->inWriteCompletion) {
 		self->inWriteCompletion = TRUE;
@@ -2762,7 +2764,7 @@ void EMUUSBAudioEngine::writeHandler (void * object, void * parameter, IOReturn 
 		curUSBFrameNumber = self->mBus->GetFrameNumber();
 		if ((SInt64)(self->mOutput.usbFrameToQueueAt - curUSBFrameNumber) > (SInt32)(self->mOutput.numUSBTimeFrames * (self->mOutput.numUSBFrameListsToQueue / 2) + 1)) {
 			// The frame list that this would have queued has already been queued by clipOutputSamples
-			debugIOLog("In writehandler Exit");
+			debugIOLogC("In writehandler Exit");
 			goto Exit;
 		}
         
@@ -2776,14 +2778,14 @@ void EMUUSBAudioEngine::writeHandler (void * object, void * parameter, IOReturn 
 			}
 		}
         
-		//debugIOLog("writehandler: frame %d, parameter %u",curUSBFrameNumber,(UInt32) parameter);
+		//debugIOLogW("writehandler: frame %d, parameter %u",curUSBFrameNumber,(UInt32) parameter);
         
 		if (0 != parameter) {
 			// Take a timestamp
 			AbsoluteTime systemTime;
 			unsigned long long	/*systemTime,*/ stampTime;
 			UInt32	byteOffset = ((UInt64)parameter) & 0x00FF;
-			unsigned long	frameIndex = ((UInt64) parameter >>16) - 1;
+			UInt32	frameIndex = (UInt32) (((UInt64) parameter >>16) - 1);
 			if (kUSBDeviceSpeedHigh == self->mHubSpeed) {// consider the high speed bus case first
 				//UInt32	byteCount = self->mOutput.maxFrameSize;
 				UInt32	byteCount = self->lastInputFrames * self->mOutput.multFactor;
@@ -2801,12 +2803,12 @@ void EMUUSBAudioEngine::writeHandler (void * object, void * parameter, IOReturn 
 			}
 			clock_get_uptime(EmuAbsoluteTimePtr(&systemTime));
 			stampTime = AbsoluteTime_to_scalar(&time);
-			debugIOLog("write frameIndex %d stampTime %llu system time %llu \n", frameIndex, stampTime, systemTime);
+			debugIOLogT("write frameIndex %ld stampTime %llu system time %llu \n", frameIndex, stampTime, systemTime);
 			//self->takeTimeStamp(TRUE, &time);
 			int delta = self->runningInputCount - self->runningOutputCount;
 			int drift = self->lastDelta - delta;
 			self->lastDelta = delta;
-			debugIOLog("running counts: input %lu, output %lu, delta %ld, drift %ld",self->runningInputCount,self->runningOutputCount,delta, drift);
+			debugIOLogC("running counts: input %u, output %u, delta %d, drift %d",(unsigned int)self->runningInputCount,(unsigned int)self->runningOutputCount,delta, drift);
             //  FIXME drift should be accounted for??? Is this the source of our clicks??
 #if 0
 			if (drift < 100) { // should never be that big
@@ -2824,7 +2826,7 @@ void EMUUSBAudioEngine::writeHandler (void * object, void * parameter, IOReturn 
 			self->writeFrameList (frameListToWrite);
 		} else {
 			++self->shouldStop;
-			debugIOLog("writeHandler: should stop");
+			debugIOLogC("writeHandler: should stop");
 			if (self->shouldStop == (self->mOutput.numUSBFrameListsToQueue + 1) && TRUE == self->terminatingDriver) {
 				self->mOutput.streamInterface->close (self);
 				self->mOutput.streamInterface = NULL;
@@ -2832,13 +2834,16 @@ void EMUUSBAudioEngine::writeHandler (void * object, void * parameter, IOReturn 
 		}
         //		IOLockUnlock(self->mWriteLock);
 	} else {
-		debugIOLog("*** Already in write completion!");
+		debugIOLogC("*** Already in write completion!");
 		return;
 	}
 Exit:
 	self->inWriteCompletion = FALSE;
 	return;
 }
+
+
+
 #if UHCISUPPORT// still incomplete
 void EMUUSBAudioEngine::writeHandlerUHCI(void* object, void* param, IOReturn result, IOUSBLowLatencyIsocFrame* pFrames) {
 	EMUUSBAudioEngine*	engine = (EMUUSBAudioEngine*) object;
@@ -2861,6 +2866,9 @@ void EMUUSBAudioEngine::writeHandlerUHCI(void* object, void* param, IOReturn res
 	engine->inWriteCompletion = FALSE;
 }
 #endif
+
+
+
 IOReturn EMUUSBAudioEngine::hardwareSampleRateChanged(const IOAudioSampleRate *newSampleRate) {
 	IOReturn	result = kIOReturnError;
     if (usbAudioDevice && ((newSampleRate->whole != sampleRate.whole) || (newSampleRate->fraction != sampleRate.fraction))) {
@@ -2974,22 +2982,28 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 		//UInt32							pollInterval = (UInt32) usbAudio->GetEndpointPollInterval(ourInterfaceNumber, alternateSettingID, mDirection);
         //	maxFrameSize = usbAudio->GetEndpointMaxPacketSize(ourInterfaceNumber, alternateSettingID, address);
 		//mPollInterval = 1 << (pollInterval -1);
-		debugIOLog("initBuffers");
+		debugIOLogC("initBuffers");
 		//, frameSize %d direction %d mPollInterval %d", frameSize, mDirection, mPollInterval);
 		// clear up any existing buffers
 		UInt32 inputSize = mInput.maxFrameSize;
 		UInt32 outputSize = mOutput.maxFrameSize;
 		UInt32	samplesPerFrame = inputSize / mInput.multFactor;
-		debugIOLog("inputSize= %d multFactor= %d", inputSize, mInput.multFactor);
-		debugIOLog("outputSize= %d multFactor= %d", outputSize, mOutput.multFactor);
+		debugIOLogC("inputSize= %d multFactor= %d", inputSize, mInput.multFactor);
+		debugIOLogC("outputSize= %d multFactor= %d", outputSize, mOutput.multFactor);
 		
         //	FailIf(samplesPerFrame != outputSize / mOutput.multFactor, Exit); - JH allocated size may be off 1 such as with AC3
 		
 		// this is total guesswork (AC)
+        
         //	UInt32	numSamplesInBuffer = samplesPerFrame * 256;//
-		UInt32	numSamplesInBuffer = PAGE_SIZE * (2 + (sampleRate.whole > 48000) + (sampleRate.whole > 96000));
 		//UInt32 numSamplesInBuffer = samplesPerFrame * 16;
-		
+		UInt32	numSamplesInBuffer = PAGE_SIZE * (2 + (sampleRate.whole > 48000) + (sampleRate.whole > 96000));
+        
+        // HACK notice that PAGE_SIZE is a hardware specific value for 32 bit intel machines.
+        // Why is this not related to the number of channels?
+        // I propose this should be computed more directly based on the framelist size.
+
+
 		
 		mInput.bufferSize = numSamplesInBuffer * mInput.multFactor;
 		mOutput.bufferSize = numSamplesInBuffer * mOutput.multFactor;
@@ -2998,16 +3012,16 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 		if (NULL != mInput.bufferMemoryDescriptor) {
 			mInput.audioStream->setSampleBuffer (NULL, 0);
 			setNumSampleFramesPerBuffer (0);
-			debugIOLog("releasing the input sampleBufferMemory descriptor");
+			debugIOLogC("releasing the input sampleBufferMemory descriptor");
 			mInput.bufferMemoryDescriptor->complete();
 			mInput.bufferMemoryDescriptor->release();
 			mInput.bufferMemoryDescriptor = NULL;
 			mInput.bufferPtr = NULL;// reset the sample buffer ptr
 		}
 		readUSBFrameListSize = inputSize * mInput.numUSBFramesPerList;
-		debugIOLog("new bufferSize = %d numSamplesInBuffer = %d\n", mInput.bufferSize, numSamplesInBuffer );
+		debugIOLogC("new bufferSize = %d numSamplesInBuffer = %d\n", mInput.bufferSize, numSamplesInBuffer );
 		if (mInput.usbBufferDescriptor) {
-			debugIOLog("disposing the mUSBBufferDescriptor input");
+			debugIOLogC("disposing the mUSBBufferDescriptor input");
 			mInput.usbBufferDescriptor->complete();
 			mInput.usbBufferDescriptor->release();
 			mInput.usbBufferDescriptor = NULL;
@@ -3015,7 +3029,7 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 		}
 		// read buffer section
 		// following is the actual buffer that stuff gets read into
-		debugIOLog("initBuffers readUSBFrameListSize %d numUSBFrameLists %d", readUSBFrameListSize, mInput.numUSBFrameLists);
+		debugIOLogC("initBuffers readUSBFrameListSize %d numUSBFrameLists %d", readUSBFrameListSize, mInput.numUSBFrameLists);
 #ifdef CONTIGUOUS
 		mInput.usbBufferDescriptor = IOBufferMemoryDescriptor::withOptions(kIOMemoryPhysicallyContiguous| kIODirectionInOut, mInput.numUSBFrameLists * readUSBFrameListSize, page_size);
 #else
@@ -3023,20 +3037,21 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 #endif
 		FailIf (NULL == mInput.usbBufferDescriptor, Exit);
 		mInput.usbBufferDescriptor->prepare();
+        // Wouter: this gets direct ptr to the USB buffer memory
 		readBuffer = mInput.usbBufferDescriptor->getBytesNoCopy();// get a valid ptr or NULL
 		FailIf (NULL == readBuffer, Exit);
 		// setup the sub ranges
 		FailIf(NULL == mInput.bufferDescriptors, Exit);
 		for (UInt32 i = 0; i < mInput.numUSBFrameLists; ++i) {
 			if (mInput.bufferDescriptors[i]) {
-                //				debugIOLog("disposing input soundBufferDescriptors[%d]", i);
+                //				debugIOLogC("disposing input soundBufferDescriptors[%d]", i);
 				mInput.bufferDescriptors[i]->complete();
 				mInput.bufferDescriptors[i]->release();
 				mInput.bufferDescriptors[i] = NULL;
 			}
 			mInput.bufferDescriptors[i] = OSTypeAlloc(IOSubMemoryDescriptor);
 			bool initResult = mInput.bufferDescriptors[i]->initSubRange(mInput.usbBufferDescriptor, i * readUSBFrameListSize, readUSBFrameListSize, kIODirectionInOut);
-            //			debugIOLog("initSubRange soundBufferDescriptors[%d] %d", i, initResult);
+            //			debugIOLogC("initSubRange soundBufferDescriptors[%d] %d", i, initResult);
 			FailIf (NULL == mInput.bufferDescriptors[i]|| !initResult, Exit);
 			result = mInput.bufferDescriptors[i]->prepare();
 			FailIf(kIOReturnSuccess != result, Exit);
@@ -3047,35 +3062,54 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 		mInput.bufferMemoryDescriptor->prepare();
 		mInput.bufferPtr = mInput.bufferMemoryDescriptor->getBytesNoCopy();// get a valid pointer or NULL
 		FailIf(NULL == mInput.bufferPtr, Exit);
-		UInt32	offsetToSet = samplesPerFrame;
+		
+        // HACK this is insufficient, we are doing block transfer with much larger blocks
+        // note, samplesPerFrame is really fields per frame
+        //UInt32	offsetToSet = samplesPerFrame;
+        // quarter a framelist is fine but gives 16ms latency.
+        // UInt32 offsetToSet = samplesPerFrame * mInput.numUSBFramesPerList / 4;
+
+        // actual jitter on the USB input is 0.01ms. But we have high latency pulses that have 1ms.
+        // The clock lock filter spreads out the effect of the pulse over a long time,
+        // at the cost of increase in latency to 3ms or so. We need to measure this all exactly.
+        UInt32 offsetToSet = sampleRate.whole / 200; // * 0.005 ms
 		
 		// use samplesPerFrame as our "safety offset" unless explicitly set as a driver property
+        // You can set it in the properties .list file in EMUUSBAudioControl04:        SafetyOffset        Number 192
+        // BUT, this is not recommended as this safety offset really depends on the settings we make here.
+        // maybe we could define something different there. Not now.
 		OSNumber *safetyOffsetObj = OSDynamicCast(OSNumber,usbAudioDevice->getProperty("SafetyOffset"));
 		if (safetyOffsetObj) {
+            debugIOLogT("using externally requested safety offset %d",safetyOffsetObj->unsigned32BitValue());
 			setSampleOffset(safetyOffsetObj->unsigned32BitValue());
 		} else {
-			setSampleOffset(2*offsetToSet);
+            debugIOLogT("using our own estimated offset %d",offsetToSet);
+            // This is the offset for the playback head: min distance the IOAudioEngine keeps from our write head.
+            setSampleOffset(offsetToSet);
 		}
-		setInputSampleLatency(2*samplesPerFrame);
+        // idem for the playback head.
+		//setInputSampleLatency(2*samplesPerFrame);
+        // HACK. This is the latency from read till end user. Not clear if IOEngine uses it.
+        setInputSampleLatency(2* mInput.numUSBFramesPerList * mInput.maxFrameSize / mInput.multFactor);
 		mInput.audioStream->setSampleBuffer(mInput.bufferPtr, mInput.bufferSize);
 		
 		//now the output buffer
 		if (mOutput.usbBufferDescriptor) {
-			debugIOLog("disposing the output mUSBBufferDescriptor");
+			debugIOLogC("disposing the output mUSBBufferDescriptor");
 			mOutput.audioStream->setSampleBuffer(NULL, 0);
 			setNumSampleFramesPerBuffer(0);
 			mOutput.usbBufferDescriptor->complete();
 			mOutput.usbBufferDescriptor->release();
 			mOutput.usbBufferDescriptor = NULL;
 		}
-		debugIOLog("In the out path, making new buffer with size of %d numSamplesInBuffer %d", mOutput.bufferSize, numSamplesInBuffer);
+		debugIOLogC("In the out path, making new buffer with size of %d numSamplesInBuffer %d", mOutput.bufferSize, numSamplesInBuffer);
 		mOutput.usbBufferDescriptor = IOBufferMemoryDescriptor::withOptions (kIODirectionInOut, mOutput.bufferSize, page_size);
 		FailIf (NULL == mOutput.usbBufferDescriptor, Exit);
 		mOutput.usbBufferDescriptor->prepare();
 		FailIf(NULL == mOutput.bufferDescriptors, Exit);
 		for (UInt32 i = 0; i < mOutput.numUSBFrameLists; ++i) {
 			if (mOutput.bufferDescriptors[i]) {
-                //				debugIOLog("disposing output soundBufferDescriptors[%d]", i);
+                //				debugIOLogC("disposing output soundBufferDescriptors[%d]", i);
 				mOutput.bufferDescriptors[i]->complete();
 				mOutput.bufferDescriptors[i]->release();
 				mOutput.bufferDescriptors[i] = NULL;
@@ -3094,12 +3128,14 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
         
 		setNumSampleFramesPerBuffer(numSamplesInBuffer);
         
-		debugIOLog("completed initBuffers");
+		debugIOLogC("completed initBuffers");
 		result = kIOReturnSuccess;
 	}
 Exit:
 	return result;
 }
+
+
 #if PREPINPUT // routines to clear out the first kNumFramesToClear frames in the input pipe - currently disabled for now.
 void EMUUSBAudioEngine::prepInputPipe() {
 	// mInput.pipe will have to exist by this point in time
@@ -3115,15 +3151,15 @@ void EMUUSBAudioEngine::prepInputPipe() {
 	IOReturn	result = kIOReturnError;
 	result = mInput.pipemOutput.usbBufferDescriptor->Read(soundBufferDescriptors[0], usbFrameToQueueAt, kNumFramesToClear, mClearIsocFrames, /*mClearInputCompletion*/ NULL, 0);
 	if (kIOReturnSuccess == result) {
-		debugIOLog("prepInputPipe ok");
+		debugIOLogC("prepInputPipe ok");
 		usbFrameToQueueAt += kNumFramesToClear;
 	}
-	debugIOLog("prepInputPipe result %x", result);
+	debugIOLogC("prepInputPipe result %x", result);
 }
 // currently debating whether or not to perform Reads synchronously or asynchronously
 void EMUUSBAudioEngine::prepInputHandler(void* object, void* frameListIndex, IOReturn result, IOUSBLowLatencyIsocFrame* pFrames) {
 	EMUUSBAudioEngine*	engine = (EMUUSBAudioEngine*) object;
-	debugIOLog("prepInputHandler result %x", result);
+	debugIOLogC("prepInputHandler result %x", result);
 }
 #endif
 
@@ -3158,19 +3194,19 @@ void EMUUSBAudioEngine::setupChannelNames() {
 	OSObject *obj = usbAudioDevice->getProperty("IOAudioEngineChannelNames");
 	OSDictionary *dict = OSDynamicCast(OSDictionary,obj);
 	if (dict) {
-		debugIOLog("Found IOAudioEngineChannelNames");
+		debugIOLogC("Found IOAudioEngineChannelNames");
 		setProperty("IOAudioEngineChannelNames",dict);
 	}
 	obj = usbAudioDevice->getProperty("IOAudioEngineChannelCategoryNames");
 	dict = OSDynamicCast(OSDictionary,obj);
 	if (dict) {
-		debugIOLog("Found IOAudioEngineChannelCategoryNames");
+		debugIOLogC("Found IOAudioEngineChannelCategoryNames");
 		setProperty("IOAudioEngineChannelCategoryNames",dict);
 	}	
 	obj = usbAudioDevice->getProperty("IOAudioEngineChannelNumberNames");
 	dict = OSDynamicCast(OSDictionary,obj);
 	if (dict) {
-		debugIOLog("Found IOAudioEngineChannelNumberNames");
+		debugIOLogC("Found IOAudioEngineChannelNumberNames");
 		setProperty("IOAudioEngineChannelNumberNames",dict);
 	}	
 }
@@ -3178,17 +3214,17 @@ void EMUUSBAudioEngine::setupChannelNames() {
 void EMUUSBAudioEngine::PushFrameSize(UInt32 frameSize) {
 	frameSizeQueue[frameSizeQueueBack++] = frameSize;
 	frameSizeQueueBack %= FRAMESIZE_QUEUE_SIZE;	
-	//debugIOLog("queued framesize %d, ptr %d",frameSize,frameSizeQueueBack);
+	//debugIOLogC("queued framesize %d, ptr %d",frameSize,frameSizeQueueBack);
 }
 
 UInt32 EMUUSBAudioEngine::PopFrameSize() {
 	if (frameSizeQueueFront == frameSizeQueueBack) {
-		debugIOLog("empty framesize queue");
+		debugIOLogC("empty framesize queue");
 		return 0;
 	}
 	UInt32 result = frameSizeQueue[frameSizeQueueFront++];
 	frameSizeQueueFront %= FRAMESIZE_QUEUE_SIZE;
-	//debugIOLog("dequeued framesize %d, read %d",result,frameSizeQueueFront);
+	//debugIOLogC("dequeued framesize %d, read %d",result,frameSizeQueueFront);
 	return result;
 }
 

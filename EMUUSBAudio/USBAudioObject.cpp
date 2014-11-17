@@ -39,7 +39,7 @@ OSDefineMetaClassAndStructors(EMUUSBAudioConfigObject, OSObject);
 // 	Public methods
 EMUUSBAudioConfigObject * EMUUSBAudioConfigObject::create(const IOUSBConfigurationDescriptor * newConfigurationDescriptor, UInt8 controlInterfaceNum) {
     EMUUSBAudioConfigObject*		configObject = new EMUUSBAudioConfigObject;
-    debugIOLog("EMUUSBAudioConfigObject::create");
+    debugIOLogPC("EMUUSBAudioConfigObject::create");
     if (configObject && !configObject->init(newConfigurationDescriptor, controlInterfaceNum)) {
         configObject->release();
         configObject = NULL;
@@ -47,11 +47,13 @@ EMUUSBAudioConfigObject * EMUUSBAudioConfigObject::create(const IOUSBConfigurati
 	return configObject;
 }
 
+// init the audio.
+//@param newConfigurationDescriptor an IOUSBConfigurationDescriptor describing the device
 bool EMUUSBAudioConfigObject::init(const IOUSBConfigurationDescriptor * newConfigurationDescriptor, UInt8 controlInterfaceNum) {
     bool	result = false;
     
 	if (OSObject::init() && newConfigurationDescriptor) {
-		debugIOLog("EMUUSBAudioConfigObject::init");
+		debugIOLogPC("EMUUSBAudioConfigObject::init");
 		UInt32	length = USBToHostWord(newConfigurationDescriptor->wTotalLength);
 		theControlInterfaceNum = controlInterfaceNum;
 		theConfigurationDescriptorPtr = (IOUSBConfigurationDescriptor *)IOMalloc(length + 1);
@@ -131,12 +133,12 @@ UInt8 EMUUSBAudioConfigObject::FindNextAltInterfaceWithSampleSize(UInt8 interfac
 UInt8 EMUUSBAudioConfigObject::FindNextAltInterfaceWithSampleRate(UInt8 interfaceNum, UInt8 startingAltInterface, UInt32 sampleRateRequested) {
 	UInt16		numAltInterfaces = GetNumAltStreamInterfaces(interfaceNum);
 	UInt8		altInterface = 255;
-    debugIOLog("FindNextAltInterfaceWithSampleRate sampleRate%d numAltInterfaces %d", sampleRateRequested, numAltInterfaces);
+    debugIOLogPC("FindNextAltInterfaceWithSampleRate sampleRate%d numAltInterfaces %d", sampleRateRequested, numAltInterfaces);
 	for (UInt8 altInterfaceIndx = startingAltInterface; altInterfaceIndx < numAltInterfaces && altInterface == 255; ++altInterfaceIndx) {
 		if (TRUE == VerifySampleRateIsSupported(interfaceNum, altInterfaceIndx, sampleRateRequested))
 			altInterface = altInterfaceIndx;
 	}
-    debugIOLog("FindNextAltInterfaceWithSampleRate altInterface is %d", altInterface);
+    debugIOLogPC("FindNextAltInterfaceWithSampleRate altInterface is %d", altInterface);
 	return altInterface;
 }
 
@@ -148,10 +150,10 @@ UInt8 EMUUSBAudioConfigObject::FindAltInterfaceWithSettings(UInt8 interfaceNum, 
 		if((GetFormat(interfaceNum, potentialAltInterface) & 0x0FFF) != 0) {	// Make sure it's not an undefined format
 			potentialAltInterface = FindNextAltInterfaceWithNumChannels(interfaceNum, potentialAltInterface, numChannels);
 			if(255 == potentialAltInterface) {
-				debugIOLog("Undefined format! No alternate setting ID for interface %d, %d channels", interfaceNum, numChannels);
+				debugIOLogPC("Undefined format! No alternate setting ID for interface %d, %d channels", interfaceNum, numChannels);
 				break;		// Done, so break out of while loop
 			}
-			debugIOLog("FindAltInterfaceWithSettings potentialAltInterface %d sampleRate %d", potentialAltInterface, sampleRate);
+			debugIOLogPC("FindAltInterfaceWithSettings potentialAltInterface %d sampleRate %d", potentialAltInterface, sampleRate);
 			if(FindNextAltInterfaceWithSampleSize(interfaceNum, potentialAltInterface, sampleSize) == potentialAltInterface) {
 				if(0 != sampleRate) {
 					// they want a specific sample rate on this interface
@@ -184,8 +186,8 @@ UInt8 EMUUSBAudioConfigObject::GetFeatureUnitIDConnectedToOutputTerminal(UInt8 i
     EMUUSBAudioControlObject*		thisControl = GetControlObject(interfaceNum, altInterfaceNum);
     UInt8						featureUnitID = 0;
     
-	debugIOLog("GetFeatureUnitIDConnectedToOutputTerminal (%d, %d, %d)", interfaceNum, altInterfaceNum, outputTerminalID);
- 	debugIOLog("GetControlObject returns %p", thisControl);
+	debugIOLogPC("GetFeatureUnitIDConnectedToOutputTerminal (%d, %d, %d)", interfaceNum, altInterfaceNum, outputTerminalID);
+ 	debugIOLogPC("GetControlObject returns %p", thisControl);
     if (thisControl)
 		featureUnitID = thisControl->GetFeatureUnitIDConnectedToOutputTerminal(outputTerminalID);
     
@@ -231,10 +233,10 @@ UInt8 EMUUSBAudioConfigObject::GetControlInterfaceNum(void) {
 UInt16 EMUUSBAudioConfigObject::GetFormat(UInt8 interfaceNum, UInt8 altInterfaceNum) {
 	EMUUSBAudioStreamObject* 		thisStream = GetStreamObject(interfaceNum, altInterfaceNum);
 	UInt16						formatTag = TYPE_I_UNDEFINED;
-	debugIOLog("in GetFormat");
+	debugIOLogPC("in GetFormat");
 	if (thisStream) {
 		formatTag = USBToHostWord(thisStream->GetFormatTag());
-		debugIOLog("formatTag is %d", formatTag);
+		debugIOLogPC("formatTag is %d", formatTag);
 	}
 	return formatTag;
 }
@@ -300,7 +302,7 @@ UInt32 EMUUSBAudioConfigObject::GetEndpointMaxPacketSize(UInt8 interfaceNum, UIn
 	EMUUSBAudioStreamObject*	stream = GetStreamObject(interfaceNum, altInterfaceNum);
 	if (stream) {
 		EMUUSBEndpointObject*	endpoint = stream->GetEndpointByAddress(address);
-		debugIOLog("GetEndpointMaxPacketSize interfaceNum %d altInterfaceNum %d address %d", interfaceNum, altInterfaceNum, address);
+		debugIOLogPC("GetEndpointMaxPacketSize interfaceNum %d altInterfaceNum %d address %d", interfaceNum, altInterfaceNum, address);
 		if (endpoint)
 			maxPacketSize = endpoint->GetMaxPacketSize();
 	}
@@ -331,21 +333,21 @@ UInt8 EMUUSBAudioConfigObject::GetIsocEndpointDirection(UInt8 interfaceNum, UInt
 	UInt8								terminalID;
 	UInt8								direction = 0xFF;
     
-  	debugIOLog("GetIsocEndpointDirection(%d, %d), thisStream = %p", interfaceNum, altInterfaceNum, thisStream);
- 	debugIOLog("GetIsocEndpointDirection(%d, %d), thisControl = %p", interfaceNum, altInterfaceNum, thisControl);
+  	debugIOLogPC("GetIsocEndpointDirection(%d, %d), thisStream = %p", interfaceNum, altInterfaceNum, thisStream);
+ 	debugIOLogPC("GetIsocEndpointDirection(%d, %d), thisControl = %p", interfaceNum, altInterfaceNum, thisControl);
 	if(NULL != thisStream && NULL != thisControl) {
 		UInt8	terminalLink = thisStream->GetTerminalLink();		// returns the unitID of the terminal the endpoint goes with
-		debugIOLog("GetIsocEndpointDirection(%d, %d), terminalLink = %d", interfaceNum, altInterfaceNum, terminalLink);
+		debugIOLogPC("GetIsocEndpointDirection(%d, %d), terminalLink = %d", interfaceNum, altInterfaceNum, terminalLink);
 		if(0 != terminalLink) {
 			UInt8	numOutputs = thisControl->GetNumOutputTerminals();
-			debugIOLog("GetIsocEndpointDirection(%d, %d), numOutputs = %d", interfaceNum, altInterfaceNum, numOutputs);
+			debugIOLogPC("GetIsocEndpointDirection(%d, %d), numOutputs = %d", interfaceNum, altInterfaceNum, numOutputs);
 			while(0xFF == direction && index < numOutputs) {
 				terminalID = thisControl->GetIndexedOutputTerminalID(index);
-				debugIOLog("GetIsocEndpointDirection(%d, %d), terminalID = %d", interfaceNum, altInterfaceNum, terminalID);
+				debugIOLogPC("GetIsocEndpointDirection(%d, %d), terminalID = %d", interfaceNum, altInterfaceNum, terminalID);
 				if(terminalID == terminalLink) {
 					direction = kUSBIn;
 					numEndpoints = numOutputs;
-					debugIOLog("GetIsocEndpointDirection(%d, %d), found an output terminal(#%d) at index %d", interfaceNum, altInterfaceNum, terminalID, index);
+					debugIOLogPC("GetIsocEndpointDirection(%d, %d), found an output terminal(#%d) at index %d", interfaceNum, altInterfaceNum, terminalID, index);
 					break;// get out of the loop
 				}
 				++index;
@@ -353,16 +355,16 @@ UInt8 EMUUSBAudioConfigObject::GetIsocEndpointDirection(UInt8 interfaceNum, UInt
             
 			if(0xFF == direction) {// get the output
 				UInt8	numInputs = thisControl->GetNumInputTerminals();
-				debugIOLog("GetIsocEndpointDirection(%d, %d), Didn't find an output terminal, checking for an input terminal", interfaceNum, altInterfaceNum);
-				debugIOLog("GetIsocEndpointDirection(%d, %d), numInputs = %d", interfaceNum, altInterfaceNum, numInputs);
+				debugIOLogPC("GetIsocEndpointDirection(%d, %d), Didn't find an output terminal, checking for an input terminal", interfaceNum, altInterfaceNum);
+				debugIOLogPC("GetIsocEndpointDirection(%d, %d), numInputs = %d", interfaceNum, altInterfaceNum, numInputs);
 				index = 0;
 				while(0xFF == direction && index < numInputs) {
 					terminalID = thisControl->GetIndexedInputTerminalID(index);
-					debugIOLog("GetIsocEndpointDirection, terminalID = %d", interfaceNum, altInterfaceNum, terminalID);
+					debugIOLogPC("GetIsocEndpointDirection, terminalID = %d", interfaceNum, altInterfaceNum, terminalID);
 					if(terminalID == terminalLink) {
 						direction = kUSBOut;
 						numEndpoints = numInputs;
-						debugIOLog("GetIsocEndpointDirection(%d, %d), found an input terminal(#%d) at index %d", interfaceNum, altInterfaceNum, terminalID, index);
+						debugIOLogPC("GetIsocEndpointDirection(%d, %d), found an input terminal(#%d) at index %d", interfaceNum, altInterfaceNum, terminalID, index);
 						break;
 					}
 					++index;
@@ -380,7 +382,7 @@ UInt8 EMUUSBAudioConfigObject::GetIsocEndpointDirection(UInt8 interfaceNum, UInt
 		}
 	}
     
-	debugIOLog("GetIsocEndpointDirection(%d, %d), endpointDirection = %d", interfaceNum, altInterfaceNum, endpointDirection);
+	debugIOLogPC("GetIsocEndpointDirection(%d, %d), endpointDirection = %d", interfaceNum, altInterfaceNum, endpointDirection);
     return endpointDirection;
 }
 
@@ -541,7 +543,7 @@ UInt8 EMUUSBAudioConfigObject::GetNumChannels(UInt8 interfaceNum, UInt8 altInter
     if (stream) {
         numChannels = stream->GetNumChannels();
     } else {
-		debugIOLog("GetNumChannels: no audio stream object!");
+		debugIOLogPC("GetNumChannels: no audio stream object!");
 	}
     return numChannels;
 }
@@ -807,7 +809,7 @@ Boolean EMUUSBAudioConfigObject::VerifySampleRateIsSupported(UInt8 interfaceNum,
 	Boolean		result = FALSE;
 	UInt32*		sampleRates = GetSampleRates(interfaceNum, altInterfaceNum);
 	UInt8		numSampleRates = GetNumSampleRates(interfaceNum, altInterfaceNum);
-    debugIOLog("VerifySampleRateIsSupported %d interfaceNum %d altInterfaceNum %d", verifyRate, interfaceNum, altInterfaceNum);
+    debugIOLogPC("VerifySampleRateIsSupported %d interfaceNum %d altInterfaceNum %d", verifyRate, interfaceNum, altInterfaceNum);
 	if(numSampleRates) {
 		// There are a discrete number of sample rates supported, so check each one to see if they support the one we want.
 		for(UInt8 rateIndx = 0; rateIndx < numSampleRates && result == FALSE; ++rateIndx)
@@ -817,7 +819,7 @@ Boolean EMUUSBAudioConfigObject::VerifySampleRateIsSupported(UInt8 interfaceNum,
 		// There is a range of sample rates supported, so check to see if the one we want is within that range.
 		result = (sampleRates[0] <= verifyRate && sampleRates[1] >= verifyRate);
 	}
-	debugIOLog("verifySampleRateIsSupported %d", result);
+	debugIOLogPC("verifySampleRateIsSupported %d", result);
 	return result;
 }
 
@@ -863,7 +865,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
 		USBInterfaceDescriptorPtr			theInterfacePtr;
 		EMUUSBAudioControlObject *				theControlObject = NULL;
 		EMUUSBAudioStreamObject *				theStreamObject = NULL;
-		UInt8 *								streamInterfaceNumbers;
+		UInt8 *								streamInterfaceNumbers=NULL;
 		UInt8								thisInterfaceNumber;
 		UInt8								lastInterfaceNumber = 0;
 		UInt8								numStreamInterfaces = 0;
@@ -876,7 +878,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
 			if(INTERFACE ==((ACInterfaceDescriptorPtr)theInterfacePtr)->bDescriptorType) {
 				UInt8		interfaceClass, interfaceSubClass;
                 
-				debugIOLog("in INTERFACE in ParseConfigurationDescriptor");
+				debugIOLogPC("in INTERFACE in ParseConfigurationDescriptor");
 				thisInterfaceNumber =((ACInterfaceDescriptorPtr)theInterfacePtr)->bInterfaceNumber;
 #if !CUSTOMDEVICE
 				if(AUDIO ==((ACInterfaceDescriptorPtr)theInterfacePtr)->bInterfaceClass) {
@@ -884,9 +886,9 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                     if(VENDOR_SPECIFIC ==((ACInterfaceDescriptorPtr)theInterfacePtr)->bInterfaceClass) {// changed to VENDOR_SPECIFIC
 #endif
                         theInterfacePtr = ParseInterfaceDescriptor(theInterfacePtr, &interfaceClass, &interfaceSubClass);
-                        debugIOLog("theControlInterfaceNum = %d, thisInterfaceNumber = %d", theControlInterfaceNum, thisInterfaceNumber);
+                        debugIOLogPC("theControlInterfaceNum = %d, thisInterfaceNumber = %d", theControlInterfaceNum, thisInterfaceNumber);
                         if(AUDIOCONTROL == interfaceSubClass && theControlInterfaceNum == thisInterfaceNumber) {
-                            debugIOLog("found a AUDIOCONTROL CS_INTERFACE ");
+                            debugIOLogPC("found a AUDIOCONTROL CS_INTERFACE ");
                             if(NULL != theControls)
                                 theControlObject = OSDynamicCast(EMUUSBAudioControlObject, theControls->getLastObject());
                             FailIf(NULL == theControlObject, Exit);
@@ -894,11 +896,11 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                             GetControlledStreamNumbers(&streamInterfaceNumbers, &numStreamInterfaces);
                             haveControlInterface = TRUE;
                         } else if(haveControlInterface && AUDIOSTREAMING == interfaceSubClass) {
-                            debugIOLog("in CS_INTERFACE in ParseConfigurationDescriptor");
+                            debugIOLogPC("in CS_INTERFACE in ParseConfigurationDescriptor");
                             for(UInt8 index = 0; index < numStreamInterfaces; ++index) {
-                                debugIOLog("comparing thisInterfaceNum = %d with %d", thisInterfaceNumber, streamInterfaceNumbers[index]);
+                                debugIOLogPC("comparing thisInterfaceNum = %d with %d", thisInterfaceNumber, streamInterfaceNumbers[index]);
                                 if(thisInterfaceNumber == streamInterfaceNumbers[index]) {
-                                    debugIOLog("found a AUDIOSTREAMING CS_INTERFACE ");
+                                    debugIOLogPC("found a AUDIOSTREAMING CS_INTERFACE ");
                                     if(NULL != theStreams)
                                         theStreamObject = OSDynamicCast(EMUUSBAudioStreamObject, theStreams->getLastObject());
                                     
@@ -916,28 +918,28 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                                 
                             }
                         } else if(MIDISTREAMING == interfaceSubClass) {
-                            debugIOLog("MIDI, jumping forward %d bytes", theInterfacePtr->bLength);
+                            debugIOLogPC("MIDI, jumping forward %d bytes", theInterfacePtr->bLength);
                             for(UInt8 index = 0; index < numStreamInterfaces; ++index) {
                                 if(thisInterfaceNumber == streamInterfaceNumbers[index]) {
-                                    debugIOLog("MIDI Stuff thisInterfaceNumber %d", thisInterfaceNumber);
+                                    debugIOLogPC("MIDI Stuff thisInterfaceNumber %d", thisInterfaceNumber);
                                     break;
                                 }
                             }
                             theInterfacePtr =(USBInterfaceDescriptorPtr)((UInt8 *)theInterfacePtr + theInterfacePtr->bLength);
                         } else if(AUDIOCONTROL == interfaceSubClass) {
-                            debugIOLog("Found a control interface that we don't care about");
-                            debugIOLog("jumping forward %d bytes",((((ACInterfaceHeaderDescriptorPtr)theInterfacePtr)->wTotalLength[1] << 8) |(((ACInterfaceHeaderDescriptorPtr)theInterfacePtr)->wTotalLength[0])));
+                            debugIOLogPC("Found a control interface that we don't care about");
+                            debugIOLogPC("jumping forward %d bytes",((((ACInterfaceHeaderDescriptorPtr)theInterfacePtr)->wTotalLength[1] << 8) |(((ACInterfaceHeaderDescriptorPtr)theInterfacePtr)->wTotalLength[0])));
                             theInterfacePtr =(USBInterfaceDescriptorPtr)((UInt8 *)theInterfacePtr +((((ACInterfaceHeaderDescriptorPtr)theInterfacePtr)->wTotalLength[1] << 8) |(((ACInterfaceHeaderDescriptorPtr)theInterfacePtr)->wTotalLength[0])));
                         } else {
-                            debugIOLog("Unknown, jumping forward %d bytes", theInterfacePtr->bLength);
+                            debugIOLogPC("Unknown, jumping forward %d bytes", theInterfacePtr->bLength);
                             theInterfacePtr =(USBInterfaceDescriptorPtr)((UInt8 *)theInterfacePtr + theInterfacePtr->bLength);
                         }
                     } else {
-                        debugIOLog("not an audio interface in ParseConfigurationDescriptor, jumping forward %d bytes", theInterfacePtr->bLength);
+                        debugIOLogPC("not an audio interface in ParseConfigurationDescriptor, jumping forward %d bytes", theInterfacePtr->bLength);
                         theInterfacePtr =(USBInterfaceDescriptorPtr)((UInt8 *)theInterfacePtr + theInterfacePtr->bLength);
                     }
                 } else {
-                    debugIOLog("in default in ParseConfigurationDescriptor, jumping forward %d bytes", theInterfacePtr->bLength);
+                    debugIOLogPC("in default in ParseConfigurationDescriptor, jumping forward %d bytes", theInterfacePtr->bLength);
                     theInterfacePtr =(USBInterfaceDescriptorPtr)((UInt8 *)theInterfacePtr + theInterfacePtr->bLength);
                 }
             }
@@ -951,7 +953,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
     }
     
     USBInterfaceDescriptorPtr EMUUSBAudioConfigObject::ParseInterfaceDescriptor(USBInterfaceDescriptorPtr theInterfacePtr, UInt8 * interfaceClass, UInt8 * interfaceSubClass) {
-        debugIOLog("in ParseInterfaceDescriptor");
+        debugIOLogPC("in ParseInterfaceDescriptor");
         
         FailIf(NULL == theInterfacePtr, Exit);
         FailIf(0 == theInterfacePtr->bLength, Exit);
@@ -962,7 +964,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
             *interfaceSubClass = theInterfacePtr->bInterfaceSubClass;
         
         if(AUDIOCONTROL == theInterfacePtr->bInterfaceSubClass) {
-            debugIOLog("found a AUDIOCONTROL interface");
+            debugIOLogPC("found a AUDIOCONTROL interface");
             if(theControlInterfaceNum == theInterfacePtr->bDescriptorSubtype) {
                 EMUUSBAudioControlObject*	theControlObject = EMUUSBAudioControlObject::create();
                 
@@ -984,11 +986,11 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                 theControlObject->release();
             }
         } else if(AUDIOSTREAMING == theInterfacePtr->bInterfaceSubClass) {
-            debugIOLog("found a AUDIOSTREAMING interface");
+            debugIOLogAS("found a AUDIOSTREAMING interface");
             EMUUSBAudioStreamObject*	theStreamObject = EMUUSBAudioStreamObject::create();
             
             FailIf(NULL == theStreamObject, Exit);
-            debugIOLog("stream parameters: subtype %d, alternate %d, endpoints %d, class %d, subclass %d, protocol %d",
+            debugIOLogAS("stream parameters: subtype %d, alternate %d, endpoints %d, class %d, subclass %d, protocol %d",
                        theInterfacePtr->bDescriptorSubtype, theInterfacePtr->bAlternateSetting,
                        theInterfacePtr->bNumEndpoints,theInterfacePtr->bInterfaceClass,
                        theInterfacePtr->bInterfaceSubClass, theInterfacePtr->bInterfaceProtocol);
@@ -1000,11 +1002,11 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
             theStreamObject->SetInterfaceProtocol(theInterfacePtr->bInterfaceProtocol);
             
             if(NULL == theStreams) {
-                debugIOLog("creating theStreams");
+                debugIOLogAS("creating theStreams");
                 theStreams = OSArray::withObjects((const OSObject **)&theStreamObject, 1);
                 FailIf(NULL == theStreams, Exit);
             } else {
-                debugIOLog("adding object to theStreams");
+                debugIOLogAS("adding object to theStreams");
                 theStreams->setObject(theStreamObject);
             }
             
@@ -1017,6 +1019,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
         return theInterfacePtr;
     }
     
+    // Wouter: seems to search the XU unit ID for some interface
     UInt8 EMUUSBAudioConfigObject::FindExtensionUnitID(UInt8 interfaceNum, UInt16 extCode) {
         EMUUSBAudioControlObject*		control = GetControlObject(interfaceNum, 0);
         UInt8						unitID = 0;
@@ -1035,7 +1038,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
     
     EMUUSBAudioControlObject * EMUUSBAudioControlObject::create(void) {
         EMUUSBAudioControlObject *		controlObject = new EMUUSBAudioControlObject;
-        debugIOLog("EMUUSBAudioControlObject::create");
+        debugIOLogPC("EMUUSBAudioControlObject::create");
         if(controlObject && (false == controlObject->init())) {
             controlObject->release();
             controlObject = 0;
@@ -1575,15 +1578,15 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
         while(theInterfacePtr->bLength && CS_INTERFACE == theInterfacePtr->bDescriptorType) {
             switch(theInterfacePtr->bDescriptorSubtype) {
                 case HEADER:
-                    debugIOLog("in HEADER in ParseACInterfaceDescriptor");
+                    debugIOLogPC("in HEADER in ParseACInterfaceDescriptor");
                     numStreamInterfaces =((ACInterfaceHeaderDescriptorPtr)theInterfacePtr)->bInCollection;
-                    debugIOLog("numStreamInterfaces = %d", numStreamInterfaces);
+                    debugIOLogPC("numStreamInterfaces = %d", numStreamInterfaces);
                     streamInterfaceNumbers =(UInt8 *)IOMalloc(numStreamInterfaces);
                     memcpy(streamInterfaceNumbers,((ACInterfaceHeaderDescriptorPtr)theInterfacePtr)->baInterfaceNr, numStreamInterfaces);
                     break;
                 case INPUT_TERMINAL:
 				{
-                    debugIOLog("in INPUT_TERMINAL in ParseACInterfaceDescriptor");
+                    debugIOLogPC("in INPUT_TERMINAL in ParseACInterfaceDescriptor");
                     EMUUSBInputTerminalObject*		inputTerminal = new EMUUSBInputTerminalObject;
                     FailIf(NULL == inputTerminal, Exit);
                     inputTerminal->SetDescriptorSubType(theInterfacePtr->bDescriptorSubtype);
@@ -1604,7 +1607,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                     break;
                 case OUTPUT_TERMINAL:
 				{
-                    debugIOLog("in OUTPUT_TERMINAL in ParseACInterfaceDescriptor");
+                    debugIOLogPC("in OUTPUT_TERMINAL in ParseACInterfaceDescriptor");
                     EMUUSBOutputTerminalObject*	outputTerminal = new EMUUSBOutputTerminalObject;
                     FailIf(NULL == outputTerminal, Exit);
                     outputTerminal->SetDescriptorSubType(theInterfacePtr->bDescriptorSubtype);
@@ -1625,7 +1628,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                 case FEATURE_UNIT:
 				{
                     UInt8					numControls;
-                    debugIOLog("in FEATURE_UNIT in ParseACInterfaceDescriptor");
+                    debugIOLogPC("in FEATURE_UNIT in ParseACInterfaceDescriptor");
                     EMUUSBFeatureUnitObject*	featureUnit =  new EMUUSBFeatureUnitObject;
                     FailIf(NULL == featureUnit, Exit);
                     featureUnit->SetDescriptorSubType(theInterfacePtr->bDescriptorSubtype);
@@ -1634,7 +1637,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                     featureUnit->SetControlSize(((ACFeatureUnitDescriptorPtr)theInterfacePtr)->bControlSize);
                     // subtract 7 because that's how many fields are guaranteed to be in the struct
                     numControls =(((ACFeatureUnitDescriptorPtr)theInterfacePtr)->bLength - 7) /((ACFeatureUnitDescriptorPtr)theInterfacePtr)->bControlSize;
-                    debugIOLog("There are %d controls on this feature unit", numControls);
+                    debugIOLogPC("There are %d controls on this feature unit", numControls);
                     featureUnit->InitControlsArray(&((ACFeatureUnitDescriptorPtr)theInterfacePtr)->bmaControls[0], numControls);
                     
                     if(NULL == mFeatureUnits)
@@ -1652,24 +1655,24 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                     UInt16 *			channelConfig;
                     UInt8				nrChannels;
                     
-                    debugIOLog("in MIXER_UNIT in ParseACInterfaceDescriptor");
+                    debugIOLogPC("in MIXER_UNIT in ParseACInterfaceDescriptor");
                     EMUUSBMixerUnitObject*	mixerUnit = new EMUUSBMixerUnitObject;
                     FailIf(NULL == mixerUnit, Exit);
-                    debugIOLog("descriptor length = %d", theInterfacePtr->bLength);
+                    debugIOLogPC("descriptor length = %d", theInterfacePtr->bLength);
                     mixerUnit->SetDescriptorSubType(theInterfacePtr->bDescriptorSubtype);
                     mixerUnit->SetUnitID(((ACMixerUnitDescriptorPtr)theInterfacePtr)->bUnitID);
-                    debugIOLog("unit ID = %d",((ACMixerUnitDescriptorPtr)theInterfacePtr)->bUnitID);
-                    debugIOLog("numInPins = %d",((ACMixerUnitDescriptorPtr)theInterfacePtr)->bNrInPins);
+                    debugIOLogPC("unit ID = %d",((ACMixerUnitDescriptorPtr)theInterfacePtr)->bUnitID);
+                    debugIOLogPC("numInPins = %d",((ACMixerUnitDescriptorPtr)theInterfacePtr)->bNrInPins);
                     mixerUnit->InitSourceIDs(&((ACMixerUnitDescriptorPtr)theInterfacePtr)->baSourceID[0],((ACMixerUnitDescriptorPtr)theInterfacePtr)->bNrInPins);
                     nrChannels =((ACMixerUnitDescriptorPtr)theInterfacePtr)->baSourceID[((ACMixerUnitDescriptorPtr)theInterfacePtr)->bNrInPins];
-                    debugIOLog("nrChannels = %d", nrChannels);
+                    debugIOLogPC("nrChannels = %d", nrChannels);
                     mixerUnit->SetNumChannels(nrChannels);
                     channelConfig =(UInt16 *)&((ACMixerUnitDescriptorPtr)theInterfacePtr)->baSourceID[((ACMixerUnitDescriptorPtr)theInterfacePtr)->bNrInPins + 1];
                     *channelConfig = USBToHostWord(*channelConfig);
-                    debugIOLog("channelConfig = %d", *channelConfig);
+                    debugIOLogPC("channelConfig = %d", *channelConfig);
                     mixerUnit->SetChannelConfig(*channelConfig);
                     controlSize =((ACMixerUnitDescriptorPtr)theInterfacePtr)->bLength - 10 -((ACMixerUnitDescriptorPtr)theInterfacePtr)->bNrInPins;
-                    debugIOLog("controlSize = %d", controlSize);
+                    debugIOLogPC("controlSize = %d", controlSize);
                     mixerUnit->InitControlsArray(&((ACMixerUnitDescriptorPtr)theInterfacePtr)->baSourceID[((ACMixerUnitDescriptorPtr)theInterfacePtr)->bNrInPins + 3], controlSize);
                     
                     if(NULL == mMixerUnits)
@@ -1683,13 +1686,13 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
 				}
                 case SELECTOR_UNIT:
 				{
-                    debugIOLog("in SELECTOR_UNIT in ParseACInterfaceDescriptor");
+                    debugIOLogPC("in SELECTOR_UNIT in ParseACInterfaceDescriptor");
                     EMUUSBSelectorUnitObject*	selectorUnit = new EMUUSBSelectorUnitObject;
                     FailIf(NULL == selectorUnit, Exit);
                     selectorUnit->SetDescriptorSubType(theInterfacePtr->bDescriptorSubtype);
                     selectorUnit->SetUnitID(((ACSelectorUnitDescriptorPtr)theInterfacePtr)->bUnitID);
                     selectorUnit->InitSourceIDs(&((ACSelectorUnitDescriptorPtr)theInterfacePtr)->baSourceID[0],((ACSelectorUnitDescriptorPtr)theInterfacePtr)->bNrInPins);
-                    debugIOLog("numInPins on selector = %d",((ACSelectorUnitDescriptorPtr)theInterfacePtr)->bNrInPins);
+                    debugIOLogPC("numInPins on selector = %d",((ACSelectorUnitDescriptorPtr)theInterfacePtr)->bNrInPins);
                     
                     if(NULL == mSelectorUnits)
                         mSelectorUnits = OSArray::withObjects((const OSObject **)&selectorUnit, 1);
@@ -1705,24 +1708,24 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                     UInt8				controlSize;
                     UInt8				nrChannels;
                     // pc driver makes additional stuff here - dolby processing, etc to see if all that is necessary
-                    debugIOLog("in PROCESSING_UNIT in ParseACInterfaceDescriptor");
+                    debugIOLogPC("in PROCESSING_UNIT in ParseACInterfaceDescriptor");
                     EMUUSBProcessingUnitObject*	processingUnit = new EMUUSBProcessingUnitObject;
                     FailIf(NULL == processingUnit, Exit);
                     processingUnit->SetDescriptorSubType(theInterfacePtr->bDescriptorSubtype);
                     processingUnit->SetUnitID(((ACProcessingUnitDescriptorPtr)theInterfacePtr)->bUnitID);
                     processingUnit->SetProcessType(((ACProcessingUnitDescriptorPtr)theInterfacePtr)->wProcessType);
-                    debugIOLog("processing unit type = 0x%x",((ACProcessingUnitDescriptorPtr)theInterfacePtr)->wProcessType);
+                    debugIOLogPC("processing unit type = 0x%x",((ACProcessingUnitDescriptorPtr)theInterfacePtr)->wProcessType);
                     processingUnit->InitSourceIDs(&((ACProcessingUnitDescriptorPtr)theInterfacePtr)->baSourceID[0],((ACProcessingUnitDescriptorPtr)theInterfacePtr)->bNrInPins);
-                    debugIOLog("numInPins = %d",((ACProcessingUnitDescriptorPtr)theInterfacePtr)->bNrInPins);
+                    debugIOLogPC("numInPins = %d",((ACProcessingUnitDescriptorPtr)theInterfacePtr)->bNrInPins);
                     nrChannels =((ACProcessingUnitDescriptorPtr)theInterfacePtr)->baSourceID[((ACProcessingUnitDescriptorPtr)theInterfacePtr)->bNrInPins];
-                    debugIOLog("nrChannels = %d", nrChannels);
+                    debugIOLogPC("nrChannels = %d", nrChannels);
                     processingUnit->SetNumChannels(nrChannels);
                     channelConfig =(UInt16 *)&((ACProcessingUnitDescriptorPtr)theInterfacePtr)->baSourceID[((ACProcessingUnitDescriptorPtr)theInterfacePtr)->bNrInPins + 1];
                     *channelConfig = USBToHostWord(*channelConfig);
-                    debugIOLog("channelConfig = %d", *channelConfig);
+                    debugIOLogPC("channelConfig = %d", *channelConfig);
                     processingUnit->SetChannelConfig(*channelConfig);
                     controlSize =((ACProcessingUnitDescriptorPtr)theInterfacePtr)->baSourceID[((ACProcessingUnitDescriptorPtr)theInterfacePtr)->bNrInPins + 4];
-                    debugIOLog("controlSize = %d", controlSize);
+                    debugIOLogPC("controlSize = %d", controlSize);
                     processingUnit->InitControlsArray(&((ACProcessingUnitDescriptorPtr)theInterfacePtr)->baSourceID[((ACProcessingUnitDescriptorPtr)theInterfacePtr)->bNrInPins + 5], controlSize);
                     
                     if(NULL == mProcessingUnits)
@@ -1736,7 +1739,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                     break;
                 case EXTENSION_UNIT:
 				{
-                    debugIOLog("in EXTENSION_UNIT in ParseACInterfaceDescriptor");
+                    debugIOLogPC("in EXTENSION_UNIT in ParseACInterfaceDescriptor");
                     EMUUSBExtensionUnitObject*	extensionUnit = new EMUUSBExtensionUnitObject;
                     FailIf(NULL == extensionUnit, Exit);
                     extensionUnit->SetDescriptorSubType(theInterfacePtr->bDescriptorSubtype);
@@ -1760,7 +1763,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
         }
         
     Exit:
-        debugIOLog("-EMUUSBAudioControlObject::ParseACInterfaceDescriptor(%p, %d)", theInterfacePtr, currentInterface);
+        debugIOLogPC("-EMUUSBAudioControlObject::ParseACInterfaceDescriptor(%p, %d)", theInterfacePtr, currentInterface);
         return theInterfacePtr;
     }
     
@@ -1771,7 +1774,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
     
     EMUUSBAudioStreamObject * EMUUSBAudioStreamObject::create(void) {
         EMUUSBAudioStreamObject *	streamObject = new EMUUSBAudioStreamObject;
-        debugIOLog("EMUUSBAudioStreamObject::create");
+        debugIOLogAS("EMUUSBAudioStreamObject::create");
         if(streamObject && (FALSE == streamObject->init())) {
             streamObject->release();
             streamObject = NULL;
@@ -1829,7 +1832,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
     }
     
     UInt8 EMUUSBAudioStreamObject::GetIsocEndpointAddress(UInt8 direction) {
-        debugIOLog("GetIsocEndpointAddress, looking for direction %d", direction);
+        debugIOLogPC("GetIsocEndpointAddress, looking for direction %d", direction);
         if(theEndpointObjects) {
             EMUUSBEndpointObject *		 endpointObject = NULL;
             UInt8	indx = 0;
@@ -1880,70 +1883,70 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
             if(CS_INTERFACE == theInterfacePtr->bDescriptorType) {
                 switch(theInterfacePtr->bDescriptorSubtype) {
                     case AS_GENERAL:
-                        debugIOLog("in AS_GENERAL in ParseASInterfaceDescriptor");
+                        debugIOLogPC("in AS_GENERAL in ParseASInterfaceDescriptor");
                         terminalLink =((ASInterfaceDescriptorPtr)theInterfacePtr)->bTerminalLink;
                         delay =((ASInterfaceDescriptorPtr)theInterfacePtr)->bDelay;
                         formatTag = USBToHostWord((((ASInterfaceDescriptorPtr)theInterfacePtr)->wFormatTag[1] << 8) |((ASInterfaceDescriptorPtr)theInterfacePtr)->wFormatTag[0]);
                         theInterfacePtr =(USBInterfaceDescriptorPtr)((UInt8 *)theInterfacePtr + theInterfacePtr->bLength);
                         break;
                     case FORMAT_TYPE:
-                        debugIOLog("in FORMAT_TYPE in ParseASInterfaceDescriptor");
+                        debugIOLogPC("in FORMAT_TYPE in ParseASInterfaceDescriptor");
                         switch(((ASFormatTypeIDescriptorPtr)theInterfacePtr)->bFormatType) {
                             case FORMAT_TYPE_I:
                             case FORMAT_TYPE_III:
-                                debugIOLog("in FORMAT_TYPE_I/FORMAT_TYPE_III in FORMAT_TYPE");
+                                debugIOLogPC("in FORMAT_TYPE_I/FORMAT_TYPE_III in FORMAT_TYPE");
                                 numChannels =((ASFormatTypeIDescriptorPtr)theInterfacePtr)->bNrChannels;
                                 subframeSize =((ASFormatTypeIDescriptorPtr)theInterfacePtr)->bSubframeSize;
                                 bitResolution =((ASFormatTypeIDescriptorPtr)theInterfacePtr)->bBitResolution;
                                 numSampleFreqs =((ASFormatTypeIDescriptorPtr)theInterfacePtr)->bSamFreqType;
                                 if(0 != numSampleFreqs) {
-                                    debugIOLog("device has a discrete number of sample rates");
+                                    debugIOLogPC("device has a discrete number of sample rates");
                                     sampleFreqs =(UInt32 *)IOMalloc(numSampleFreqs * sizeof(UInt32));
                                     for(UInt32 indx = 0; indx < numSampleFreqs; ++indx)
                                         sampleFreqs[indx] = ConvertSampleFreq( &((ASFormatTypeIDescriptorPtr)theInterfacePtr)->sampleFreq[indx * 3]);
                                 } else {
-                                    debugIOLog("device has a variable number of sample rates");
+                                    debugIOLogPC("device has a variable number of sample rates");
                                     sampleFreqs =(UInt32 *)IOMalloc(2 * sizeof(UInt32));
                                     sampleFreqs[0] = ConvertSampleFreq( &((ASFormatTypeIDescriptorPtr)theInterfacePtr)->sampleFreq[0] );
                                     sampleFreqs[1] = ConvertSampleFreq( &((ASFormatTypeIDescriptorPtr)theInterfacePtr)->sampleFreq[3] );
                                 }
                                 break;
                             case FORMAT_TYPE_II:
-                                debugIOLog("in FORMAT_TYPE_II in FORMAT_TYPE");
+                                debugIOLogPC("in FORMAT_TYPE_II in FORMAT_TYPE");
                                 maxBitRate = USBToHostWord(((ASFormatTypeIIDescriptorPtr)theInterfacePtr)->wMaxBitRate);
                                 samplesPerFrame = USBToHostWord(((ASFormatTypeIIDescriptorPtr)theInterfacePtr)->wSamplesPerFrame);
                                 numSampleFreqs =((ASFormatTypeIIDescriptorPtr)theInterfacePtr)->bSamFreqType;
                                 if(0 != numSampleFreqs) {
-                                    debugIOLog("device has a discrete number of sample rates");
+                                    debugIOLogPC("device has a discrete number of sample rates");
                                     sampleFreqs =(UInt32 *)IOMalloc(numSampleFreqs * sizeof(UInt32));
                                     for(UInt32 indx = 0; indx < numSampleFreqs; indx++) {
                                         sampleFreqs[indx] = ConvertSampleFreq( &((ASFormatTypeIIDescriptorPtr)theInterfacePtr)->sampleFreq[indx * 3] );
                                     }
                                 } else {
-                                    debugIOLog("device has a variable number of sample rates");
+                                    debugIOLogPC("device has a variable number of sample rates");
                                     sampleFreqs =(UInt32 *)IOMalloc(2 * sizeof(UInt32));
                                     sampleFreqs[0] = ConvertSampleFreq(&((ASFormatTypeIIDescriptorPtr)theInterfacePtr)->sampleFreq[0]);
                                     sampleFreqs[1] = ConvertSampleFreq(&((ASFormatTypeIIDescriptorPtr)theInterfacePtr)->sampleFreq[3]);
                                 }
                                 break;
                             default:
-                                debugIOLog("!!!!unknown format type in FORMAT_TYPE!!!!");
+                                debugIOLogPC("!!!!unknown format type in FORMAT_TYPE!!!!");
                         }
                         theInterfacePtr =(USBInterfaceDescriptorPtr)((UInt8 *)theInterfacePtr + theInterfacePtr->bLength);
                         break;
                     case FORMAT_SPECIFIC:
-                        debugIOLog("in FORMAT_SPECIFIC in ParseASInterfaceDescriptor");
+                        debugIOLogPC("in FORMAT_SPECIFIC in ParseASInterfaceDescriptor");
                         wFormatTag = USBToHostWord(((ASFormatSpecificDescriptorHeaderPtr)theInterfacePtr)->wFormatTag[1] << 8 |((ASFormatSpecificDescriptorHeaderPtr)theInterfacePtr)->wFormatTag[0]);
                         switch(wFormatTag) {
                             case MPEG:
-                                debugIOLog("in FORMAT_SPECIFIC in MPEG");
+                                debugIOLogPC("in FORMAT_SPECIFIC in MPEG");
                                 bmMPEGCapabilities = USBToHostWord(
                                                                    ((ASMPEGFormatSpecificDescriptorPtr)theInterfacePtr)->bmMPEGCapabilities[1] << 8 |
                                                                    ((ASMPEGFormatSpecificDescriptorPtr)theInterfacePtr)->bmMPEGCapabilities[0]);
                                 bmMPEGFeatures =((ASMPEGFormatSpecificDescriptorPtr)theInterfacePtr)->bmMPEGFeatures;
                                 break;
                             case AC3:
-                                debugIOLog("in FORMAT_SPECIFIC in AC3");
+                                debugIOLogPC("in FORMAT_SPECIFIC in AC3");
                                 bmAC3BSID = USBToHostLong(
                                                           ((ASAC3FormatSpecificDescriptorPtr)theInterfacePtr)->bmBSID[3] << 24 |
                                                           ((ASAC3FormatSpecificDescriptorPtr)theInterfacePtr)->bmBSID[2] << 16 |
@@ -1952,25 +1955,25 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                                 bmAC3Features =((ASAC3FormatSpecificDescriptorPtr)theInterfacePtr)->bmAC3Features;
                                 break;
                             default:
-                                debugIOLog("!!!!unknown format type 0x%x in FORMAT_SPECIFIC!!!!", wFormatTag);
+                                debugIOLogPC("!!!!unknown format type 0x%x in FORMAT_SPECIFIC!!!!", wFormatTag);
                                 break;
                         }
                         theInterfacePtr =(USBInterfaceDescriptorPtr)((UInt8 *)theInterfacePtr + theInterfacePtr->bLength);
                         break;
                     default:
-                        debugIOLog("in default in ParseASInterfaceDescriptor");
+                        debugIOLogPC("in default in ParseASInterfaceDescriptor");
                         theInterfacePtr =(USBInterfaceDescriptorPtr)((UInt8 *)theInterfacePtr + theInterfacePtr->bLength);
                 }
             } else {
                 switch(theInterfacePtr->bDescriptorType) {
                     case INTERFACE:
                         // need to make a new interface object for this new interface or new alternate interface
-                        debugIOLog("in INTERFACE in ParseASInterfaceDescriptor");
+                        debugIOLogPC("in INTERFACE in ParseASInterfaceDescriptor");
                         done = TRUE;
                         break;
                     case ENDPOINT:
 					{
-                        debugIOLog("in ENDPOINT in ParseASInterfaceDescriptor");
+                        debugIOLogPC("in ENDPOINT in ParseASInterfaceDescriptor");
                         EMUUSBEndpointObject*	endpoint = EMUUSBEndpointObject::create();
                         endpoint->SetAddress(((USBEndpointDescriptorPtr)theInterfacePtr)->bEndpointAddress);
                         endpoint->SetAttributes(((USBEndpointDescriptorPtr)theInterfacePtr)->bmAttributes);
@@ -1979,7 +1982,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                         endpoint->SetPollInt(((USBEndpointDescriptorPtr)theInterfacePtr)->bInterval);
 #if !CUSTOMDEVICE
                         endpoint->SetSynchAddress((((USBEndpointDescriptorPtr)theInterfacePtr)->bSynchAddress | 0x80));
-                        debugIOLog("in ENDPOINT in ParseASInterfaceDescriptor endpointAddress %d, maxPacketSize %d, bInterval %d, syncAddress %d",
+                        debugIOLogPC("in ENDPOINT in ParseASInterfaceDescriptor endpointAddress %d, maxPacketSize %d, bInterval %d, syncAddress %d",
                                    ((USBEndpointDescriptorPtr)theInterfacePtr)->bEndpointAddress, USBToHostWord(((USBEndpointDescriptorPtr)theInterfacePtr)->wMaxPacketSize),
                                    ((USBEndpointDescriptorPtr)theInterfacePtr)->bInterval, ((USBEndpointDescriptorPtr)theInterfacePtr)->bSynchAddress);
 #endif
@@ -1995,7 +1998,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                     }
                         break;
                     case CS_ENDPOINT:
-                        debugIOLog("in CS_ENDPOINT in ParseASInterfaceDescriptor");
+                        debugIOLogPC("in CS_ENDPOINT in ParseASInterfaceDescriptor");
                         if(EP_GENERAL ==((ASEndpointDescriptorPtr)theInterfacePtr)->bDescriptorSubtype) {
                             theIsocEndpointObject = new EMUUSBCSASIsocADEndpointObject(((ASEndpointDescriptorPtr)theInterfacePtr)->bmAttributes &(1 << sampleFreqControlBit),
                                                                                        ((ASEndpointDescriptorPtr)theInterfacePtr)->bmAttributes &(1 << pitchControlBit),
@@ -2006,13 +2009,13 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                         theInterfacePtr =(USBInterfaceDescriptorPtr)((UInt8 *)theInterfacePtr + theInterfacePtr->bLength);
                         break;
                     default:
-                        debugIOLog("in default in else in ParseASInterfaceDescriptor");
+                        debugIOLogPC("in default in else in ParseASInterfaceDescriptor");
                         theInterfacePtr =(USBInterfaceDescriptorPtr)((UInt8 *)theInterfacePtr + theInterfacePtr->bLength);
                 }
             }
         }
     Exit:
-        debugIOLog("-EMUUSBAudioStreamObject::ParseASInterfaceDescriptor(%x, %d)", theInterfacePtr, currentInterface);
+        debugIOLogPC("-EMUUSBAudioStreamObject::ParseASInterfaceDescriptor(%x, %d)", theInterfacePtr, currentInterface);
         return theInterfacePtr;
     }
     /*
@@ -2061,7 +2064,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
     
     EMUUSBEndpointObject * EMUUSBEndpointObject::create(void) {
         EMUUSBEndpointObject *		endpointObject = new EMUUSBEndpointObject;
-        debugIOLog("EMUUSBEndpointObject::create");
+        debugIOLogPC("EMUUSBEndpointObject::create");
         if(endpointObject && (FALSE == endpointObject->init())) {
             endpointObject->release();
             endpointObject = 0;

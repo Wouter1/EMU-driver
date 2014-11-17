@@ -33,6 +33,7 @@
 #define __EMUUSBAudio__IOSyncer__
 
 
+
 #include <libkern/c++/OSObject.h>
 #include <IOKit/IOTypes.h>
 #include <IOKit/IOLocks.h>
