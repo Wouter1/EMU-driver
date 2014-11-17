@@ -1,0 +1,1218 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6102A5F40992C42F00F97B33 /* libEMUUSBAudioFloatLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6102A5F30992C42F00F97B33 /* libEMUUSBAudioFloatLib.a */; };
+		6113553209927D6900FF7772 /* EMUHALPlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6113553009927D6900FF7772 /* EMUHALPlugin.cpp */; };
+		6113554709927E0700FF7772 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6113554509927E0600FF7772 /* CoreAudio.framework */; };
+		6113554809927E0700FF7772 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6113554609927E0700FF7772 /* IOKit.framework */; };
+		611AC92B09FA9161007431E8 /* EMUXUCustomControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 611AC92A09FA9161007431E8 /* EMUXUCustomControl.cpp */; };
+		614CA4360A12E2B6007B66F0 /* CoreMIDIServer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 614CA4350A12E2B6007B66F0 /* CoreMIDIServer.framework */; };
+		614CA48D0A12E6C2007B66F0 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */; };
+		614CA4910A12E6F5007B66F0 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6113554609927E0700FF7772 /* IOKit.framework */; };
+		614CA4BE0A12E879007B66F0 /* IOServiceClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4A60A12E879007B66F0 /* IOServiceClient.cpp */; };
+		614CA4BF0A12E879007B66F0 /* MIDIBackCompatible.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4A80A12E879007B66F0 /* MIDIBackCompatible.cpp */; };
+		614CA4C00A12E879007B66F0 /* MIDIDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4AA0A12E879007B66F0 /* MIDIDriver.cpp */; };
+		614CA4C10A12E879007B66F0 /* MIDIDriverDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4AC0A12E879007B66F0 /* MIDIDriverDevice.cpp */; };
+		614CA4C20A12E879007B66F0 /* MIDIDriverUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4AE0A12E879007B66F0 /* MIDIDriverUtils.cpp */; };
+		614CA4C30A12E879007B66F0 /* USBDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4B00A12E879007B66F0 /* USBDevice.cpp */; };
+		614CA4C40A12E879007B66F0 /* USBDeviceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4B20A12E879007B66F0 /* USBDeviceManager.cpp */; };
+		614CA4C50A12E879007B66F0 /* USBInterfaceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4B40A12E879007B66F0 /* USBInterfaceManager.cpp */; };
+		614CA4C60A12E879007B66F0 /* USBMIDIDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4B60A12E879007B66F0 /* USBMIDIDevice.cpp */; };
+		614CA4C70A12E879007B66F0 /* USBMIDIDeviceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4B80A12E879007B66F0 /* USBMIDIDeviceManager.cpp */; };
+		614CA4C80A12E879007B66F0 /* USBMIDIDriverBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4BA0A12E879007B66F0 /* USBMIDIDriverBase.cpp */; };
+		614CA4C90A12E879007B66F0 /* USBVendorMIDIDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4BC0A12E879007B66F0 /* USBVendorMIDIDriver.cpp */; };
+		614CA4D10A12E897007B66F0 /* CAHostTimeBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4CD0A12E897007B66F0 /* CAHostTimeBase.cpp */; };
+		614CA4D20A12E897007B66F0 /* CAMutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4CF0A12E897007B66F0 /* CAMutex.cpp */; };
+		614CA4D50A12E8AB007B66F0 /* EMUUSBMIDI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 614CA4D30A12E8AB007B66F0 /* EMUUSBMIDI.cpp */; };
+		614CA5F20A12F156007B66F0 /* EMUHALPlugin.bundle in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8D576316048677EA00EA77CD /* EMUHALPlugin.bundle */; };
+		614D5CBB0992AE4000D209A0 /* EMUUSBAudioClip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61509FD8099288D50005A5A8 /* EMUUSBAudioClip.cpp */; };
+		61509FE0099288D50005A5A8 /* EMUUSBAudioDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61509FD9099288D50005A5A8 /* EMUUSBAudioDevice.cpp */; };
+		61509FE1099288D50005A5A8 /* EMUUSBAudioEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61509FDA099288D50005A5A8 /* EMUUSBAudioEngine.cpp */; };
+		61509FE2099288D50005A5A8 /* EMUUSBAudioPlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61509FDB099288D50005A5A8 /* EMUUSBAudioPlugin.cpp */; };
+		61509FE3099288D50005A5A8 /* EMUUSBAudioLevelControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61509FDC099288D50005A5A8 /* EMUUSBAudioLevelControl.cpp */; };
+		61509FE4099288D50005A5A8 /* EMUUSBAudioMuteControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61509FDD099288D50005A5A8 /* EMUUSBAudioMuteControl.cpp */; };
+		61509FE5099288D50005A5A8 /* USBAudioObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61509FDE099288D50005A5A8 /* USBAudioObject.cpp */; };
+		61CE51300BDD5F2E00D75767 /* EMUUSBUserClient.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 61CE512F0BDD5F2E00D75767 /* EMUUSBUserClient.h */; };
+		61CE51320BDD5F3900D75767 /* EMUUSBUserClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 61CE51310BDD5F3900D75767 /* EMUUSBUserClient.cpp */; };
+		61CE51370BDD62BF00D75767 /* EMUUSBPlatform.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 61CE51360BDD62BF00D75767 /* EMUUSBPlatform.h */; };
+		8D576314048677EA00EA77CD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */; };
+		8D5B49A804867FD3000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8D5B49A704867FD3000E48DA /* InfoPlist.strings */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		614D5CC40992AE9D00D209A0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 089C1669FE841209C02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 614D5CB80992AE4000D209A0;
+			remoteInfo = "EMUUSBAudioFloatLib (Upgraded)";
+		};
+		6150A1C009929A120005A5A8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 089C1669FE841209C02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D57630D048677EA00EA77CD;
+			remoteInfo = HALPlugin;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		614CA5DC0A12F139007B66F0 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				614CA5F20A12F156007B66F0 /* EMUHALPlugin.bundle in CopyFiles */,
+				61CE51300BDD5F2E00D75767 /* EMUUSBUserClient.h in CopyFiles */,
+				61CE51370BDD62BF00D75767 /* EMUUSBPlatform.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
+		6102A5F30992C42F00F97B33 /* libEMUUSBAudioFloatLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libEMUUSBAudioFloatLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		6107221C0A1A2D7A00E84F70 /* CAException.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CAException.h; sourceTree = "<group>"; };
+		6113553009927D6900FF7772 /* EMUHALPlugin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = EMUHALPlugin.cpp; sourceTree = "<group>"; };
+		6113553109927D6900FF7772 /* EMUHALPlugin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EMUHALPlugin.h; sourceTree = "<group>"; };
+		6113554509927E0600FF7772 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
+		6113554609927E0700FF7772 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		6113554F09927E3200FF7772 /* EMUUSBDeviceDefines.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EMUUSBDeviceDefines.h; sourceTree = "<group>"; };
+		611AC92609FA9156007431E8 /* EMUXUCustomControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EMUXUCustomControl.h; sourceTree = "<group>"; };
+		611AC92A09FA9161007431E8 /* EMUXUCustomControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EMUXUCustomControl.cpp; sourceTree = "<group>"; };
+		614CA3190A12E0D3007B66F0 /* EMUMIDIDriver.plugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EMUMIDIDriver.plugin; sourceTree = BUILT_PRODUCTS_DIR; };
+		614CA31A0A12E0D3007B66F0 /* EMUMIDIPlugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "EMUMIDIPlugin-Info.plist"; sourceTree = "<group>"; };
+		614CA4350A12E2B6007B66F0 /* CoreMIDIServer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDIServer.framework; path = /System/Library/Frameworks/CoreMIDIServer.framework; sourceTree = "<absolute>"; };
+		614CA4A60A12E879007B66F0 /* IOServiceClient.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = IOServiceClient.cpp; sourceTree = "<group>"; };
+		614CA4A70A12E879007B66F0 /* IOServiceClient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = IOServiceClient.h; sourceTree = "<group>"; };
+		614CA4A80A12E879007B66F0 /* MIDIBackCompatible.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = MIDIBackCompatible.cpp; sourceTree = "<group>"; };
+		614CA4A90A12E879007B66F0 /* MIDIBackCompatible.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MIDIBackCompatible.h; sourceTree = "<group>"; };
+		614CA4AA0A12E879007B66F0 /* MIDIDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = MIDIDriver.cpp; sourceTree = "<group>"; };
+		614CA4AB0A12E879007B66F0 /* MIDIDriverClass.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MIDIDriverClass.h; sourceTree = "<group>"; };
+		614CA4AC0A12E879007B66F0 /* MIDIDriverDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = MIDIDriverDevice.cpp; sourceTree = "<group>"; };
+		614CA4AD0A12E879007B66F0 /* MIDIDriverDevice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MIDIDriverDevice.h; sourceTree = "<group>"; };
+		614CA4AE0A12E879007B66F0 /* MIDIDriverUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = MIDIDriverUtils.cpp; sourceTree = "<group>"; };
+		614CA4AF0A12E879007B66F0 /* MIDIDriverUtils.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MIDIDriverUtils.h; sourceTree = "<group>"; };
+		614CA4B00A12E879007B66F0 /* USBDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = USBDevice.cpp; sourceTree = "<group>"; };
+		614CA4B10A12E879007B66F0 /* USBDevice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = USBDevice.h; sourceTree = "<group>"; };
+		614CA4B20A12E879007B66F0 /* USBDeviceManager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = USBDeviceManager.cpp; sourceTree = "<group>"; };
+		614CA4B30A12E879007B66F0 /* USBDeviceManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = USBDeviceManager.h; sourceTree = "<group>"; };
+		614CA4B40A12E879007B66F0 /* USBInterfaceManager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = USBInterfaceManager.cpp; sourceTree = "<group>"; };
+		614CA4B50A12E879007B66F0 /* USBInterfaceManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = USBInterfaceManager.h; sourceTree = "<group>"; };
+		614CA4B60A12E879007B66F0 /* USBMIDIDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = USBMIDIDevice.cpp; sourceTree = "<group>"; };
+		614CA4B70A12E879007B66F0 /* USBMIDIDevice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = USBMIDIDevice.h; sourceTree = "<group>"; };
+		614CA4B80A12E879007B66F0 /* USBMIDIDeviceManager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = USBMIDIDeviceManager.cpp; sourceTree = "<group>"; };
+		614CA4B90A12E879007B66F0 /* USBMIDIDeviceManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = USBMIDIDeviceManager.h; sourceTree = "<group>"; };
+		614CA4BA0A12E879007B66F0 /* USBMIDIDriverBase.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = USBMIDIDriverBase.cpp; sourceTree = "<group>"; };
+		614CA4BB0A12E879007B66F0 /* USBMIDIDriverBase.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = USBMIDIDriverBase.h; sourceTree = "<group>"; };
+		614CA4BC0A12E879007B66F0 /* USBVendorMIDIDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = USBVendorMIDIDriver.cpp; sourceTree = "<group>"; };
+		614CA4BD0A12E879007B66F0 /* USBVendorMIDIDriver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = USBVendorMIDIDriver.h; sourceTree = "<group>"; };
+		614CA4CD0A12E897007B66F0 /* CAHostTimeBase.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = CAHostTimeBase.cpp; sourceTree = "<group>"; };
+		614CA4CE0A12E897007B66F0 /* CAHostTimeBase.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CAHostTimeBase.h; sourceTree = "<group>"; };
+		614CA4CF0A12E897007B66F0 /* CAMutex.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = CAMutex.cpp; sourceTree = "<group>"; };
+		614CA4D00A12E897007B66F0 /* CAMutex.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CAMutex.h; sourceTree = "<group>"; };
+		614CA4D30A12E8AB007B66F0 /* EMUUSBMIDI.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBMIDI.cpp; sourceTree = "<group>"; };
+		614CA4D40A12E8AB007B66F0 /* EMUUSBMIDI.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EMUUSBMIDI.h; sourceTree = "<group>"; };
+		614D5CE80992B1B000D209A0 /* libEMUUSBAudioFloatLib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libEMUUSBAudioFloatLib.a; path = build/Release/libEMUUSBAudioFloatLib.a; sourceTree = "<group>"; };
+		61509FC5099288670005A5A8 /* EMUUSBAudio.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EMUUSBAudio.kext; sourceTree = BUILT_PRODUCTS_DIR; };
+		61509FC6099288670005A5A8 /* EMUUSBAudio-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "EMUUSBAudio-Info.plist"; sourceTree = "<group>"; };
+		61509FD8099288D50005A5A8 /* EMUUSBAudioClip.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBAudioClip.cpp; sourceTree = "<group>"; };
+		61509FD9099288D50005A5A8 /* EMUUSBAudioDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBAudioDevice.cpp; sourceTree = "<group>"; wrapsLines = 1; };
+		61509FDA099288D50005A5A8 /* EMUUSBAudioEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBAudioEngine.cpp; sourceTree = "<group>"; };
+		61509FDB099288D50005A5A8 /* EMUUSBAudioPlugin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBAudioPlugin.cpp; sourceTree = "<group>"; };
+		61509FDC099288D50005A5A8 /* EMUUSBAudioLevelControl.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBAudioLevelControl.cpp; sourceTree = "<group>"; };
+		61509FDD099288D50005A5A8 /* EMUUSBAudioMuteControl.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBAudioMuteControl.cpp; sourceTree = "<group>"; };
+		61509FDE099288D50005A5A8 /* USBAudioObject.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = USBAudioObject.cpp; sourceTree = "<group>"; };
+		61509FE6099288EA0005A5A8 /* EMUUSBAudioDefines.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioDefines.h; sourceTree = "<group>"; };
+		61509FE7099288EA0005A5A8 /* EMUUSBAudioClip.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioClip.h; sourceTree = "<group>"; };
+		61509FE8099288EA0005A5A8 /* EMUUSBAudioCommon.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioCommon.h; sourceTree = "<group>"; };
+		61509FE9099288EA0005A5A8 /* EMUUSBAudioDevice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioDevice.h; sourceTree = "<group>"; };
+		61509FEA099288EA0005A5A8 /* EMUUSBAudioEngine.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioEngine.h; sourceTree = "<group>"; };
+		61509FEB099288EA0005A5A8 /* EMUUSBAudioPlugin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioPlugin.h; sourceTree = "<group>"; };
+		61509FEC099288EA0005A5A8 /* EMUUSBAudioLevelControl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioLevelControl.h; sourceTree = "<group>"; };
+		61509FED099288EA0005A5A8 /* EMUUSBAudioMuteControl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioMuteControl.h; sourceTree = "<group>"; };
+		61509FEE099288EA0005A5A8 /* USBAudioObject.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = USBAudioObject.h; sourceTree = "<group>"; };
+		61CE512F0BDD5F2E00D75767 /* EMUUSBUserClient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EMUUSBUserClient.h; sourceTree = "<group>"; };
+		61CE51310BDD5F3900D75767 /* EMUUSBUserClient.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBUserClient.cpp; sourceTree = "<group>"; };
+		61CE51360BDD62BF00D75767 /* EMUUSBPlatform.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EMUUSBPlatform.h; sourceTree = "<group>"; };
+		8D576316048677EA00EA77CD /* EMUHALPlugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EMUHALPlugin.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D576317048677EA00EA77CD /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		614CA3170A12E0D3007B66F0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				614CA4360A12E2B6007B66F0 /* CoreMIDIServer.framework in Frameworks */,
+				614CA48D0A12E6C2007B66F0 /* CoreFoundation.framework in Frameworks */,
+				614CA4910A12E6F5007B66F0 /* IOKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		614D5CBC0992AE4000D209A0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		61509FC3099288670005A5A8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6102A5F40992C42F00F97B33 /* libEMUUSBAudioFloatLib.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D576313048677EA00EA77CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D576314048677EA00EA77CD /* CoreFoundation.framework in Frameworks */,
+				6113554709927E0700FF7772 /* CoreAudio.framework in Frameworks */,
+				6113554809927E0700FF7772 /* IOKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		089C166AFE841209C02AAC07 /* HALPlugin */ = {
+			isa = PBXGroup;
+			children = (
+				614CA3220A12E16F007B66F0 /* MIDIClasses */,
+				61509FD0099288B20005A5A8 /* Headers */,
+				61509FCD0992889E0005A5A8 /* Classes */,
+				08FB77AFFE84173DC02AAC07 /* Source */,
+				089C167CFE841241C02AAC07 /* Resources */,
+				089C1671FE841209C02AAC07 /* External Frameworks and Libraries */,
+				19C28FB6FE9D52B211CA2CBB /* Products */,
+				61509FC6099288670005A5A8 /* EMUUSBAudio-Info.plist */,
+				614CA31A0A12E0D3007B66F0 /* EMUMIDIPlugin-Info.plist */,
+			);
+			name = HALPlugin;
+			sourceTree = "<group>";
+		};
+		089C1671FE841209C02AAC07 /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */,
+				6113554509927E0600FF7772 /* CoreAudio.framework */,
+				6113554609927E0700FF7772 /* IOKit.framework */,
+				614CA4350A12E2B6007B66F0 /* CoreMIDIServer.framework */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		089C167CFE841241C02AAC07 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8D576317048677EA00EA77CD /* Info.plist */,
+				8D5B49A704867FD3000E48DA /* InfoPlist.strings */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		08FB77AFFE84173DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				6113553009927D6900FF7772 /* EMUHALPlugin.cpp */,
+				6113554F09927E3200FF7772 /* EMUUSBDeviceDefines.h */,
+				6113553109927D6900FF7772 /* EMUHALPlugin.h */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		19C28FB6FE9D52B211CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				614D5CE80992B1B000D209A0 /* libEMUUSBAudioFloatLib.a */,
+				8D576316048677EA00EA77CD /* EMUHALPlugin.bundle */,
+				61509FC5099288670005A5A8 /* EMUUSBAudio.kext */,
+				6102A5F30992C42F00F97B33 /* libEMUUSBAudioFloatLib.a */,
+				614CA3190A12E0D3007B66F0 /* EMUMIDIDriver.plugin */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		614CA3220A12E16F007B66F0 /* MIDIClasses */ = {
+			isa = PBXGroup;
+			children = (
+				614CA4D30A12E8AB007B66F0 /* EMUUSBMIDI.cpp */,
+				614CA4D40A12E8AB007B66F0 /* EMUUSBMIDI.h */,
+				614CA4CC0A12E88A007B66F0 /* Public */,
+				614CA4A50A12E864007B66F0 /* Shared */,
+			);
+			name = MIDIClasses;
+			sourceTree = "<group>";
+		};
+		614CA4A50A12E864007B66F0 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				614CA4A60A12E879007B66F0 /* IOServiceClient.cpp */,
+				614CA4A70A12E879007B66F0 /* IOServiceClient.h */,
+				614CA4A80A12E879007B66F0 /* MIDIBackCompatible.cpp */,
+				614CA4A90A12E879007B66F0 /* MIDIBackCompatible.h */,
+				614CA4AA0A12E879007B66F0 /* MIDIDriver.cpp */,
+				614CA4AB0A12E879007B66F0 /* MIDIDriverClass.h */,
+				614CA4AC0A12E879007B66F0 /* MIDIDriverDevice.cpp */,
+				614CA4AD0A12E879007B66F0 /* MIDIDriverDevice.h */,
+				614CA4AE0A12E879007B66F0 /* MIDIDriverUtils.cpp */,
+				614CA4AF0A12E879007B66F0 /* MIDIDriverUtils.h */,
+				614CA4B00A12E879007B66F0 /* USBDevice.cpp */,
+				614CA4B10A12E879007B66F0 /* USBDevice.h */,
+				614CA4B20A12E879007B66F0 /* USBDeviceManager.cpp */,
+				614CA4B30A12E879007B66F0 /* USBDeviceManager.h */,
+				614CA4B40A12E879007B66F0 /* USBInterfaceManager.cpp */,
+				614CA4B50A12E879007B66F0 /* USBInterfaceManager.h */,
+				614CA4B60A12E879007B66F0 /* USBMIDIDevice.cpp */,
+				614CA4B70A12E879007B66F0 /* USBMIDIDevice.h */,
+				614CA4B80A12E879007B66F0 /* USBMIDIDeviceManager.cpp */,
+				614CA4B90A12E879007B66F0 /* USBMIDIDeviceManager.h */,
+				614CA4BA0A12E879007B66F0 /* USBMIDIDriverBase.cpp */,
+				614CA4BB0A12E879007B66F0 /* USBMIDIDriverBase.h */,
+				614CA4BC0A12E879007B66F0 /* USBVendorMIDIDriver.cpp */,
+				614CA4BD0A12E879007B66F0 /* USBVendorMIDIDriver.h */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+		614CA4CC0A12E88A007B66F0 /* Public */ = {
+			isa = PBXGroup;
+			children = (
+				614CA4CD0A12E897007B66F0 /* CAHostTimeBase.cpp */,
+				614CA4CE0A12E897007B66F0 /* CAHostTimeBase.h */,
+				614CA4CF0A12E897007B66F0 /* CAMutex.cpp */,
+				6107221C0A1A2D7A00E84F70 /* CAException.h */,
+				614CA4D00A12E897007B66F0 /* CAMutex.h */,
+			);
+			name = Public;
+			sourceTree = "<group>";
+		};
+		61509FCD0992889E0005A5A8 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				61CE51310BDD5F3900D75767 /* EMUUSBUserClient.cpp */,
+				611AC92A09FA9161007431E8 /* EMUXUCustomControl.cpp */,
+				61509FD8099288D50005A5A8 /* EMUUSBAudioClip.cpp */,
+				61509FD9099288D50005A5A8 /* EMUUSBAudioDevice.cpp */,
+				61509FDA099288D50005A5A8 /* EMUUSBAudioEngine.cpp */,
+				61509FDB099288D50005A5A8 /* EMUUSBAudioPlugin.cpp */,
+				61509FDC099288D50005A5A8 /* EMUUSBAudioLevelControl.cpp */,
+				61509FDD099288D50005A5A8 /* EMUUSBAudioMuteControl.cpp */,
+				61509FDE099288D50005A5A8 /* USBAudioObject.cpp */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		61509FD0099288B20005A5A8 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				61CE51360BDD62BF00D75767 /* EMUUSBPlatform.h */,
+				61CE512F0BDD5F2E00D75767 /* EMUUSBUserClient.h */,
+				61509FE6099288EA0005A5A8 /* EMUUSBAudioDefines.h */,
+				61509FE7099288EA0005A5A8 /* EMUUSBAudioClip.h */,
+				61509FE8099288EA0005A5A8 /* EMUUSBAudioCommon.h */,
+				61509FE9099288EA0005A5A8 /* EMUUSBAudioDevice.h */,
+				61509FEA099288EA0005A5A8 /* EMUUSBAudioEngine.h */,
+				61509FEB099288EA0005A5A8 /* EMUUSBAudioPlugin.h */,
+				61509FEC099288EA0005A5A8 /* EMUUSBAudioLevelControl.h */,
+				61509FED099288EA0005A5A8 /* EMUUSBAudioMuteControl.h */,
+				611AC92609FA9156007431E8 /* EMUXUCustomControl.h */,
+				61509FEE099288EA0005A5A8 /* USBAudioObject.h */,
+			);
+			name = Headers;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		614D5CB90992AE4000D209A0 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		614CA3180A12E0D3007B66F0 /* EMUMIDIDriver */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 614CA31B0A12E0D3007B66F0 /* Build configuration list for PBXNativeTarget "EMUMIDIDriver" */;
+			buildPhases = (
+				614CA3150A12E0D3007B66F0 /* Resources */,
+				614CA3160A12E0D3007B66F0 /* Sources */,
+				614CA3170A12E0D3007B66F0 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EMUMIDIDriver;
+			productName = EMUMIDIPlugin;
+			productReference = 614CA3190A12E0D3007B66F0 /* EMUMIDIDriver.plugin */;
+			productType = "com.apple.product-type.bundle";
+		};
+		614D5CB80992AE4000D209A0 /* EMUUSBAudioFloatLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 614D5CBE0992AE4000D209A0 /* Build configuration list for PBXNativeTarget "EMUUSBAudioFloatLib" */;
+			buildPhases = (
+				614D5CB90992AE4000D209A0 /* Headers */,
+				614D5CBA0992AE4000D209A0 /* Sources */,
+				614D5CBC0992AE4000D209A0 /* Frameworks */,
+				614D5CBD0992AE4000D209A0 /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EMUUSBAudioFloatLib;
+			productInstallPath = /usr/local/lib;
+			productName = EMUUSBAudioFloatLib;
+			productReference = 6102A5F30992C42F00F97B33 /* libEMUUSBAudioFloatLib.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		61509FC4099288670005A5A8 /* EMUUSBAudio */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 61509FC7099288670005A5A8 /* Build configuration list for PBXNativeTarget "EMUUSBAudio" */;
+			buildPhases = (
+				61509FC1099288670005A5A8 /* Sources */,
+				614CA5DA0A12F11B007B66F0 /* Resources */,
+				614CA5DC0A12F139007B66F0 /* CopyFiles */,
+				61509FC3099288670005A5A8 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6150A1C109929A120005A5A8 /* PBXTargetDependency */,
+				614D5CC50992AE9D00D209A0 /* PBXTargetDependency */,
+			);
+			name = EMUUSBAudio;
+			productName = EMUUSBAudio;
+			productReference = 61509FC5099288670005A5A8 /* EMUUSBAudio.kext */;
+			productType = "com.apple.product-type.kernel-extension.iokit";
+		};
+		8D57630D048677EA00EA77CD /* EMUHALPlugin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB911A08733D790010E9CD /* Build configuration list for PBXNativeTarget "EMUHALPlugin" */;
+			buildPhases = (
+				8D57630F048677EA00EA77CD /* Resources */,
+				8D576311048677EA00EA77CD /* Sources */,
+				8D576313048677EA00EA77CD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EMUHALPlugin;
+			productInstallPath = "$(HOME)/Library/Bundles";
+			productName = HALPlugin;
+			productReference = 8D576316048677EA00EA77CD /* EMUHALPlugin.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		089C1669FE841209C02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB911E08733D790010E9CD /* Build configuration list for PBXProject "HulaDrvr" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 1;
+			mainGroup = 089C166AFE841209C02AAC07 /* HALPlugin */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				61509FC4099288670005A5A8 /* EMUUSBAudio */,
+				8D57630D048677EA00EA77CD /* EMUHALPlugin */,
+				614D5CB80992AE4000D209A0 /* EMUUSBAudioFloatLib */,
+				614CA3180A12E0D3007B66F0 /* EMUMIDIDriver */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		614CA3150A12E0D3007B66F0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		614CA5DA0A12F11B007B66F0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D57630F048677EA00EA77CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D5B49A804867FD3000E48DA /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXRezBuildPhase section */
+		614D5CBD0992AE4000D209A0 /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXRezBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		614CA3160A12E0D3007B66F0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				614CA4BE0A12E879007B66F0 /* IOServiceClient.cpp in Sources */,
+				614CA4BF0A12E879007B66F0 /* MIDIBackCompatible.cpp in Sources */,
+				614CA4C00A12E879007B66F0 /* MIDIDriver.cpp in Sources */,
+				614CA4C10A12E879007B66F0 /* MIDIDriverDevice.cpp in Sources */,
+				614CA4C20A12E879007B66F0 /* MIDIDriverUtils.cpp in Sources */,
+				614CA4C30A12E879007B66F0 /* USBDevice.cpp in Sources */,
+				614CA4C40A12E879007B66F0 /* USBDeviceManager.cpp in Sources */,
+				614CA4C50A12E879007B66F0 /* USBInterfaceManager.cpp in Sources */,
+				614CA4C60A12E879007B66F0 /* USBMIDIDevice.cpp in Sources */,
+				614CA4C70A12E879007B66F0 /* USBMIDIDeviceManager.cpp in Sources */,
+				614CA4C80A12E879007B66F0 /* USBMIDIDriverBase.cpp in Sources */,
+				614CA4C90A12E879007B66F0 /* USBVendorMIDIDriver.cpp in Sources */,
+				614CA4D10A12E897007B66F0 /* CAHostTimeBase.cpp in Sources */,
+				614CA4D20A12E897007B66F0 /* CAMutex.cpp in Sources */,
+				614CA4D50A12E8AB007B66F0 /* EMUUSBMIDI.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		614D5CBA0992AE4000D209A0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				614D5CBB0992AE4000D209A0 /* EMUUSBAudioClip.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		61509FC1099288670005A5A8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				61509FE0099288D50005A5A8 /* EMUUSBAudioDevice.cpp in Sources */,
+				61509FE1099288D50005A5A8 /* EMUUSBAudioEngine.cpp in Sources */,
+				61509FE2099288D50005A5A8 /* EMUUSBAudioPlugin.cpp in Sources */,
+				61509FE3099288D50005A5A8 /* EMUUSBAudioLevelControl.cpp in Sources */,
+				61509FE4099288D50005A5A8 /* EMUUSBAudioMuteControl.cpp in Sources */,
+				61509FE5099288D50005A5A8 /* USBAudioObject.cpp in Sources */,
+				611AC92B09FA9161007431E8 /* EMUXUCustomControl.cpp in Sources */,
+				61CE51320BDD5F3900D75767 /* EMUUSBUserClient.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D576311048677EA00EA77CD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6113553209927D6900FF7772 /* EMUHALPlugin.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		614D5CC50992AE9D00D209A0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 614D5CB80992AE4000D209A0 /* EMUUSBAudioFloatLib */;
+			targetProxy = 614D5CC40992AE9D00D209A0 /* PBXContainerItemProxy */;
+		};
+		6150A1C109929A120005A5A8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D57630D048677EA00EA77CD /* EMUHALPlugin */;
+			targetProxy = 6150A1C009929A120005A5A8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		8D5B49A704867FD3000E48DA /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C167EFE841241C02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1DB48EB20A41E7940086D341 /* Release with FireLog Debug info */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(FRAMEWORK_SEARCH_PATHS)",
+					"$(SYSTEM_LIBRARY_DIR)/Frameworks",
+					"$(SRCROOT)",
+				);
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G4;
+				HEADER_SEARCH_PATHS = (
+					"$(SYSTEM_LIBRARY_DIR)/Frameworks/Kernel.framework/Headers",
+					"$(SYSTEM_LIBRARY_DIR)/Frameworks/Firelog.framework/Headers",
+				);
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_PREPROCESS = YES;
+				INFOPLIST_PREPROCESSOR_DEFINITIONS = (
+					"$(INFOPLIST_PREPROCESSOR_DEFINITIONS)",
+					"USE_FIRELOG=1",
+				);
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				PREBINDING = NO;
+				PRODUCT_NAME = EMUHALPlugin;
+				SDKROOT_i386 = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT_ppc = /Developer/SDKs/MacOSX10.4.0.sdk;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				WRAPPER_EXTENSION = bundle;
+				ZERO_LINK = NO;
+			};
+			name = "Release with FireLog Debug info";
+		};
+		1DB48EB30A41E7940086D341 /* Release with FireLog Debug info */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					KERNEL,
+					KERNEL_PRIVATE,
+					DRIVER_PRIVATE,
+					APPLE,
+					NeXT,
+				);
+				HEADER_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Kernel.framework/Headers\"";
+				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
+				LIBRARY_STYLE = STATIC;
+				OTHER_CFLAGS = (
+					"-nostdinc",
+					"-finline",
+					"-fno-keep-inline-functions",
+					"-force_cpusubtype_ALL",
+					"-fcheck-new",
+					"-static",
+				);
+				OTHER_LDFLAGS = "-static";
+				OTHER_LIBTOOL_FLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = EMUUSBAudioFloatLib;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = "Release with FireLog Debug info";
+		};
+		1DB48EB40A41E7940086D341 /* Release with FireLog Debug info */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G4;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_VERSION_ppc = 4.0;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				INFOPLIST_FILE = "EMUUSBAudio-Info.plist";
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Extensions";
+				LIBRARY_SEARCH_PATHS = (
+					"$(LIBRARY_SEARCH_PATHS)",
+					"$(SRCROOT)/build/Release",
+				);
+				MODULE_NAME = com.emu.driver.EMUUSBAudio;
+				MODULE_VERSION = 1.0.0;
+				PREBINDING = NO;
+				PRODUCT_NAME = EMUUSBAudio;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				WRAPPER_EXTENSION = kext;
+				ZERO_LINK = NO;
+			};
+			name = "Release with FireLog Debug info";
+		};
+		1DB48EB50A41E7940086D341 /* Release with FireLog Debug info */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION_ppc = 3.3;
+				INFOPLIST_FILE = "EMUMIDIPlugin-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				LIBRARY_SEARCH_PATHS = "$(LIBRARY_SEARCH_PATHS)";
+				PREBINDING = NO;
+				PRODUCT_NAME = EMUMIDIDriver;
+				WRAPPER_EXTENSION = plugin;
+				ZERO_LINK = NO;
+			};
+			name = "Release with FireLog Debug info";
+		};
+		1DB48EB60A41E7940086D341 /* Release with FireLog Debug info */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = _HULA_MACOSX_;
+				GCC_VERSION_i386 = 4.0;
+				GCC_VERSION_ppc = 3.3;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_PREPROCESS = YES;
+				INFOPLIST_PREPROCESSOR_DEFINITIONS = (
+					"$(INFOPLIST_PREPROCESSOR_DEFINITIONS)",
+					"USE_FIRELOG=1",
+				);
+				PREBINDING = NO;
+				SDKROOT_i386 = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT_ppc = /Developer/SDKs/MacOSX10.3.9.sdk;
+				SYMROOT = build;
+			};
+			name = "Release with FireLog Debug info";
+		};
+		1DEB911B08733D790010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(FRAMEWORK_SEARCH_PATHS)",
+					"$(SRCROOT)",
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_MODEL_TUNING = "";
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Kernel.framework/Headers\"";
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_PREPROCESS = YES;
+				INFOPLIST_PREPROCESSOR_DEFINITIONS = (
+					"$(INFOPLIST_PREPROCESSOR_DEFINITIONS)",
+					"USE_FIRELOG=1",
+				);
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = EMUHALPlugin;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				WRAPPER_EXTENSION = bundle;
+				ZERO_LINK = NO;
+			};
+			name = Debug;
+		};
+		1DEB911C08733D790010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(FRAMEWORK_SEARCH_PATHS)",
+					"$(SRCROOT)",
+				);
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G4;
+				HEADER_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Kernel.framework/Headers\"";
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				PRODUCT_NAME = EMUHALPlugin;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				WRAPPER_EXTENSION = bundle;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		1DEB911F08733D790010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_DEBUGGING_SYMBOLS = full;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = _HULA_MACOSX_;
+				GCC_VERSION_i386 = 4.0;
+				GCC_VERSION_ppc = 3.3;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_PREPROCESS = YES;
+				INFOPLIST_PREPROCESSOR_DEFINITIONS = (
+					"USE_FIRELOG=1",
+					"$(INFOPLIST_PREPROCESSOR_DEFINITIONS)",
+				);
+				PREBINDING = NO;
+				SDKROOT_i386 = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT_ppc = /Developer/SDKs/MacOSX10.3.9.sdk;
+				STRIP_INSTALLED_PRODUCT = NO;
+			};
+			name = Debug;
+		};
+		1DEB912008733D790010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = _HULA_MACOSX_;
+				GCC_VERSION_i386 = 4.0;
+				GCC_VERSION_ppc = 3.3;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_PREPROCESS = YES;
+				PREBINDING = NO;
+				SDKROOT_i386 = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT_ppc = /Developer/SDKs/MacOSX10.3.9.sdk;
+				SYMROOT = build;
+			};
+			name = Release;
+		};
+		614CA31C0A12E0D3007B66F0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G4;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				INFOPLIST_FILE = "EMUMIDIPlugin-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				LIBRARY_SEARCH_PATHS = "$(LIBRARY_SEARCH_PATHS)";
+				PREBINDING = NO;
+				PRODUCT_NAME = EMUMIDIDriver;
+				WRAPPER_EXTENSION = plugin;
+				ZERO_LINK = NO;
+			};
+			name = Debug;
+		};
+		614CA31D0A12E0D3007B66F0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION_ppc = 3.3;
+				INFOPLIST_FILE = "EMUMIDIPlugin-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				LIBRARY_SEARCH_PATHS = "$(LIBRARY_SEARCH_PATHS)";
+				PREBINDING = NO;
+				PRODUCT_NAME = EMUMIDIDriver;
+				WRAPPER_EXTENSION = plugin;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		614D5CBF0992AE4000D209A0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				COPY_PHASE_STRIP = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					KERNEL,
+					KERNEL_PRIVATE,
+					DRIVER_PRIVATE,
+					APPLE,
+					NeXT,
+				);
+				HEADER_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Kernel.framework/Headers\"";
+				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
+				LIBRARY_STYLE = STATIC;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = (
+					"-nostdinc",
+					"-finline",
+					"-fno-keep-inline-functions",
+					"-force_cpusubtype_ALL",
+					"-fcheck-new",
+					"-static",
+				);
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOL_FLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = EMUUSBAudioFloatLib;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				STRIP_STYLE = all;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Debug;
+		};
+		614D5CC00992AE4000D209A0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				COPY_PHASE_STRIP = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					KERNEL,
+					KERNEL_PRIVATE,
+					DRIVER_PRIVATE,
+					APPLE,
+					NeXT,
+				);
+				HEADER_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Kernel.framework/Headers\"";
+				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
+				LIBRARY_STYLE = STATIC;
+				OTHER_CFLAGS = (
+					"-nostdinc",
+					"-finline",
+					"-fno-keep-inline-functions",
+					"-force_cpusubtype_ALL",
+					"-fcheck-new",
+					"-static",
+				);
+				OTHER_LDFLAGS = "-static";
+				OTHER_LIBTOOL_FLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = EMUUSBAudioFloatLib;
+				REZ_EXECUTABLE = YES;
+				SDKROOT_i386 = /Developer/SDKs/MacOSX10.5.sdk;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		61509FC8099288670005A5A8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION_ppc = 4.0;
+				INFOPLIST_FILE = "EMUUSBAudio-Info.plist";
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Extensions";
+				LIBRARY_SEARCH_PATHS = (
+					"$(LIBRARY_SEARCH_PATHS)",
+					"$(SRCROOT)/build/Debug",
+				);
+				MODULE_NAME = com.emu.driver.EMUUSBAudio;
+				MODULE_VERSION = 1.0.0;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "-DDEBUGLOG";
+				PREBINDING = NO;
+				PRODUCT_NAME = EMUUSBAudio;
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = all;
+				WRAPPER_EXTENSION = kext;
+				ZERO_LINK = NO;
+			};
+			name = Debug;
+		};
+		61509FC9099288670005A5A8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G4;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_VERSION_ppc = 4.0;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				INFOPLIST_FILE = "EMUUSBAudio-Info.plist";
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Extensions";
+				LIBRARY_SEARCH_PATHS = (
+					"$(LIBRARY_SEARCH_PATHS)",
+					"$(SRCROOT)/build/Release",
+				);
+				MODULE_NAME = com.emu.driver.EMUUSBAudio;
+				MODULE_VERSION = 1.0.0;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				PRODUCT_NAME = EMUUSBAudio;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				WRAPPER_EXTENSION = kext;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		81D16A5E0AFC1E0B00BBE3F0 /* Timebomb Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(FRAMEWORK_SEARCH_PATHS)",
+					"$(SRCROOT)",
+				);
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G4;
+				HEADER_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Kernel.framework/Headers\"";
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				PRODUCT_NAME = EMUHALPlugin;
+				SDKROOT_i386 = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT_ppc = /Developer/SDKs/MacOSX10.4.0.sdk;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				WRAPPER_EXTENSION = bundle;
+				ZERO_LINK = NO;
+			};
+			name = "Timebomb Release";
+		};
+		81D16A5F0AFC1E0B00BBE3F0 /* Timebomb Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					KERNEL,
+					KERNEL_PRIVATE,
+					DRIVER_PRIVATE,
+					APPLE,
+					NeXT,
+				);
+				HEADER_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Kernel.framework/Headers\"";
+				JAVA_COMPILER_DEBUGGING_SYMBOLS = NO;
+				LIBRARY_STYLE = STATIC;
+				OTHER_CFLAGS = (
+					"-nostdinc",
+					"-finline",
+					"-fno-keep-inline-functions",
+					"-force_cpusubtype_ALL",
+					"-fcheck-new",
+					"-static",
+				);
+				OTHER_LDFLAGS = "-static";
+				OTHER_LIBTOOL_FLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = EMUUSBAudioFloatLib;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = "Timebomb Release";
+		};
+		81D16A600AFC1E0B00BBE3F0 /* Timebomb Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G4;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_VERSION_ppc = 4.0;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				INFOPLIST_FILE = "EMUUSBAudio-Info.plist";
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Extensions";
+				LIBRARY_SEARCH_PATHS = (
+					"$(LIBRARY_SEARCH_PATHS)",
+					"$(SRCROOT)/build/Release",
+				);
+				MODULE_NAME = com.emu.driver.EMUUSBAudio;
+				MODULE_VERSION = 1.0.0;
+				PREBINDING = NO;
+				PRODUCT_NAME = EMUUSBAudio;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				WRAPPER_EXTENSION = kext;
+				ZERO_LINK = NO;
+			};
+			name = "Timebomb Release";
+		};
+		81D16A610AFC1E0B00BBE3F0 /* Timebomb Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION_ppc = 3.3;
+				INFOPLIST_FILE = "EMUMIDIPlugin-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				LIBRARY_SEARCH_PATHS = "$(LIBRARY_SEARCH_PATHS)";
+				PREBINDING = NO;
+				PRODUCT_NAME = EMUMIDIDriver;
+				WRAPPER_EXTENSION = plugin;
+				ZERO_LINK = NO;
+			};
+			name = "Timebomb Release";
+		};
+		81D16A620AFC1E0B00BBE3F0 /* Timebomb Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					_HULA_MACOSX_,
+					"ENABLE_TIMEBOMB=1",
+					"TIMEBOMB_TIME=1176613200",
+				);
+				GCC_VERSION_i386 = 4.0;
+				GCC_VERSION_ppc = 3.3;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_PREPROCESS = YES;
+				PREBINDING = NO;
+				SDKROOT_i386 = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT_ppc = /Developer/SDKs/MacOSX10.3.9.sdk;
+				SYMROOT = build;
+			};
+			name = "Timebomb Release";
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB911A08733D790010E9CD /* Build configuration list for PBXNativeTarget "EMUHALPlugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB911B08733D790010E9CD /* Debug */,
+				1DEB911C08733D790010E9CD /* Release */,
+				81D16A5E0AFC1E0B00BBE3F0 /* Timebomb Release */,
+				1DB48EB20A41E7940086D341 /* Release with FireLog Debug info */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		1DEB911E08733D790010E9CD /* Build configuration list for PBXProject "HulaDrvr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB911F08733D790010E9CD /* Debug */,
+				1DEB912008733D790010E9CD /* Release */,
+				81D16A620AFC1E0B00BBE3F0 /* Timebomb Release */,
+				1DB48EB60A41E7940086D341 /* Release with FireLog Debug info */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		614CA31B0A12E0D3007B66F0 /* Build configuration list for PBXNativeTarget "EMUMIDIDriver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				614CA31C0A12E0D3007B66F0 /* Debug */,
+				614CA31D0A12E0D3007B66F0 /* Release */,
+				81D16A610AFC1E0B00BBE3F0 /* Timebomb Release */,
+				1DB48EB50A41E7940086D341 /* Release with FireLog Debug info */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		614D5CBE0992AE4000D209A0 /* Build configuration list for PBXNativeTarget "EMUUSBAudioFloatLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				614D5CBF0992AE4000D209A0 /* Debug */,
+				614D5CC00992AE4000D209A0 /* Release */,
+				81D16A5F0AFC1E0B00BBE3F0 /* Timebomb Release */,
+				1DB48EB30A41E7940086D341 /* Release with FireLog Debug info */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		61509FC7099288670005A5A8 /* Build configuration list for PBXNativeTarget "EMUUSBAudio" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				61509FC8099288670005A5A8 /* Debug */,
+				61509FC9099288670005A5A8 /* Release */,
+				81D16A600AFC1E0B00BBE3F0 /* Timebomb Release */,
+				1DB48EB40A41E7940086D341 /* Release with FireLog Debug info */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 089C1669FE841209C02AAC07 /* Project object */;
+}

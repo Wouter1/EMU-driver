@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>EMUMIDIDriver</string>
+	<key>CFBundleGetInfoString</key>
+	<string>EMUMIDIDriver, Copyright 2006 EMU Systems Inc</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.emu.EMUMIDIDriver</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>EMUMIDIDriver</string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.1.1</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>1.1.1</string>
+	<key>CFPlugInDynamicRegisterFunction</key>
+	<string></string>
+	<key>CFPlugInDynamicRegistration</key>
+	<string>NO</string>
+	<key>CFPlugInFactories</key>
+	<dict>
+		<key>C4A7FFE6-BBAA-4F55-900B-7B9B4B3F4BFA</key>
+		<string>NewEMUUSBMIDIDriver</string>
+	</dict>
+	<key>CFPlugInTypes</key>
+	<dict>
+		<key>ECDE9574-0FE4-11D4-BB1A-0050E4CEA526</key>
+		<array>
+			<string>C4A7FFE6-BBAA-4F55-900B-7B9B4B3F4BFA</string>
+		</array>
+	</dict>
+	<key>CFPluginUnloadFunction</key>
+	<dict/>
+</dict>
+</plist>

@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>EMUUSBAudio</string>
+	<key>CFBundleGetInfoString</key>
+	<string>EMUUSBAudio 1.0.0 060627, Copyright 2005 - 2007 EMU Systems Inc.</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.emu.driver.EMUUSBAudio</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>EMUUSBAudio</string>
+	<key>CFBundlePackageType</key>
+	<string>KEXT</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.1.2</string>
+	<key>CFBundleSignature</key>
+	<string>EMUU</string>
+	<key>CFBundleVersion</key>
+	<string>1.1.2</string>
+	<key>IOKitPersonalities</key>
+	<dict>
+		<key>EMUSBAudioTrackerPre</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.emu.driver.EMUUSBAudio</string>
+			<key>IOClass</key>
+			<string>EMUUSBAudioDevice</string>
+			<key>IOProbeScore</key>
+			<integer>8000</integer>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>IOUserClientClass</key>
+			<string>EMUUSBUserClient</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bDeviceClass</key>
+			<integer>239</integer>
+			<key>bInterfaceClass</key>
+			<integer>255</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>bInterfaceProtocol</key>
+			<integer>0</integer>
+			<key>bInterfaceSubClass</key>
+			<integer>1</integer>
+			<key>bcdDevice</key>
+			<integer>256</integer>
+			<key>idProduct</key>
+			<integer>16138</integer>
+			<key>idVendor</key>
+			<integer>1054</integer>
+			<key>SafetyOffset</key>
+			<integer>192</integer>
+		</dict>
+		<key>EMUUSBAudioControl02</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.emu.driver.EMUUSBAudio</string>
+			<key>IOClass</key>
+			<string>EMUUSBAudioDevice</string>
+			<key>IOProbeScore</key>
+			<integer>8000</integer>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>IOUserClientClass</key>
+			<string>EMUUSBUserClient</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bDeviceClass</key>
+			<integer>239</integer>
+			<key>bInterfaceClass</key>
+			<integer>255</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>bInterfaceProtocol</key>
+			<integer>0</integer>
+			<key>bInterfaceSubClass</key>
+			<integer>1</integer>
+			<key>bcdDevice</key>
+			<integer>256</integer>
+			<key>idProduct</key>
+			<integer>16130</integer>
+			<key>idVendor</key>
+			<integer>1054</integer>
+			<key>IOAudioEngineChannelNames</key>
+			<dict>
+				<key>InputChannel1</key>
+				<string>Analog In 1</string>
+				<key>InputChannel2</key>
+				<string>Analog In 2</string>
+				<key>OutputChannel1</key>
+				<string>Analog Out 1</string>
+				<key>OutputChannel2</key>
+				<string>Analog Out 2</string>
+			</dict>
+			<key>IOAudioEngineChannelCategoryNames</key>
+			<dict>
+				<key>InputChannel1</key>
+				<string>Analog In</string>
+				<key>InputChannel2</key>
+				<string>Analog In</string>
+				<key>OutputChannel1</key>
+				<string>Analog Out</string>
+				<key>OutputChannel2</key>
+				<string>Analog Out</string>
+			</dict>
+			<key>IOAudioEngineChannelNumberNames</key>
+			<dict>
+				<key>InputChannel1</key>
+				<string>1</string>
+				<key>InputChannel2</key>
+				<string>2</string>
+				<key>OutputChannel1</key>
+				<string>1</string>
+				<key>OutputChannel2</key>
+				<string>2</string>
+			</dict>
+			<key>SafetyOffset</key>
+			<integer>192</integer>
+			<key>TransportTypeOverride</key>
+			<integer>1</integer>			
+		</dict>
+		<key>EMUUSBAudioControl04</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.emu.driver.EMUUSBAudio</string>
+			<key>IOClass</key>
+			<string>EMUUSBAudioDevice</string>
+			<key>IOProbeScore</key>
+			<integer>8000</integer>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>IOUserClientClass</key>
+			<string>EMUUSBUserClient</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bDeviceClass</key>
+			<integer>239</integer>
+			<key>bInterfaceClass</key>
+			<integer>255</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>bInterfaceProtocol</key>
+			<integer>0</integer>
+			<key>bInterfaceSubClass</key>
+			<integer>1</integer>
+			<key>bcdDevice</key>
+			<integer>256</integer>
+			<key>idProduct</key>
+			<integer>16132</integer>
+			<key>idVendor</key>
+			<integer>1054</integer>
+			<key>bHasSPDIFClock</key>
+			<integer>1</integer>
+			<key>IOAudioEngineChannelNames</key>
+			<dict>
+				<key>InputChannel1</key>
+				<string>Analog In 1</string>
+				<key>InputChannel2</key>
+				<string>Analog In 2</string>
+				<key>InputChannel3</key>
+				<string>SPDIF In 1</string>
+				<key>InputChannel4</key>
+				<string>SPDIF In 2</string>
+				<key>OutputChannel1</key>
+				<string>Analog Out 1</string>
+				<key>OutputChannel2</key>
+				<string>Analog Out 2</string>
+				<key>OutputChannel3</key>
+				<string>SPDIF Out 1</string>
+				<key>OutputChannel4</key>
+				<string>SPDIF Out 2</string>				
+			</dict>
+			<key>IOAudioEngineChannelCategoryNames</key>
+			<dict>
+				<key>InputChannel1</key>
+				<string>Analog In</string>
+				<key>InputChannel2</key>
+				<string>Analog In</string>
+				<key>InputChannel3</key>
+				<string>SPDIF In</string>
+				<key>InputChannel4</key>
+				<string>SPDIF In</string>
+				<key>OutputChannel1</key>
+				<string>Analog Out</string>
+				<key>OutputChannel2</key>
+				<string>Analog Out</string>
+				<key>OutputChannel3</key>
+				<string>SPDIF Out</string>
+				<key>OutputChannel4</key>
+				<string>SPDIF Out</string>				
+			</dict>
+			<key>IOAudioEngineChannelNumberNames</key>
+			<dict>
+				<key>InputChannel1</key>
+				<string>1</string>
+				<key>InputChannel2</key>
+				<string>2</string>
+				<key>InputChannel3</key>
+				<string>1</string>
+				<key>InputChannel4</key>
+				<string>2</string>
+				<key>OutputChannel1</key>
+				<string>1</string>
+				<key>OutputChannel2</key>
+				<string>2</string>
+				<key>OutputChannel3</key>
+				<string>1</string>
+				<key>OutputChannel4</key>
+				<string>2</string>				
+			</dict>
+			<key>SafetyOffset</key>
+			<integer>192</integer>
+			<key>TransportTypeOverride</key>
+			<integer>1</integer>			
+		</dict>
+		<key>EMUUSBAudioControl10</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.emu.driver.EMUUSBAudio</string>
+			<key>IOClass</key>
+			<string>EMUUSBAudioDevice</string>
+			<key>IOProbeScore</key>
+			<integer>8000</integer>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>IOUserClientClass</key>
+			<string>EMUUSBUserClient</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bDeviceClass</key>
+			<integer>239</integer>
+			<key>bInterfaceClass</key>
+			<integer>255</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>bInterfaceProtocol</key>
+			<integer>0</integer>
+			<key>bInterfaceSubClass</key>
+			<integer>1</integer>
+			<key>bcdDevice</key>
+			<integer>256</integer>
+			<key>idProduct</key>
+			<integer>16139</integer>
+			<key>idVendor</key>
+			<integer>1054</integer>
+			<key>bHasSPDIFClock</key>
+			<integer>1</integer>
+			<key>IOAudioEngineChannelNames</key>
+			<dict>
+				<key>InputChannel1</key>
+				<string>Analog In 1</string>
+				<key>InputChannel2</key>
+				<string>Analog In 2</string>
+				<key>InputChannel3</key>
+				<string>SPDIF In 1</string>
+				<key>InputChannel4</key>
+				<string>SPDIF In 2</string>
+				<key>OutputChannel1</key>
+				<string>Analog Out 1</string>
+				<key>OutputChannel2</key>
+				<string>Analog Out 2</string>
+				<key>OutputChannel3</key>
+				<string>SPDIF Out 1</string>
+				<key>OutputChannel4</key>
+				<string>SPDIF Out 2</string>				
+			</dict>
+			<key>IOAudioEngineChannelCategoryNames</key>
+			<dict>
+				<key>InputChannel1</key>
+				<string>Analog In</string>
+				<key>InputChannel2</key>
+				<string>Analog In</string>
+				<key>InputChannel3</key>
+				<string>SPDIF In</string>
+				<key>InputChannel4</key>
+				<string>SPDIF In</string>
+				<key>OutputChannel1</key>
+				<string>Analog Out</string>
+				<key>OutputChannel2</key>
+				<string>Analog Out</string>
+				<key>OutputChannel3</key>
+				<string>SPDIF Out</string>
+				<key>OutputChannel4</key>
+				<string>SPDIF Out</string>				
+			</dict>
+			<key>IOAudioEngineChannelNumberNames</key>
+			<dict>
+				<key>InputChannel1</key>
+				<string>1</string>
+				<key>InputChannel2</key>
+				<string>2</string>
+				<key>InputChannel3</key>
+				<string>1</string>
+				<key>InputChannel4</key>
+				<string>2</string>
+				<key>OutputChannel1</key>
+				<string>1</string>
+				<key>OutputChannel2</key>
+				<string>2</string>
+				<key>OutputChannel3</key>
+				<string>1</string>
+				<key>OutputChannel4</key>
+				<string>2</string>				
+			</dict>
+			<key>SafetyOffset</key>
+			<integer>192</integer>
+			<key>TransportTypeOverride</key>
+			<integer>1</integer>			
+		</dict>
+		<!--
+		<key>EMUUSBAudioStream</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.emu.driver.EMUUSBAudio</string>
+			<key>IOClass</key>
+			<string>EMUUSBAudioEngine</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>bInterfaceProtocol</key>
+			<integer>0</integer>
+			<key>bInterfaceSubClass</key>
+			<integer>2</integer>
+			<key>idVendor</key>
+			<integer>1054</integer>
+		</dict>
+		-->
+	</dict>
+	<key>OSBundleCompatibleVersion</key>
+	<string>1.0.0</string>
+	<key>OSBundleLibraries</key>
+	<dict>
+#ifdef USE_FIRELOG
+		<key>com.apple.FireLog</key>
+		<string>2.0</string>
+#endif
+		<key>com.apple.iokit.IOAudioFamily</key>
+		<string>1.1d26</string>
+		<key>com.apple.iokit.IOUSBFamily</key>
+		<string>1.9.4fc1</string>
+	</dict>
+</dict>
+</plist>

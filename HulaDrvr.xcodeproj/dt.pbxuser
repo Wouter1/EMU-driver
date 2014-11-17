@@ -1,0 +1,440 @@
+// !$*UTF8*$!
+{
+	089C1669FE841209C02AAC07 /* Project object */ = {
+		activeBuildConfigurationName = Release;
+		activeBuildStyle = 014CEA3F0018CDD111CA2923 /* Debug */;
+		activeTarget = 61509FC4099288670005A5A8 /* EMUUSBAudio */;
+		addToTargets = (
+			61509FC4099288670005A5A8 /* EMUUSBAudio */,
+		);
+		breakpoints = (
+		);
+		codeSenseManager = 6113553409927D6900FF7772 /* Code sense */;
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXBookmarksDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXBookmarksDataSource_NameID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					200,
+					200,
+					382.5835,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXBookmarksDataSource_LocationID,
+					PBXBookmarksDataSource_NameID,
+					PBXBookmarksDataSource_CommentsID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXErrorsWarningsDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXErrorsWarningsDataSource_LocationID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					300,
+					463.2085,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXErrorsWarningsDataSource_TypeID,
+					PBXErrorsWarningsDataSource_MessageID,
+					PBXErrorsWarningsDataSource_LocationID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					573,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXFindDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFindDataSource_LocationID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					517,
+					120,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFindDataSource_MessageID,
+					PBXFindDataSource_LocationID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXSymbolsDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXSymbolsDataSource_SymbolNameID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					16,
+					200,
+					50,
+					513.2085,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXSymbolsDataSource_SymbolTypeIconID,
+					PBXSymbolsDataSource_SymbolNameID,
+					PBXSymbolsDataSource_SymbolTypeID,
+					PBXSymbolsDataSource_ReferenceNameID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.XCSCMDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					20,
+					549,
+					20,
+					48.1626,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_SCM_ColumnID,
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					200,
+					511,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 170107473;
+			PBXWorkspaceStateSaveDate = 170107473;
+		};
+		perUserProjectItems = {
+			61238E570A23A32C0022938D /* PBXTextBookmark */ = 61238E570A23A32C0022938D /* PBXTextBookmark */;
+			61238E580A23A32C0022938D /* PBXTextBookmark */ = 61238E580A23A32C0022938D /* PBXTextBookmark */;
+			61238E590A23A32C0022938D /* PBXTextBookmark */ = 61238E590A23A32C0022938D /* PBXTextBookmark */;
+			61238E5A0A23A32C0022938D /* PBXTextBookmark */ = 61238E5A0A23A32C0022938D /* PBXTextBookmark */;
+			61F5C61C0A11475A003A9D6D /* PBXTextBookmark */ = 61F5C61C0A11475A003A9D6D /* PBXTextBookmark */;
+			61F5C61D0A11475A003A9D6D /* PBXTextBookmark */ = 61F5C61D0A11475A003A9D6D /* PBXTextBookmark */;
+			61F5C61E0A11475A003A9D6D /* PBXTextBookmark */ = 61F5C61E0A11475A003A9D6D /* PBXTextBookmark */;
+			61F5C61F0A11475A003A9D6D /* PBXTextBookmark */ = 61F5C61F0A11475A003A9D6D /* PBXTextBookmark */;
+		};
+		sourceControlManager = 6113553309927D6900FF7772 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	089C167EFE841241C02AAC07 /* English */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {854, 636}}";
+			sepNavSelRange = "{541, 0}";
+			sepNavVisRect = "{{0, 0}, {854, 636}}";
+			sepNavWindowFrame = "{{342, -81}, {899, 765}}";
+		};
+	};
+	6113553009927D6900FF7772 /* EMUHALPlugin.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {854, 5992}}";
+			sepNavSelRange = "{11056, 16}";
+			sepNavVisRect = "{{0, 4172}, {854, 617}}";
+			sepNavWindowFrame = "{{110, 56}, {899, 690}}";
+		};
+	};
+	6113553109927D6900FF7772 /* EMUHALPlugin.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1138, 673}}";
+			sepNavSelRange = "{364, 0}";
+			sepNavVisRect = "{{0, 0}, {1138, 673}}";
+			sepNavWindowFrame = "{{737, 0}, {1183, 746}}";
+		};
+	};
+	6113553309927D6900FF7772 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+		scmType = "";
+	};
+	6113553409927D6900FF7772 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	6113554F09927E3200FF7772 /* EMUUSBDeviceDefines.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {975, 1974}}";
+			sepNavSelRange = "{398, 17}";
+			sepNavVisRect = "{{0, 0}, {975, 673}}";
+			sepNavWindowFrame = "{{642, 0}, {1020, 746}}";
+		};
+	};
+	611AC92609FA9156007431E8 /* EMUXUCustomControl.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1184, 673}}";
+			sepNavSelRange = "{1080, 0}";
+			sepNavVisRect = "{{0, 0}, {1138, 673}}";
+			sepNavWindowFrame = "{{448, 0}, {1183, 746}}";
+		};
+	};
+	611AC92A09FA9161007431E8 /* EMUXUCustomControl.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1118, 1358}}";
+			sepNavSelRange = "{3186, 0}";
+			sepNavVisRect = "{{0, 985}, {979, 373}}";
+			sepNavWindowFrame = "{{92, 0}, {1020, 746}}";
+		};
+	};
+	61238E570A23A32C0022938D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 61509FDA099288D50005A5A8 /* EMUUSBAudioEngine.cpp */;
+		name = ampleRate;
+		rLen = 9;
+		rLoc = 84086;
+		rType = 0;
+		vrLen = 2641;
+		vrLoc = 82446;
+	};
+	61238E580A23A32C0022938D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 61509FD9099288D50005A5A8 /* EMUUSBAudioDevice.cpp */;
+		name = "ber from the bus";
+		rLen = 16;
+		rLoc = 83327;
+		rType = 0;
+		vrLen = 1847;
+		vrLoc = 83084;
+	};
+	61238E590A23A32C0022938D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 61509FC6099288670005A5A8 /* EMUUSBAudio-Info.plist */;
+		name = "EMUUSBAudio-Info.plist: 99";
+		rLen = 0;
+		rLoc = 2941;
+		rType = 0;
+		vrLen = 1249;
+		vrLoc = 1308;
+	};
+	61238E5A0A23A32C0022938D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 61509FE8099288EA0005A5A8 /* EMUUSBAudioCommon.h */;
+		name = "EMUUSBAudioCommon.h: CONSOLELOGGING";
+		rLen = 0;
+		rLoc = 420;
+		rType = 0;
+		vrLen = 1345;
+		vrLoc = 0;
+	};
+	614CA3180A12E0D3007B66F0 /* EMUMIDIDriver */ = {
+		activeExec = 0;
+	};
+	614D5CB80992AE4000D209A0 /* EMUUSBAudioFloatLib */ = {
+		activeExec = 0;
+	};
+	61509FC4099288670005A5A8 /* EMUUSBAudio */ = {
+		activeExec = 0;
+	};
+	61509FC6099288670005A5A8 /* EMUUSBAudio-Info.plist */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {686, 1652}}";
+			sepNavSelRange = "{2941, 0}";
+			sepNavVisRect = "{{0, 560}, {544, 617}}";
+			sepNavWindowFrame = "{{277, 56}, {589, 690}}";
+		};
+	};
+	61509FD8099288D50005A5A8 /* EMUUSBAudioClip.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1268, 50820}}";
+			sepNavSelRange = "{5735, 20}";
+			sepNavVisRect = "{{0, 4970}, {975, 673}}";
+			sepNavWindowFrame = "{{4, 0}, {1020, 746}}";
+		};
+	};
+	61509FD9099288D50005A5A8 /* EMUUSBAudioDevice.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1244, 32424}}";
+			sepNavSelRange = "{83327, 16}";
+			sepNavVisRect = "{{0, 27888}, {889, 673}}";
+			sepNavWindowFrame = "{{380, 0}, {934, 746}}";
+		};
+	};
+	61509FDA099288D50005A5A8 /* EMUUSBAudioEngine.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1388, 29694}}";
+			sepNavSelRange = "{84086, 9}";
+			sepNavVisRect = "{{0, 26131}, {975, 673}}";
+			sepNavWindowFrame = "{{292, 0}, {1020, 746}}";
+		};
+	};
+	61509FDB099288D50005A5A8 /* EMUUSBAudioPlugin.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {979, 1638}}";
+			sepNavSelRange = "{3501, 10}";
+			sepNavVisRect = "{{0, 1165}, {979, 373}}";
+			sepNavWindowFrame = "{{422, 0}, {1240, 746}}";
+		};
+	};
+	61509FDC099288D50005A5A8 /* EMUUSBAudioLevelControl.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1658, 5488}}";
+			sepNavSelRange = "{14152, 10}";
+			sepNavVisRect = "{{0, 5115}, {979, 373}}";
+			sepNavWindowFrame = "{{497, 0}, {1183, 746}}";
+		};
+	};
+	61509FDD099288D50005A5A8 /* EMUUSBAudioMuteControl.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1448, 2646}}";
+			sepNavSelRange = "{6946, 10}";
+			sepNavVisRect = "{{0, 2273}, {979, 373}}";
+			sepNavWindowFrame = "{{377, 0}, {1183, 746}}";
+		};
+	};
+	61509FDE099288D50005A5A8 /* USBAudioObject.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1472, 30786}}";
+			sepNavSelRange = "{72148, 7}";
+			sepNavVisRect = "{{0, 26447}, {973, 376}}";
+			sepNavWindowFrame = "{{14, 0}, {1020, 746}}";
+		};
+	};
+	61509FE7099288EA0005A5A8 /* EMUUSBAudioClip.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {979, 686}}";
+			sepNavSelRange = "{53, 0}";
+			sepNavVisRect = "{{0, 0}, {979, 373}}";
+		};
+	};
+	61509FE8099288EA0005A5A8 /* EMUUSBAudioCommon.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {975, 1484}}";
+			sepNavSelRange = "{420, 0}";
+			sepNavVisRect = "{{0, 0}, {975, 673}}";
+			sepNavWindowFrame = "{{4, 0}, {1020, 746}}";
+		};
+	};
+	61509FE9099288EA0005A5A8 /* EMUUSBAudioDevice.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1196, 3472}}";
+			sepNavSelRange = "{11850, 0}";
+			sepNavVisRect = "{{0, 0}, {979, 373}}";
+			sepNavWindowFrame = "{{181, 0}, {1020, 746}}";
+		};
+	};
+	61509FEA099288EA0005A5A8 /* EMUUSBAudioEngine.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1208, 3332}}";
+			sepNavSelRange = "{2445, 0}";
+			sepNavVisRect = "{{0, 721}, {854, 617}}";
+			sepNavWindowFrame = "{{83, 56}, {899, 690}}";
+		};
+	};
+	61509FEB099288EA0005A5A8 /* EMUUSBAudioPlugin.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {979, 1190}}";
+			sepNavSelRange = "{977, 1}";
+			sepNavVisRect = "{{0, 0}, {979, 373}}";
+			sepNavWindowFrame = "{{19, -5}, {1183, 746}}";
+		};
+	};
+	61509FEC099288EA0005A5A8 /* EMUUSBAudioLevelControl.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1610, 1204}}";
+			sepNavSelRange = "{2907, 5}";
+			sepNavVisRect = "{{0, 831}, {979, 373}}";
+		};
+	};
+	61509FED099288EA0005A5A8 /* EMUUSBAudioMuteControl.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1556, 854}}";
+			sepNavSelRange = "{2100, 5}";
+			sepNavVisRect = "{{0, 481}, {979, 373}}";
+		};
+	};
+	61509FEE099288EA0005A5A8 /* USBAudioObject.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1064, 13370}}";
+			sepNavSelRange = "{25118, 22}";
+			sepNavVisRect = "{{0, 9803}, {979, 373}}";
+			sepNavWindowFrame = "{{308, 0}, {1183, 746}}";
+		};
+	};
+	61F5C61C0A11475A003A9D6D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 61509FDA099288D50005A5A8 /* EMUUSBAudioEngine.cpp */;
+		name = "time %llu";
+		rLen = 9;
+		rLoc = 84086;
+		rType = 0;
+		vrLen = 2292;
+		vrLoc = 82533;
+	};
+	61F5C61D0A11475A003A9D6D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 61509FD9099288D50005A5A8 /* EMUUSBAudioDevice.cpp */;
+		name = clock_get_uptime;
+		rLen = 16;
+		rLoc = 83327;
+		rType = 0;
+		vrLen = 1729;
+		vrLoc = 83095;
+	};
+	61F5C61E0A11475A003A9D6D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 61509FC6099288670005A5A8 /* EMUUSBAudio-Info.plist */;
+		name = "EMUUSBAudio-Info.plist: 101";
+		rLen = 0;
+		rLoc = 2941;
+		rType = 0;
+		vrLen = 1197;
+		vrLoc = 1323;
+	};
+	61F5C61F0A11475A003A9D6D /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 61509FE8099288EA0005A5A8 /* EMUUSBAudioCommon.h */;
+		name = "EMUUSBAudioCommon.h: CONSOLELOGGING";
+		rLen = 0;
+		rLoc = 420;
+		rType = 0;
+		vrLen = 1330;
+		vrLoc = 0;
+	};
+	8D57630D048677EA00EA77CD /* EMUHALPlugin */ = {
+		activeExec = 0;
+	};
+	8D576317048677EA00EA77CD /* Info.plist */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1090, 520}}";
+			sepNavSelRange = "{659, 0}";
+			sepNavVisRect = "{{0, 0}, {1090, 520}}";
+			sepNavWindowFrame = "{{181, 150}, {1135, 593}}";
+		};
+	};
+}
