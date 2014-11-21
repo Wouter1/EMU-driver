@@ -1,7 +1,7 @@
-EMU-driver
-==========
+EMU-USB driver
+=============
 
-OSX Kernel extension for Creative Labs EMU driver
+OSX driver for Creative Labs EMU USBr
 
 The current version compiles with Xcode 5.1.1.
 Original comes from source forge revision 7. http://sourceforge.net/projects/zaudiodrivermac/
@@ -13,28 +13,23 @@ The first goal here was to get the audio input working properly, without the cli
 
 * This version ONLY works for audio input at 96kHz.
 * The audio output does not work. 
-* The control panel also does not recognise this driver.
+* Only audio input stereo 96kHz was tested on EMU0404 USB. 
+
+Please notify me how my driver works on other EMU USB devices.
 
 
 Installation
 ========
-1. Use the original EMU driver provided by E-MU (http://support.creative.com/Products/ProductDetails.aspx?catID=237&catName=USB+Audio%2fMIDI+Interfaces&subCatID=611&subCatName=USB+Audio%2fMIDI+Interfaces&prodID=15185&prodName=0404+USB+2.0&bTopTwenty=1&VARSET=prodfaq:PRODFAQ_15185,VARSET=CategoryID:237)
-2. Use the control panel to set the EMU speed to 96 kHz
-3. Turn off the EMU device
-
-Then proceed installing this new driver:
-
-4. Run the kextInstall script 
-5. enter your admin password at the prompt
+1. Turn off the EMU device
+2. Run the kextInstall script 
+3. Use the control panel to set the EMU speed to 96 kHz
+4. enter your admin password at the prompt
 
 or
 
-4. manually copy EMUUSBAudio.kext into  /System/Library/Extensions/ 
-5. reboot
-
-The original version of the driver 'EMUUSBAudio original.kext' is also provided here. 
-You can copy that one back to  /System/Library/Extensions/ and reboot restore the original driver.
-
+1. manually copy EMUUSBAudio.kext into  /System/Library/Extensions/ 
+2. reboot
+3. Use the control panel to set the EMU speed to 96 kHz
 
 Usage
 ======
@@ -43,9 +38,19 @@ Usage
 2. Select the EMU input in your favourite tool (e.g., Audacity)
 3. Make your recording
 
+Uninstall
+=======
+Download and install the original EMU driver provided by E-MU (http://support.creative.com/Products/ProductDetails.aspx?catID=237&catName=USB+Audio%2fMIDI+Interfaces&subCatID=611&subCatName=USB+Audio%2fMIDI+Interfaces&prodID=15185&prodName=0404+USB+2.0&bTopTwenty=1&VARSET=prodfaq:PRODFAQ_15185,VARSET=CategoryID:237)
+
+OR
+
+1. rename EMUUSBAudio original.kext to EMUUSBAudio.kext
+2. Turn off your EMU device
+3. run the kextInstall script
+
 
 Building from source code
-======
+===================
 
 1. Open the project in Xcode (double click src/EMUUSBAudio.xcodeproj)
 2. Select Product/Build menu item
@@ -54,4 +59,5 @@ Building from source code
 5. Copy the kext into the directory where the kextInstall script is
 
 After that the kExtInstall script is ready for use (see Installation)
+
 
