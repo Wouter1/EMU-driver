@@ -1381,12 +1381,10 @@ Boolean EMUUSBAudioEngine::getDescriptorString(char *buffer, UInt8 index) {
 OSString * EMUUSBAudioEngine::getGlobalUniqueID () {
     OSString *			uniqueID = NULL;
 	OSNumber *			usbLocation = NULL;
-	Boolean             haveSerial;
 	UInt32				locationID ;
 	UInt8				interfaceNumber = 0;
 	char				productString[kStringBufferSize];
 	char				manufacturerString[kStringBufferSize];
-	char				serialNumberString[kStringBufferSize];
     char                locationIDString[kStringBufferSize];
     char                uniqueIDStr[MAX_ID_SIZE];
     
@@ -1395,7 +1393,6 @@ OSString * EMUUSBAudioEngine::getGlobalUniqueID () {
     getDescriptorString(manufacturerString, usbDevice->GetManufacturerStringIndex ());
     getDescriptorString(productString,usbDevice->GetProductStringIndex ());
 	interfaceNumber = mInput.streamInterface->GetInterfaceNumber ();
-    haveSerial = getDescriptorString(serialNumberString,usbDevice->GetSerialNumberStringIndex ());
     usbLocation = OSDynamicCast (OSNumber, usbDevice->getProperty (kUSBDevicePropertyLocationID));
     if (NULL != usbLocation) {
         locationID = usbLocation->unsigned32BitValue ();
@@ -1404,13 +1401,8 @@ OSString * EMUUSBAudioEngine::getGlobalUniqueID () {
         strncpy (locationIDString, "Unknown location",kStringBufferSize);
     }
 
-    if (haveSerial) {
-        snprintf (uniqueIDStr, MAX_ID_SIZE,"EMUUSBAudioEngine:%s:%s:%s:%d",
-                  manufacturerString, productString, serialNumberString, interfaceNumber);
-    } else {
-        snprintf (uniqueIDStr, MAX_ID_SIZE, "EMUUSBAudioEngine:%s:%s:%s:%d",
+    snprintf (uniqueIDStr, MAX_ID_SIZE, "EMUUSBAudioEngine:%s:%s:%s:%d",
                   manufacturerString, productString, locationIDString, interfaceNumber);
-    }
     
     uniqueID = OSString::withCString (uniqueIDStr);
     debugIOLog ("getGlobalUniqueID = %s", uniqueIDStr);
