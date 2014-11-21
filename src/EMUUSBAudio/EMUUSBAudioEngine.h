@@ -146,6 +146,10 @@ class EMUUSBAudioDevice;
 
 #define FRAMESIZE_QUEUE_SIZE				    128
 
+// max size of the globally unique descriptor ID. See getGlobalUniqueID()
+#define MAX_ID_SIZE 128
+
+
 class IOSyncer;
 class EMUUSBAudioEngine;
 class EMUUSBAudioPlugin;
@@ -516,6 +520,14 @@ protected:
  	static void waitForFirstUSBFrameCompletion (OSObject * owner, IOTimerEventSource * sender);
     
 	virtual bool willTerminate (IOService * provider, IOOptionBits options);
+
+    /**
+     Get stringDescriptor into buffer. Buffer has to be kStringBufferSize
+     @param index the string index to be fetched. If null, the get fails.
+     @return true if succes, false if failed. If failed, buffer is filled with "Unknown".
+     */
+    virtual Boolean getDescriptorString(char *buffer, UInt8 index);
+
 	virtual OSString * getGlobalUniqueID ();
     
     /*!

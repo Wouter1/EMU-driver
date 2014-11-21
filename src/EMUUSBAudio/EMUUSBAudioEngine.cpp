@@ -1362,84 +1362,58 @@ IOAudioStreamDirection EMUUSBAudioEngine::getDirection () {
 	return (IOAudioStreamDirection) -1;
 }
 
+Boolean EMUUSBAudioEngine::getDescriptorString(char *buffer, UInt8 index) {
+    IOReturn	res = kIOReturnSuccess;
+    IOUSBDevice *usbDevice =mInput.streamInterface->GetDevice();
+
+    buffer[0] = 0;
+	if (index != 0) {
+		res = usbDevice->GetStringDescriptor (index, buffer, kStringBufferSize);
+    }
+	if (buffer[0] == 0 || res != kIOReturnSuccess) {
+		strncpy (buffer, "Unknown",kStringBufferSize-1);
+        return false;
+	}
+    return true;
+}
+
+
 OSString * EMUUSBAudioEngine::getGlobalUniqueID () {
-    char *				uniqueIDStr = NULL;
     OSString *			uniqueID = NULL;
 	OSNumber *			usbLocation = NULL;
-	IOReturn			err = kIOReturnSuccess;
-    UInt32				uniqueIDSize = 128; // ??? - JH
-	UInt32				locationID = 0;
-	UInt8				stringIndex = 0;
+	Boolean             haveSerial;
+	UInt32				locationID ;
 	UInt8				interfaceNumber = 0;
 	char				productString[kStringBufferSize];
 	char				manufacturerString[kStringBufferSize];
 	char				serialNumberString[kStringBufferSize];
-	char				locationIDString[kStringBufferSize];
-	char				interfaceNumberString[4];	// biggest string possible is "255"
+    char                locationIDString[kStringBufferSize];
+    char                uniqueIDStr[MAX_ID_SIZE];
     
-	uniqueIDSize += strlen ("EMUUSBAudioEngine");
+    IOUSBDevice *usbDevice =mInput.streamInterface->GetDevice();
     
-	manufacturerString[0] = 0;
-	stringIndex = mInput.streamInterface->GetDevice()->GetManufacturerStringIndex ();
-	if (0 != stringIndex)
-		mInput.streamInterface->GetDevice()->GetStringDescriptor (stringIndex, manufacturerString, kStringBufferSize);
-    
-	if (0 == manufacturerString[0] || kIOReturnSuccess != err)
-		strncpy (manufacturerString, "Unknown Manufacturer",kStringBufferSize-1);
-	
-	uniqueIDSize += strlen (manufacturerString);
-    
-	productString[0] = 0;
-	stringIndex = mInput.streamInterface->GetDevice()->GetProductStringIndex ();
-	if (0 != stringIndex)
-		mInput.streamInterface->GetDevice()->GetStringDescriptor (stringIndex, productString, kStringBufferSize);
-    
-	if (0 == productString[0] || kIOReturnSuccess != err)
-		strncpy (productString, "Unknown USB Audio Device",kStringBufferSize-1);
-	
-	uniqueIDSize += strlen (productString);
-    
-	serialNumberString[0] = 0;
-	stringIndex = mInput.streamInterface->GetDevice()->GetSerialNumberStringIndex ();
-	stringIndex = 0;
-	if (0 != stringIndex)
-		err = mInput.streamInterface->GetDevice()->GetStringDescriptor (stringIndex, serialNumberString, kStringBufferSize);
-    
-	if (0 == serialNumberString[0] || kIOReturnSuccess != err) {
-		// device doesn't have a serial number, get its location ID
-		usbLocation = OSDynamicCast (OSNumber, mInput.streamInterface->GetDevice()->getProperty (kUSBDevicePropertyLocationID));
-		if (NULL != usbLocation) {
-			locationID = usbLocation->unsigned32BitValue ();
-			snprintf (locationIDString,sizeof(locationIDString), "%x", locationID);
-		} else {
-			strncpy (locationIDString, "Unknown location",kStringBufferSize-1);
-		}
-		uniqueIDSize += strlen (locationIDString);
-	} else {
-		// device has a serial number that we can use to track it
-		debugIOLog ("device has a serial number = %s", serialNumberString);
-		uniqueIDSize += strlen (serialNumberString);
-	}
-    
+    getDescriptorString(manufacturerString, usbDevice->GetManufacturerStringIndex ());
+    getDescriptorString(productString,usbDevice->GetProductStringIndex ());
 	interfaceNumber = mInput.streamInterface->GetInterfaceNumber ();
-	snprintf (interfaceNumberString, sizeof(interfaceNumberString),"%d", interfaceNumber);
-	uniqueIDSize += strlen (interfaceNumberString);
+    haveSerial = getDescriptorString(serialNumberString,usbDevice->GetSerialNumberStringIndex ());
+    usbLocation = OSDynamicCast (OSNumber, usbDevice->getProperty (kUSBDevicePropertyLocationID));
+    if (NULL != usbLocation) {
+        locationID = usbLocation->unsigned32BitValue ();
+        snprintf (locationIDString,kStringBufferSize, "%x", locationID);
+    } else {
+        strncpy (locationIDString, "Unknown location",kStringBufferSize);
+    }
+
+    if (haveSerial) {
+        snprintf (uniqueIDStr, MAX_ID_SIZE,"EMUUSBAudioEngine:%s:%s:%s:%d",
+                  manufacturerString, productString, serialNumberString, interfaceNumber);
+    } else {
+        snprintf (uniqueIDStr, MAX_ID_SIZE, "EMUUSBAudioEngine:%s:%s:%s:%d",
+                  manufacturerString, productString, locationIDString, interfaceNumber);
+    }
     
-	uniqueIDStr = (char *)IOMalloc (uniqueIDSize);
-    
-	if (NULL != uniqueIDStr) {
-		uniqueIDStr[0] = 0;
-        
-		if (0 == serialNumberString[0]) {
-			snprintf (uniqueIDStr, sizeof(uniqueIDStr), "EMUUSBAudioEngine:%s:%s:%s:%s",manufacturerString, productString, locationIDString, interfaceNumberString);
-		} else {
-			snprintf (uniqueIDStr, sizeof(uniqueIDStr),"EMUUSBAudioEngine:%s:%s:%s:%s", manufacturerString, productString, serialNumberString, interfaceNumberString);
-		}
-        
-		uniqueID = OSString::withCString (uniqueIDStr);
-		debugIOLog ("getGlobalUniqueID = %s", uniqueIDStr);
-		IOFree (uniqueIDStr, uniqueIDSize);
-	}
+    uniqueID = OSString::withCString (uniqueIDStr);
+    debugIOLog ("getGlobalUniqueID = %s", uniqueIDStr);
     
 	return uniqueID;
 }

@@ -9,8 +9,8 @@ echo "Installing EMU driver"
 set pathname=`dirname "$0"`
 cd "$pathname"
 
-mkdir EMUUSBAudio.kext/Contents/Plugins/
-cp -r EMUHALPlugin.bundle EMUUSBAudio.kext/Contents/Plugins/
+//mkdir EMUUSBAudio.kext/Contents/Plugins/
+//cp -r EMUHALPlugin.bundle EMUUSBAudio.kext/Contents/Plugins/
 
 echo "plz to turn off your device for loading of kext, you have 3 seconds to do so"
 sleep 3
