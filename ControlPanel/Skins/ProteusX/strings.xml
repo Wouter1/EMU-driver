@@ -1,0 +1,219 @@
+<?xml version = "1.0" encoding = "UTF-8" standalone = "no" ?>
+
+<!--************************************************************************
+**	Description: This file declares strings, with or without translations.
+**	Note that keys may or may not repeat within individual language nodes.
+**	Note also that viable real-time alternatives to this are Translator's...
+**************************************************************************-->
+<!-- Internal DTD subset -->
+<!DOCTYPE strings [
+	<!ELEMENT strings (language*, string*)>
+	<!ELEMENT language (string*)>
+	<!ELEMENT string (key, value?, source?, translation?)>
+	<!ELEMENT key (#PCDATA)>
+	<!ELEMENT value (#PCDATA)>
+	<!ELEMENT source (#PCDATA)>
+	<!ELEMENT translation (#PCDATA)>
+
+	<!ATTLIST language name CDATA #REQUIRED>
+]>
+
+<strings>
+	<language name="English">
+<!-- BEGIN : Title bar label-->
+		<string>
+			<key>0202_MAINWINDOW_TITLEBAR</key>
+			<value>E-MU 0202|USB [Control Panel]</value>
+		</string>
+		<string>
+			<key>0404_MAINWINDOW_TITLEBAR</key>
+			<value>E-MU 0404|USB [Control Panel]</value>
+		</string>
+		<string>
+			<key>TRACKERPRE_MAINWINDOW_TITLEBAR</key>
+			<value>E-MU Tracker pre|USB [Control Panel]</value>
+		</string>
+		<string>
+			<key>0204_MAINWINDOW_TITLEBAR</key>
+			<value>E-MU 0204|USB [Control Panel]</value>
+		</string>
+		<string>
+			<key>0808_MAINWINDOW_TITLEBAR</key>
+			<value>E-MU 0808|USB [Control Panel]</value>
+		</string>
+		<string>
+			<key>1214_MAINWINDOW_TITLEBAR</key>
+			<value>E-MU 1214|USB [Control Panel]</value>
+		</string>
+		<string>
+			<key>0406_MAINWINDOW_TITLEBAR</key>
+			<value>E-MU 0406|USB [Control Panel]</value>
+		</string>
+		<string>
+			<key>TRACKERPREPLUS_MAINWINDOW_TITLEBAR</key>
+			<value>E-MU Tracker pre+ [Control Panel]</value>
+		</string>
+		<string>
+			<key>NODEVICE_MAINWINDOW_TITLEBAR</key>
+			<value>E-MU USB Audio Control Panel</value>
+		</string>
+<!-- END : Title bar label-->
+<!-- BEGIN : Strings displayed on the Menu bar-->		
+		<string>
+			<key>MENUBAR_VIEW_SHOW_HIDE_APP</key>
+			<value>&amp;Hide Application</value>
+		</string>
+		<string>
+			<key>MENUBAR_VIEW_SHOW_HIDE_APP1</key>
+			<value>Show/&amp;Hide Application</value>
+		</string>
+		<string>
+			<key>MENUBAR_VIEW_MENU_TEXT</key>
+			<value>&amp;View</value>
+		</string>
+		<string>
+			<key>MENUBAR_HELP_MENU_TEXT</key>
+			<value>&amp;Help</value>
+		</string>
+		<string>
+			<key>MENUBAR_HELP_MENU_ABOUT_ECONTROL</key>
+			<value>&amp;About E-MU USB Audio Control Panel</value>
+		</string>	
+		<string>
+			<key>MENUBAR_HELP_MENU_LAUNCH_MANUAL</key>
+			<value>&amp;Launch Manual</value>
+		</string>		
+		<string>
+			<key>MENUBAR_HELP_MENU_CHECK_UPDATES</key>
+			<value>Check &amp;Updates</value>
+		</string>		
+		<string>
+			<key>MENUBAR_HELP_MENU_REGISTER_WEBPAGE</key>
+			<value>&amp;Register Your Product</value>
+		</string>		
+		<string>
+			<key>MENUBAR_SKIN_MENU_TEXT</key>
+			<value>S&amp;kin</value>
+		</string>
+<!-- END : Strings displayed on the Menu bar -->
+<!-- BEGIN: Strings displayed on Main Window-->
+		<string>
+			<key>MAINWINDOW_DEVICE_TAG</key>
+			<value>&amp;Device:</value>
+		</string>
+		<string>
+			<key>MAINWINDOW_SAMPLERATE_TAG</key>
+			<value>Sample &amp;Rate:</value>
+		</string>
+		<string>
+			<key>MAINWINDOW_SYNCSOURCE_TAG</key>
+			<value>&amp;Sync Source :</value>
+		</string>
+		<string>
+			<key>MAINWINDOW_DIGITAL_INPUTSTATUS_TAG</key>
+			<value>Digital Input Status :</value>
+		</string>
+		<string>
+			<key>MAINWINDOW_SPDIF_OUTFORMAT_TAG</key>
+			<value>S/PDIF &amp;Output Format:</value>
+		</string>
+		<string>
+			<key>MAINWINDOW_LOCK_TAG</key>
+			<value>Lock</value>
+		</string>
+		<string>
+			<key>MAINWINDOW_DIGITAL_SRC_TAG</key>
+			<value>SRC</value>
+		</string>
+		<string>
+			<key>MAINWINDOW_TOOLTIPS_TAG</key>
+			<value>&amp;ToolTips</value>
+		</string>
+		<string>
+			<key>MAINWINDOW_SOFTLIMIT_TAG</key>
+			<value>Soft &amp;Limit</value>
+		</string>
+		<string>
+			<key>MAINWINDOW_INPUT_STATUS_TAG</key>
+			<value>Input Status</value>
+		</string>
+		<string>
+			<key>MAINWINDOW_INPUT_MODE_TAG</key>
+			<value>Input Mode</value>
+		</string>
+		<string>
+			<key>MAINWINDOW_OUTPUT_MODE_TAG</key>
+			<value>Output Mode</value>
+		</string>
+		
+<!-- END : Strings displayed on Main Window -->	
+<!-- BEGIN : Tray Icon Menu -->
+		<string>
+			<key>TRAY_MENU_SHOW</key>
+			<value>&amp;Show</value>
+		</string>
+		<string>
+			<key>TRAY_MENU_LOADATSTARTUP</key>
+			<value>&amp;Load Application at Startup</value>
+		</string>		
+		<string>
+			<key>TRAY_MENU_EXIT</key>
+			<value>&amp;Exit</value>
+		</string>
+<!-- END : Tray Icon Menu -->
+<!-- BEGIN : Strings displayed for Tool Tips -->
+		<string>
+			<key>TOOLTIP_DEVICE_SELECT</key>
+			<value>Selects which E-MU USB device is controlled by E-MU USB Audio Control Panel</value>
+		</string>
+		<string>
+			<key>TOOLTIP_SAMPLERATE_SELECT</key>
+			<value>Selects the system sample rate</value>
+		</string>
+		<string>
+			<key>TOOLTIP_SYNCSOURCE_SELECT</key>
+			<value>Selects internal or external clock source</value>
+		</string>
+		<string>
+			<key>TOOLTIP_SRLOCK_DISP</key>
+			<value>Indicates that the E-MU USB device is receiving sample rate clock</value>
+		</string>
+		<string>
+			<key>TOOLTIP_SRCON_DISP</key>
+			<value>Indicates that the S/PDIF input is not locked to the sample rate and is being sample rate converted</value>
+		</string>
+		<string>
+			<key>TOOLTIP_SPDIFOUTFORMAT_SELECT</key>
+			<value>Selects between S/PDIF or AES/EBU format for the S/PDIF output</value>
+		</string>
+		<string>
+			<key>TOOLTIP_SOFTLIMIT_SELECT</key>
+			<value>Turns the analog soft limiters on or off(both channels)</value>
+		</string>
+		<string>
+			<key>TOOLTIP_DIGITAL_SR_DISP</key>
+			<value>Displays the sample rate of the external clock (if applicable)</value>
+		</string>
+		<string>
+			<key>TOOLTIP_TOOLTIP_TOGGLE</key>
+			<value>Turns on or off the popup text messages</value>
+		</string>
+		<string>
+			<key>TOOLTIP_INPUT_STATUS</key>
+			<value>Displays the detected input source and sample rate</value>
+		</string>
+		<string>
+			<key>TOOLTIP_INPUT_MODE</key>
+			<value>Selects Analog, S/PDIF or ADAT for the input mode</value>
+		</string>
+		<string>
+			<key>TOOLTIP_OUTPUT_MODE</key>
+			<value>Selects Analog, S/PDIF or ADAT for the output mode</value>
+		</string>
+		<string>
+			<key>TOOLTIP_HEADPHONE_SOURCE</key>
+			<value>Selects the output channels for headphone monitoring</value>
+		</string>
+<!-- END : Strings displayed for Tool Tips -->
+	</language>
+</strings>
