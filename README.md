@@ -1,7 +1,7 @@
 EMU-USB driver
 =============
 
-OSX driver for Creative Labs EMU USBr
+OSX driver for Creative Labs EMU USB
 
 The current version compiles with Xcode 5.1.1.
 Original comes from source forge revision 7. http://sourceforge.net/projects/zaudiodrivermac/
