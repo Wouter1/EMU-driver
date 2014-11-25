@@ -68,6 +68,7 @@
 #include "EMUUSBAudioClip.h"
 
 #include "StreamInfo.h"
+#include "ADRingBuffer.h"
 
 class EMUUSBAudioDevice;
 
@@ -288,9 +289,9 @@ protected:
     
     
     /*! @discussion StreamInfo relevant for the reading-from-USB (recording). */
-	StreamInfo						mInput;
+	ADRingBuffer						mInput;
     /*! @discussion StreamInfo relevant for the writing-to-USB (playback) */
-	StreamInfo						mOutput;
+	StreamInfo                          mOutput;
     
 	// engine data (i.e., not stream-specific)
 	IOSyncer *							mSyncer;

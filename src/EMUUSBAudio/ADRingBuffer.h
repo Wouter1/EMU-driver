@@ -9,9 +9,9 @@
 #ifndef __EMUUSBAudio__ADRingBuffer__
 #define __EMUUSBAudio__ADRingBuffer__
 
-class ADRingBuffer {
+class ADRingBuffer: public StreamInfo {
 public:
-    void readBytes();
+    
 protected:
     
 };
