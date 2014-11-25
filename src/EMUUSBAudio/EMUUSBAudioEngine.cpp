@@ -799,11 +799,7 @@ IOReturn EMUUSBAudioEngine::GatherInputSamples(Boolean doTimeStamp) {
 		mInput.bufferOffset = 0;
         debugIOLogR("BUG EMUUSBAudioEngine::GatherInputSamples wrong offset");
     }
-    
-    
-    
-
-    
+   
     while(mInput.frameIndex < RECORD_NUM_USB_FRAMES_PER_LIST
           && -1 != pFrames[mInput.frameIndex].frStatus // no transport at all
           && kUSBLowLatencyIsochTransferKey != pFrames[mInput.frameIndex].frStatus // partially transported
@@ -815,10 +811,10 @@ IOReturn EMUUSBAudioEngine::GatherInputSamples(Boolean doTimeStamp) {
         if (mDropStartingFrames <= 0)
         {
             UInt32	byteCount = pFrames[mInput.frameIndex].frActCount;
-            if (byteCount != lastInputSize) {
+            if (byteCount != mInput.lastInputSize) {
                 debugIOLogR("Happy Leap Sample!  new size = %d, current size = %d",byteCount,lastInputSize);
-                lastInputSize = byteCount;
-                lastInputFrames = byteCount / mInput.multFactor;
+                mInput.lastInputSize = byteCount;
+                mInput.lastInputFrames = byteCount / mInput.multFactor;
             }
             totalreceived += byteCount;
             
@@ -828,10 +824,10 @@ IOReturn EMUUSBAudioEngine::GatherInputSamples(Boolean doTimeStamp) {
                 doLog("****** OVERRUN: write head is overtaking read head!");
             }
             
-            runningInputCount += lastInputFrames;
+            mInput.runningInputCount += mInput.lastInputFrames;
             //	debugIOLogC("push %d",lastInputFrames);
             // save the # of frames to the framesize queue so that we generate an appropriately sized output packet
-            PushFrameSize(lastInputFrames);
+            PushFrameSize(mInput.lastInputFrames);
             SInt32	numBytesToEnd = mInput.bufferSize - mInput.bufferOffset; // assumes that bufferOffset <= bufferSize
             if (byteCount < numBytesToEnd) { // no wrap
                 memcpy(dest, source, byteCount);
@@ -2137,7 +2133,8 @@ IOReturn EMUUSBAudioEngine::readFrameList (UInt32 frameListNum) {
 
 
 
-void EMUUSBAudioEngine::readCompleted (void * object, void * frameListNrPtr, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
+void EMUUSBAudioEngine::readCompleted (void * object, void * frameListNrPtr,
+                                       IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
    
 	EMUUSBAudioEngine *	engine = (EMUUSBAudioEngine *)object;
 
@@ -2145,20 +2142,15 @@ void EMUUSBAudioEngine::readCompleted (void * object, void * frameListNrPtr, IOR
     debugIOLogR("+ readCompleted framelist %d currentFrameList %d result %x frametime %lld systime %lld",
                 frameListnr, engine->mInput.currentFrameList, result, myFrames->frTimeStamp,systemTime);
 
-    // CHECK is this really used?
-//    if (TRUE == engine->startingEngine) {
-//        doLog("EMUUSBAudioEngine::readCompleted SERIOUS: engine still starting up. Exit readCompleted.");
-//        return; // wait till engine really started.
-//    }
     engine->startingEngine = FALSE; // HACK if we turn off the timer to start the  thing...
 
     
     IOLockLock(engine->mInput.mLock);
-    // HACK we MUST have the lock now as we must restart reading the list.
-    // This means we may have to wait for GatherInputSamples to complete from a call from convertInputSamples.
-    // should be short.
-    // We must fix this problem.
-    
+    /* HACK we MUST have the lock now as we must restart reading the list.
+     This means we may have to wait for GatherInputSamples to complete from a call from convertInputSamples.
+     should be short. And our call to GatherInputSamples will be very fast. Would be nice
+     if we can fix this better.
+    */
     /*An "underrun error" occurs when the UART transmitter has completed sending a character and the transmit buffer is empty. In asynchronous modes this is treated as an indication that no data remains to be transmitted, rather than an error, since additional stop bits can be appended. This error indication is commonly found in USARTs, since an underrun is more serious in synchronous systems.
      */
 
@@ -2348,7 +2340,8 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	previouslyPreparedBufferOffset = 0;		// Start playing from the start of the buffer
 	fractionalSamplesRemaining = 0;			// Reset our parital frame list info
     shouldStop = 0;
-	runningInputCount = runningOutputCount = 0;
+	mInput.runningInputCount = 0;
+    runningOutputCount = 0;
 	lastDelta = 0;
 	debugIOLogC("mInput.frameQueuedList");
 	if (mInput.frameQueuedForList) {
@@ -2715,7 +2708,8 @@ void EMUUSBAudioEngine::writeHandler (void * object, void * parameter, IOReturn 
 			UInt32	frameIndex = (UInt32) (((UInt64) parameter >>16) - 1);
 			if (kUSBDeviceSpeedHigh == self->mHubSpeed) {// consider the high speed bus case first
 				//UInt32	byteCount = self->mOutput.maxFrameSize;
-				UInt32	byteCount = self->lastInputFrames * self->mOutput.multFactor;
+                // We just use the #input frames as measure for #output??
+				UInt32	byteCount = self->mInput.lastInputFrames * self->mOutput.multFactor;
 				UInt32	preWrapBytes = byteCount - byteOffset;
 				debugIOLog2("** writeHandler time stamp **");
 				time = self->generateTimeStamp(frameIndex, preWrapBytes, byteCount);
@@ -2732,7 +2726,7 @@ void EMUUSBAudioEngine::writeHandler (void * object, void * parameter, IOReturn 
 			stampTime = AbsoluteTime_to_scalar(&time);
 			debugIOLogT("write frameIndex %ld stampTime %llu system time %llu \n", frameIndex, stampTime, systemTime);
 			//self->takeTimeStamp(TRUE, &time);
-			int delta = self->runningInputCount - self->runningOutputCount;
+			int delta = self->mInput.runningInputCount - self->runningOutputCount;
 			int drift = self->lastDelta - delta;
 			self->lastDelta = delta;
 			debugIOLogC("running counts: input %u, output %u, delta %d, drift %d",(unsigned int)self->runningInputCount,(unsigned int)self->runningOutputCount,delta, drift);

@@ -351,9 +351,6 @@ protected:
     /*! number of initial frames that are dropped. See kNumberOfStartingFramesToDrop */
 	UInt32								mDropStartingFrames;
 	Boolean								needTimeStamps;
-	UInt32								lastInputSize;
-	UInt32								lastInputFrames;
-	UInt32								runningInputCount;
 	UInt32								runningOutputCount;
 	SInt32								lastDelta;
 	UInt32								lastNonZeroFrame;

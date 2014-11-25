@@ -27,6 +27,13 @@ public:
     
     /*! wrap timestamp for this framelist. 0 if no wrap occured */
     UInt64                  frameListWrapTimeStamp;
+    
+    UInt32					lastInputSize;
+	UInt32					lastInputFrames;
+    /*! counter used to steer the DAStream (playback) */
+	UInt32					runningInputCount;
+
+    
 protected:
 
 };
