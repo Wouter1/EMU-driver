@@ -2859,7 +2859,7 @@ Exit:
     return result;
 }
 
-IOReturn EMUUSBAudioEngine::hardwareSampleRateChangedAux(const IOAudioSampleRate *newSampleRate, EMUUSBAudioEngine::StreamInfo &info) {
+IOReturn EMUUSBAudioEngine::hardwareSampleRateChangedAux(const IOAudioSampleRate *newSampleRate, StreamInfo &info) {
 	IOReturn	result = kIOReturnError;
 	const IOAudioStreamFormat*			theFormat =info.audioStream->getFormat();
 	EMUUSBAudioConfigObject*	usbAudio = usbAudioDevice->GetUSBAudioConfigObject();
