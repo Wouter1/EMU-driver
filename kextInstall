@@ -9,9 +9,6 @@ echo "Installing EMU driver"
 set pathname=`dirname "$0"`
 cd "$pathname"
 
-//mkdir EMUUSBAudio.kext/Contents/Plugins/
-//cp -r EMUHALPlugin.bundle EMUUSBAudio.kext/Contents/Plugins/
-
 echo "plz to turn off your device for loading of kext, you have 3 seconds to do so"
 sleep 3
 sudo kextunload /System/Library/Extensions/EMUUSBAudio.kext
@@ -25,9 +22,6 @@ sudo chgrp -R wheel EMUUSBAudio.kext
 echo "loading new kext"
 sudo kextload -v EMUUSBAudio.kext
 kextutil -s ~/symbols/ -A EMUUSBAudio.kext/
-#cd ~/
-#echo "cleaning up"
-#sudo rm -r ~/tmp
 echo "so long"
 
 
