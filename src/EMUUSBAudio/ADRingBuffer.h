@@ -20,9 +20,9 @@ public:
      @param timeNs the smoothed-out time stamp when the wrap occured 
      @param increment true if the wrap should increment the wrap counter. 
      */
-    virtual void notifyWrapTimeNs(AbsoluteTime timeNs, Boolean increment);
+    //virtual void notifyWrapTimeNs(AbsoluteTime timeNs, Boolean increment);
 
-    void makeTimeStampFromWrap(AbsoluteTime wt);
+    //void makeTimeStampFromWrap(AbsoluteTime wt);
 
 // should become private. Right now it's still shared with EMUUSBAudioEngine.
         
