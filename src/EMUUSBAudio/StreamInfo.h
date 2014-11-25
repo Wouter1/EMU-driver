@@ -9,6 +9,12 @@
 #ifndef EMUUSBAudio_StreamInfo_h
 #define EMUUSBAudio_StreamInfo_h
 
+#include <IOKit/usb/IOUSBPipe.h>
+#include <IOKit/usb/IOUSBDevice.h>
+#include <IOKit/usb/IOUSBInterface.h>
+#include <IOKit/audio/IOAudioStream.h>
+#include <IOKit/IOSubMemoryDescriptor.h>
+
 /*!
  @abstract  the state or our mInput/mOutput USB stream.
  @discussion To handle an USB stream the program joggles with a set of USB frames,

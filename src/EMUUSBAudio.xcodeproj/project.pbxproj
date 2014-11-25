@@ -28,6 +28,7 @@
 		6C7E54951A0BF90800D647B5 /* ADRingBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7E54931A0BF90800D647B5 /* ADRingBuffer.h */; };
 		6C8BF21C1A2507FC00F2052A /* LowPassFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C8BF21A1A2507FC00F2052A /* LowPassFilter.cpp */; };
 		6C8BF21D1A2507FC00F2052A /* LowPassFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C8BF21B1A2507FC00F2052A /* LowPassFilter.h */; };
+		6C8BF21E1A25232700F2052A /* ADRingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7E54921A0BF90800D647B5 /* ADRingBuffer.cpp */; };
 		6C97E7F819EDB4C400C376B9 /* EMUUSBAudioLevelControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C071319E4578A00F1FD56 /* EMUUSBAudioLevelControl.cpp */; };
 		6C97E7F919EDB4C900C376B9 /* EMUUSBAudioMuteControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C071B19E4714500F1FD56 /* EMUUSBAudioMuteControl.cpp */; };
 /* End PBXBuildFile section */
@@ -293,6 +294,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C8BF21E1A25232700F2052A /* ADRingBuffer.cpp in Sources */,
 				6C5464221A15606C003C251B /* EMUUSBUserClient.cpp in Sources */,
 				6C39DF8919F2C3BD00D027FC /* EMUUSBAudioClip.cpp in Sources */,
 				6C97E7F919EDB4C900C376B9 /* EMUUSBAudioMuteControl.cpp in Sources */,
