@@ -38,8 +38,6 @@
 #include "EMUUSBUserClient.h"
 #include "EMUUSBLogging.h"
 
-// HACK where is math.h ??
-#define abs(x) ( (x)<0? -(x): x)
 
 #define super IOAudioEngine
 
@@ -879,9 +877,6 @@ IOReturn EMUUSBAudioEngine::GatherInputSamples(Boolean doTimeStamp) {
 }
 
 
-//expected wrap time in ns.
-// HACK we need to do this more flexible. This depends on sample rate.
-#define EXPECTED_WRAP_TIME 128000000
 
 
 void EMUUSBAudioEngine::makeTimeStampFromWrap(AbsoluteTime wt) {
@@ -890,7 +885,7 @@ void EMUUSBAudioEngine::makeTimeStampFromWrap(AbsoluteTime wt) {
 
     if (goodWraps >= 5) {
         // regular operation after initial wraps. Mass-spring-damper filter.
-        takeTimeStampNs(filter(wrapTimeNs,FALSE),TRUE);
+        takeTimeStampNs(mInput.lpfilter.filter(wrapTimeNs,FALSE),TRUE);
     } else {
         
         // setting up the timer. Find good wraps.
@@ -904,7 +899,7 @@ void EMUUSBAudioEngine::makeTimeStampFromWrap(AbsoluteTime wt) {
             if (errorT < EXPECTED_WRAP_TIME/1000) {
                 goodWraps ++;
                 if (goodWraps == 5) {
-                    takeTimeStampNs(filter(wrapTimeNs,TRUE),FALSE);
+                    takeTimeStampNs(mInput.lpfilter.filter(wrapTimeNs,TRUE),FALSE);
                     doLog("USB timer started");
                  }
             } else {
@@ -923,35 +918,6 @@ void EMUUSBAudioEngine::takeTimeStampNs(UInt64 timeStampNs, Boolean increment) {
 
 }
 
-#define K 1     // spring constant for filter
-#define M 10000 // mass for the filter
-#define DA 200  // 2 Sqrt[M K] for critical damping.
-
-UInt64 EMUUSBAudioEngine::filter(UInt64 inputx, Boolean initialize) {
-    UInt64 xnext;
-    SInt64 unext,du,F;
-    
-    if (initialize) {
-        x = inputx;
-        dx = EXPECTED_WRAP_TIME;
-        u=0;
-        return inputx;
-    }
-    
-    xnext = x + dx ; // the next filtered output
-    unext = inputx - xnext; // error u
-    
-    du = unext - u; // change of the error, for damping
-    if (abs(du) < EXPECTED_WRAP_TIME/2000) {
-        F = K * unext + DA * du; // force on spring
-        dx = dx + F/M ;
-    }
-    x = xnext;
-    u= unext; // update the filter
-    
-    debugIOLogT("filter %lld -> %lld", inputx, x);
-    return x;
-}
 
 
 void EMUUSBAudioEngine::addSoftVolumeControls()

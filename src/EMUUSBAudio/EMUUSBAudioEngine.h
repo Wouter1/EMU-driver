@@ -378,12 +378,6 @@ protected:
     Boolean previousTimeWasFirstTime;
     /*! good wraps since start of audio input */
     UInt16 goodWraps;
-    /*! position (time) for the filter (ns) */
-    UInt64 x;
-    /*! speed (wrap-time-difference) for the filter (ns) */
-    UInt64 dx;
-    /*! the deviation/drift for the filter (ns)*/
-    UInt64 u;
 
 	
 	void	GetDeviceInfo (void);
@@ -576,10 +570,6 @@ protected:
     /*! as takeTimeStamp but takes nanoseconds instead of AbsoluteTime */
     void takeTimeStampNs(UInt64 timeStampNs, Boolean increment);
 
-    /*! filter a given wrap time using a outlier reject and a mass-spring-damper filter 
-     @param wrapTime the time (ns) of the next wrap. 
-     @param initialize true if this is first call. This initializes internal vars x, dx, u */
-    UInt64 filter(UInt64 wrapTime, Boolean initialize);
 };
 
 #endif /* defined(__EMUUSBAudio__EMUUSBAudioEngine__) */
