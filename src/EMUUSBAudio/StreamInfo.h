@@ -115,12 +115,6 @@ struct StreamInfo {
     UInt64 *					frameQueuedForList;
     
     
-    /*! Used in GatherInputSamples to keep track of which framelist we were converting. */
-    UInt64 previousFrameList;
-    /*! used in GatherInputSamples to keep track of which frame in the list we were left at (first non-converted frame index) */
-    UInt32 frameIndex;
-    /*! wrap timestamp for this framelist. 0 if no wrap occured */
-    UInt64 frameListWrapTimeStamp;
     
     
 };

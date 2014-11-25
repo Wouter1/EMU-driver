@@ -266,11 +266,8 @@ protected:
 #endif
 	
 	volatile UInt32						shouldStop;
-#if LOCKING
-	IOLock*								mLock;
 	IOLock*								mWriteLock;
 	IOLock*								mFormatLock;
-#endif
 	
 #if PREPINPUT
 	IOUSBLowLatencyIsocFrame *			mClearIsocFrames;

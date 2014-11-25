@@ -56,10 +56,9 @@ void EMUUSBAudioEngine::free () {
 		startTimer->release ();
 		startTimer = NULL;
 	}
-#if LOCKING
-	if (NULL != mLock) {
-		IOLockFree(mLock);
-		mLock = NULL;
+	if (NULL != mInput.mLock) {
+		IOLockFree(mInput.mLock);
+		mInput.mLock = NULL;
 	}
 	if (NULL != mWriteLock) {
 		IOLockFree(mWriteLock);
@@ -73,7 +72,6 @@ void EMUUSBAudioEngine::free () {
 		mFormatLock = NULL;
 	}
 	
-#endif
 	if (NULL != mInput.frameQueuedForList) {
 		delete [] mInput.frameQueuedForList;
 		mInput.frameQueuedForList = NULL;
@@ -1104,10 +1102,10 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBuf, void *de
     debugIOLogTD("C %d %d",firstSampleByte, mInput.bufferOffset);
 
     if (!startingEngine && !shouldStop) {
-        Boolean haveLock=IOLockTryLock(mLock);
+        Boolean haveLock=IOLockTryLock(mInput.mLock);
         if (haveLock) {
             GatherInputSamples(false);
-            IOLockUnlock(mLock);
+            IOLockUnlock(mInput.mLock);
         }
     }
     
@@ -1407,11 +1405,9 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
     
     debugIOLog ("+EMUUSBAudioEngine[%p]::initHardware (%p)", this, provider);
 	terminatingDriver = FALSE;
-#if LOCKING
-	mLock = NULL;
+	mInput.mLock = NULL;
 	mWriteLock = NULL;
 	mFormatLock = NULL;
-#endif
     FailIf (FALSE == super::initHardware (provider), Exit);
     
 	FailIf (NULL == usbAudioDevice, Exit); // (AC mod)
@@ -1465,14 +1461,13 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
 	
 	mInput.numUSBTimeFrames = mInput.numUSBFramesPerList / kNumberOfFramesPerMillisecond;
 	
-#if LOCKING
-	mLock = IOLockAlloc();
-	FailIf(!mLock, Exit);
+	mInput.mLock = IOLockAlloc();
+	FailIf(!mInput.mLock, Exit);
 	mWriteLock = IOLockAlloc();
 	FailIf(!mWriteLock, Exit);
 	mFormatLock = IOLockAlloc();
 	FailIf(!mFormatLock, Exit);
-#endif
+
 	// alloc memory required to clear the input pipe
 #if PREPINPUT
 	mClearIsocFrames = (IOUSBLowLatencyIsocFrame*) IOMalloc(kNumFramesToClear * sizeof(IOUSBLowLatencyIsocFrame));
@@ -2158,7 +2153,7 @@ void EMUUSBAudioEngine::readCompleted (void * object, void * frameListNrPtr, IOR
     engine->startingEngine = FALSE; // HACK if we turn off the timer to start the  thing...
 
     
-    IOLockLock(engine->mLock);
+    IOLockLock(engine->mInput.mLock);
     // HACK we MUST have the lock now as we must restart reading the list.
     // This means we may have to wait for GatherInputSamples to complete from a call from convertInputSamples.
     // should be short.
@@ -2197,7 +2192,7 @@ void EMUUSBAudioEngine::readCompleted (void * object, void * frameListNrPtr, IOR
 			engine->mInput.streamInterface = NULL;
 		}
 	}
-	IOLockUnlock(engine->mLock);
+	IOLockUnlock(engine->mInput.mLock);
     
 	debugIOLogR("- readCompleted currentFrameList=%d",engine->mInput.currentFrameList);
 	return;
