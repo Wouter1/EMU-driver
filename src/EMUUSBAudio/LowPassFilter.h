@@ -34,6 +34,9 @@ public:
     /*! filter a given wrap time using a outlier reject and a mass-spring-damper filter
      @param wrapTime the time (ns) of the next wrap.
      @param initialize true if this is first call. This initializes internal vars x, dx, u 
+     @return the filtered value for this wrap time. This will be hardly influenced by
+     the actual wrap time and be mostly the expected wrap time; but the filter will be
+     adjusted over time to keep real and estimated wrap times in line. 
      */
     UInt64 filter(UInt64 wrapTime, Boolean initialize);
 
