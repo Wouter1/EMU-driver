@@ -13,16 +13,16 @@
 #include <IOKit/IOLib.h> 
 
 
-class ADRingBuffer: public StreamInfo {
+struct ADRingBuffer: public StreamInfo {
 public:
 
     /*! notify that the Ring Buffer wrapped around at given time.
-     @param timeNs the smoothed-out time stamp when the wrap occured 
+     @param time the smoothed-out time stamp when the wrap occured 
      @param increment true if the wrap should increment the wrap counter. 
      */
-    //virtual void notifyWrapTimeNs(AbsoluteTime timeNs, Boolean increment);
+    virtual void notifyWrap(AbsoluteTime *time, bool increment) = 0;
 
-    //void makeTimeStampFromWrap(AbsoluteTime wt);
+    void makeTimeStampFromWrap(AbsoluteTime wt);
 
 // should become private. Right now it's still shared with EMUUSBAudioEngine.
         

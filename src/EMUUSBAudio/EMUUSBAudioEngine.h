@@ -163,6 +163,9 @@ typedef struct FrameListWriteInfo {
     UInt32								retryCount;
 } FrameListWriteInfo;
 
+
+
+
 /*!
  @abstract implements IOAudioEngine. Provides audio stream services.
  Uses USB services itself to read from EMU device.
@@ -284,9 +287,22 @@ protected:
 	IOAudioToggleControl*				mInputMuteControl;
 	EMUUSBAudioSoftLevelControl*		mInputVolume;
     
+    /*! implement the virtuals of ADRingBuffer  */
+    struct EMUADRingBuffer: public ADRingBuffer {
+        public:
+            /*! init, pass parent pointer*/
+            void init(EMUUSBAudioEngine * engine);
+        
+            void notifyWrap(AbsoluteTime *time, bool increment);
+        private:
+            // pointer to the engine. This is just the parent
+            EMUUSBAudioEngine *             theEngine;
+    };
+    
+
     
     /*! @discussion StreamInfo relevant for the reading-from-USB (recording). */
-	ADRingBuffer						mInput;
+	EMUADRingBuffer						mInput;
     /*! @discussion StreamInfo relevant for the writing-to-USB (playback) */
 	StreamInfo                          mOutput;
     

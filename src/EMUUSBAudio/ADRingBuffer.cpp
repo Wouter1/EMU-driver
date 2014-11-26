@@ -8,3 +8,6 @@
 
 #include "ADRingBuffer.h"
 
+void ADRingBuffer::makeTimeStampFromWrap(AbsoluteTime wt) {
+    //TODO
+}

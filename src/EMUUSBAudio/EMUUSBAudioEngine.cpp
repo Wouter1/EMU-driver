@@ -535,6 +535,15 @@ Exit:
 	return resultCode;
 }
 
+void EMUUSBAudioEngine::EMUADRingBuffer::init(EMUUSBAudioEngine * engine) {
+    theEngine = engine;
+}
+
+void EMUUSBAudioEngine::EMUADRingBuffer::notifyWrap(AbsoluteTime *time, bool increment) {
+    theEngine->takeTimeStamp(increment,time);
+}
+
+
 void EMUUSBAudioEngine::CalculateSamplesPerFrame (UInt32 inSampleRate, UInt16 * averageFrameSamples, UInt16 * additionalSampleFrameFreq) {
 	UInt32		subFrameDivisor = 1000;// * (8 / mPollInterval);
 	UInt32		divisor = inSampleRate % subFrameDivisor;

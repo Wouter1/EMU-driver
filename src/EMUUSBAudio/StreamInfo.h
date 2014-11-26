@@ -32,19 +32,20 @@ struct StreamInfo {
     /*! The point where the next raw USB byte can be written in bufferPtr. Always in [0, bufferSize> */
     UInt32		bufferOffset;
     
-    /*! Wouter: =numChannels * #bytes per sample for this stream =  frame size.
+    /*! =numChannels * #bytes per sample for this stream =  frame size.
      this will be 6 for stereo 24 bit audio. */
     UInt32		multFactor;
     
-    /*! 'specifiying how many bytes to read or write' (Wouter: from  USH.h).
-     The max number of bytes that we can receive in a single frame which is part of a USB frameList.
+    /*! The max number of bytes that we can receive in a single frame which is part of a USB frameList.
      Is set to (averageFrameSamples + 1) * mInput.multFactor. Eg 97*6=582 for 96kHz/24 stereo  */
     UInt32		maxFrameSize;
     
     /*! This is the length of the bufferDescriptors array and usbIsocFrames.
      // I think sizes of 4 and 8 are usual.*/
     UInt32		numUSBFrameLists;
-    /*!Wouter: the number of usb frames in our lists. Hard set to RECORD_NUM_USB_FRAMES_PER_LIST or PLAY_NUM_USB_FRAMES_PER_LIST (64 usually). USB calls back to us only after 'completion' (I guess all frames were read, or something went wrong), calling back to readHandler.
+    /*! The number of usb frames in our lists. Hard set to RECORD_NUM_USB_FRAMES_PER_LIST 
+        or PLAY_NUM_USB_FRAMES_PER_LIST (64 usually). USB calls back to us only after 'completion' 
+        (after all frames were read, or something went wrong), calling back to readHandler.
      */
     UInt32		numUSBFramesPerList;
     /*! = mInput.numUSBFramesPerList / kNumberOfFramesPerMillisecond = 8 usually.
@@ -64,13 +65,15 @@ struct StreamInfo {
      */
     UInt32		bufferSize;
     
-    // Wouter: The nummer of channels coming in. Typically 1 (mono) or 2 (stereo).
+    /*! The nummer of channels coming in. Typically 1 (mono) or 2 (stereo). */
     UInt32		numChannels;
     UInt32		frameOffset;
     UInt8		streamDirection;
     UInt8		interfaceNumber;
     UInt8		alternateSettingID;
-    /*! the framelist that we are expecting to complete from next. Basically runs from 0 to numUSBFrameListsToQueue-1 and then
+    
+    /*! the framelist that we are expecting to complete from next. 
+     Basically runs from 0 to numUSBFrameListsToQueue-1 and then
      restarts at 0. Updated after readHandler handled the block. */
     volatile UInt32						currentFrameList;
     
@@ -80,7 +83,8 @@ struct StreamInfo {
     IOUSBPipe					  *pipe;
     IOUSBPipe					  *associatedPipe;
     
-    /*! @discussion Wouter : array of IOUSBLowLatencyIsocFrame containing USB status for a frame. size (for mInput) = numUSBFrameLists * numUSBFramesPerList */
+    /*! @discussion array of IOUSBLowLatencyIsocFrame containing USB status for a frame. 
+       size (for mInput) = numUSBFrameLists * numUSBFramesPerList */
     IOUSBLowLatencyIsocFrame	  *usbIsocFrames;
     
     /*! @abstract
@@ -100,6 +104,7 @@ struct StreamInfo {
     
     /*! The memory descriptor for the The intermediate ring buffer of size bufferSize.*/
     IOBufferMemoryDescriptor	*bufferMemoryDescriptor;
+    
     /*! array of pointers to IOMemoryDescriptor of length [frameListnum]. This is where raw USB data will come in.
      @discussion Contains copy of the received USB data.
      When a framelist is complete, readhHandler copies the data from the frame list
