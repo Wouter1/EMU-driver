@@ -22,8 +22,14 @@ public:
      */
     virtual void notifyWrap(AbsoluteTime *time, bool increment) = 0;
 
-    void makeTimeStampFromWrap(AbsoluteTime wt);
+    /*! make a time stamp for a frame that has given frametime .
+     we ignore the exact pos of the sample in the frame because measurements showed no relation between
+     this position and the time of the frame.
+     @param frametime the timestamp for the USB frame that wrapped the buffer. I guess that the timestamp is for completion of the frame.
+     */
+    virtual void makeTimeStampFromWrap(AbsoluteTime frametime);
 
+    
 // should become private. Right now it's still shared with EMUUSBAudioEngine.
         
     /* lock to ensure convertInputSamples and readHandler are never run together */
@@ -46,7 +52,16 @@ public:
     /*! counter used to steer the DAStream (playback) */
 	UInt32					runningInputCount;
 
-    
+    /*! good wraps since start of audio input */
+    UInt16 goodWraps;
+
+    /*! last received frame timestamp */
+    AbsoluteTime previousfrTimestampNs;
+
+private:
+    /*! as takeTimeStamp but takes nanoseconds instead of AbsoluteTime */
+    void takeTimeStampNs(UInt64 timeStampNs, Boolean increment);
+
 
 };
 

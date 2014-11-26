@@ -230,6 +230,7 @@ bool EMUUSBAudioEngine::start (IOService * provider) {
     
 	debugIOLog ("+EMUUSBAudioEngine[%p]::start (%p)", this, provider);
     
+    mInput.init(this);
 	// Find out what interface number the driver is being instantiated against so that we always ask about
 	// our particular interface and not some other interface the device might have.
     
@@ -540,7 +541,11 @@ void EMUUSBAudioEngine::EMUADRingBuffer::init(EMUUSBAudioEngine * engine) {
 }
 
 void EMUUSBAudioEngine::EMUADRingBuffer::notifyWrap(AbsoluteTime *time, bool increment) {
+    if (theEngine) {
     theEngine->takeTimeStamp(increment,time);
+    } else {
+        doLog("BUG! EMUUSBAudioEngine not initialized");
+    }
 }
 
 
@@ -786,7 +791,7 @@ IOReturn EMUUSBAudioEngine::GatherInputSamples(Boolean doTimeStamp) {
     
     // handle outstanding wraps so that we have it available for this round
     if (doTimeStamp && mInput.frameListWrapTimeStamp!=0) {
-        makeTimeStampFromWrap(mInput.frameListWrapTimeStamp);
+        mInput.makeTimeStampFromWrap(mInput.frameListWrapTimeStamp);
         mInput.frameListWrapTimeStamp = 0;
     }
     
@@ -871,7 +876,7 @@ IOReturn EMUUSBAudioEngine::GatherInputSamples(Boolean doTimeStamp) {
     } else {
          // reached end of list reached.
         if (doTimeStamp && mInput.frameListWrapTimeStamp!=0) {
-            makeTimeStampFromWrap(mInput.frameListWrapTimeStamp);
+            mInput.makeTimeStampFromWrap(mInput.frameListWrapTimeStamp);
             mInput.frameListWrapTimeStamp=0;
         }
     }
@@ -882,44 +887,6 @@ IOReturn EMUUSBAudioEngine::GatherInputSamples(Boolean doTimeStamp) {
 
 
 
-void EMUUSBAudioEngine::makeTimeStampFromWrap(AbsoluteTime wt) {
-    UInt64 wrapTimeNs;
-    absolutetime_to_nanoseconds(wt,&wrapTimeNs);
-
-    if (goodWraps >= 5) {
-        // regular operation after initial wraps. Mass-spring-damper filter.
-        takeTimeStampNs(mInput.lpfilter.filter(wrapTimeNs,FALSE),TRUE);
-    } else {
-        
-        // setting up the timer. Find good wraps.
-        if (goodWraps == 0) {
-            goodWraps++;
-        } else {
-            // check if previous wrap had correct spacing deltaT.
-            SInt64 deltaT = wrapTimeNs - previousfrTimestampNs - EXPECTED_WRAP_TIME;
-            UInt64 errorT = abs( deltaT );
-            
-            if (errorT < EXPECTED_WRAP_TIME/1000) {
-                goodWraps ++;
-                if (goodWraps == 5) {
-                    takeTimeStampNs(mInput.lpfilter.filter(wrapTimeNs,TRUE),FALSE);
-                    doLog("USB timer started");
-                 }
-            } else {
-                goodWraps = 0;
-                doLog("USB hick (%lld). timer re-syncing.",errorT);
-            }
-        }
-        previousfrTimestampNs = wrapTimeNs;
-    }
-}
-
-void EMUUSBAudioEngine::takeTimeStampNs(UInt64 timeStampNs, Boolean increment) {
-    AbsoluteTime t;
-    nanoseconds_to_absolutetime(timeStampNs, &t);
-    takeTimeStamp(increment, &t);
-
-}
 
 
 
@@ -1730,8 +1697,8 @@ IOReturn EMUUSBAudioEngine::performAudioEngineStart () {
 	// Reset timestamping mechanism
     
     //HACK to support another hack for timestamps.
-    previousfrTimestampNs = 0;
-    goodWraps = 0;
+    mInput.previousfrTimestampNs = 0;
+    mInput.goodWraps = 0;
 
     
 	if (mPlugin)  {

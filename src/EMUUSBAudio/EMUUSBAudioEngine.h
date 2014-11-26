@@ -383,11 +383,7 @@ protected:
     /*!  frameSizeQueueBack points to first free element in frameSizeQueue. */
     UInt32 frameSizeQueueBack;
     
-    /*! last received frame timestamp */
-    AbsoluteTime previousfrTimestampNs;
     Boolean previousTimeWasFirstTime;
-    /*! good wraps since start of audio input */
-    UInt16 goodWraps;
 
 	
 	void	GetDeviceInfo (void);
@@ -571,14 +567,6 @@ protected:
 	UInt32	PopFrameSize();
 	void	ClearFrameSizes();
 
-    /*! make a time stamp for a frame that has given frametime .
-     we ignore the exact pos of the sample in the frame because measurements showed no relation between 
-     this position and the time of the frame.
-     @param frametime the timestamp for the USB frame that wrapped the buffer. I guess that the timestamp is for completion of the frame.
-     */
-    void makeTimeStampFromWrap(AbsoluteTime frametime);
-    /*! as takeTimeStamp but takes nanoseconds instead of AbsoluteTime */
-    void takeTimeStampNs(UInt64 timeStampNs, Boolean increment);
 
 };
 
