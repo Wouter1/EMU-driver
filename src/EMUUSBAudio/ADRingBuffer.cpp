@@ -9,6 +9,16 @@
 #include "ADRingBuffer.h"
 #include "EMUUSBLogging.h"
 
+void ADRingBuffer::init() {
+
+}
+
+
+void ADRingBuffer::start() {
+    previousfrTimestampNs = 0;
+    goodWraps = 0;
+}
+
 
 void ADRingBuffer::makeTimeStampFromWrap(AbsoluteTime wt) {
     UInt64 wrapTimeNs;

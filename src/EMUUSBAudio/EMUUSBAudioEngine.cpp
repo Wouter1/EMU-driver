@@ -537,6 +537,7 @@ Exit:
 }
 
 void EMUUSBAudioEngine::EMUADRingBuffer::init(EMUUSBAudioEngine * engine) {
+    ADRingBuffer::init();
     theEngine = engine;
 }
 
@@ -1696,10 +1697,7 @@ IOReturn EMUUSBAudioEngine::performAudioEngineStart () {
     debugIOLog ("+EMUUSBAudioEngine[%p]::performAudioEngineStart ()", this);
 	// Reset timestamping mechanism
     
-    //HACK to support another hack for timestamps.
-    mInput.previousfrTimestampNs = 0;
-    mInput.goodWraps = 0;
-
+    mInput.start();
     
 	if (mPlugin)  {
 		debugIOLogC("starting plugin");

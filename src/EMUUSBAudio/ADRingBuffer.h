@@ -15,6 +15,11 @@
 
 struct ADRingBuffer: public StreamInfo {
 public:
+    /*! initializes the ring buffer. Must be called before use. */
+    void init();
+    
+    /*! starts the ring buffer IO. Must be called to start */
+    void start();
 
     /*! notify that the Ring Buffer wrapped around at given time.
      @param time the smoothed-out time stamp when the wrap occured 
