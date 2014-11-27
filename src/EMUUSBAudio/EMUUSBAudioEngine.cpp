@@ -966,6 +966,7 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBuf, void *de
     debugIOLogTD("C %d %d",firstSampleByte, mInput.bufferOffset);
 
     if (!mInput.startingEngine && !mInput.shouldStop) {
+        // we try to gather all the bytes now: it may take long time before completion callback comes in the ring buffer.
         Boolean haveLock=IOLockTryLock(mInput.mLock);
         if (haveLock) {
             mInput.GatherInputSamples(false);

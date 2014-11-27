@@ -199,9 +199,10 @@ protected:
     
 
     
-    /*! @discussion StreamInfo relevant for the reading-from-USB (recording). */
+    /*! StreamInfo relevant for the reading-from-USB (recording). */
 	EMUADRingBuffer						mInput;
-    /*! @discussion StreamInfo relevant for the writing-to-USB (playback) */
+    
+    /*! StreamInfo relevant for the writing-to-USB (playback) */
 	StreamInfo                          mOutput;
     
     

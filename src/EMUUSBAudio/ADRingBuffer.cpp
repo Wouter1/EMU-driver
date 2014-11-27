@@ -22,13 +22,13 @@ void ADRingBuffer::start() {
 
 void ADRingBuffer::makeTimeStampFromWrap(AbsoluteTime wt) {
     UInt64 wrapTimeNs;
+    
     absolutetime_to_nanoseconds(wt,&wrapTimeNs);
     
     if (goodWraps >= 5) {
-        // regular operation after initial wraps. Mass-spring-damper filter.
+        // regular operation after initial wraps.
         takeTimeStampNs(lpfilter.filter(wrapTimeNs,FALSE),TRUE);
     } else {
-        
         // setting up the timer. Find good wraps.
         if (goodWraps == 0) {
             goodWraps++;
@@ -54,9 +54,9 @@ void ADRingBuffer::makeTimeStampFromWrap(AbsoluteTime wt) {
 
 void ADRingBuffer::takeTimeStampNs(UInt64 timeStampNs, Boolean increment) {
     AbsoluteTime t;
+    
     nanoseconds_to_absolutetime(timeStampNs, &t);
     notifyWrap(&t,increment);
-    
 }
 
 Queue * ADRingBuffer::getFrameSizeQueue() {
@@ -69,9 +69,7 @@ IOReturn ADRingBuffer::GatherInputSamples(Boolean doTimeStamp) {
 	UInt8*			buffStart = (UInt8*) bufferPtr;
     UInt32         totalreceived=0;
 	UInt8*			dest = buffStart + bufferOffset;
-    
-    // for OVERRUN checks
-    UInt32 readHeadPos = nextExpectedFrame * multFactor;
+    UInt32 readHeadPos = nextExpectedFrame * multFactor;     // for OVERRUN checks
     
     debugIOLogR("+GatherInputSamples %d", bufferOffset / multFactor);
     // check if we moved to the next frame. This is done when primary USB interrupt occurs.

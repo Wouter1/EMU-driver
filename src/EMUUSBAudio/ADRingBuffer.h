@@ -34,9 +34,11 @@ public:
     virtual void        notifyClosed() =0  ;
 
     /*! make a time stamp for a frame that has given frametime .
-     we ignore the exact pos of the sample in the frame because measurements showed no relation between
+     We ignore the exact pos of the sample in the frame because measurements showed no relation between
      this position and the time of the frame.
-     @param frametime the timestamp for the USB frame that wrapped the buffer. I guess that the timestamp is for completion of the frame.
+     
+     @param frametime the timestamp for the USB frame that wrapped the buffer. 
+     I guess that the timestamp is for completion of the frame.
      */
     virtual void        makeTimeStampFromWrap(AbsoluteTime frametime);
 
@@ -44,10 +46,9 @@ public:
      Copy input frames from given USB port framelist into the mInput and inform HAL about
      timestamps when we recycle the ring buffer. Also updates mInput. bufferOffset.
      
-     The idea is that this function can be called any number of times while we are waiting
-     for the framelist read to finish.
-     What is unclear is how this is done - there seems no memory of what was already done
-     in previous calls to this routine and duplicate work may be done.
+     THis function can be called any number of times while we are waiting
+     for the framelist read to finish. This can be called both from readHandler and from 
+     convertInputSamples.
      
      You must lock IO ( IOLockLock(mLock)) before calling this. We can not do this ourselves
      because readHandler (who will need to call us) has to lock before this point and
@@ -58,18 +59,6 @@ public:
      @return kIOReturnSuccess if all frames were read properly, or kIOReturnStillOpen if there
      were still un-handled frames in the frame list.
      
-     @discussion
-     routine called by the readHandler.
-     Expects that all RECORD_NUM_USB_FRAMES_PER_LIST frames are read completely.
-     If not, an error may be logged. Not clear what will happen then higher up,
-     the mInput values will be updated properly in any case but of course with
-     less data than might be expected.
-     
-     This should be a low latency callback. I THINK that we should not do all the copy
-     work here. But the time stamping that is done here is crucial. It is currently
-     halfway the code, it should be right at the start.
-     
-     Called exclusively from readHandler.
      This code directly uses readBuffer to access the bytes.
      
      This function does NOT check for buffer overrun.
