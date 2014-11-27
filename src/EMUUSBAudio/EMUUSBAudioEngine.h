@@ -134,13 +134,8 @@ public:
     
     virtual IOReturn performAudioEngineStart ();
     virtual IOReturn performAudioEngineStop ();
-#if 1
 	virtual IOReturn hardwareSampleRateChanged(const IOAudioSampleRate *sampleRate);
-#endif
 	static void sampleRateHandler (void * target, void * parameter, IOReturn result, IOUSBIsocFrame * pFrames);
-#if PREPINPUT
-	static void prepInputHandler(void* object, void* frameListIndex, IOReturn result, IOUSBLowLatencyIsocFrame* pFrames);
-#endif
     
     /*!
       queue a write from clipOutputSamples. This is called from clipOutputSamples.
@@ -177,10 +172,6 @@ protected:
 	IOLock*								mWriteLock;
 	IOLock*								mFormatLock;
 	
-#if PREPINPUT
-	IOUSBLowLatencyIsocFrame *			mClearIsocFrames;
-	IOUSBLowLatencyIsocCompletion *		mClearInputCompletion;
-#endif
     
 	bool								mDidOutputVolumeChange;
 	bool								mIsOutputMuted;
@@ -367,9 +358,6 @@ protected:
      @param additionalSampleFrameFreq: = 1000/(inSampleRate%1000) (or 0) (Wouter:??) */
 	void CalculateSamplesPerFrame (UInt32 sampleRate, UInt16 * averageFrameSize, UInt16 * additionalSampleFrameFreq);
 	IOReturn initBuffers();
-#if PREPINPUT
-	void prepInputPipe();
-#endif
     
     /*! copy the mNewReferenceUSBFrame and mNewReferenceWallTime value from usbAudioDevice 
      @param frame gets copy of mNewReferenceUSBFrame

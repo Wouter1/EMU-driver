@@ -192,14 +192,6 @@ IOReturn ADRingBuffer::readFrameList (UInt32 frameListNum) {
 			usbIsocFrames[firstFrame+i].frReqCount = maxFrameSize; // #bytes to read.
 			*(UInt64 *)(&(usbIsocFrames[firstFrame + i].frTimeStamp)) = 	0ul; //time when frame was procesed
 		}
-        //debugIOLogC("read framelist : %d frames, %d bytes per frame",numUSBFramesPerList, maxFrameSize);
-        
-		//result = pipe->Read(bufferDescriptors[frameListNum], usbFrameToQueueAt, numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum], 1);//mPollInterval);
-        
-        // HACK. Disabled the 'refresh of frame list'. We read only when read calls back
-        // HACK. always keep reading, instead of targeting explicit framenr - that seemed unreliable.
-        // we now prefer to keep reading instead of hanging on a bad USB frame nr.
-        // FIXME can we check somehow if we do not loose data on the USB stream this way?
         
         /*The updatefrequency is not so well documented. But in IOUSBInterfaceInterface192 I read:
          Specifies how often, in milliseconds, the frame list data should be updated. Valid range is 0 - 8. If 0, it means that the framelist should be updated at the end of the transfer.
@@ -209,13 +201,14 @@ IOReturn ADRingBuffer::readFrameList (UInt32 frameListNum) {
          If you set this to 1, this jump is 8x more often, about once 30 seconds, but is only 1ms.
          We must keep these jumps small, to avoid timestamp errors and buffer overruns.
          */
-		result = pipe->Read(bufferDescriptors[frameListNum], kAppleUSBSSIsocContinuousFrame, numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
+		result = pipe->Read(bufferDescriptors[frameListNum], kAppleUSBSSIsocContinuousFrame,
+                            numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
         if (result!=kIOReturnSuccess) {
             doLog("USB pipe READ error %x",result);
         }
-		if (frameQueuedForList)
+		if (frameQueuedForList) {
 			frameQueuedForList[frameListNum] = usbFrameToQueueAt;
-        
+        }
         
 		usbFrameToQueueAt += numUSBTimeFrames;
 	}

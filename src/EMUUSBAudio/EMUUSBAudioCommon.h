@@ -36,8 +36,7 @@
 #include "EMUUSBLogging.h"
 
 #define	CUSTOMDEVICE	1
-#define PREPINPUT	0
-#define UHCISUPPORT 0
+
 #include <libkern/OSTypes.h>
 #if DEBUGLOGGING
 #include <IOKit/usb/IOUSBLog.h>
