@@ -37,7 +37,7 @@
 
 #include <IOKit/IOLib.h>
 // CRAP! https://developer.apple.com/Library/mac/releasenotes/General/APIDiffsMacOSX10_8/Kernel.html
-// IOKit/IOSyncer.h has been removed! 
+// IOKit/IOSyncer.h has been removed!
 #include <IOSyncer.h>
 #include <IOKit/IOService.h>
 #include <IOKit/IOMessage.h>
@@ -90,27 +90,27 @@ typedef struct FrameListWriteInfo {
  @abstract implements IOAudioEngine. Provides audio stream services.
  Uses USB services itself to read from EMU device.
  
- @discussion 
-This engine currently combines a number of functionalities:
+ @discussion
+ This engine currently combines a number of functionalities:
  1. convert USB data to 32 bit float,
  2. USB communication engine for input of isoc streams from EMU,
  3. converter 32 bit float sample data to USB data
  4. USB communication for output to EMU
  5. timing generators so that HAL can call us at the right times.
-
+ 
  All data structures for all of these are stuffed into this structure.
-
+ 
  the current size of this structure IMHO shows
  that this code is in extremely bad shape. We have code duplication and many
  fields in here that are too detailed in this scope. ALso there basically
  was nothing documented. The amount of fields in this object is large (61)
  and the code is more than 3000 lines. There is a lot of redundancy in the fields as well.
  
- Note that apple (and maybe, USB) has quite hard requirements on how data should 
+ Note that apple (and maybe, USB) has quite hard requirements on how data should
  be allocated to USB packets over time. Details are here
  https://developer.apple.com/library/mac/technotes/tn2274/_index.html.
- Failure to comply with the bandwidth rules for the current sample rate 
- and format may not only result in audio corruption for that particular stream, 
+ Failure to comply with the bandwidth rules for the current sample rate
+ and format may not only result in audio corruption for that particular stream,
  but for all of the other streams on the same engine.
  
  Note2. Almost all comments in the code were reverse engineered. Wouter.
@@ -138,11 +138,11 @@ public:
 	static void sampleRateHandler (void * target, void * parameter, IOReturn result, IOUSBIsocFrame * pFrames);
     
     /*!
-      queue a write from clipOutputSamples. This is called from clipOutputSamples.
-      @param parameter the framelistnumber. Actually is a void * that is coming
-        out of the StreamInfo struct in the kernel. This driver tries to put an UInt32 in it
-        in a hacky way. probably to avoid memory allocation. Wouter: fixed this to UInt64, *  to UInt32 is KO on 64bit archi.
-    */
+     queue a write from clipOutputSamples. This is called from clipOutputSamples.
+     @param parameter the framelistnumber. Actually is a void * that is coming
+     out of the StreamInfo struct in the kernel. This driver tries to put an UInt32 in it
+     in a hacky way. probably to avoid memory allocation. Wouter: fixed this to UInt64, *  to UInt32 is KO on 64bit archi.
+     */
     static void writeHandler (void * object, void * parameter, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
 	virtual IOReturn pluginDeviceRequest (IOUSBDevRequest * request, IOUSBCompletion * completion);
 	virtual void pluginSetConfigurationApp (const char * bundleID);
@@ -185,19 +185,19 @@ protected:
     
     /*! implement the virtuals of ADRingBuffer  */
     struct EMUADRingBuffer: public ADRingBuffer {
-        public:
-            /*! init, pass parent pointer*/
-            void    init(EMUUSBAudioEngine * engine);
+    public:
+        /*! init, pass parent pointer*/
+        void    init(EMUUSBAudioEngine * engine);
         
-            void    notifyWrap(AbsoluteTime *time, bool increment);
-            void    notifyClosed();
-
-        private:
-            // pointer to the engine. This is just the parent
-            EMUUSBAudioEngine *             theEngine;
+        void    notifyWrap(AbsoluteTime *time, bool increment);
+        void    notifyClosed();
+        
+    private:
+        // pointer to the engine. This is just the parent
+        EMUUSBAudioEngine *             theEngine;
     };
     
-
+    
     
     /*! StreamInfo relevant for the reading-from-USB (recording). */
 	EMUADRingBuffer						mInput;
@@ -246,7 +246,7 @@ protected:
 	UInt8								framesUntilRefresh;
 	UInt8								mAnchorResetCount;
 	UInt8								mHubSpeed;
-    /*! update frequency for IOUSBLowLatencyIsocFrame. see the documentation IOUSBPipe.  
+    /*! update frequency for IOUSBLowLatencyIsocFrame. see the documentation IOUSBPipe.
      0=only at end. 1..8 means 1..8 refresh calls per millisecond. Wouter: I disabled this to get the stuff working at all. */
 	UInt8								mPollInterval;
     
@@ -264,7 +264,7 @@ protected:
 	
     
     Boolean previousTimeWasFirstTime;
-
+    
 	
 	void	GetDeviceInfo (void);
 	IOReturn	PrepareWriteFrameList (UInt32 usbFrameListIndex);
@@ -280,22 +280,22 @@ protected:
     static bool audioDevicePublished (EMUUSBAudioEngine *audioEngine, void *ref, IOService *newService);
     
     /*!
-     @abstract detects start of USB and then sets startingEngine=FALSE 
+     @abstract detects start of USB and then sets startingEngine=FALSE
      @discussion Check that the first USB frame has been read.
      Uses a timer to check every 50 microseconds if first USB frame did complete.
-     After 60 tries this process time-outs.     
+     After 60 tries this process time-outs.
      */
  	static void waitForFirstUSBFrameCompletion (OSObject * owner, IOTimerEventSource * sender);
     
 	virtual bool willTerminate (IOService * provider, IOOptionBits options);
-
+    
     /**
      Get stringDescriptor into buffer. Buffer has to be kStringBufferSize
      @param index the string index to be fetched. If null, the get fails.
      @return true if succes, false if failed. If failed, buffer is filled with "Unknown".
      */
     virtual Boolean getDescriptorString(char *buffer, UInt8 index);
-
+    
 	virtual OSString * getGlobalUniqueID ();
     
     
@@ -311,9 +311,9 @@ protected:
     virtual void *getSampleBuffer (void);
 	UInt32 getSampleBufferSize (void);
     
-    /*! compresses audio to a smaller block. 
+    /*! compresses audio to a smaller block.
      @discussion when convertInputSamples skips bytes, this code attempts to connect the ends.
-     This code is referring to pFrames which is void inside convertInputSamples. Therefore this 
+     This code is referring to pFrames which is void inside convertInputSamples. Therefore this
      code seems not safe to use. */
 	void CoalesceInputSamples(SInt32 numBytesToCoalesce, IOUSBLowLatencyIsocFrame * pFrames);
 	virtual void resetClipPosition (IOAudioStream *audioStream, UInt32 clipSampleFrame);
@@ -329,11 +329,11 @@ protected:
      @param audioStream
      */
     virtual IOReturn clipOutputSamples (const void *mixBuf, void *sampleBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream);
-
+    
 	/*!
      @abstract convert numSampleFrames samples from mInput into the destBuf. Implements IOAudioInterface input handler. Called from IOAudioStream::readInputSamples.
      @discussion
-     this is called when the HAL needs audio samples from the input. HAL calls this based on 
+     this is called when the HAL needs audio samples from the input. HAL calls this based on
      timer info returned from "takeTimeStamp" (FIXME apple doc seems wrong. what's the real name?)
      The meaning of the arguments was reverse engineered from the IOAudioStream source code.
      
@@ -352,7 +352,7 @@ protected:
 	
     /*! This gets called when the HAL wants to select one of the different formats that we made available via mainStream->addAvailableFormat */
     virtual IOReturn performFormatChange (IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate);
-
+    
     /*! compute the averageFrameSamples
      @param sampleRate the target samplerate, eg 96000
      @param averageFrameSize output: =inSampleRate / 1000 = the average #bytes for the frame. Eg 96 for 96kHz samplerate.
@@ -360,9 +360,9 @@ protected:
 	void CalculateSamplesPerFrame (UInt32 sampleRate, UInt16 * averageFrameSize, UInt16 * additionalSampleFrameFreq);
 	IOReturn initBuffers();
     
-    /*! copy the mNewReferenceUSBFrame and mNewReferenceWallTime value from usbAudioDevice 
+    /*! copy the mNewReferenceUSBFrame and mNewReferenceWallTime value from usbAudioDevice
      @param frame gets copy of mNewReferenceUSBFrame
-     @param time gets copy of mNewReferenceWallTime 
+     @param time gets copy of mNewReferenceWallTime
      @return kIOReturnSuccess. I don't see why it would ever fail. */
 	IOReturn getAnchor(UInt64* frame, AbsoluteTime* time);
     
@@ -371,7 +371,7 @@ protected:
      @param usbFrameIndex the frame index number in the frameList
      @param preWrapBytes the the number of bytes before the wrap
      @param byteCount the total number of bytes in this frameList (including the ones before the wrap).
-      byteCount MUST never == 0. If this computation is incorrect, we will encounter audio artifacts
+     byteCount MUST never == 0. If this computation is incorrect, we will encounter audio artifacts
      */
 	AbsoluteTime generateTimeStamp (UInt32 usbFrameIndex, UInt32 preWrapBytes, UInt32 byteCount);
     
@@ -391,8 +391,8 @@ protected:
 	//UInt32	PopFrameSize();
 	//void	ClearFrameSizes();
     
-
-
+    
+    
 };
 
 #endif /* defined(__EMUUSBAudio__EMUUSBAudioEngine__) */

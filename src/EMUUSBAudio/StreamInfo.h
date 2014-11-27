@@ -117,9 +117,9 @@ struct StreamInfo {
     /*! This is the length of the bufferDescriptors array and usbIsocFrames.
      // I think sizes of 4 and 8 are usual.*/
     UInt32		numUSBFrameLists;
-    /*! The number of usb frames in our lists. Hard set to RECORD_NUM_USB_FRAMES_PER_LIST 
-        or PLAY_NUM_USB_FRAMES_PER_LIST (64 usually). USB calls back to us only after 'completion' 
-        (after all frames were read, or something went wrong), calling back to readHandler.
+    /*! The number of usb frames in our lists. Hard set to RECORD_NUM_USB_FRAMES_PER_LIST
+     or PLAY_NUM_USB_FRAMES_PER_LIST (64 usually). USB calls back to us only after 'completion'
+     (after all frames were read, or something went wrong), calling back to readHandler.
      */
     UInt32		numUSBFramesPerList;
     /*! = mInput.numUSBFramesPerList / kNumberOfFramesPerMillisecond = 8 usually.
@@ -146,7 +146,7 @@ struct StreamInfo {
     UInt8		interfaceNumber;
     UInt8		alternateSettingID;
     
-    /*! the framelist that we are expecting to complete from next. 
+    /*! the framelist that we are expecting to complete from next.
      Basically runs from 0 to numUSBFrameListsToQueue-1 and then
      restarts at 0. Updated after readHandler handled the block. */
     volatile UInt32						currentFrameList;
@@ -157,8 +157,8 @@ struct StreamInfo {
     IOUSBPipe					  *pipe;
     IOUSBPipe					  *associatedPipe;
     
-    /*! @discussion array of IOUSBLowLatencyIsocFrame containing USB status for a frame. 
-       size (for mInput) = numUSBFrameLists * numUSBFramesPerList */
+    /*! @discussion array of IOUSBLowLatencyIsocFrame containing USB status for a frame.
+     size (for mInput) = numUSBFrameLists * numUSBFramesPerList */
     IOUSBLowLatencyIsocFrame	  *usbIsocFrames;
     
     /*! @abstract

@@ -24,22 +24,22 @@
 /*!
  * A low pass filter. It is a simple mass-spring-damper system.
  * It uses a very high mass and weak spring so it is essential that
- * the initial "speed" (EXPECTED_WRAP_TIME) is very close to correct. 
+ * the initial "speed" (EXPECTED_WRAP_TIME) is very close to correct.
  * The damper is critically damped which means we have as little oscillations as possible without
- * overshooting. 
+ * overshooting.
  */
 class LowPassFilter {
-
+    
 public:
     /*! filter a given wrap time using a outlier reject and a mass-spring-damper filter
      @param wrapTime the time (ns) of the next wrap.
-     @param initialize true if this is first call. This initializes internal vars x, dx, u 
+     @param initialize true if this is first call. This initializes internal vars x, dx, u
      @return the filtered value for this wrap time. This will be hardly influenced by
      the actual wrap time and be mostly the expected wrap time; but the filter will be
-     adjusted over time to keep real and estimated wrap times in line. 
+     adjusted over time to keep real and estimated wrap times in line.
      */
     UInt64 filter(UInt64 wrapTime, Boolean initialize);
-
+    
 private:
     /*! position (time) for the filter (ns) */
     UInt64 x;
@@ -47,7 +47,7 @@ private:
     UInt64 dx;
     /*! the deviation/drift for the filter (ns)*/
     UInt64 u;
-
+    
 };
 
 

@@ -10,7 +10,7 @@
 #include "EMUUSBLogging.h"
 
 void ADRingBuffer::init() {
-
+    
 }
 
 
@@ -126,7 +126,7 @@ IOReturn ADRingBuffer::GatherInputSamples(Boolean doTimeStamp) {
             runningInputCount += lastInputFrames;
             // save the # of frames to the framesize queue so that we generate an appropriately sized output packet
             frameSizeQueue.push(lastInputFrames);
-
+            
             SInt32	numBytesToEnd = bufferSize - bufferOffset; // assumes that bufferOffset <= bufferSize
             if (byteCount < numBytesToEnd) { // no wrap
                 memcpy(dest, source, byteCount);
@@ -216,7 +216,7 @@ IOReturn ADRingBuffer::readFrameList (UInt32 frameListNum) {
 
 
 void ADRingBuffer::readCompleted (void * object, void * frameListNrPtr,
-                                       IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
+                                  IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
     
 	ADRingBuffer *	ringbuf = (ADRingBuffer *)object;
     

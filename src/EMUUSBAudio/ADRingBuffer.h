@@ -10,7 +10,7 @@
 #define __EMUUSBAudio__ADRingBuffer__
 #include "LowPassFilter.h"
 #include "StreamInfo.h"
-#include <IOKit/IOLib.h> 
+#include <IOKit/IOLib.h>
 #include "Queue.h"
 
 
@@ -21,33 +21,33 @@ public:
     
     /*! starts the ring buffer IO. Must be called to start */
     void                start();
-
+    
     /*! notify that the Ring Buffer wrapped around at given time.
-     @param time the smoothed-out time stamp when the wrap occured 
-     @param increment true if the wrap should increment the wrap counter. 
+     @param time the smoothed-out time stamp when the wrap occured
+     @param increment true if the wrap should increment the wrap counter.
      */
     virtual void        notifyWrap(AbsoluteTime *time, bool increment) = 0;
-
+    
     /*!
      Called when the Ring Buffer has closed all input streams.
      */
     virtual void        notifyClosed() =0  ;
-
+    
     /*! make a time stamp for a frame that has given frametime .
      We ignore the exact pos of the sample in the frame because measurements showed no relation between
      this position and the time of the frame.
      
-     @param frametime the timestamp for the USB frame that wrapped the buffer. 
+     @param frametime the timestamp for the USB frame that wrapped the buffer.
      I guess that the timestamp is for completion of the frame.
      */
     virtual void        makeTimeStampFromWrap(AbsoluteTime frametime);
-
+    
     /*!
      Copy input frames from given USB port framelist into the mInput and inform HAL about
      timestamps when we recycle the ring buffer. Also updates mInput. bufferOffset.
      
      THis function can be called any number of times while we are waiting
-     for the framelist read to finish. This can be called both from readHandler and from 
+     for the framelist read to finish. This can be called both from readHandler and from
      convertInputSamples.
      
      You must lock IO ( IOLockLock(mLock)) before calling this. We can not do this ourselves
@@ -74,7 +74,7 @@ public:
     
     /*! get the framesize queue */
     Queue *             getFrameSizeQueue();
-
+    
     /*!
      @abstract initializes the read of a frameList (typ. 64 frames) from USB.
      @discussion queues all numUSBFramesPerList frames in given frameListNum for reading.
@@ -86,7 +86,7 @@ public:
      This makes no sense to me. Maybe this is a hardware requirement.
      */
     IOReturn            readFrameList (UInt32 frameListNum);
-
+    
     /*!readHandler is the callback from USB completion. Updates mInput.usbFrameToQueueAt.
      
      @discussion Wouter: This implements IOUSBLowLatencyIsocCompletionAction and the callback function for USB frameread.
@@ -101,9 +101,9 @@ public:
      
      */
     static void         readCompleted (void * object, void * frameListIndex, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
-
-// should become private. Right now it's still shared with EMUUSBAudioEngine.
-        
+    
+    // should become private. Right now it's still shared with EMUUSBAudioEngine.
+    
     /* lock to ensure convertInputSamples and readHandler are never run together */
     IOLock*					mLock;
     
@@ -123,43 +123,43 @@ public:
 	UInt32					lastInputFrames;
     /*! counter used to steer the DAStream (playback) */
 	UInt32					runningInputCount;
-
+    
     /*! good wraps since start of audio input */
     UInt16 goodWraps;
-
+    
     /*! last received frame timestamp */
     AbsoluteTime previousfrTimestampNs;
-
+    
     /*! The value we expect for firstSampleFrame in next call to convertInputSamples.
      The reading of our input buffer should be continuous, not jump around. */
 	UInt32								nextExpectedFrame;
-
+    
     /*! = maxFrameSize * numUSBFramesPerList; total byte size for buffering frameLists for USB reading. eg 582*64 = 37248.
      */
 	UInt32								readUSBFrameListSize;
-
+    
     /*!  direct ptr to USB data buffer = mInput. usbBufferDescriptor. These are
      the buffers for each of the USB readFrameLists. Not clear why this is allocated as one big slot. */
 	void *								readBuffer;
-
+    
     /*! number of initial frames that are dropped. See kNumberOfStartingFramesToDrop */
 	UInt32								mDropStartingFrames;
-
+    
     volatile UInt32						shouldStop;
-
+    
     Boolean								terminatingDriver;
     
     /*!  this is TRUE until we receive the first USB packet. */
 	Boolean								startingEngine;
-
-
+    
+    
 private:
     /*! as takeTimeStamp but takes nanoseconds instead of AbsoluteTime */
     void takeTimeStampNs(UInt64 timeStampNs, Boolean increment);
-
+    
     Queue frameSizeQueue;
-
-
+    
+    
 };
 
 
