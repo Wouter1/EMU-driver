@@ -22,7 +22,7 @@ Installation
 ========
 1. Use your original control panel to set the EMU speed to 96 kHz
 2. Turn off the EMU device
-3.Download (click on "Download ZIP") and unzip the driver
+3. Download (click on "Download ZIP") and unzip the driver
 4. Run the kextInstall script 
 5. enter your admin password at the prompt
 
