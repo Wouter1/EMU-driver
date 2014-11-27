@@ -20,16 +20,17 @@ Please notify me how my driver works on other EMU USB devices.
 
 Installation
 ========
-1. Turn off the EMU device
-2. Run the kextInstall script 
-3. Use the control panel to set the EMU speed to 96 kHz
-4. enter your admin password at the prompt
+1. Use your original control panel to set the EMU speed to 96 kHz
+2. Turn off the EMU device
+3.Download (click on "Download ZIP") and unzip the driver
+4. Run the kextInstall script 
+5. enter your admin password at the prompt
 
 or
 
-1. manually copy EMUUSBAudio.kext into  /System/Library/Extensions/ 
-2. reboot
-3. Use the control panel to set the EMU speed to 96 kHz
+1. Use your original control panel to set the EMU speed to 96 kHz
+2. manually copy EMUUSBAudio.kext into  /System/Library/Extensions/ 
+3. reboot
 
 Usage
 ======
