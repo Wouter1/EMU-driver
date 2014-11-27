@@ -17,23 +17,28 @@
 struct ADRingBuffer: public StreamInfo {
 public:
     /*! initializes the ring buffer. Must be called before use. */
-    void init();
+    void                init();
     
     /*! starts the ring buffer IO. Must be called to start */
-    void start();
+    void                start();
 
     /*! notify that the Ring Buffer wrapped around at given time.
      @param time the smoothed-out time stamp when the wrap occured 
      @param increment true if the wrap should increment the wrap counter. 
      */
-    virtual void notifyWrap(AbsoluteTime *time, bool increment) = 0;
+    virtual void        notifyWrap(AbsoluteTime *time, bool increment) = 0;
+
+    /*!
+     Called when the Ring Buffer has closed all input streams.
+     */
+    virtual void        notifyClosed() =0  ;
 
     /*! make a time stamp for a frame that has given frametime .
      we ignore the exact pos of the sample in the frame because measurements showed no relation between
      this position and the time of the frame.
      @param frametime the timestamp for the USB frame that wrapped the buffer. I guess that the timestamp is for completion of the frame.
      */
-    virtual void makeTimeStampFromWrap(AbsoluteTime frametime);
+    virtual void        makeTimeStampFromWrap(AbsoluteTime frametime);
 
     /*!
      Copy input frames from given USB port framelist into the mInput and inform HAL about
@@ -76,13 +81,38 @@ public:
      If false, the timestamp will be stored in frameListWrapTimestamp, and will be executed when
      this function is called on the same frame again but then with doTimeStamp=true (which happens at read completion)
      */
-	IOReturn GatherInputSamples(Boolean doTimeStamp);
+	IOReturn            GatherInputSamples(Boolean doTimeStamp);
     
     /*! get the framesize queue */
-    Queue * getFrameSizeQueue();
+    Queue *             getFrameSizeQueue();
 
-    
-    
+    /*!
+     @abstract initializes the read of a frameList (typ. 64 frames) from USB.
+     @discussion queues all numUSBFramesPerList frames in given frameListNum for reading.
+     The callback when the read is complete is readHandler. There used to be multiple callbacks
+     every mPollInterval
+     Also it is requested to update the info every 1 ms.
+     @param frameListNum the frame list to use, in range [0-numUSBFrameLists> which is usually 0-8.
+     orig docu said "frameListNum must be in the valid range 0 - 126".
+     This makes no sense to me. Maybe this is a hardware requirement.
+     */
+    IOReturn            readFrameList (UInt32 frameListNum);
+
+    /*!readHandler is the callback from USB completion. Updates mInput.usbFrameToQueueAt.
+     
+     @discussion Wouter: This implements IOUSBLowLatencyIsocCompletionAction and the callback function for USB frameread.
+     Warning: This routine locks the IO. Probably because the code is not thread safe.
+     Note: The original code also calls it explicitly from convertInputSamples but that hangs the system (I think because of the lock).
+     
+     
+     @param object the parent audiohandler
+     @param frameListIndex the frameList number that completed and triggered this call.
+     @param result  this handler will do special actions if set values different from kIOReturnSuccess. This probably indicates the USB read status.
+     @param pFrames the frames that need checking. Expects that all RECORD_NUM_USB_FRAMES_PER_LIST frames are available completely.
+     
+     */
+    static void         readCompleted (void * object, void * frameListIndex, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
+
 // should become private. Right now it's still shared with EMUUSBAudioEngine.
         
     /* lock to ensure convertInputSamples and readHandler are never run together */
@@ -125,6 +155,14 @@ public:
 
     /*! number of initial frames that are dropped. See kNumberOfStartingFramesToDrop */
 	UInt32								mDropStartingFrames;
+
+    volatile UInt32						shouldStop;
+
+    Boolean								terminatingDriver;
+    
+    /*!  this is TRUE until we receive the first USB packet. */
+	Boolean								startingEngine;
+
 
 private:
     /*! as takeTimeStamp but takes nanoseconds instead of AbsoluteTime */

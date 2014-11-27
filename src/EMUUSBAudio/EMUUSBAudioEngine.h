@@ -141,20 +141,6 @@ public:
 #if PREPINPUT
 	static void prepInputHandler(void* object, void* frameListIndex, IOReturn result, IOUSBLowLatencyIsocFrame* pFrames);
 #endif
-    /*!readHandler is the callback from USB completion. Updates mInput.usbFrameToQueueAt.
-
-     @discussion Wouter: This implements IOUSBLowLatencyIsocCompletionAction and the callback function for USB frameread. 
-     Warning: This routine locks the IO. Probably because the code is not thread safe.
-     Note: The original code also calls it explicitly from convertInputSamples but that hangs the system (I think because of the lock).
-     
-     
-     @param object the parent audiohandler
-     @param frameListIndex the frameList number that completed and triggered this call.
-     @param result  this handler will do special actions if set values different from kIOReturnSuccess. This probably indicates the USB read status. 
-     @param pFrames the frames that need checking. Expects that all RECORD_NUM_USB_FRAMES_PER_LIST frames are available completely.
-     
-     */
-    static void readCompleted (void * object, void * frameListIndex, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
     
     /*!
       queue a write from clipOutputSamples. This is called from clipOutputSamples.
@@ -188,7 +174,6 @@ protected:
     UInt64								mLastWrapFrame;
 #endif
 	
-	volatile UInt32						shouldStop;
 	IOLock*								mWriteLock;
 	IOLock*								mFormatLock;
 	
@@ -211,9 +196,11 @@ protected:
     struct EMUADRingBuffer: public ADRingBuffer {
         public:
             /*! init, pass parent pointer*/
-            void init(EMUUSBAudioEngine * engine);
+            void    init(EMUUSBAudioEngine * engine);
         
-            void notifyWrap(AbsoluteTime *time, bool increment);
+            void    notifyWrap(AbsoluteTime *time, bool increment);
+            void    notifyClosed();
+
         private:
             // pointer to the engine. This is just the parent
             EMUUSBAudioEngine *             theEngine;
@@ -275,9 +262,6 @@ protected:
 	Boolean								inWriteCompletion;
 	Boolean								usbStreamRunning;
     
-    /*!  this is TRUE until we receive the first USB packet. */
-	Boolean								startingEngine;
-	Boolean								terminatingDriver;
     
 	Boolean								needTimeStamps;
 	UInt32								runningOutputCount;
@@ -322,17 +306,6 @@ protected:
 
 	virtual OSString * getGlobalUniqueID ();
     
-    /*!
-     @abstract initializes the read of a frameList (typ. 64 frames) from USB.
-     @discussion queues all numUSBFramesPerList frames in given frameListNum for reading.
-     The callback when the read is complete is readHandler. There used to be multiple callbacks
-     every mPollInterval
-     Also it is requested to update the info every 1 ms. 
-     @param frameListNum the frame list to use, in range [0-numUSBFrameLists> which is usually 0-8.
-     orig docu said "frameListNum must be in the valid range 0 - 126".
-     This makes no sense to me. Maybe this is a hardware requirement.
-     */
-    IOReturn readFrameList (UInt32 frameListNum);
     
     /*!  initializes the write a of a frame list (typ. 64 frames) to USB. called from writeHandler */
     IOReturn writeFrameList (UInt32 frameListNum);

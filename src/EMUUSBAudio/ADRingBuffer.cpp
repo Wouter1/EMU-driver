@@ -172,4 +172,111 @@ IOReturn ADRingBuffer::GatherInputSamples(Boolean doTimeStamp) {
 }
 
 
+IOReturn ADRingBuffer::readFrameList (UInt32 frameListNum) {
+    debugIOLogR("+ read frameList %d ", frameListNum);
+    if (shouldStop) {
+        debugIOLog("*** Read should have stopped. Who is calling this? Canceling call")
+        return kIOReturnAborted;
+    }
+    
+	IOReturn	result = kIOReturnError;
+	if (pipe) {
+		UInt32		firstFrame = frameListNum * numUSBFramesPerList;
+		usbCompletion[frameListNum].target = (void*) this;
+		usbCompletion[frameListNum].action = readCompleted;
+		usbCompletion[frameListNum].parameter = (void*) (UInt64)frameListNum; // remember the frameListNum
+        
+		for (int i = 0; i < numUSBFramesPerList; ++i) {
+			usbIsocFrames[firstFrame+i].frStatus = -1; // used to check if this frame was already received
+			usbIsocFrames[firstFrame+i].frActCount = 0; // actual #bytes transferred
+			usbIsocFrames[firstFrame+i].frReqCount = maxFrameSize; // #bytes to read.
+			*(UInt64 *)(&(usbIsocFrames[firstFrame + i].frTimeStamp)) = 	0ul; //time when frame was procesed
+		}
+        //debugIOLogC("read framelist : %d frames, %d bytes per frame",numUSBFramesPerList, maxFrameSize);
+        
+		//result = pipe->Read(bufferDescriptors[frameListNum], usbFrameToQueueAt, numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum], 1);//mPollInterval);
+        
+        // HACK. Disabled the 'refresh of frame list'. We read only when read calls back
+        // HACK. always keep reading, instead of targeting explicit framenr - that seemed unreliable.
+        // we now prefer to keep reading instead of hanging on a bad USB frame nr.
+        // FIXME can we check somehow if we do not loose data on the USB stream this way?
+        
+        /*The updatefrequency is not so well documented. But in IOUSBInterfaceInterface192 I read:
+         Specifies how often, in milliseconds, the frame list data should be updated. Valid range is 0 - 8. If 0, it means that the framelist should be updated at the end of the transfer.
+         It appears that this number also has impact on the timing details in the frame list.
+         If you set this to 0, there happens an additional 8ms for a full framelist once in a
+         few minutes in the timings.
+         If you set this to 1, this jump is 8x more often, about once 30 seconds, but is only 1ms.
+         We must keep these jumps small, to avoid timestamp errors and buffer overruns.
+         */
+		result = pipe->Read(bufferDescriptors[frameListNum], kAppleUSBSSIsocContinuousFrame, numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
+        if (result!=kIOReturnSuccess) {
+            doLog("USB pipe READ error %x",result);
+        }
+		if (frameQueuedForList)
+			frameQueuedForList[frameListNum] = usbFrameToQueueAt;
+        
+        
+		usbFrameToQueueAt += numUSBTimeFrames;
+	}
+	return result;
+}
+
+
+
+void ADRingBuffer::readCompleted (void * object, void * frameListNrPtr,
+                                       IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
+    
+	ADRingBuffer *	ringbuf = (ADRingBuffer *)object;
+    
+    // HACK we have numUSBFramesPerList frames, which one to check?? Print frame 0 info.
+    debugIOLogR("+ readCompleted framelist %d currentFrameList %d result %x frametime %lld systime %lld",
+                frameListnr, ringbuf->currentFrameList, result, myFrames->frTimeStamp,systemTime);
+    
+    ringbuf->startingEngine = FALSE; // HACK if we turn off the timer to start the  thing...
+    
+    
+    IOLockLock(ringbuf->mLock);
+    /* HACK we MUST have the lock now as we must restart reading the list.
+     This means we may have to wait for GatherInputSamples to complete from a call from convertInputSamples.
+     should be short. And our call to GatherInputSamples will be very fast. Would be nice
+     if we can fix this better.
+     */
+    /*An "underrun error" occurs when the UART transmitter has completed sending a character and the transmit buffer is empty. In asynchronous modes this is treated as an indication that no data remains to be transmitted, rather than an error, since additional stop bits can be appended. This error indication is commonly found in USARTs, since an underrun is more serious in synchronous systems.
+     */
+    
+	if (kIOReturnAborted != result) {
+        if (ringbuf->GatherInputSamples(true) != kIOReturnSuccess) {
+            debugIOLog("***** EMUUSBAudioEngine::readCompleted failed to read all packets from USB stream!");
+        }
+	}
+	
+    // Wouter:  data collection from the USB read is complete.
+    // Now start the read on the next block.
+	if (!ringbuf->shouldStop) {
+        UInt32	frameListToRead;
+		// (orig doc) keep incrementing until limit of numUSBFrameLists - 1 is reached.
+        // also, we can wonder if we want to do it this way. Why not just check what comes in instead
+        ringbuf->currentFrameList =(ringbuf->currentFrameList + 1) % RECORD_NUM_USB_FRAME_LISTS;
+        
+        // now we have already numUSBFrameListsToQueue-1 other framelist queues running.
+        // We set our current list to the next one that is not yet running
+        
+        frameListToRead = ringbuf->currentFrameList - 1 + ringbuf->numUSBFrameListsToQueue;
+        frameListToRead -= ringbuf->numUSBFrameLists * (frameListToRead >= ringbuf->numUSBFrameLists);// crop the number of framesToRead
+        // seems something equal to frameListToRead = (frameListnr + ringbuf->numUSBFrameListsToQueue) % ringbuf->numUSBFrameLists;
+        ringbuf->readFrameList(frameListToRead); // restart reading (but for different framelist).
+        
+	} else  {// stop issued FIX THIS CODE
+		debugIOLogR("++EMUUSBAudioEngine::readCompleted() - stopping: %d", ringbuf->shouldStop);
+		++ringbuf->shouldStop;
+		if (ringbuf->shouldStop == (ringbuf->numUSBFrameListsToQueue + 1) && TRUE == ringbuf->terminatingDriver) {
+            ringbuf->notifyClosed();
+		}
+	}
+	IOLockUnlock(ringbuf->mLock);
+    
+	debugIOLogR("- readCompleted currentFrameList=%d",ringbuf->currentFrameList);
+	return;
+}
 
