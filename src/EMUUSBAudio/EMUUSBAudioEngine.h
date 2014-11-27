@@ -72,86 +72,6 @@
 
 class EMUUSBAudioDevice;
 
-//	-----------------------------------------------------------------
-#define	kSampleRate_44100				44100
-#define kDefaultSamplingRate			kSampleRate_44100
-#define	kBitDepth_16bits				16
-#define kBitDepth_24bits				24
-#define	kChannelCount_MONO				1
-#define	kChannelCount_STEREO			2
-#define kChannelCount_QUAD				4
-#define kChannelCount_10				10 // this is stupid
-
-/*! initial time in ms for USB callback timer. Normally kRefreshInterval is used. */
-#define kMinimumInterval				1
-#define kMinimumFrameOffset				1
-#define kUSB2FrameOffset				1// additional offset for high speed USB 2.0
-#define kWallTimeExtraPrecision         10000
-/*! something nanoseconds used in waitForFirstUSBFrameCompletion, maybe for initial sync?*/
-#define kWallTimeConstant				1000000
-/*! main rate for USB callback timer (ms) */
-#define kRefreshInterval				128
-/*! after this number of reads from the USB, the time is re-anchored. See getAnchorFrameAndTimeStamp*/
-#define kRefreshCount					8
-/*! params for very simple lowpass filter in jitter filter */
-#define kInvariantCoeff					1024
-#define kInvariantCoeffM1				1023
-#define kInvariantCoeffDiv2				512
-
-
-// these should be dynamic based on poll interval
-/* Wouter: I think this confusion between 1 and 8 is caused by differences in USB 1 vs 2.  Earlier versions of the specification divide bus time into 1-millisecond frames, each of which can carry multiple transactions to multiple destinations. (A transaction contains two or more packets: a token packet and one or more data packets, a handshake packet, or both.) The USB 2.0 specification divides the 1-millisecond frame into eight, 125-microsecond microframes, each of which can carry multiple transactions to multiple destinations.
-  
- This driver seems hard coded to do 1000 requests per second (see CalculateSamplesPerFrame.). What puzzles me is that this is the maximum.
- 
- Note on the docu that I added: A number of functions here are obligatory implementations of the IOAudioEngine. Others are support functions for our convenience. It is unfortunate that the distinction is unclear and also that I have to document functions that should (and probably do) already have documentation in the interface definition.  Maybe I'm missing something?
-*/
-#if 1
-
-/*! Number of USB frames per millisecond for USB2 */
-#define kNumberOfFramesPerMillisecond 8
-#define kPollIntervalShift 3 // log2 of kNumberOfFramesPerMillisecond
-/*! Number of frames that we transfer in a request to USB. USB transfers frames once per millisecond
- But we prepare NUMBER_FRAMES so that we do not have to deal with that every ms but only every NUMBER_FRAMES ms.
- These frames are grouped into a single request, the larger this number the larger the chunks we get from USB.
-
- Technically this size should be irrelevant, because the array is refreshed in memory anyway and because the
- timestamps we need are stored in the USB frames as long as we need them.
-
- However, it seems that the exact time at which we call takeTimeStamp is critical as well. 
- 
-
- */
-
-#define NUMBER_FRAMES 64
-//#define NUMBER_FRAMES 16
-
-
-#else
-
-/*! Wouter: this looks like old USB1. Not supported anymore */
-#define kNumberOfFramesPerMillisecond 1
-#define kPollIntervalShift 0
-#define NUMBER_FRAMES 8
-
-#endif
-
-#define RECORD_NUM_USB_FRAME_LISTS				4
-#define RECORD_FRAME_LISTS_LIMIT				RECORD_NUM_USB_FRAME_LISTS - 1
-#define RECORD_NUM_USB_FRAMES_PER_LIST			NUMBER_FRAMES
-#define RECORD_NUM_USB_FRAME_LISTS_TO_QUEUE		4
-
-#define PLAY_NUM_USB_FRAME_LISTS				4
-#define PLAY_NUM_USB_FRAMES_PER_LIST			NUMBER_FRAMES
-#define PLAY_NUM_USB_FRAME_LISTS_TO_QUEUE		2
-// was 2
-#define kMaxAttempts							3
-
-#define FRAMESIZE_QUEUE_SIZE				    128
-
-// max size of the globally unique descriptor ID. See getGlobalUniqueID()
-#define MAX_ID_SIZE 128
-
 
 class IOSyncer;
 class EMUUSBAudioEngine;
@@ -306,6 +226,7 @@ protected:
     /*! @discussion StreamInfo relevant for the writing-to-USB (playback) */
 	StreamInfo                          mOutput;
     
+    
 	// engine data (i.e., not stream-specific)
 	IOSyncer *							mSyncer;
 	EMUUSBAudioDevice *					usbAudioDevice;
@@ -316,9 +237,6 @@ protected:
 	IOSubMemoryDescriptor *				theWrapDescriptors[2];
 	IOMemoryDescriptor *				neededSampleRateDescriptor;
     
-    /*!  direct ptr to USB data buffer = mInput. usbBufferDescriptor. These are
-     the buffers for each of the USB readFrameLists. Not clear why this is allocated as one big slot. */
-	void *								readBuffer;
 	UInt32 *							aveSampleRateBuf;		// 4 byte value
     /*!
      this is a timer with time kMinimumInterval that calls waitForFirstUSBFrameCompletion.
@@ -339,9 +257,6 @@ protected:
 	UInt32								previouslyPreparedBufferOffset;
 	UInt32								safeToEraseTo;
 	UInt32								lastSafeErasePoint;
-    /*! = maxFrameSize * numUSBFramesPerList; total byte size for buffering frameLists for USB reading. eg 582*64 = 37248.
-     */
-	UInt32								readUSBFrameListSize;
 	UInt32								averageSampleRate;
     /*! selected rate, eg 96000. WARNING usually this is PLAIN ZERO ==0 not clear why this is not set properly. Avoid this!!!!!! */
 	UInt32								hardwareSampleRate;
@@ -364,24 +279,13 @@ protected:
 	Boolean								startingEngine;
 	Boolean								terminatingDriver;
     
-    /*! number of initial frames that are dropped. See kNumberOfStartingFramesToDrop */
-	UInt32								mDropStartingFrames;
 	Boolean								needTimeStamps;
 	UInt32								runningOutputCount;
 	SInt32								lastDelta;
 	UInt32								lastNonZeroFrame;
     
-    /*! The value we expect for firstSampleFrame in next call to convertInputSamples. 
-     The reading of our input buffer should be continuous, not jump around. */
-	UInt32								nextExpectedFrame;
 	UInt32								nextExpectedOutputFrame;
 	
-    /*! FIFO Queue for framesizes.  Used to communicate USB input frames to the USB writer. */
-	UInt32								frameSizeQueue[FRAMESIZE_QUEUE_SIZE];
-    /*! frameSizeQueueFront points to first available element in frameSizeQueue*/
-	UInt32								frameSizeQueueFront;
-    /*!  frameSizeQueueBack points to first free element in frameSizeQueue. */
-    UInt32 frameSizeQueueBack;
     
     Boolean previousTimeWasFirstTime;
 
@@ -441,48 +345,6 @@ protected:
     virtual IOAudioStreamDirection getDirection ();
     virtual void *getSampleBuffer (void);
 	UInt32 getSampleBufferSize (void);
-    /*!
-     Copy input frames from given USB port framelist into the mInput and inform HAL about 
-     timestamps when we recycle the ring buffer. Also updates mInput. bufferOffset.
-     
-     The idea is that this function can be called any number of times while we are waiting
-     for the framelist read to finish.
-     What is unclear is how this is done - there seems no memory of what was already done
-     in previous calls to this routine and duplicate work may be done.
-     
-     You must lock IO (     IOLockLock(mLock)) before calling this. We can not do this ourselves
-     because readHandler (who will need to call us) has to lock before this point and 
-     locking multiple times ourselves will deadlock.
-
-     This function always uses mInput.currentFrameList as the framelist to handle.
-     
-     @return kIOReturnSuccess if all frames were read properly, or kIOReturnStillOpen if there
-     were still un-handled frames in the frame list.
-
-     @discussion
-     routine called by the readHandler.
-     Expects that all RECORD_NUM_USB_FRAMES_PER_LIST frames are read completely.
-     If not, an error may be logged. Not clear what will happen then higher up, 
-     the mInput values will be updated properly in any case but of course with 
-     less data than might be expected.
-     
-     This should be a low latency callback. I THINK that we should not do all the copy
-     work here. But the time stamping that is done here is crucial. It is currently 
-     halfway the code, it should be right at the start.
-     
-     Called exclusively from readHandler.
-     This code directly uses readBuffer to access the bytes.
-     
-     This function does NOT check for buffer overrun. 
-     
-     This function modifies FrameIndex, lastInputSize, LastInputFrames, and runningInputCount. It may
-     also alter bufferOffset but that will result in a warning in the logs.
-     
-     @param doTimeStamp true if function should also execute makeTimeStampForWrap if a wrap occurs.
-     If false, the timestamp will be stored in frameListWrapTimestamp, and will be executed when 
-     this function is called on the same frame again but then with doTimeStamp=true (which happens at read completion)
-     */
-	IOReturn GatherInputSamples(Boolean doTimeStamp);
     
     /*! compresses audio to a smaller block. 
      @discussion when convertInputSamples skips bytes, this code attempts to connect the ends.
@@ -560,12 +422,13 @@ protected:
 	void	setupChannelNames();
     
     /*! pushes a new frameSize into the frameSizeQueue and increases the frameSizeQueueBack.  Used to communicate USB input frames to the USB writer.*/
-	void	PushFrameSize(UInt32 frameSize);
+	//void	PushFrameSize(UInt32 frameSize);
     /*! adds toAdd to the frameSizeQueue[frameSizeQueuefront]. Exclusively used for USB output frames. */
-	void	AddToLastFrameSize(SInt32 toAdd);
+	//void	AddToLastFrameSize(SInt32 toAdd);
     /*! get the frameSizeQueue at the front and increases the front. returns 0 if queue empty. Exclusively used for USB output frames.*/
-	UInt32	PopFrameSize();
-	void	ClearFrameSizes();
+	//UInt32	PopFrameSize();
+	//void	ClearFrameSizes();
+    
 
 
 };

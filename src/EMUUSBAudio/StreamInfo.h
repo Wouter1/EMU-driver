@@ -15,6 +15,80 @@
 #include <IOKit/audio/IOAudioStream.h>
 #include <IOKit/IOSubMemoryDescriptor.h>
 
+
+//	-----------------------------------------------------------------
+#define	kSampleRate_44100				44100
+#define kDefaultSamplingRate			kSampleRate_44100
+#define	kBitDepth_16bits				16
+#define kBitDepth_24bits				24
+#define	kChannelCount_MONO				1
+#define	kChannelCount_STEREO			2
+#define kChannelCount_QUAD				4
+#define kChannelCount_10				10 // this is stupid
+
+/*! initial time in ms for USB callback timer. Normally kRefreshInterval is used. */
+#define kMinimumInterval				1
+#define kMinimumFrameOffset				1
+#define kUSB2FrameOffset				1// additional offset for high speed USB 2.0
+#define kWallTimeExtraPrecision         10000
+/*! something nanoseconds used in waitForFirstUSBFrameCompletion, maybe for initial sync?*/
+#define kWallTimeConstant				1000000
+/*! main rate for USB callback timer (ms) */
+#define kRefreshInterval				128
+/*! after this number of reads from the USB, the time is re-anchored. See getAnchorFrameAndTimeStamp*/
+#define kRefreshCount					8
+/*! params for very simple lowpass filter in jitter filter */
+#define kInvariantCoeff					1024
+#define kInvariantCoeffM1				1023
+#define kInvariantCoeffDiv2				512
+
+
+// these should be dynamic based on poll interval
+/* Wouter: I think this confusion between 1 and 8 is caused by differences in USB 1 vs 2.  Earlier versions of the specification divide bus time into 1-millisecond frames, each of which can carry multiple transactions to multiple destinations. (A transaction contains two or more packets: a token packet and one or more data packets, a handshake packet, or both.) The USB 2.0 specification divides the 1-millisecond frame into eight, 125-microsecond microframes, each of which can carry multiple transactions to multiple destinations.
+ 
+ This driver seems hard coded to do 1000 requests per second (see CalculateSamplesPerFrame.). What puzzles me is that this is the maximum.
+ 
+ Note on the docu that I added: A number of functions here are obligatory implementations of the IOAudioEngine. Others are support functions for our convenience. It is unfortunate that the distinction is unclear and also that I have to document functions that should (and probably do) already have documentation in the interface definition.  Maybe I'm missing something?
+ */
+
+/*! Number of USB frames per millisecond for USB2 */
+#define kNumberOfFramesPerMillisecond 8
+#define kPollIntervalShift 3 // log2 of kNumberOfFramesPerMillisecond
+/*! Number of frames that we transfer in a request to USB. USB transfers frames once per millisecond
+ But we prepare NUMBER_FRAMES so that we do not have to deal with that every ms but only every NUMBER_FRAMES ms.
+ These frames are grouped into a single request, the larger this number the larger the chunks we get from USB.
+ 
+ Technically this size should be irrelevant, because the array is refreshed in memory anyway and because the
+ timestamps we need are stored in the USB frames as long as we need them.
+ 
+ However, it seems that the exact time at which we call takeTimeStamp is critical as well.
+ 
+ 
+ */
+
+#define NUMBER_FRAMES 64
+//#define NUMBER_FRAMES 16
+
+
+
+#define RECORD_NUM_USB_FRAME_LISTS				4
+#define RECORD_FRAME_LISTS_LIMIT				RECORD_NUM_USB_FRAME_LISTS - 1
+#define RECORD_NUM_USB_FRAMES_PER_LIST			NUMBER_FRAMES
+#define RECORD_NUM_USB_FRAME_LISTS_TO_QUEUE		4
+
+#define PLAY_NUM_USB_FRAME_LISTS				4
+#define PLAY_NUM_USB_FRAMES_PER_LIST			NUMBER_FRAMES
+#define PLAY_NUM_USB_FRAME_LISTS_TO_QUEUE		2
+// was 2
+#define kMaxAttempts							3
+
+
+// max size of the globally unique descriptor ID. See getGlobalUniqueID()
+#define MAX_ID_SIZE 128
+
+
+
+
 /*!
  @abstract  the state or our mInput/mOutput USB stream.
  @discussion To handle an USB stream the program joggles with a set of USB frames,
