@@ -12,6 +12,7 @@
 #include "StreamInfo.h"
 #include <IOKit/IOLib.h>
 #include "Queue.h"
+#include "kern/locks.h"
 
 
 struct ADRingBuffer: public StreamInfo {
