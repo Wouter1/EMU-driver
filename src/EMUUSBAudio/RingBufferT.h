@@ -14,7 +14,7 @@
 
 
 /*
- RingBuffer. A ring buffer is a LIFO buffer with fixed size.
+ RingBuffer. A ring buffer is a FIFO buffer with fixed size.
  This is just the interface definition. Check RingBufferDefault
  
  Seems we can't use exceptions in the kernel, I get "cannot use 'throw' with
