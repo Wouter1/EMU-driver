@@ -946,13 +946,14 @@ IOReturn EMUUSBAudioEngine::softwareMuteChangedHandler(OSObject * target, IOAudi
 
 
 
-IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBuf, void *destBuf, UInt32 firstSampleFrame,
-                                                 UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat,
+IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void *destBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat,
                                                  IOAudioStream *audioStream) {
 	UInt32		lastSampleByte = (firstSampleFrame + numSampleFrames) * mInput.multFactor;// max number of bytes to get
 	IOReturn	result;
     
     debugIOLogR("+convertInputSamples firstSampleFrame=%u, numSampleFrames=%d srcbuf=%p dest=%p byteorder=%d bitWidth=%d numchannels=%d",firstSampleFrame,numSampleFrames,sampleBuf,destBuf,streamFormat->fByteOrder,streamFormat->fBitWidth,streamFormat->fNumChannels);
+
+    
     
     if (mInput.startingEngine) {
         return kIOReturnUnderrun;
@@ -986,12 +987,13 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBuf, void *de
     // I don't like this black box approach but we have to live with it.
     
     debugIOLog2("convertFromEMUUSBAudioInputStreamNoWrap destBuf = %p, firstSampleFrame = %d, numSampleFrames = %d", destBuf, firstSampleFrame, numSampleFrames);
-    result = convertFromEMUUSBAudioInputStreamNoWrap (sampleBuf, destBuf, firstSampleFrame, numSampleFrames, streamFormat);
+    result = convertFromEMUUSBAudioInputStreamNoWrap (mInput.bufferPtr, destBuf, firstSampleFrame, numSampleFrames, streamFormat);
 	if (mPlugin)
 		mPlugin->pluginProcessInput ((float *)destBuf + (firstSampleFrame * streamFormat->fNumChannels), numSampleFrames, streamFormat->fNumChannels);
     
     
-    // set the expected starting point for the next read. IOAudioDevice may jump around depending on timestamps we feed it....
+    // set the expected starting point for the next read. IOAudioDevice may jump around
+    // depending on timestamps we feed it....
     // FIXME
 	mInput.nextExpectedFrame = firstSampleFrame + numSampleFrames;
 	if (mInput.nextExpectedFrame*mInput.multFactor >= mInput.bufferSize) {
@@ -2649,7 +2651,10 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 		//setInputSampleLatency(2*samplesPerFrame);
         // HACK. This is the latency from read till end user. Not clear if IOEngine uses it.
         setInputSampleLatency(2* mInput.numUSBFramesPerList * mInput.maxFrameSize / mInput.multFactor);
-		mInput.audioStream->setSampleBuffer(mInput.bufferPtr, mInput.bufferSize);
+		
+        //HACK. IOAudio should not be messing with our streams. They are private.
+        // the plan is to bury them even deeper in RingBuffer.
+        //mInput.audioStream->setSampleBuffer(mInput.bufferPtr, mInput.bufferSize);
 		
 		//now the output buffer
 		if (mOutput.usbBufferDescriptor) {
