@@ -11,7 +11,9 @@
 
 #include "RingBufferT.h"
 
-/*! Simple default implementation for RingBufferT. Fixed size. Partially thread safe:
+/*! Default implementation for RingBufferT. Fixed size. 
+ 
+ * Partially thread safe:
  *  read and write can be called in parallel from different threads
  *  read should not be called from multiple threads at same time
  *  write idem.
@@ -26,20 +28,22 @@ private:
     
 public:
     
-    void init() {
+    IOReturn init() {
 		readhead=0;
         writehead=0;
+        return kIOReturnSuccess;
 	}
     
-    IOReturn push(TYPE * object) {
+    
+    IOReturn push(TYPE object, AbsoluteTime time) {
         UInt16 newwritehead = writehead+1;
         if (newwritehead== SIZE) newwritehead=0;
         if (newwritehead == readhead) {
             return kIOReturnOverrun ;
         }
-        buffer[writehead]=* object;
+        buffer[writehead]= object;
         writehead = newwritehead;
-        if (writehead == 0) notifyWrap();
+        if (writehead == 0) notifyWrap(time);
         return kIOReturnSuccess;
 	}
     
@@ -53,12 +57,13 @@ public:
         return kIOReturnSuccess;
     }
     
-    IOReturn push(TYPE *objects, UInt16 num) {
+
+    IOReturn push(TYPE *objects, UInt16 num, AbsoluteTime time) {
         if (num > vacant()) { return kIOReturnOverrun ; }
         
         for ( UInt16 n = 0; n<num; n++) {
             buffer[writehead++] = objects[n];
-            if (writehead == SIZE) { writehead = 0; notifyWrap(); }
+            if (writehead == SIZE) { writehead = 0; notifyWrap(time); }
         }
         return kIOReturnSuccess;
     }
@@ -74,7 +79,9 @@ public:
         return kIOReturnSuccess;
     }
     
-    void notifyWrap() { }
+    void notifyWrap(AbsoluteTime time) {
+        // default: do nothing
+    }
     
     UInt16 available() {
         // +SIZE because % does not properly handle negative
