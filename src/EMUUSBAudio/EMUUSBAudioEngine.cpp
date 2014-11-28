@@ -1837,15 +1837,10 @@ IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 arrayIndex) {
 				fractionalSamplesRemaining -= 1000;
 			}
 			// get the size of the corresponding input packet (this will hopefully keep our sample counts in sync)
-#if 1
-			thisFrameSize = mInput.getFrameSizeQueue()->pop();
-			if (!thisFrameSize) {
+			if (mInput.getFrameSizeQueue()->pop(&thisFrameSize) != kIOReturnSuccess) {
 				thisFrameSize = stockSamplesInFrame;
 			}
 			
-#else
-			thisFrameSize = integerSamplesInFrame;
-#endif
 			runningOutputCount += thisFrameSize;
 			//debugIOLogC("thisFrameSize %d",thisFrameSize);
 			thisFrameSize *= mOutput.multFactor;
@@ -1853,28 +1848,6 @@ IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 arrayIndex) {
 			if (thisFrameSize >= numBytesToBufferEnd) {
                 //		debugIOLogC("param has something %d", numUSBFramesPrepared);
                 
-#if 0
-				//perform zero test
-				bool allZeroes = true;
-				for (int i = lastPreparedByte; i < lastPreparedByte + numBytesToBufferEnd; ++i) {
-                    //debugIOLogC("%d",((Byte *) mOutput.bufferPtr)[i]);
-                    if (((Byte *) mOutput.bufferPtr)[i] != 1) {
-                        allZeroes = false;
-                        break;
-                    }
-				}
-				if (allZeroes) {
-					++contiguousZeroes;
-					//debugIOLogC("*** detected all zeroes in write buffer %d ",numUSBFramesPrepared);
-				} else {
-					contiguousZeroes = 0;
-					//debugIOLogC("*** non-zero buffer %d",mOutput.usbFrameToQueueAt+numUSBFramesPrepared);
-					if (mOutput.usbFrameToQueueAt+numUSBFramesPrepared - lastNonZeroFrame > 1) {
-						debugIOLogW("*** non-zero discontinuity at %d",mOutput.usbFrameToQueueAt+numUSBFramesPrepared);
-					}
-					lastNonZeroFrame = mOutput.usbFrameToQueueAt+numUSBFramesPrepared;
-				}
-#endif
                 
 				lastPreparedByte = thisFrameSize - numBytesToBufferEnd;
 				mOutput.usbCompletion[arrayIndex].parameter = (void *)(UInt64)(((numUSBFramesPrepared + 1) << 16) | lastPreparedByte);
@@ -1882,28 +1855,6 @@ IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 arrayIndex) {
 				numBytesToBufferEnd = sampleBufferSize - lastPreparedByte;// reset
 				haveWrapped = true;
 			} else {
-#if 0
-			    //perform zero test
-				bool allZeroes = true;
-				for (int i = lastPreparedByte; i < lastPreparedByte + thisFrameSize; ++i) {
-                    //debugIOLogC("%d",((Byte *) mOutput.bufferPtr)[i]);
-                    if (((Byte *) mOutput.bufferPtr)[i] != 1) {
-                        allZeroes = false;
-                        break;
-                    }
-				}
-				if (allZeroes) {
-					++contiguousZeroes;
-					//debugIOLogC("*** detected all zeroes in write buffer %d ",numUSBFramesPrepared);
-				} else {
-					contiguousZeroes = 0;
-					//debugIOLogC("*** non-zero buffer %d",mOutput.usbFrameToQueueAt+numUSBFramesPrepared);
-					if (mOutput.usbFrameToQueueAt+numUSBFramesPrepared - lastNonZeroFrame > 1) {
-						debugIOLogW("*** non-zero discontinuity at %d --> %d",lastNonZeroFrame,mOutput.usbFrameToQueueAt+numUSBFramesPrepared);
-					}
-					lastNonZeroFrame = mOutput.usbFrameToQueueAt+numUSBFramesPrepared;
-				}
-#endif
 				thisFrameListSize += thisFrameSize;
 				lastPreparedByte += thisFrameSize;
 				numBytesToBufferEnd -= thisFrameSize;
@@ -2088,7 +2039,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	safeToEraseTo = 0;
 	lastSafeErasePoint = 0;
 	mInput.bufferOffset = mOutput.bufferOffset = 0;
-	mInput.getFrameSizeQueue()->clear();
+	mInput.getFrameSizeQueue()->init();
 	mInput.startingEngine = TRUE;
 	previouslyPreparedBufferOffset = 0;		// Start playing from the start of the buffer
 	fractionalSamplesRemaining = 0;			// Reset our parital frame list info

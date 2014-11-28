@@ -11,9 +11,12 @@
 #include "LowPassFilter.h"
 #include "StreamInfo.h"
 #include <IOKit/IOLib.h>
-#include "Queue.h"
+#include "FixedSizeRingBufferT.h"
 #include "kern/locks.h"
 
+#define FRAMESIZE_QUEUE_SIZE				    128
+
+typedef FixedSizeRingBufferT<UInt32, FRAMESIZE_QUEUE_SIZE> FrameSizeQueue;
 
 struct ADRingBuffer: public StreamInfo {
 public:
@@ -74,7 +77,7 @@ public:
 	IOReturn            GatherInputSamples(Boolean doTimeStamp);
     
     /*! get the framesize queue */
-    Queue *             getFrameSizeQueue();
+    FrameSizeQueue *             getFrameSizeQueue();
     
     /*!
      @abstract initializes the read of a frameList (typ. 64 frames) from USB.
@@ -158,7 +161,7 @@ private:
     /*! as takeTimeStamp but takes nanoseconds instead of AbsoluteTime */
     void takeTimeStampNs(UInt64 timeStampNs, Boolean increment);
     
-    Queue frameSizeQueue;
+    FrameSizeQueue frameSizeQueue;
     
     
 };

@@ -59,7 +59,7 @@ void ADRingBuffer::takeTimeStampNs(UInt64 timeStampNs, Boolean increment) {
     notifyWrap(&t,increment);
 }
 
-Queue * ADRingBuffer::getFrameSizeQueue() {
+FrameSizeQueue * ADRingBuffer::getFrameSizeQueue() {
     return &frameSizeQueue;
 }
 
@@ -124,8 +124,14 @@ IOReturn ADRingBuffer::GatherInputSamples(Boolean doTimeStamp) {
             }
             
             runningInputCount += lastInputFrames;
-            // save the # of frames to the framesize queue so that we generate an appropriately sized output packet
-            frameSizeQueue.push(lastInputFrames);
+            // save the # of frames to the framesize queue so that we
+            // can generate an appropriately sized output packet
+            // HACK disabled for now, we don't have the DA running yet so this only
+            // causes queue overflows right now.
+//            if (frameSizeQueue.push(&lastInputFrames) != kIOReturnSuccess) {
+//                doLog("framesizequeue overflow");
+//            }
+            
             
             SInt32	numBytesToEnd = bufferSize - bufferOffset; // assumes that bufferOffset <= bufferSize
             if (byteCount < numBytesToEnd) { // no wrap
