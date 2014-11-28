@@ -9,8 +9,9 @@
 #include "ADRingBuffer.h"
 #include "EMUUSBLogging.h"
 
-void ADRingBuffer::init() {
-    
+
+void ADRingBuffer::init(RingBufferDefault<UInt8> *inputRing) {
+    usbRing = inputRing;
 }
 
 
@@ -56,7 +57,7 @@ void ADRingBuffer::takeTimeStampNs(UInt64 timeStampNs, Boolean increment) {
     AbsoluteTime t;
     
     nanoseconds_to_absolutetime(timeStampNs, &t);
-    notifyWrap(&t,increment);
+    usbRing->notifyWrap(t) ; // HACK!!!! ring should call this itself.
 }
 
 FrameSizeQueue * ADRingBuffer::getFrameSizeQueue() {

@@ -78,12 +78,22 @@ class EMUUSBAudioEngine;
 class EMUUSBAudioPlugin;
 
 typedef struct FrameListWriteInfo {
-    EMUUSBAudioEngine *				audioEngine;
-    UInt32								frameListNum;
-    UInt32								retryCount;
+    EMUUSBAudioEngine *			audioEngine;
+    UInt32						frameListNum;
+    UInt32						retryCount;
 } FrameListWriteInfo;
 
 
+/*! connector from the input ring buffer to the IOAudioEngine. */
+struct UsbInputRing: RingBufferDefault<UInt8>
+{
+    IOReturn init(UInt32 newSize, IOAudioEngine *engine);
+    void free();
+    void notifyWrap(AbsoluteTime time);
+private:
+    IOAudioEngine *theEngine; // pointer to the engine, for calling takeTimeStamp.
+    int delaycount;  // first wraps we tell engine not to increment loop counter..
+};
 
 
 /*!
@@ -188,8 +198,6 @@ protected:
     public:
         /*! init, pass parent pointer*/
         void    init(EMUUSBAudioEngine * engine);
-        
-        void    notifyWrap(AbsoluteTime *time, bool increment);
         void    notifyClosed();
         
     private:
@@ -201,7 +209,9 @@ protected:
     
     /*! StreamInfo relevant for the reading-from-USB (recording). */
 	EMUADRingBuffer						mInput;
-    
+    /*! the USB input ring. We need to pass it downwards and handle time signals */
+    UsbInputRing                        usbInputRing;
+
     /*! StreamInfo relevant for the writing-to-USB (playback) */
 	StreamInfo                          mOutput;
     
@@ -262,6 +272,7 @@ protected:
     
 	UInt32								nextExpectedOutputFrame;
 	
+    
     
     Boolean previousTimeWasFirstTime;
     
@@ -381,7 +392,7 @@ protected:
     
 	void				findAudioStreamInterfaces(IOUSBInterface *pAudioControlIfc); // AC mod
     
-	void	setupChannelNames();
+	void                setupChannelNames();
     
     /*! pushes a new frameSize into the frameSizeQueue and increases the frameSizeQueueBack.  Used to communicate USB input frames to the USB writer.*/
 	//void	PushFrameSize(UInt32 frameSize);
@@ -390,7 +401,6 @@ protected:
     /*! get the frameSizeQueue at the front and increases the front. returns 0 if queue empty. Exclusively used for USB output frames.*/
 	//UInt32	PopFrameSize();
 	//void	ClearFrameSizes();
-    
     
     
 };

@@ -200,7 +200,6 @@ bool EMUUSBAudioEngine::init (OSDictionary *properties) {
 	mInput.usbCompletion = mOutput.usbCompletion= NULL;
 	mInput.usbIsocFrames = mOutput.usbIsocFrames = NULL;
     
-    
 Exit:
 	debugIOLogC("EMUUSBAudioEngine[%p]::init ()", this);
 	return result;
@@ -527,17 +526,17 @@ Exit:
 }
 
 void EMUUSBAudioEngine::EMUADRingBuffer::init(EMUUSBAudioEngine * engine) {
-    ADRingBuffer::init();
+    ADRingBuffer::init(&engine->usbInputRing);
     theEngine = engine;
 }
 
-void EMUUSBAudioEngine::EMUADRingBuffer::notifyWrap(AbsoluteTime *time, bool increment) {
-    if (theEngine) {
-        theEngine->takeTimeStamp(increment,time);
-    } else {
-        doLog("BUG! EMUUSBAudioEngine not initialized");
-    }
-}
+//void EMUUSBAudioEngine::EMUADRingBuffer::notifyWrap(AbsoluteTime *time, bool increment) {
+//    if (theEngine) {
+//        theEngine->takeTimeStamp(increment,time);
+//    } else {
+//        doLog("BUG! EMUUSBAudioEngine not initialized");
+//    }
+//}
 
 void EMUUSBAudioEngine::EMUADRingBuffer::notifyClosed() {
     if (theEngine) {
@@ -948,23 +947,28 @@ IOReturn EMUUSBAudioEngine::softwareMuteChangedHandler(OSObject * target, IOAudi
 
 IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void *destBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat,
                                                  IOAudioStream *audioStream) {
-	UInt32		lastSampleByte = (firstSampleFrame + numSampleFrames) * mInput.multFactor;// max number of bytes to get
+    
+    // Since we don't tell IOAudioEngine about our sample buffer, we get null for sampleBufNull.
+    
+	UInt32		lastSampleByte = (firstSampleFrame + numSampleFrames) * mInput.multFactor;
+    // max number of bytes to get
 	IOReturn	result;
     
     debugIOLogR("+convertInputSamples firstSampleFrame=%u, numSampleFrames=%d srcbuf=%p dest=%p byteorder=%d bitWidth=%d numchannels=%d",firstSampleFrame,numSampleFrames,sampleBuf,destBuf,streamFormat->fByteOrder,streamFormat->fBitWidth,streamFormat->fNumChannels);
-
     
     
     if (mInput.startingEngine) {
         return kIOReturnUnderrun;
     }
     
-    
-	if (firstSampleFrame != mInput.nextExpectedFrame) {
-		debugIOLogC("****** HICCUP firstSampleFrame=%d, nextExpectedFrame=%d",firstSampleFrame,nextExpectedFrame);
-    }
-    UInt32 firstSampleByte =firstSampleFrame* mInput.multFactor;
-    debugIOLogTD("C %d %d",firstSampleByte, mInput.bufferOffset);
+    //    // We don't care actually anymore, we run our own buffers.
+    //	if (firstSampleFrame != mInput.nextExpectedFrame) {
+    //		debugIOLogC("****** HICCUP firstSampleFrame=%d, nextExpectedFrame=%d",firstSampleFrame,nextExpectedFrame);
+    //    }
+    //
+    //
+    //    UInt32 firstSampleByte = firstSampleFrame * mInput.multFactor;
+    //    debugIOLogTD("C %d %d",firstSampleByte, mInput.bufferOffset);
     
     if (!mInput.startingEngine && !mInput.shouldStop) {
         // we try to gather all the bytes now: it may take long time before completion callback comes in the ring buffer.
@@ -975,11 +979,11 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
         }
     }
     
-    // current write head inside that range? Then this is going to cause serious distortion!
-    if (firstSampleByte<=mInput.bufferOffset && mInput.bufferOffset<lastSampleByte) {
-        doLog("****** STUTTER IOAudioEngine convertInputSamples is reading over the write head");
-        // do not return, keep going and hope we will get in sync.... If we return, everything will start throwing above us.
-    }
+    //    // current write head inside that range? Then this is going to cause serious distortion!
+    //    if (firstSampleByte<=mInput.bufferOffset && mInput.bufferOffset<lastSampleByte) {
+    //        doLog("****** STUTTER IOAudioEngine convertInputSamples is reading over the write head");
+    //        // do not return, keep going and hope we will get in sync.... If we return, everything will start throwing above us.
+    //    }
     
     // at this point, mInput should contain sufficient info to handle the request.
     // It's the caller that "ensures" this using
@@ -2563,8 +2567,7 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
         // Why is this not related to the number of channels?
         // I propose this should be computed more directly based on the framelist size.
         
-        
-		
+        usbInputRing.init(mInput.multFactor * numSamplesInBuffer, this);
 		mInput.bufferSize = numSamplesInBuffer * mInput.multFactor;
 		mOutput.bufferSize = numSamplesInBuffer * mOutput.multFactor;
 		
@@ -2745,6 +2748,29 @@ void EMUUSBAudioEngine::setupChannelNames() {
 	if (dict) {
 		debugIOLogC("Found IOAudioEngineChannelNumberNames");
 		setProperty("IOAudioEngineChannelNumberNames",dict);
-	}	
+	}
 }
 
+/*********************************************/
+// UsbInputRing code
+
+IOReturn UsbInputRing::init(UInt32 newSize, IOAudioEngine *engine) {
+    theEngine = engine;
+    delaycount = 1;
+    return RingBufferDefault<UInt8>::init(newSize);
+}
+
+void UsbInputRing::free() {
+    RingBufferDefault<UInt8>::free();
+    theEngine = NULL;
+}
+
+void UsbInputRing::notifyWrap(AbsoluteTime time) {
+    if (delaycount>0) {
+        delaycount--;
+        theEngine -> takeTimeStamp(false, &time);
+    } else{
+        theEngine -> takeTimeStamp(true, &time);
+        
+    }
+}

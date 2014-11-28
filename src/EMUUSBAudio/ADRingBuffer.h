@@ -18,19 +18,21 @@
 
 typedef RingBufferDefault<UInt32> FrameSizeQueue;
 
+
+
+
+
+
+
 struct ADRingBuffer: public StreamInfo {
 public:
-    /*! initializes the ring buffer. Must be called before use. */
-    void                init();
+    /*! initializes the ring buffer. Must be called before use. 
+     @param inputRing the initialized USBInputRing.
+     */
+    void                init(RingBufferDefault<UInt8> *inputRing);
     
     /*! starts the ring buffer IO. Must be called to start */
     void                start();
-    
-    /*! notify that the Ring Buffer wrapped around at given time.
-     @param time the smoothed-out time stamp when the wrap occured
-     @param increment true if the wrap should increment the wrap counter.
-     */
-    virtual void        notifyWrap(AbsoluteTime *time, bool increment) = 0;
     
     /*!
      Called when the Ring Buffer has closed all input streams.
@@ -161,9 +163,10 @@ private:
     /*! as takeTimeStamp but takes nanoseconds instead of AbsoluteTime */
     void takeTimeStampNs(UInt64 timeStampNs, Boolean increment);
     
-    FrameSizeQueue frameSizeQueue;
+    FrameSizeQueue                      frameSizeQueue;
     
-    
+    /*! the input ring. Received from the Engine */
+    RingBufferDefault<UInt8> *          usbRing;
 };
 
 
