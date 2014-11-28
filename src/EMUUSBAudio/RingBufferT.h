@@ -22,9 +22,11 @@
 
 template<typename T> class RingBufferT {
 public:
-    /*! initializes the buffer. Also call the first time */
+    /*! initializes the buffer. Also call the first time 
+     @param size the size of the ring buffer.   
+     */
 	
-    virtual IOReturn init() = 0;
+    virtual IOReturn init(UInt32 size) = 0;
     
     /*! put one object in the ring. May print warning if overflow 
      @param object the object to push

@@ -71,7 +71,7 @@ void EMUUSBAudioEngine::free () {
 		IOLockFree(mFormatLock);
 		mFormatLock = NULL;
 	}
-	
+	mInput.getFrameSizeQueue()->free();
 	if (NULL != mInput.frameQueuedForList) {
 		delete [] mInput.frameQueuedForList;
 		mInput.frameQueuedForList = NULL;
@@ -2039,7 +2039,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	safeToEraseTo = 0;
 	lastSafeErasePoint = 0;
 	mInput.bufferOffset = mOutput.bufferOffset = 0;
-	mInput.getFrameSizeQueue()->init();
+	mInput.getFrameSizeQueue()->init(FRAMESIZE_QUEUE_SIZE);
 	mInput.startingEngine = TRUE;
 	previouslyPreparedBufferOffset = 0;		// Start playing from the start of the buffer
 	fractionalSamplesRemaining = 0;			// Reset our parital frame list info

@@ -11,7 +11,7 @@
 
 #include "RingBufferT.h"
 
-/*! Default implementation for RingBufferT. Fixed size. 
+/*! Default implementation for RingBufferT. Fixed size.
  
  * Partially thread safe:
  *  read and write can be called in parallel from different threads
@@ -22,17 +22,34 @@ template <typename TYPE, UInt16 SIZE>
 
 class FixedSizeRingBufferT: public RingBufferT<TYPE> {
 private:
-	TYPE buffer[SIZE];
+	TYPE *buffer=0;
+    UInt32 size=0; // number of elements in buffer.
     UInt16 readhead; // index of next read. range [0,SIZE>
     UInt16 writehead; // index of next write. range [0,SIZE>
     
 public:
     
-    IOReturn init() {
+    IOReturn init(UInt32 newSize) {
+        free(); // just in case free was not done
+        
+        size=newSize;
 		readhead=0;
         writehead=0;
+        buffer=(TYPE *)IOMalloc(size * sizeof(TYPE));
+        if (buffer==0) {
+            size=0;
+            return kIOReturnNoResources;
+        }
         return kIOReturnSuccess;
 	}
+    
+    void free() {
+        if (buffer){
+            IOFree(buffer,size * sizeof(TYPE));
+            buffer=0;
+            size=0;
+        }
+    }
     
     
     IOReturn push(TYPE object, AbsoluteTime time) {
@@ -57,7 +74,7 @@ public:
         return kIOReturnSuccess;
     }
     
-
+    
     IOReturn push(TYPE *objects, UInt16 num, AbsoluteTime time) {
         if (num > vacant()) { return kIOReturnOverrun ; }
         
