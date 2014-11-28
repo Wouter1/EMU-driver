@@ -15,9 +15,10 @@
 
 /*
  RingBuffer. A ring buffer is a LIFO buffer with fixed size.
+ This is just the interface definition. Check RingBufferDefault
  
  Seems we can't use exceptions in the kernel, I get "cannot use 'throw' with
- exceptions disabled. Therefore all functions return IOReturn
+ exceptions disabled". Therefore all functions return IOReturn.
  */
 
 template<typename T> class RingBufferT {

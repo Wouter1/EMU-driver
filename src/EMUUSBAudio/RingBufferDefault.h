@@ -1,26 +1,29 @@
 //
-//  FixedSizeRingBufferT.h
+//  RingBufferDefault.h
 //  EMUUSBAudio
 //
 //  Created by Wouter Pasman on 28/11/14.
-//  Copyright (c) 2014 Wouter Pasman. All rights reserved.
+//  Copyright (c) 2014 com.emu. All rights reserved.
 //
 
-#ifndef EMUUSBAudio_FixedSizeRingBufferT_h
-#define EMUUSBAudio_FixedSizeRingBufferT_h
+#ifndef EMUUSBAudio_RingBufferDefault_h
+#define EMUUSBAudio_RingBufferDefault_h
+
 
 #include "RingBufferT.h"
 
 /*! Default implementation for RingBufferT. Fixed size.
+ This is still a template because of the TYPE but actually this is a complete
+ implementation.
  
  * Partially thread safe:
  *  read and write can be called in parallel from different threads
  *  read should not be called from multiple threads at same time
  *  write idem.
  */
-template <typename TYPE, UInt16 SIZE>
+template <typename TYPE>
 
-class FixedSizeRingBufferT: public RingBufferT<TYPE> {
+class RingBufferDefault: public RingBufferT<TYPE> {
 private:
 	TYPE *buffer=0;
     UInt32 size=0; // number of elements in buffer.
@@ -54,7 +57,7 @@ public:
     
     IOReturn push(TYPE object, AbsoluteTime time) {
         UInt16 newwritehead = writehead+1;
-        if (newwritehead== SIZE) newwritehead=0;
+        if (newwritehead== size) newwritehead=0;
         if (newwritehead == readhead) {
             return kIOReturnOverrun ;
         }
@@ -70,7 +73,7 @@ public:
         }
         *data = buffer[readhead];
         readhead = readhead+1;
-        if (readhead == SIZE) readhead=0;
+        if (readhead == size) readhead=0;
         return kIOReturnSuccess;
     }
     
@@ -80,7 +83,7 @@ public:
         
         for ( UInt16 n = 0; n<num; n++) {
             buffer[writehead++] = objects[n];
-            if (writehead == SIZE) { writehead = 0; notifyWrap(time); }
+            if (writehead == size) { writehead = 0; notifyWrap(time); }
         }
         return kIOReturnSuccess;
     }
@@ -91,7 +94,7 @@ public:
         
         for (UInt16 n = 0; n < num ; n++) {
             objects[n] = buffer[readhead++];
-            if (readhead==SIZE) { readhead = 0; }
+            if (readhead==size) { readhead = 0; }
         }
         return kIOReturnSuccess;
     }
@@ -102,18 +105,17 @@ public:
     
     UInt16 available() {
         // +SIZE because % does not properly handle negative
-        UInt32 avail = (SIZE + writehead - readhead ) % SIZE;
+        UInt32 avail = (size + writehead - readhead ) % size;
         return avail;
     }
     
     UInt16 vacant() {
         // +2*SIZE because % does not properly handle negative
-        UInt32 vacant =  (2*SIZE + readhead - writehead - 1 ) % SIZE;
+        UInt32 vacant =  (2*size + readhead - writehead - 1 ) % size;
         return vacant;
         
     }
     
 };
-
 
 #endif

@@ -11,12 +11,12 @@
 #include "LowPassFilter.h"
 #include "StreamInfo.h"
 #include <IOKit/IOLib.h>
-#include "FixedSizeRingBufferT.h"
+#include "RingBufferDefault.h"
 #include "kern/locks.h"
 
 #define FRAMESIZE_QUEUE_SIZE				    128
 
-typedef FixedSizeRingBufferT<UInt32, FRAMESIZE_QUEUE_SIZE> FrameSizeQueue;
+typedef RingBufferDefault<UInt32> FrameSizeQueue;
 
 struct ADRingBuffer: public StreamInfo {
 public:
