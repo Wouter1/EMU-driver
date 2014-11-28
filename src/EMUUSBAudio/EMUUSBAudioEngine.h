@@ -68,7 +68,7 @@
 #include "EMUUSBAudioClip.h"
 
 #include "StreamInfo.h"
-#include "ADRingBuffer.h"
+#include "EMUUSBInputStream.h"
 
 class EMUUSBAudioDevice;
 
@@ -194,7 +194,7 @@ protected:
 	EMUUSBAudioSoftLevelControl*		mInputVolume;
     
     /*! implement the virtuals of ADRingBuffer  */
-    struct EMUADRingBuffer: public ADRingBuffer {
+    struct EMUADRingBuffer: public EMUUSBInputStream {
     public:
         /*! init, pass parent pointer*/
         void    init(EMUUSBAudioEngine * engine);
@@ -393,14 +393,6 @@ protected:
 	void				findAudioStreamInterfaces(IOUSBInterface *pAudioControlIfc); // AC mod
     
 	void                setupChannelNames();
-    
-    /*! pushes a new frameSize into the frameSizeQueue and increases the frameSizeQueueBack.  Used to communicate USB input frames to the USB writer.*/
-	//void	PushFrameSize(UInt32 frameSize);
-    /*! adds toAdd to the frameSizeQueue[frameSizeQueuefront]. Exclusively used for USB output frames. */
-	//void	AddToLastFrameSize(SInt32 toAdd);
-    /*! get the frameSizeQueue at the front and increases the front. returns 0 if queue empty. Exclusively used for USB output frames.*/
-	//UInt32	PopFrameSize();
-	//void	ClearFrameSizes();
     
     
 };

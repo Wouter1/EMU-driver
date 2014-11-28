@@ -12,7 +12,7 @@
 
 #include "RingBufferT.h"
 
-/*! Default implementation for RingBufferT. Fixed size.
+/*! Default implementation for RingBufferT.
  This is still a template because of the TYPE but actually this is a complete
  implementation.
  
@@ -20,6 +20,9 @@
  *  read and write can be called in parallel from different threads
  *  read should not be called from multiple threads at same time
  *  write idem.
+ 
+ * We do not need full thread safety because there is only 1 producer (GatherInputSamples)
+ * and one consumer (IOAudioEngine).
  */
 template <typename TYPE>
 

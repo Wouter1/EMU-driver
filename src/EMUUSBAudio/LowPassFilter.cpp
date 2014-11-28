@@ -3,7 +3,7 @@
 //  EMUUSBAudio
 //
 //  Created by Wouter Pasman on 25/11/14.
-//  Copyright (c) 2014 com.emu. All rights reserved.
+//  Copyright (c) 2014 Wouter Pasman. All rights reserved.
 //
 
 #include "LowPassFilter.h"

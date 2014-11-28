@@ -525,28 +525,6 @@ Exit:
 	return resultCode;
 }
 
-void EMUUSBAudioEngine::EMUADRingBuffer::init(EMUUSBAudioEngine * engine) {
-    ADRingBuffer::init(&engine->usbInputRing);
-    theEngine = engine;
-}
-
-//void EMUUSBAudioEngine::EMUADRingBuffer::notifyWrap(AbsoluteTime *time, bool increment) {
-//    if (theEngine) {
-//        theEngine->takeTimeStamp(increment,time);
-//    } else {
-//        doLog("BUG! EMUUSBAudioEngine not initialized");
-//    }
-//}
-
-void EMUUSBAudioEngine::EMUADRingBuffer::notifyClosed() {
-    if (theEngine) {
-        theEngine->mInput.streamInterface->close(theEngine);
-        theEngine->mInput.streamInterface = NULL;
-        
-    } else {
-        doLog("BUG! EMUUSBAudioEngine not initialized");
-    }
-}
 
 
 void EMUUSBAudioEngine::CalculateSamplesPerFrame (UInt32 inSampleRate, UInt16 * averageFrameSamples, UInt16 * additionalSampleFrameFreq) {
@@ -2772,5 +2750,24 @@ void UsbInputRing::notifyWrap(AbsoluteTime time) {
     } else{
         theEngine -> takeTimeStamp(true, &time);
         
+    }
+}
+
+/*********************************************/
+// EMUADRingBuffer code
+
+
+void EMUUSBAudioEngine::EMUADRingBuffer::init(EMUUSBAudioEngine * engine) {
+    EMUUSBInputStream::init(&engine->usbInputRing);
+    theEngine = engine;
+}
+
+void EMUUSBAudioEngine::EMUADRingBuffer::notifyClosed() {
+    if (theEngine) {
+        theEngine->mInput.streamInterface->close(theEngine);
+        theEngine->mInput.streamInterface = NULL;
+        
+    } else {
+        doLog("BUG! EMUUSBAudioEngine not initialized");
     }
 }
