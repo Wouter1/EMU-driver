@@ -32,6 +32,8 @@ public:
     /*! put one object in the ring. May print warning if overflow 
      @param object the object to push
      @param time the time stamp associated with this object.
+     This is typically the lowest level timestamp you can get our hands on,
+     eg a timestamp from a USB frame.
      @return kIOReturnSuccess if ok, possibly  kIOReturnOverrun */
 
 	virtual IOReturn push( T object, AbsoluteTime time) = 0;
@@ -40,6 +42,8 @@ public:
      @param objects array[num] of num objects to push
      @param num the number of objects in the array
      @param time the time stamp associated with the objects.
+     This is typically the lowest level timestamp you can get our hands on,
+     eg a timestamp from a USB frame.
      @return kIOReturnSuccess if ok, possibly  kIOReturnOverrun */
 
     virtual IOReturn push(T *objects, UInt16 num, AbsoluteTime time) = 0 ;
@@ -52,6 +56,8 @@ public:
     
     /*! pop num objects from the ring.
      caller has to ensure that the size of objects array is at least num 
+     @param objects array[num] of num objects to push
+     @param num the number of objects in the array
      @return kIOReturnSuccess if ok, possibly  kIOReturnUnderrun */
     
     virtual IOReturn pop(T *objects, UInt16 num) = 0;
@@ -64,7 +70,8 @@ public:
     virtual UInt16 vacant() = 0;
     
     /*! called when the write head wraps back to 0. Overwrite to get notification. 
-     @param time the time passed with the push of the object that caused the wrap
+     @param time the time associated with the push of the object that caused the wrap.
+    
      */
     
     virtual void notifyWrap(AbsoluteTime time) = 0;

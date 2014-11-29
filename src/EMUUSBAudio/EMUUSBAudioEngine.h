@@ -84,15 +84,45 @@ typedef struct FrameListWriteInfo {
 } FrameListWriteInfo;
 
 
-/*! connector from the input ring buffer to the IOAudioEngine. */
+/*! connector from the input ring buffer to our IOAudioEngine.
+ Collect and filter timestamps from wrap events in the ring
+ and forward them to IOAudioEngine */
 struct UsbInputRing: RingBufferDefault<UInt8>
 {
-    IOReturn init(UInt32 newSize, IOAudioEngine *engine);
-    void free();
-    void notifyWrap(AbsoluteTime time);
+    IOReturn    init(UInt32 newSize, IOAudioEngine *engine);
+    
+    void        free();
+    
+    /*! callback when a ring wraps.
+     Give IOAudioEngine a time stamp now.
+     We ignore the exact pos of the sample in the frame because 
+     measurements showed no relation between this position and the time of 
+     the frame that caused the wrap.
+     
+     @param time the timestamp for the USB frame that wrapped the buffer.
+     I guess that the timestamp is for completion of the frame but I can't find
+     it in the USB documentations.
+     */
+    void        notifyWrap(AbsoluteTime time);
+    
 private:
-    IOAudioEngine *theEngine; // pointer to the engine, for calling takeTimeStamp.
-    int delaycount;  // first wraps we tell engine not to increment loop counter..
+    /*! take timestamp, but in nanoseconds (instead of AbsoluteTime). */
+    void        takeTimeStampNs(UInt64 timeStampNs, Boolean increment);
+    
+    /*! pointer to the engine, for calling takeTimeStamp. */
+    IOAudioEngine   *theEngine;
+    
+    /*! low pass filter to smooth out wrap times */
+    LowPassFilter   lpfilter;
+    
+    /*! first wraps we tell engine not to increment loop counter. */
+    bool            isFirstWrap;
+    
+    /*! good wraps since start of audio input */
+    UInt16          goodWraps;
+    
+    /*! last received frame timestamp */
+    AbsoluteTime    previousfrTimestampNs;
 };
 
 
@@ -193,8 +223,8 @@ protected:
 	IOAudioToggleControl*				mInputMuteControl;
 	EMUUSBAudioSoftLevelControl*		mInputVolume;
     
-    /*! implement the virtuals of ADRingBuffer  */
-    struct EMUADRingBuffer: public EMUUSBInputStream {
+    /*! Connect  EMUUSBInputStream close event. Can this be done easier?  */
+    struct OurUSBInputStream: public EMUUSBInputStream {
     public:
         /*! init, pass parent pointer*/
         void    init(EMUUSBAudioEngine * engine);
@@ -208,7 +238,7 @@ protected:
     
     
     /*! StreamInfo relevant for the reading-from-USB (recording). */
-	EMUADRingBuffer						mInput;
+	OurUSBInputStream						mInput;
     /*! the USB input ring. We need to pass it downwards and handle time signals */
     UsbInputRing                        usbInputRing;
 

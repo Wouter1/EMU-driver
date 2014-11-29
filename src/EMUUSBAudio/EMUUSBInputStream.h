@@ -38,14 +38,6 @@ public:
      */
     virtual void        notifyClosed() =0  ;
     
-    /*! make a time stamp for a frame that has given frametime .
-     We ignore the exact pos of the sample in the frame because measurements showed no relation between
-     this position and the time of the frame.
-     
-     @param frametime the timestamp for the USB frame that wrapped the buffer.
-     I guess that the timestamp is for completion of the frame.
-     */
-    virtual void        makeTimeStampFromWrap(AbsoluteTime frametime);
     
     /*!
      Copy input frames from given USB port framelist into the mInput and inform HAL about
@@ -83,9 +75,9 @@ public:
     /*!
      @abstract initializes the read of a frameList (typ. 64 frames) from USB.
      @discussion queues all numUSBFramesPerList frames in given frameListNum for reading.
-     The callback when the read is complete is readHandler. There used to be multiple callbacks
-     every mPollInterval
-     Also it is requested to update the info every 1 ms.
+     The callback when the read is complete is readCompleted.
+     Also it is requested to update the info in the framelists every 1 ms to 
+     make it possible to achieve low latency (by reading the framelist before completion).
      @param frameListNum the frame list to use, in range [0-numUSBFrameLists> which is usually 0-8.
      orig docu said "frameListNum must be in the valid range 0 - 126".
      This makes no sense to me. Maybe this is a hardware requirement.
@@ -112,9 +104,6 @@ public:
     /* lock to ensure convertInputSamples and readHandler are never run together */
     IOLock*					mLock;
     
-    /*! our low pass filter to smooth out wrap times */
-    LowPassFilter           lpfilter;
-    
     /*! Used in GatherInputSamples to keep track of which framelist we were converting. */
     UInt64                  previousFrameList;
     
@@ -129,11 +118,6 @@ public:
     /*! counter used to steer the DAStream (playback) */
 	UInt32					runningInputCount;
     
-    /*! good wraps since start of audio input */
-    UInt16 goodWraps;
-    
-    /*! last received frame timestamp */
-    AbsoluteTime previousfrTimestampNs;
     
     /*! The value we expect for firstSampleFrame in next call to convertInputSamples.
      The reading of our input buffer should be continuous, not jump around. */
@@ -159,8 +143,6 @@ public:
     
     
 private:
-    /*! as takeTimeStamp but takes nanoseconds instead of AbsoluteTime */
-    void takeTimeStampNs(UInt64 timeStampNs, Boolean increment);
     
     FrameSizeQueue                      frameSizeQueue;
     

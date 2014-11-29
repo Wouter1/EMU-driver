@@ -2067,8 +2067,6 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
         debugIOLogC("post initBuffers");
 	}
     
-    // Wouter: this is bad example of code duplication.
-    // Is it not possible to make this more modular?
     
 	//first do the input
     
@@ -2126,8 +2124,6 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	
 	resultCode = mOutput.streamInterface->SetAlternateInterface (this, mOutput.alternateSettingID);
 	FailIf (kIOReturnSuccess != resultCode, Exit);
-    
-    
     
 	//don't know if this is useful or not
 	//setClockIsStable(FALSE);
@@ -2734,8 +2730,12 @@ void EMUUSBAudioEngine::setupChannelNames() {
 
 IOReturn UsbInputRing::init(UInt32 newSize, IOAudioEngine *engine) {
     theEngine = engine;
-    delaycount = 1;
+    isFirstWrap = true;
     return RingBufferDefault<UInt8>::init(newSize);
+    
+    previousfrTimestampNs = 0;
+    goodWraps = 0;
+
 }
 
 void UsbInputRing::free() {
@@ -2743,27 +2743,58 @@ void UsbInputRing::free() {
     theEngine = NULL;
 }
 
-void UsbInputRing::notifyWrap(AbsoluteTime time) {
-    if (delaycount>0) {
-        delaycount--;
-        theEngine -> takeTimeStamp(false, &time);
-    } else{
-        theEngine -> takeTimeStamp(true, &time);
-        
+void UsbInputRing::notifyWrap(AbsoluteTime wt) {
+    UInt64 wrapTimeNs;
+    
+    absolutetime_to_nanoseconds(wt,&wrapTimeNs);
+    
+    if (goodWraps >= 5) {
+        // regular operation after initial wraps.
+        takeTimeStampNs(lpfilter.filter(wrapTimeNs,FALSE),TRUE);
+    } else {
+        // setting up the timer. Find good wraps.
+        if (goodWraps == 0) {
+            goodWraps++;
+        } else {
+            // check if previous wrap had correct spacing deltaT.
+            SInt64 deltaT = wrapTimeNs - previousfrTimestampNs - EXPECTED_WRAP_TIME;
+            UInt64 errorT = abs( deltaT );
+            
+            if (errorT < EXPECTED_WRAP_TIME/1000) {
+                goodWraps ++;
+                if (goodWraps == 5) {
+                    takeTimeStampNs(lpfilter.filter(wrapTimeNs,TRUE),FALSE);
+                    doLog("USB timer started");
+                }
+            } else {
+                goodWraps = 0;
+                doLog("USB hick (%lld). timer re-syncing.",errorT);
+            }
+        }
+        previousfrTimestampNs = wrapTimeNs;
     }
 }
 
+
+void UsbInputRing::takeTimeStampNs(UInt64 timeStampNs, Boolean increment) {
+    AbsoluteTime t;
+    
+    nanoseconds_to_absolutetime(timeStampNs, &t);
+    theEngine->takeTimeStamp(increment, &t) ;
+}
+
 /*********************************************/
-// EMUADRingBuffer code
+// OurUSBInputStream code
 
 
-void EMUUSBAudioEngine::EMUADRingBuffer::init(EMUUSBAudioEngine * engine) {
+void EMUUSBAudioEngine::OurUSBInputStream::init(EMUUSBAudioEngine * engine) {
     EMUUSBInputStream::init(&engine->usbInputRing);
     theEngine = engine;
 }
 
-void EMUUSBAudioEngine::EMUADRingBuffer::notifyClosed() {
+void EMUUSBAudioEngine::OurUSBInputStream::notifyClosed() {
     if (theEngine) {
+        // this one call is why we need this class
         theEngine->mInput.streamInterface->close(theEngine);
         theEngine->mInput.streamInterface = NULL;
         

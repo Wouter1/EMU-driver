@@ -18,49 +18,8 @@ void EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing) {
 
 
 void EMUUSBInputStream::start() {
-    previousfrTimestampNs = 0;
-    goodWraps = 0;
 }
 
-
-void EMUUSBInputStream::makeTimeStampFromWrap(AbsoluteTime wt) {
-    UInt64 wrapTimeNs;
-    
-    absolutetime_to_nanoseconds(wt,&wrapTimeNs);
-    
-    if (goodWraps >= 5) {
-        // regular operation after initial wraps.
-        takeTimeStampNs(lpfilter.filter(wrapTimeNs,FALSE),TRUE);
-    } else {
-        // setting up the timer. Find good wraps.
-        if (goodWraps == 0) {
-            goodWraps++;
-        } else {
-            // check if previous wrap had correct spacing deltaT.
-            SInt64 deltaT = wrapTimeNs - previousfrTimestampNs - EXPECTED_WRAP_TIME;
-            UInt64 errorT = abs( deltaT );
-            
-            if (errorT < EXPECTED_WRAP_TIME/1000) {
-                goodWraps ++;
-                if (goodWraps == 5) {
-                    takeTimeStampNs(lpfilter.filter(wrapTimeNs,TRUE),FALSE);
-                    doLog("USB timer started");
-                }
-            } else {
-                goodWraps = 0;
-                doLog("USB hick (%lld). timer re-syncing.",errorT);
-            }
-        }
-        previousfrTimestampNs = wrapTimeNs;
-    }
-}
-
-void EMUUSBInputStream::takeTimeStampNs(UInt64 timeStampNs, Boolean increment) {
-    AbsoluteTime t;
-    
-    nanoseconds_to_absolutetime(timeStampNs, &t);
-    usbRing->notifyWrap(t) ; // HACK!!!! ring should call this itself.
-}
 
 FrameSizeQueue * EMUUSBInputStream::getFrameSizeQueue() {
     return &frameSizeQueue;
@@ -79,7 +38,7 @@ IOReturn EMUUSBInputStream::GatherInputSamples(Boolean doTimeStamp) {
     
     // handle outstanding wraps so that we have it available for this round
     if (doTimeStamp && frameListWrapTimeStamp!=0) {
-        makeTimeStampFromWrap(frameListWrapTimeStamp);
+        usbRing->notifyWrap(frameListWrapTimeStamp) ; // HACK!!!! ring should call this itself.
         frameListWrapTimeStamp = 0;
     }
     
@@ -105,7 +64,7 @@ IOReturn EMUUSBInputStream::GatherInputSamples(Boolean doTimeStamp) {
     while(frameIndex < RECORD_NUM_USB_FRAMES_PER_LIST
           && -1 != pFrames[frameIndex].frStatus // no transport at all
           && kUSBLowLatencyIsochTransferKey != pFrames[frameIndex].frStatus // partially transported
-          //&& (doTimeStamp || frameIndex < 33) // HACK for testing partial processing
+          //&& (doTimeStamp || frameIndex < 33) // for testing partial processing
           )
     {
         UInt8*			source = (UInt8*) readBuffer + (currentFrameList * readUSBFrameListSize)
@@ -170,9 +129,10 @@ IOReturn EMUUSBInputStream::GatherInputSamples(Boolean doTimeStamp) {
     } else {
         // reached end of list reached.
         if (doTimeStamp && frameListWrapTimeStamp!=0) {
-            makeTimeStampFromWrap(frameListWrapTimeStamp);
+            usbRing->notifyWrap(frameListWrapTimeStamp) ; // HACK!!!! ring should call this itself.
             frameListWrapTimeStamp=0;
         }
+        //Don't restart reading here, that can be done only from readCompleted callback.
     }
     debugIOLogR("-GatherInputSamples received %d first open frame=%d",totalreceived, frameIndex);
     return kIOReturnSuccess;
@@ -227,56 +187,62 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
 void EMUUSBInputStream::readCompleted (void * object, void * frameListNrPtr,
                                   IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
     
-	EMUUSBInputStream *	ringbuf = (EMUUSBInputStream *)object;
+	EMUUSBInputStream *	usbstream = (EMUUSBInputStream *)object;
     
     // HACK we have numUSBFramesPerList frames, which one to check?? Print frame 0 info.
     debugIOLogR("+ readCompleted framelist %d currentFrameList %d result %x frametime %lld systime %lld",
-                frameListnr, ringbuf->currentFrameList, result, myFrames->frTimeStamp,systemTime);
+                frameListnr, usbstream->currentFrameList, result, myFrames->frTimeStamp,systemTime);
     
-    ringbuf->startingEngine = FALSE; // HACK if we turn off the timer to start the  thing...
+    usbstream->startingEngine = FALSE; // HACK if we turn off the timer to start the  thing...
     
     
-    IOLockLock(ringbuf->mLock);
     /* HACK we MUST have the lock now as we must restart reading the list.
      This means we may have to wait for GatherInputSamples to complete from a call from convertInputSamples.
-     should be short. And our call to GatherInputSamples will be very fast. Would be nice
+     Should return quick. And our call to GatherInputSamples will be very fast. Would be nice
      if we can fix this better.
+     
+     CHECK it might be long if this thread is scheduled out. Not sure if that would matter
+     as we have a few more readlists running.
+     
+     Maybe we can       attach a state to framelists so that we can restart from gatherInputSamples.
      */
+    IOLockLock(usbstream->mLock);
+
     /*An "underrun error" occurs when the UART transmitter has completed sending a character and the transmit buffer is empty. In asynchronous modes this is treated as an indication that no data remains to be transmitted, rather than an error, since additional stop bits can be appended. This error indication is commonly found in USARTs, since an underrun is more serious in synchronous systems.
      */
     
 	if (kIOReturnAborted != result) {
-        if (ringbuf->GatherInputSamples(true) != kIOReturnSuccess) {
+        if (usbstream->GatherInputSamples(true) != kIOReturnSuccess) {
             debugIOLog("***** EMUUSBAudioEngine::readCompleted failed to read all packets from USB stream!");
         }
 	}
 	
-    // Wouter:  data collection from the USB read is complete.
+    // Data collection from the USB read is complete.
     // Now start the read on the next block.
-	if (!ringbuf->shouldStop) {
+	if (!usbstream->shouldStop) {
         UInt32	frameListToRead;
 		// (orig doc) keep incrementing until limit of numUSBFrameLists - 1 is reached.
         // also, we can wonder if we want to do it this way. Why not just check what comes in instead
-        ringbuf->currentFrameList =(ringbuf->currentFrameList + 1) % RECORD_NUM_USB_FRAME_LISTS;
+        usbstream->currentFrameList =(usbstream->currentFrameList + 1) % RECORD_NUM_USB_FRAME_LISTS;
         
         // now we have already numUSBFrameListsToQueue-1 other framelist queues running.
         // We set our current list to the next one that is not yet running
         
-        frameListToRead = ringbuf->currentFrameList - 1 + ringbuf->numUSBFrameListsToQueue;
-        frameListToRead -= ringbuf->numUSBFrameLists * (frameListToRead >= ringbuf->numUSBFrameLists);// crop the number of framesToRead
-        // seems something equal to frameListToRead = (frameListnr + ringbuf->numUSBFrameListsToQueue) % ringbuf->numUSBFrameLists;
-        ringbuf->readFrameList(frameListToRead); // restart reading (but for different framelist).
+        frameListToRead = usbstream->currentFrameList - 1 + usbstream->numUSBFrameListsToQueue;
+        frameListToRead -= usbstream->numUSBFrameLists * (frameListToRead >= usbstream->numUSBFrameLists);// crop the number of framesToRead
+        // seems something equal to frameListToRead = (frameListnr + usbstream->numUSBFrameListsToQueue) % usbstream->numUSBFrameLists;
+        usbstream->readFrameList(frameListToRead); // restart reading (but for different framelist).
         
-	} else  {// stop issued FIX THIS CODE
-		debugIOLogR("++EMUUSBAudioEngine::readCompleted() - stopping: %d", ringbuf->shouldStop);
-		++ringbuf->shouldStop;
-		if (ringbuf->shouldStop == (ringbuf->numUSBFrameListsToQueue + 1) && TRUE == ringbuf->terminatingDriver) {
-            ringbuf->notifyClosed();
+	} else  {
+		debugIOLogR("++EMUUSBAudioEngine::readCompleted() - stopping: %d", usbstream->shouldStop);
+		++usbstream->shouldStop;
+		if (usbstream->shouldStop == (usbstream->numUSBFrameListsToQueue + 1) && TRUE == usbstream->terminatingDriver) {
+            usbstream->notifyClosed();
 		}
 	}
-	IOLockUnlock(ringbuf->mLock);
+	IOLockUnlock(usbstream->mLock);
     
-	debugIOLogR("- readCompleted currentFrameList=%d",ringbuf->currentFrameList);
+	debugIOLogR("- readCompleted currentFrameList=%d",usbstream->currentFrameList);
 	return;
 }
 

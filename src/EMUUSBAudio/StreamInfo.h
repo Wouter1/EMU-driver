@@ -199,9 +199,6 @@ struct StreamInfo {
     /*! an array of size [frameListnum] holding usbFrameToQueueAt for each frame when it was requested for read */
     UInt64 *					frameQueuedForList;
     
-    
-    
-    
 };
 
 
