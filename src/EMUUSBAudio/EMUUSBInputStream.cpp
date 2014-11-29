@@ -236,8 +236,7 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
     // because we have only so many frame lists
     
     // HACK we have numUSBFramesPerList frames, which one to check?? Print frame 0 info.
-    debugIOLogR("+ readCompleted framelist %d  result %x frametime %lld ",
-                currentFrameList, result);
+    debugIOLogR("+ readCompleted framelist %d  result %x ", currentFrameList, result);
     
     startingEngine = FALSE; // HACK if we turn off the timer to start the  thing...
     
