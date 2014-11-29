@@ -89,6 +89,10 @@ public:
      */
     IOReturn            readFrameList (UInt32 frameListNum);
     
+
+    /*! static version of readCompleted, with first argument being 'this' */
+    static void         readCompleted (void * object, void * frameListIndex, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
+    
     /*!readHandler is the callback from USB completion. Updates mInput.usbFrameToQueueAt.
      
      @discussion Wouter: This implements IOUSBLowLatencyIsocCompletionAction and the callback function for USB frameread.
@@ -102,8 +106,9 @@ public:
      @param pFrames the frames that need checking. Expects that all RECORD_NUM_USB_FRAMES_PER_LIST frames are available completely.
      
      */
-    static void         readCompleted (void * object, void * frameListIndex, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
-    
+    void            readCompleted (void * frameListIndex, IOReturn result,
+                                   IOUSBLowLatencyIsocFrame * pFrames);
+
     // should become private. Right now it's still shared with EMUUSBAudioEngine.
     
     /* lock to ensure convertInputSamples and readHandler are never run together */

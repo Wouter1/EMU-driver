@@ -198,18 +198,19 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
 	return result;
 }
 
-
-
 void EMUUSBInputStream::readCompleted (void * object, void * frameListNrPtr,
+                                       IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
+    ((EMUUSBInputStream *)object)->readCompleted(frameListNrPtr, result, pFrames);
+}
+
+void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
                                   IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
-    
-	EMUUSBInputStream *	usbstream = (EMUUSBInputStream *)object;
     
     // HACK we have numUSBFramesPerList frames, which one to check?? Print frame 0 info.
     debugIOLogR("+ readCompleted framelist %d  result %x frametime %lld ",
-                usbstream->currentFrameList, result);
+                currentFrameList, result);
     
-    usbstream->startingEngine = FALSE; // HACK if we turn off the timer to start the  thing...
+    startingEngine = FALSE; // HACK if we turn off the timer to start the  thing...
     
     
     /* HACK we MUST have the lock now as we must restart reading the list.
@@ -222,43 +223,43 @@ void EMUUSBInputStream::readCompleted (void * object, void * frameListNrPtr,
      
      Maybe we can  attach a state to framelists so that we can restart from gatherInputSamples.
      */
-    IOLockLock(usbstream->mLock);
+    IOLockLock(mLock);
 
     /*An "underrun error" occurs when the UART transmitter has completed sending a character and the transmit buffer is empty. In asynchronous modes this is treated as an indication that no data remains to be transmitted, rather than an error, since additional stop bits can be appended. This error indication is commonly found in USARTs, since an underrun is more serious in synchronous systems.
      */
     
 	if (kIOReturnAborted != result) {
-        if (usbstream->GatherInputSamples(true) != kIOReturnSuccess) {
+        if (GatherInputSamples(true) != kIOReturnSuccess) {
             debugIOLog("***** EMUUSBAudioEngine::readCompleted failed to read all packets from USB stream!");
         }
 	}
 	
     // Data collection from the USB read is complete.
     // Now start the read on the next block.
-	if (!usbstream->shouldStop) {
+	if (!shouldStop) {
         UInt32	frameListToRead;
 		// (orig doc) keep incrementing until limit of numUSBFrameLists - 1 is reached.
         // also, we can wonder if we want to do it this way. Why not just check what comes in instead
-        usbstream->currentFrameList =(usbstream->currentFrameList + 1) % RECORD_NUM_USB_FRAME_LISTS;
+        currentFrameList =(currentFrameList + 1) % RECORD_NUM_USB_FRAME_LISTS;
         
         // now we have already numUSBFrameListsToQueue-1 other framelist queues running.
         // We set our current list to the next one that is not yet running
         
-        frameListToRead = usbstream->currentFrameList - 1 + usbstream->numUSBFrameListsToQueue;
-        frameListToRead -= usbstream->numUSBFrameLists * (frameListToRead >= usbstream->numUSBFrameLists);// crop the number of framesToRead
+        frameListToRead = currentFrameList - 1 + numUSBFrameListsToQueue;
+        frameListToRead -= numUSBFrameLists * (frameListToRead >= numUSBFrameLists);// crop the number of framesToRead
         // seems something equal to frameListToRead = (frameListnr + usbstream->numUSBFrameListsToQueue) % usbstream->numUSBFrameLists;
-        usbstream->readFrameList(frameListToRead); // restart reading (but for different framelist).
+        readFrameList(frameListToRead); // restart reading (but for different framelist).
         
 	} else  {
-		debugIOLogR("++EMUUSBAudioEngine::readCompleted() - stopped: %d", usbstream->shouldStop);
-        if (usbstream->shouldStop == RECORD_NUM_USB_FRAME_LISTS) {
-            usbstream->stopped();
+		debugIOLogR("++EMUUSBAudioEngine::readCompleted() - stopped: %d", shouldStop);
+        if (shouldStop == RECORD_NUM_USB_FRAME_LISTS) {
+            stopped();
 		}
-		usbstream->shouldStop++;
+		shouldStop++;
 	}
-	IOLockUnlock(usbstream->mLock);
+	IOLockUnlock(mLock);
     
-	debugIOLogR("- readCompleted currentFrameList=%d",usbstream->currentFrameList);
+	debugIOLogR("- readCompleted currentFrameList=%d",currentFrameList);
 	return;
 }
 
