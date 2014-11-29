@@ -56,10 +56,6 @@ void EMUUSBAudioEngine::free () {
 		startTimer->release ();
 		startTimer = NULL;
 	}
-	if (NULL != mInput.mLock) {
-		IOLockFree(mInput.mLock);
-		mInput.mLock = NULL;
-	}
 	if (NULL != mWriteLock) {
 		IOLockFree(mWriteLock);
 		mWriteLock = NULL;
@@ -1249,7 +1245,6 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
     
     debugIOLog ("+EMUUSBAudioEngine[%p]::initHardware (%p)", this, provider);
 	terminatingDriver = FALSE;
-	mInput.mLock = NULL;
 	mWriteLock = NULL;
 	mFormatLock = NULL;
     FailIf (FALSE == super::initHardware (provider), Exit);
@@ -1305,8 +1300,6 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
 	
 	mInput.numUSBTimeFrames = mInput.numUSBFramesPerList / kNumberOfFramesPerMillisecond;
 	
-	mInput.mLock = IOLockAlloc();
-	FailIf(!mInput.mLock, Exit);
 	mWriteLock = IOLockAlloc();
 	FailIf(!mWriteLock, Exit);
 	mFormatLock = IOLockAlloc();
@@ -2106,9 +2099,12 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 		resultCode = mInput.associatedPipe->Read(neededSampleRateDescriptor, kAppleUSBSSIsocContinuousFrame, 1,&(mSampleRateFrame), &sampleRateCompletion);
 	}
 
-    usbInputRing.init(mInput.bufferSize, this);
+    resultCode =usbInputRing.init(mInput.bufferSize, this);
+    FailIf( kIOReturnSuccess != resultCode, Exit);
+           
     mInput.init(this);
-    mInput.start();
+    resultCode = mInput.start();
+    FailIf (kIOReturnSuccess != resultCode, Exit)
 
 	
 	// and now the output
@@ -2129,6 +2125,9 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     
 Exit:
 	if (kIOReturnSuccess != resultCode) {
+        mInput.stop();
+        IOSleep(1000); // HACK give mInput time to stop. Callback is tricky at this point.
+        usbInputRing.free();
 		RELEASEOBJ(mInput.pipe);
 		RELEASEOBJ(mOutput.pipe);
 		RELEASEOBJ(mInput.associatedPipe);

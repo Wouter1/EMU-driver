@@ -30,8 +30,9 @@ public:
      */
     virtual void                init(RingBufferDefault<UInt8> *inputRing);
     
-    /*! starts the input stream. Must be called to start */
-    virtual void                start();
+    /*! starts the input stream. Must be called to start
+     @return kIOReturnSuccess if all ok. */
+    virtual IOReturn                start();
     
     /*! stops the input stream. Must be called to stop.
      Stop takes some time (have to wait for callbacks from all streams). 
@@ -61,7 +62,7 @@ public:
      orig docu said "frameListNum must be in the valid range 0 - 126".
      This makes no sense to me. Maybe this is a hardware requirement.
      */
-    IOReturn            readFrameList (UInt32 frameListNum);
+    IOReturn                    readFrameList (UInt32 frameListNum);
     
 
     /*! static version of readCompleted, with first argument being 'this' */
@@ -85,8 +86,6 @@ public:
 
     // should become private. Right now it's still shared with EMUUSBAudioEngine.
     
-    /* lock to ensure convertInputSamples and readHandler are never run together */
-    IOLock*					mLock;
     
     /*! Used in GatherInputSamples to keep track of which framelist we were converting. */
     UInt64                  previousFrameList;
@@ -126,7 +125,8 @@ public:
     
     
 private:
-    /*! internal function to complete the stopping procedure. */
+    /*! internal function to complete the stopping procedure. Does not call notifyStopped as this
+     is also used internally to handle error conditions before even started. */
     void stopped();
     
     /*!
@@ -157,13 +157,18 @@ private:
      If false, the timestamp will be stored in frameListWrapTimestamp, and will be executed when
      this function is called on the same frame again but then with doTimeStamp=true (which happens at read completion)
      */
-	IOReturn            GatherInputSamples(Boolean doTimeStamp);
+	IOReturn                    GatherInputSamples(Boolean doTimeStamp);
 
     
-    FrameSizeQueue          frameSizeQueue;
+    FrameSizeQueue              frameSizeQueue;
     
     /*! the input ring. Received from the Engine */
-    RingBufferDefault<UInt8> *    usbRing;
+    RingBufferDefault<UInt8> *  usbRing;
+    
+    /* lock to ensure update and readHandler are never run together */
+    IOLock*                     mLock;
+    
+
 };
 
 

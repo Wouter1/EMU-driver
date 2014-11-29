@@ -10,6 +10,7 @@
 
 #include "EMUUSBInputStream.h"
 #include "EMUUSBLogging.h"
+#include "EMUUSBAudioCommon.h"
 
 
 void EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing) {
@@ -17,21 +18,31 @@ void EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing) {
 }
 
 
-void EMUUSBInputStream::start() {
+IOReturn EMUUSBInputStream::start() {
     shouldStop = 0;
-    
     currentFrameList = 0;
+    mLock = NULL;
+	mLock = IOLockAlloc();
+	FailIf(!mLock, Exit);
     
-    frameSizeQueue.init(FRAMESIZE_QUEUE_SIZE);
+    FailIf(frameSizeQueue.init(FRAMESIZE_QUEUE_SIZE) != kIOReturnSuccess,Exit);
     
     // we start reading on all framelists. USB will figure it out and take the next one in order
     // when it has data. We restart each framelist immediately in readCompleted when we get data.
 	for (UInt32 frameListNum = currentFrameList; frameListNum < numUSBFrameListsToQueue; ++frameListNum) {
 		readFrameList(frameListNum);
 	}
+    
+    return kIOReturnSuccess;
+    
+Exit:
+    stopped();
+    return kIOReturnNoMemory;
 }
 
 void EMUUSBInputStream::stop() {
+    if (!mLock) return;
+    
     if (shouldStop==0) {
         shouldStop=1;
     }
@@ -206,13 +217,23 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
 	return result;
 }
 
+
+
+
 void EMUUSBInputStream::readCompleted (void * object, void * frameListNrPtr,
                                        IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
     ((EMUUSBInputStream *)object)->readCompleted(frameListNrPtr, result, pFrames);
 }
 
+
+
+
 void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
                                   IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
+    if (!mLock) return;
+    
+    // at this point we assume shouldStop < RECORD_NUM_USB_FRAME_LISTS
+    // because we have only so many frame lists
     
     // HACK we have numUSBFramesPerList frames, which one to check?? Print frame 0 info.
     debugIOLogR("+ readCompleted framelist %d  result %x frametime %lld ",
@@ -260,12 +281,14 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
         
 	} else  {
 		debugIOLogR("++EMUUSBAudioEngine::readCompleted() - stopped: %d", shouldStop);
-        if (shouldStop == RECORD_NUM_USB_FRAME_LISTS) {
-            stopped();
-		}
 		shouldStop++;
 	}
 	IOLockUnlock(mLock);
+    
+    if (shouldStop > RECORD_NUM_USB_FRAME_LISTS) {
+        stopped();
+        notifyClosed();
+    }
     
 	debugIOLogR("- readCompleted currentFrameList=%d",currentFrameList);
 	return;
@@ -274,6 +297,11 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
 
 void EMUUSBInputStream::stopped() {
     frameSizeQueue.free();
+    
+    if (NULL != mLock) {
+		IOLockFree(mLock);
+		mLock = NULL;
+	}
+
     debugIOLogR("All stopped");
-    notifyClosed();
 }
