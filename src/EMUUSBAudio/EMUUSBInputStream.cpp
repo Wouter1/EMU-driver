@@ -18,8 +18,14 @@ void EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing) {
 
 
 void EMUUSBInputStream::start() {
+    shouldStop = 0;
 }
 
+void EMUUSBInputStream::stop() {
+    if (shouldStop==0) {
+        shouldStop=1;
+    }
+}
 
 FrameSizeQueue * EMUUSBInputStream::getFrameSizeQueue() {
     return &frameSizeQueue;
@@ -33,7 +39,7 @@ IOReturn EMUUSBInputStream::GatherInputSamples(Boolean doTimeStamp) {
 	UInt8*			dest = buffStart + bufferOffset;
     UInt32 readHeadPos = nextExpectedFrame * multFactor;     // for OVERRUN checks
     
-    debugIOLogR("+GatherInputSamples %d", bufferOffset / multFactor);
+    debugIOLogRD("+GatherInputSamples %d", bufferOffset / multFactor);
     // check if we moved to the next frame. This is done when primary USB interrupt occurs.
     
     // handle outstanding wraps so that we have it available for this round
@@ -43,12 +49,12 @@ IOReturn EMUUSBInputStream::GatherInputSamples(Boolean doTimeStamp) {
     }
     
     if (previousFrameList != currentFrameList) {
-        debugIOLogR("GatherInputSamples going from framelist %d to %d. lastindex=%d",previousFrameList , currentFrameList,frameIndex);
+        debugIOLogRD("GatherInputSamples going from framelist %d to %d. lastindex=%d",previousFrameList , currentFrameList,frameIndex);
         if (frameIndex != RECORD_NUM_USB_FRAMES_PER_LIST) {
             doLog("***** Previous framelist was not handled completely, only %d",frameIndex);
         }
         if (frameListWrapTimeStamp != 0) {
-            doLog("wrap         is still open!!"); // we can't erase, we would loose sync point....
+            doLog("wrap is still open!!"); // we can't erase, we would loose sync point....
         }
         previousFrameList = currentFrameList;
         frameIndex=0;
@@ -134,7 +140,7 @@ IOReturn EMUUSBInputStream::GatherInputSamples(Boolean doTimeStamp) {
         }
         //Don't restart reading here, that can be done only from readCompleted callback.
     }
-    debugIOLogR("-GatherInputSamples received %d first open frame=%d",totalreceived, frameIndex);
+    debugIOLogRD("-GatherInputSamples received %d first open frame=%d",totalreceived, frameIndex);
     return kIOReturnSuccess;
 }
 
@@ -190,8 +196,8 @@ void EMUUSBInputStream::readCompleted (void * object, void * frameListNrPtr,
 	EMUUSBInputStream *	usbstream = (EMUUSBInputStream *)object;
     
     // HACK we have numUSBFramesPerList frames, which one to check?? Print frame 0 info.
-    debugIOLogR("+ readCompleted framelist %d currentFrameList %d result %x frametime %lld systime %lld",
-                frameListnr, usbstream->currentFrameList, result, myFrames->frTimeStamp,systemTime);
+    debugIOLogR("+ readCompleted framelist %d  result %x frametime %lld ",
+                usbstream->currentFrameList, result);
     
     usbstream->startingEngine = FALSE; // HACK if we turn off the timer to start the  thing...
     
@@ -204,7 +210,7 @@ void EMUUSBInputStream::readCompleted (void * object, void * frameListNrPtr,
      CHECK it might be long if this thread is scheduled out. Not sure if that would matter
      as we have a few more readlists running.
      
-     Maybe we can       attach a state to framelists so that we can restart from gatherInputSamples.
+     Maybe we can  attach a state to framelists so that we can restart from gatherInputSamples.
      */
     IOLockLock(usbstream->mLock);
 
@@ -236,7 +242,9 @@ void EMUUSBInputStream::readCompleted (void * object, void * frameListNrPtr,
 	} else  {
 		debugIOLogR("++EMUUSBAudioEngine::readCompleted() - stopping: %d", usbstream->shouldStop);
 		++usbstream->shouldStop;
+        //            if (usbstream->shouldStop == RECORD_NUM_USB_FRAME_LISTS) {
 		if (usbstream->shouldStop == (usbstream->numUSBFrameListsToQueue + 1) && TRUE == usbstream->terminatingDriver) {
+            debugIOLogR("All stopped");
             usbstream->notifyClosed();
 		}
 	}

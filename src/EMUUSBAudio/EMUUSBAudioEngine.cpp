@@ -932,7 +932,7 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
     // max number of bytes to get
 	IOReturn	result;
     
-    debugIOLogR("+convertInputSamples firstSampleFrame=%u, numSampleFrames=%d srcbuf=%p dest=%p byteorder=%d bitWidth=%d numchannels=%d",firstSampleFrame,numSampleFrames,sampleBuf,destBuf,streamFormat->fByteOrder,streamFormat->fBitWidth,streamFormat->fNumChannels);
+    debugIOLogRD("+convertInputSamples firstSampleFrame=%u, numSampleFrames=%d srcbuf=%p dest=%p byteorder=%d bitWidth=%d numchannels=%d",firstSampleFrame,numSampleFrames,sampleBufNull,destBuf,streamFormat->fByteOrder,streamFormat->fBitWidth,streamFormat->fNumChannels);
     
     
     if (mInput.startingEngine) {
@@ -968,7 +968,7 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
     // "sophisticated techniques and extremely accurate timing mechanisms".
     // I don't like this black box approach but we have to live with it.
     
-    debugIOLog2("convertFromEMUUSBAudioInputStreamNoWrap destBuf = %p, firstSampleFrame = %d, numSampleFrames = %d", destBuf, firstSampleFrame, numSampleFrames);
+    debugIOLogRD("convertFromEMUUSBAudioInputStreamNoWrap destBuf = %p, firstSampleFrame = %d, numSampleFrames = %d", destBuf, firstSampleFrame, numSampleFrames);
     result = convertFromEMUUSBAudioInputStreamNoWrap (mInput.bufferPtr, destBuf, firstSampleFrame, numSampleFrames, streamFormat);
 	if (mPlugin)
 		mPlugin->pluginProcessInput ((float *)destBuf + (firstSampleFrame * streamFormat->fNumChannels), numSampleFrames, streamFormat->fNumChannels);
@@ -1009,7 +1009,7 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
                    usedNumberOfSamples);
 		}
 	}
-    debugIOLogC("-convertInputSamples");
+    debugIOLogRD("-convertInputSamples");
     
 	return result;
 }
@@ -2150,7 +2150,10 @@ Exit:
 IOReturn EMUUSBAudioEngine::stopUSBStream () {
 	debugIOLog ("+EMUUSBAudioEngine[%p]::stopUSBStream ()", this);
 	usbStreamRunning = FALSE;
-	mInput.shouldStop = mInput.shouldStop + (0 == mInput.shouldStop);
+    mInput.stop();
+    // HACK give time to the input channel to stop. But we have this callback notifyStopped?
+    // can we use that?
+    IOSleep(1000);
 	if (NULL != mOutput.pipe) {
 		if (FALSE == mInput.terminatingDriver)
 			mOutput.pipe->SetPipePolicy (0, 0);// don't call USB to avoid deadlock

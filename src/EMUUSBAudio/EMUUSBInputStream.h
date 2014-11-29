@@ -30,9 +30,12 @@ public:
      */
     void                init(RingBufferDefault<UInt8> *inputRing);
     
-    /*! starts the ring buffer IO. Must be called to start */
+    /*! starts the input stream. Must be called to start */
     void                start();
     
+    /*! stops the input stream. Must be called to stop */
+    void                stop();
+
     /*!
      Called when the Ring Buffer has closed all input streams.
      */
