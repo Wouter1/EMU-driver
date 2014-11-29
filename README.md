@@ -14,6 +14,7 @@ The first goal here was to get the audio input working properly, without the cli
 * This version ONLY works for audio input at 96kHz.
 * The audio output does not work. 
 * Only audio input stereo 96kHz was tested on EMU0404 USB. 
+* Only works the first use. If you start sample the second time, distortion appears #7. 
 
 Please notify me how my driver works on other EMU USB devices.
 
