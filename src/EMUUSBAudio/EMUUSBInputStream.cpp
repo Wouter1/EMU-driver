@@ -22,6 +22,8 @@ void EMUUSBInputStream::start() {
     
     currentFrameList = 0;
     
+    frameSizeQueue.init(FRAMESIZE_QUEUE_SIZE);
+    
     // we start reading on all framelists. USB will figure it out and take the next one in order
     // when it has data. We restart each framelist immediately in readCompleted when we get data.
 	for (UInt32 frameListNum = currentFrameList; frameListNum < numUSBFrameListsToQueue; ++frameListNum) {
@@ -248,13 +250,11 @@ void EMUUSBInputStream::readCompleted (void * object, void * frameListNrPtr,
         usbstream->readFrameList(frameListToRead); // restart reading (but for different framelist).
         
 	} else  {
-		debugIOLogR("++EMUUSBAudioEngine::readCompleted() - stopping: %d", usbstream->shouldStop);
-		++usbstream->shouldStop;
-        //            if (usbstream->shouldStop == RECORD_NUM_USB_FRAME_LISTS) {
-		if (usbstream->shouldStop == (usbstream->numUSBFrameListsToQueue + 1) && TRUE == usbstream->terminatingDriver) {
-            debugIOLogR("All stopped");
-            usbstream->notifyClosed();
+		debugIOLogR("++EMUUSBAudioEngine::readCompleted() - stopped: %d", usbstream->shouldStop);
+        if (usbstream->shouldStop == RECORD_NUM_USB_FRAME_LISTS) {
+            usbstream->stopped();
 		}
+		usbstream->shouldStop++;
 	}
 	IOLockUnlock(usbstream->mLock);
     
@@ -263,3 +263,8 @@ void EMUUSBInputStream::readCompleted (void * object, void * frameListNrPtr,
 }
 
 
+void EMUUSBInputStream::stopped() {
+    frameSizeQueue.free();
+    debugIOLogR("All stopped");
+    notifyClosed();
+}

@@ -219,7 +219,6 @@ bool EMUUSBAudioEngine::start (IOService * provider) {
     
 	debugIOLog ("+EMUUSBAudioEngine[%p]::start (%p)", this, provider);
     
-    mInput.init(this);
 	// Find out what interface number the driver is being instantiated against so that we always ask about
 	// our particular interface and not some other interface the device might have.
     
@@ -1253,7 +1252,7 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
 	EMUUSBAudioConfigObject*	usbAudio;
     
     debugIOLog ("+EMUUSBAudioEngine[%p]::initHardware (%p)", this, provider);
-	mInput.terminatingDriver = FALSE;
+	terminatingDriver = FALSE;
 	mInput.mLock = NULL;
 	mWriteLock = NULL;
 	mFormatLock = NULL;
@@ -1568,7 +1567,6 @@ IOReturn EMUUSBAudioEngine::performAudioEngineStart () {
     debugIOLog ("+EMUUSBAudioEngine[%p]::performAudioEngineStart ()", this);
 	// Reset timestamping mechanism
     
-    mInput.start();
     
 	if (mPlugin)  {
 		debugIOLogC("starting plugin");
@@ -2023,7 +2021,6 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	safeToEraseTo = 0;
 	lastSafeErasePoint = 0;
 	mInput.bufferOffset = mOutput.bufferOffset = 0;
-	mInput.getFrameSizeQueue()->init(FRAMESIZE_QUEUE_SIZE);
 	mInput.startingEngine = TRUE;
 	previouslyPreparedBufferOffset = 0;		// Start playing from the start of the buffer
 	fractionalSamplesRemaining = 0;			// Reset our parital frame list info
@@ -2112,8 +2109,11 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 		//resultCode = mInput.associatedPipe->Read(neededSampleRateDescriptor, nextSynchReadFrame, 1,&(mSampleRateFrame), &sampleRateCompletion);
 		resultCode = mInput.associatedPipe->Read(neededSampleRateDescriptor, kAppleUSBSSIsocContinuousFrame, 1,&(mSampleRateFrame), &sampleRateCompletion);
 	}
-    
+
+    usbInputRing.init(mInput.bufferSize, this);
+    mInput.init(this);
     mInput.start();
+
 	
 	// and now the output
 	
@@ -2146,11 +2146,11 @@ IOReturn EMUUSBAudioEngine::stopUSBStream () {
 	debugIOLog ("+EMUUSBAudioEngine[%p]::stopUSBStream ()", this);
 	usbStreamRunning = FALSE;
     mInput.stop();
-    // HACK give time to the input channel to stop. But we have this callback notifyStopped?
-    // can we use that?
+    // HACK give time to the input channel to stop.
+    // move code to notifyClosed()?  Or consider the sleep as a time-out?
     IOSleep(1000);
 	if (NULL != mOutput.pipe) {
-		if (FALSE == mInput.terminatingDriver)
+		if (FALSE == terminatingDriver)
 			mOutput.pipe->SetPipePolicy (0, 0);// don't call USB to avoid deadlock
 		
 		// Have to close the current pipe so we can open a new one because changing the alternate interface will tear down the current pipe
@@ -2158,15 +2158,16 @@ IOReturn EMUUSBAudioEngine::stopUSBStream () {
 	}
 	RELEASEOBJ(mOutput.associatedPipe);
 	if (NULL != mInput.pipe) {
-		if (FALSE == mInput.terminatingDriver)
+		if (FALSE == terminatingDriver)
 			mInput.pipe->SetPipePolicy (0, 0);// don't call USB to avoid deadlock
 		
 		// Have to close the current pipe so we can open a new one because changing the alternate interface will tear down the current pipe
 		RELEASEOBJ(mInput.pipe);
 	}
 	RELEASEOBJ(mInput.associatedPipe);
-	
-	if (FALSE == mInput.terminatingDriver) {
+
+    
+	if (FALSE == terminatingDriver) {
 		// Don't call USB if we are being terminated because we could deadlock their workloop.
 		if (NULL != mInput.streamInterface) // if we don't have an interface, message() got called and we are being terminated
 			mInput.streamInterface->SetAlternateInterface (this, kRootAlternateSetting);
@@ -2251,7 +2252,7 @@ Exit:
 bool EMUUSBAudioEngine::willTerminate (IOService * provider, IOOptionBits options) {
     
 	if (mInput.streamInterface == provider) {
-		mInput.terminatingDriver = TRUE;
+		terminatingDriver = TRUE;
 		if (FALSE == usbStreamRunning) {
 			// Close our stream interface and go away because we're not running.
 			mInput.streamInterface->close (this);
@@ -2263,7 +2264,7 @@ bool EMUUSBAudioEngine::willTerminate (IOService * provider, IOOptionBits option
 			}
 		}
 	} else if (mOutput.streamInterface == provider) {
-		mInput.terminatingDriver = TRUE;
+		terminatingDriver = TRUE;
 		if (FALSE == usbStreamRunning) {
 			// Close our stream interface and go away because we're not running.
 			mOutput.streamInterface->close (this);
@@ -2388,7 +2389,7 @@ void EMUUSBAudioEngine::writeHandler (void * object, void * parameter, IOReturn 
 		} else {
 			self->mInput.shouldStop++;
 			debugIOLogC("writeHandler: should stop");
-			if (self->mInput.shouldStop == (self->mOutput.numUSBFrameListsToQueue + 1) && TRUE == self->mInput.terminatingDriver) {
+			if (self->mInput.shouldStop == (self->mOutput.numUSBFrameListsToQueue + 1) && TRUE == self->terminatingDriver) {
 				self->mOutput.streamInterface->close (self);
 				self->mOutput.streamInterface = NULL;
 			}
@@ -2539,10 +2540,9 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
         // Why is this not related to the number of channels?
         // I propose this should be computed more directly based on the framelist size.
         
-        usbInputRing.init(mInput.multFactor * numSamplesInBuffer, this);
 		mInput.bufferSize = numSamplesInBuffer * mInput.multFactor;
 		mOutput.bufferSize = numSamplesInBuffer * mOutput.multFactor;
-		
+
 		// setup the input buffer
 		if (NULL != mInput.bufferMemoryDescriptor) {
 			mInput.audioStream->setSampleBuffer (NULL, 0);
@@ -2727,12 +2727,14 @@ void EMUUSBAudioEngine::setupChannelNames() {
 // UsbInputRing code
 
 IOReturn UsbInputRing::init(UInt32 newSize, IOAudioEngine *engine) {
+    debugIOLogR("+UsbInputRing::init")
     theEngine = engine;
     isFirstWrap = true;
     return RingBufferDefault<UInt8>::init(newSize);
     
     previousfrTimestampNs = 0;
     goodWraps = 0;
+    debugIOLogR("-UsbInputRing::init")
 
 }
 
@@ -2790,12 +2792,18 @@ void EMUUSBAudioEngine::OurUSBInputStream::init(EMUUSBAudioEngine * engine) {
     theEngine = engine;
 }
 
+
+
 void EMUUSBAudioEngine::OurUSBInputStream::notifyClosed() {
     if (theEngine) {
-        // this one call is why we need this class
-        theEngine->mInput.streamInterface->close(theEngine);
-        theEngine->mInput.streamInterface = NULL;
+        debugIOLogR("+EMUUSBAudioEngine::OurUSBInputStream::notifyClosed.");
+        theEngine->usbInputRing.free();
         
+        if (TRUE == theEngine->terminatingDriver) {
+            // this one call is why we need this class
+            theEngine->mInput.streamInterface->close(theEngine);
+            theEngine->mInput.streamInterface = NULL;
+        }
     } else {
         doLog("BUG! EMUUSBAudioEngine not initialized");
     }

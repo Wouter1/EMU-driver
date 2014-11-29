@@ -37,7 +37,7 @@ private:
 public:
     
     IOReturn init(UInt32 newSize) {
-        debugIOLogR("ring buffer allocate %d",size);
+        debugIOLogR("ring buffer allocate %d",newSize);
         if (newSize<=0) {
             return kIOReturnBadArgument;
         }

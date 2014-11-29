@@ -28,15 +28,15 @@ public:
     /*! initializes the ring buffer. Must be called before use.
      @param inputRing the initialized USBInputRing.
      */
-    void                init(RingBufferDefault<UInt8> *inputRing);
+    virtual void                init(RingBufferDefault<UInt8> *inputRing);
     
     /*! starts the input stream. Must be called to start */
-    void                start();
+    virtual void                start();
     
     /*! stops the input stream. Must be called to stop.
      Stop takes some time (have to wait for callbacks from all streams). 
      A callback notifyClosed is done when close is complete.*/
-    void                stop();
+    virtual void                stop();
 
     /*!
      Called when the Ring Buffer has closed all input streams.
@@ -126,33 +126,34 @@ public:
     
     /*! The value we expect for firstSampleFrame in next call to convertInputSamples.
      The reading of our input buffer should be continuous, not jump around. */
-	UInt32								nextExpectedFrame;
+	UInt32					nextExpectedFrame;
     
     /*! = maxFrameSize * numUSBFramesPerList; total byte size for buffering frameLists for USB reading. eg 582*64 = 37248.
      */
-	UInt32								readUSBFrameListSize;
+	UInt32					readUSBFrameListSize;
     
     /*!  direct ptr to USB data buffer = mInput. usbBufferDescriptor. These are
      the buffers for each of the USB readFrameLists. Not clear why this is allocated as one big slot. */
 	void *								readBuffer;
     
     /*! number of initial frames that are dropped. See kNumberOfStartingFramesToDrop */
-	UInt32								mDropStartingFrames;
+	UInt32					mDropStartingFrames;
     
-    volatile UInt32						shouldStop;
+    volatile UInt32			shouldStop;
     
-    Boolean								terminatingDriver;
     
     /*!  this is TRUE until we receive the first USB packet. */
-	Boolean								startingEngine;
+	Boolean					startingEngine;
     
     
 private:
+    /*! internal function to complete the stopping procedure. */
+    void stopped();
     
-    FrameSizeQueue                      frameSizeQueue;
+    FrameSizeQueue          frameSizeQueue;
     
     /*! the input ring. Received from the Engine */
-    RingBufferDefault<UInt8> *          usbRing;
+    RingBufferDefault<UInt8> *    usbRing;
 };
 
 

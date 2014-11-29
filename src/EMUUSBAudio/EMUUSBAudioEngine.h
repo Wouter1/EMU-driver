@@ -226,7 +226,8 @@ protected:
     /*! Connect  EMUUSBInputStream close event. Can this be done easier?  */
     struct OurUSBInputStream: public EMUUSBInputStream {
     public:
-        /*! init, pass parent pointer*/
+        /*! init, pass parent pointer. The usbInputRing must be configured before this is called.
+         FIXME maybe pass usbInputRing as param then? */
         void    init(EMUUSBAudioEngine * engine);
         void    notifyClosed();
         
@@ -427,7 +428,9 @@ protected:
     
 	void                setupChannelNames();
     
-    
+    /*! This is set true when we got signalled to terminate */
+    Boolean								terminatingDriver;
+
 };
 
 #endif /* defined(__EMUUSBAudio__EMUUSBAudioEngine__) */
