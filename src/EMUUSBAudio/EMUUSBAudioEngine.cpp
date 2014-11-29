@@ -949,11 +949,7 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
     
     if (!mInput.startingEngine && !mInput.shouldStop) {
         // we try to gather all the bytes now: it may take long time before completion callback comes in the ring buffer.
-        Boolean haveLock=IOLockTryLock(mInput.mLock);
-        if (haveLock) {
-            mInput.GatherInputSamples(false);
-            IOLockUnlock(mInput.mLock);
-        }
+        mInput.update();
     }
     
     //    // current write head inside that range? Then this is going to cause serious distortion!

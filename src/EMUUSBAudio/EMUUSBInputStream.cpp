@@ -41,6 +41,14 @@ FrameSizeQueue * EMUUSBInputStream::getFrameSizeQueue() {
     return &frameSizeQueue;
 }
 
+void EMUUSBInputStream::update() {
+    Boolean haveLock=IOLockTryLock(mLock);
+    if (haveLock) {
+        GatherInputSamples(false);
+        IOLockUnlock(mLock);
+    }
+
+}
 
 IOReturn EMUUSBInputStream::GatherInputSamples(Boolean doTimeStamp) {
 	UInt32			numBytesToCopy = 0; // number of bytes to move the dest ptr by each time

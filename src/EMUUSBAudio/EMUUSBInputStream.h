@@ -41,41 +41,15 @@ public:
     /*!
      Called when the Ring Buffer has closed all input streams.
      */
-    virtual void        notifyClosed() =0  ;
+    virtual void                notifyClosed() =0  ;
     
-    
-    /*!
-     Copy input frames from given USB port framelist into the mInput and inform HAL about
-     timestamps when we recycle the ring buffer. Also updates mInput. bufferOffset.
-     
-     THis function can be called any number of times while we are waiting
-     for the framelist read to finish. This can be called both from readHandler and from
-     convertInputSamples.
-     
-     You must lock IO ( IOLockLock(mLock)) before calling this. We can not do this ourselves
-     because readHandler (who will need to call us) has to lock before this point and
-     locking multiple times ourselves will deadlock.
-     
-     This function always uses mInput.currentFrameList as the framelist to handle.
-     
-     @return kIOReturnSuccess if all frames were read properly, or kIOReturnStillOpen if there
-     were still un-handled frames in the frame list.
-     
-     This code directly uses readBuffer to access the bytes.
-     
-     This function does NOT check for buffer overrun.
-     
-     This function modifies FrameIndex, lastInputSize, LastInputFrames, and runningInputCount. It may
-     also alter bufferOffset but that will result in a warning in the logs.
-     
-     @param doTimeStamp true if function should also execute makeTimeStampForWrap if a wrap occurs.
-     If false, the timestamp will be stored in frameListWrapTimestamp, and will be executed when
-     this function is called on the same frame again but then with doTimeStamp=true (which happens at read completion)
-     */
-	IOReturn            GatherInputSamples(Boolean doTimeStamp);
+    /*! This can be called externally to check if USB input is already available.
+     The USB completion callback is a bit slow, this is to speed up the process and
+     lower the latency */
+    void                        update();
     
     /*! get the framesize queue */
-    FrameSizeQueue *             getFrameSizeQueue();
+    FrameSizeQueue *            getFrameSizeQueue();
     
     /*!
      @abstract initializes the read of a frameList (typ. 64 frames) from USB.
@@ -154,6 +128,37 @@ public:
 private:
     /*! internal function to complete the stopping procedure. */
     void stopped();
+    
+    /*!
+     Copy input frames from given USB port framelist into the mInput and inform HAL about
+     timestamps when we recycle the ring buffer. Also updates mInput. bufferOffset.
+     
+     THis function can be called any number of times while we are waiting
+     for the framelist read to finish. This can be called both from readHandler and from
+     convertInputSamples.
+     
+     You must lock IO ( IOLockLock(mLock)) before calling this. We can not do this ourselves
+     because readHandler (who will need to call us) has to lock before this point and
+     locking multiple times ourselves will deadlock.
+     
+     This function always uses mInput.currentFrameList as the framelist to handle.
+     
+     @return kIOReturnSuccess if all frames were read properly, or kIOReturnStillOpen if there
+     were still un-handled frames in the frame list.
+     
+     This code directly uses readBuffer to access the bytes.
+     
+     This function does NOT check for buffer overrun.
+     
+     This function modifies FrameIndex, lastInputSize, LastInputFrames, and runningInputCount. It may
+     also alter bufferOffset but that will result in a warning in the logs.
+     
+     @param doTimeStamp true if function should also execute makeTimeStampForWrap if a wrap occurs.
+     If false, the timestamp will be stored in frameListWrapTimestamp, and will be executed when
+     this function is called on the same frame again but then with doTimeStamp=true (which happens at read completion)
+     */
+	IOReturn            GatherInputSamples(Boolean doTimeStamp);
+
     
     FrameSizeQueue          frameSizeQueue;
     
