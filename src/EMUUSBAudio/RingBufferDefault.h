@@ -29,7 +29,7 @@ template <typename TYPE>
 
 class RingBufferDefault: public RingBufferT<TYPE> {
 private:
-	TYPE *buffer=0;
+	TYPE *buffer=0; //
     UInt32 size=0; // number of elements in buffer.
     UInt16 readhead; // index of next read. range [0,SIZE>
     UInt16 writehead; // index of next write. range [0,SIZE>
@@ -37,7 +37,12 @@ private:
 public:
     
     IOReturn init(UInt32 newSize) {
-        free(); // just in case free was not done
+        debugIOLogR("ring buffer allocate %d",size);
+        if (newSize<=0) {
+            return kIOReturnBadArgument;
+        }
+
+        free(); // just in case free was not done of old buffer
         
         size=newSize;
 		readhead=0;
@@ -61,6 +66,9 @@ public:
     
     
     IOReturn push(TYPE object, AbsoluteTime time) {
+        if (!buffer) {
+            return kIOReturnNotReady;
+        }
         UInt16 newwritehead = writehead+1;
         if (newwritehead== size) newwritehead=0;
         if (newwritehead == readhead) {
@@ -73,6 +81,10 @@ public:
 	}
     
     IOReturn pop(TYPE * data) {
+        if (!buffer) {
+            return kIOReturnNotReady;
+        }
+
         if (readhead == writehead) {
             return kIOReturnUnderrun;
         }
@@ -84,6 +96,10 @@ public:
     
     
     IOReturn push(TYPE *objects, UInt16 num, AbsoluteTime time) {
+        if (!buffer) {
+            return kIOReturnNotReady;
+        }
+
         if (num > vacant()) { return kIOReturnOverrun ; }
         
         for ( UInt16 n = 0; n<num; n++) {
@@ -95,6 +111,10 @@ public:
     
     
     IOReturn pop(TYPE *objects, UInt16 num) {
+        if (!buffer) {
+            return kIOReturnNotReady;
+        }
+
         if (num > available()) { return kIOReturnUnderrun; }
         
         for (UInt16 n = 0; n < num ; n++) {
@@ -109,12 +129,20 @@ public:
     }
     
     UInt16 available() {
+        if (!buffer) {
+            return 0;
+        }
+
         // +SIZE because % does not properly handle negative
         UInt32 avail = (size + writehead - readhead ) % size;
         return avail;
     }
     
     UInt16 vacant() {
+        if (!buffer) {
+            return 0;
+        }
+
         // +2*SIZE because % does not properly handle negative
         UInt32 vacant =  (2*size + readhead - writehead - 1 ) % size;
         return vacant;

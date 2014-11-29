@@ -33,7 +33,9 @@ public:
     /*! starts the input stream. Must be called to start */
     void                start();
     
-    /*! stops the input stream. Must be called to stop */
+    /*! stops the input stream. Must be called to stop.
+     Stop takes some time (have to wait for callbacks from all streams). 
+     A callback notifyClosed is done when close is complete.*/
     void                stop();
 
     /*!
