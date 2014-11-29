@@ -343,7 +343,10 @@ protected:
     /*!  initializes the write a of a frame list (typ. 64 frames) to USB. called from writeHandler */
     IOReturn writeFrameList (UInt32 frameListNum);
     
+    /*! called from performAudioEngineStart */
     IOReturn startUSBStream();
+    
+    /*! called from performAudioEngineStop */
     IOReturn stopUSBStream ();
     
     virtual UInt32 getCurrentSampleFrame (void);

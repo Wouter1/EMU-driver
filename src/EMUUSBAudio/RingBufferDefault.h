@@ -11,6 +11,7 @@
 
 
 #include "RingBufferT.h"
+#include "EMUUSBLogging.h"
 
 /*! Default implementation for RingBufferT.
  This is still a template because of the TYPE but actually this is a complete
@@ -51,6 +52,7 @@ public:
     
     void free() {
         if (buffer){
+            debugIOLogR("ring buffer freed %d",size);
             IOFree(buffer,size * sizeof(TYPE));
             buffer=0;
             size=0;

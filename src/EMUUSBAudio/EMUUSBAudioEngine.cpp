@@ -2017,7 +2017,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	UInt32	newOutputMultFactor = (outputFormat->fBitWidth / 8) * outputFormat->fNumChannels;
 	
 	UInt32	altFrameSampleSize = averageFrameSamples + 1;
-	mInput.currentFrameList = mOutput.currentFrameList = 0;
+	mOutput.currentFrameList = 0;
     mInput.previousFrameList = 3; //  different from currentFrameList.
     
 	safeToEraseTo = 0;
@@ -2113,12 +2113,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 		resultCode = mInput.associatedPipe->Read(neededSampleRateDescriptor, kAppleUSBSSIsocContinuousFrame, 1,&(mSampleRateFrame), &sampleRateCompletion);
 	}
     
-    // we start reading on all framelists. USB will figure it out and take the next one in order
-    // when it has data. We restart each framelist immediately in readCompleted when we get data.
-	for (UInt32 frameListNum = mInput.currentFrameList; frameListNum < mInput.numUSBFrameListsToQueue; ++frameListNum) {
-		mInput.readFrameList(frameListNum);
-	}
-    
+    mInput.start();
 	
 	// and now the output
 	

@@ -19,6 +19,14 @@ void EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing) {
 
 void EMUUSBInputStream::start() {
     shouldStop = 0;
+    
+    currentFrameList = 0;
+    
+    // we start reading on all framelists. USB will figure it out and take the next one in order
+    // when it has data. We restart each framelist immediately in readCompleted when we get data.
+	for (UInt32 frameListNum = currentFrameList; frameListNum < numUSBFrameListsToQueue; ++frameListNum) {
+		readFrameList(frameListNum);
+	}
 }
 
 void EMUUSBInputStream::stop() {
