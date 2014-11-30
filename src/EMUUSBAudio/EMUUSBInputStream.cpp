@@ -85,7 +85,6 @@ IOReturn EMUUSBInputStream::update() {
 }
 
 IOReturn EMUUSBInputStream::GatherInputSamples() {
-    ReturnIf(!started, kIOReturnNotOpen);
     
 	UInt32			numBytesToCopy = 0; // number of bytes to move the dest ptr by each time
 	UInt8*			buffStart = (UInt8*) bufferPtr;
