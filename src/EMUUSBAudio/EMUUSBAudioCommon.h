@@ -111,7 +111,7 @@ goto handler;												\
 //	-----------------------------------------------------------------
 #define ReturnIf( cond, returnValue )                                           \
 if (cond) {                                                                     \
-debugIOLog( SoundAssertionMessage( cond,  __FILE__, __LINE__, returnValue ));   \
+SoundAssertionFailed( cond,  __FILE__, __LINE__, returnValue)                   \
 return (returnValue);                                                           \
 }
 

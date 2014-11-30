@@ -47,8 +47,9 @@ IOReturn EMUUSBInputStream::start() {
 
 
 IOReturn EMUUSBInputStream::stop() {
+    debugIOLogR("stop input stream");
     ReturnIf(!started, kIOReturnNotOpen);
-    
+    started = false;
     if (shouldStop == 0) {
         shouldStop=1;
     }
@@ -60,6 +61,7 @@ IOReturn EMUUSBInputStream::stop() {
 IOReturn EMUUSBInputStream::free() {
     ReturnIf(!initialized, kIOReturnNotReady);
     ReturnIf(started, kIOReturnStillOpen);
+    initialized=false;
     
     if (NULL != mLock) {
 		IOLockFree(mLock);
