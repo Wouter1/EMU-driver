@@ -46,7 +46,7 @@ public:
      eg a timestamp from a USB frame.
      @return kIOReturnSuccess if ok, possibly  kIOReturnOverrun */
 
-    virtual IOReturn push(T *objects, UInt16 num, AbsoluteTime time) = 0 ;
+    virtual IOReturn push(T *objects, UInt32 num, AbsoluteTime time) = 0 ;
     
     /* Get one object from the ring. 
      @param pointer to mem block to contain the object
@@ -60,14 +60,14 @@ public:
      @param num the number of objects in the array
      @return kIOReturnSuccess if ok, possibly  kIOReturnUnderrun */
     
-    virtual IOReturn pop(T *objects, UInt16 num) = 0;
+    virtual IOReturn pop(T *objects, UInt32 num) = 0;
     
     /*! get the number of objects in the ring */
     
-    virtual UInt16 available() = 0;
+    virtual UInt32 available() = 0;
     
     /*! get the number of free slots in the ring */
-    virtual UInt16 vacant() = 0;
+    virtual UInt32 vacant() = 0;
     
     /*! called when the write head wraps back to 0. Overwrite to get notification. 
      @param time the time associated with the push of the object that caused the wrap.

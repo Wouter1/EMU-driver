@@ -31,12 +31,12 @@ class RingBufferDefault: public RingBufferT<TYPE> {
 private:
 	TYPE *buffer=0; //
     UInt32 size=0; // number of elements in buffer.
-    UInt16 readhead; // index of next read. range [0,SIZE>
-    UInt16 writehead; // index of next write. range [0,SIZE>
+    UInt32 readhead; // index of next read. range [0,SIZE>
+    UInt32 writehead; // index of next write. range [0,SIZE>
     
 public:
     
-    IOReturn init(UInt32 newSize) {
+    IOReturn init(UInt32 newSize) override {
         debugIOLogR("ring buffer allocate %d",newSize);
         if (newSize<=0) {
             return kIOReturnBadArgument;
@@ -65,11 +65,11 @@ public:
     }
     
     
-    IOReturn push(TYPE object, AbsoluteTime time) {
+    IOReturn push(TYPE object, AbsoluteTime time) override{
         if (!buffer) {
             return kIOReturnNotReady;
         }
-        UInt16 newwritehead = writehead+1;
+        UInt32 newwritehead = writehead+1;
         if (newwritehead== size) newwritehead=0;
         if (newwritehead == readhead) {
             return kIOReturnOverrun ;
@@ -80,7 +80,7 @@ public:
         return kIOReturnSuccess;
 	}
     
-    IOReturn pop(TYPE * data) {
+    IOReturn pop(TYPE * data) override{
         if (!buffer) {
             return kIOReturnNotReady;
         }
@@ -95,14 +95,14 @@ public:
     }
     
     
-    IOReturn push(TYPE *objects, UInt16 num, AbsoluteTime time) {
+    IOReturn push(TYPE *objects, UInt32 num, AbsoluteTime time) override{
         if (!buffer) {
             return kIOReturnNotReady;
         }
 
         if (num > vacant()) { return kIOReturnOverrun ; }
         
-        for ( UInt16 n = 0; n<num; n++) {
+        for ( UInt32 n = 0; n<num; n++) {
             buffer[writehead++] = objects[n];
             if (writehead == size) { writehead = 0; notifyWrap(time); }
         }
@@ -110,14 +110,14 @@ public:
     }
     
     
-    IOReturn pop(TYPE *objects, UInt16 num) {
+    IOReturn pop(TYPE *objects, UInt32 num) override{
         if (!buffer) {
             return kIOReturnNotReady;
         }
 
         if (num > available()) { return kIOReturnUnderrun; }
         
-        for (UInt16 n = 0; n < num ; n++) {
+        for (UInt32 n = 0; n < num ; n++) {
             objects[n] = buffer[readhead++];
             if (readhead==size) { readhead = 0; }
         }
@@ -128,7 +128,7 @@ public:
         // default: do nothing
     }
     
-    UInt16 available() {
+    UInt32 available() override{
         if (!buffer) {
             return 0;
         }
@@ -138,7 +138,7 @@ public:
         return avail;
     }
     
-    UInt16 vacant() {
+    UInt32 vacant() override{
         if (!buffer) {
             return 0;
         }
