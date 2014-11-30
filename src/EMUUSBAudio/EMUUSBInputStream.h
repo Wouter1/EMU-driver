@@ -69,8 +69,6 @@ public:
     /*! used in GatherInputSamples to keep track of which frame in the list we were left at (first non-converted frame index) */
     UInt32                  frameIndex;
     
-    /*! wrap timestamp for this framelist. 0 if no wrap occured */
-    UInt64                  frameListWrapTimeStamp;
     
     UInt32					lastInputSize;
 	UInt32					lastInputFrames;
@@ -128,11 +126,8 @@ private:
      This function modifies FrameIndex, lastInputSize, LastInputFrames, and runningInputCount. It may
      also alter bufferOffset but that will result in a warning in the logs.
      
-     @param doTimeStamp true if function should also execute makeTimeStampForWrap if a wrap occurs.
-     If false, the timestamp will be stored in frameListWrapTimestamp, and will be executed when
-     this function is called on the same frame again but then with doTimeStamp=true (which happens at read completion)
      */
-	IOReturn                    GatherInputSamples(Boolean doTimeStamp);
+	IOReturn                    GatherInputSamples();
     
     /*!
      @abstract initializes the read of a frameList (typ. 64 frames) from USB.

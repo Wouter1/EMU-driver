@@ -76,13 +76,13 @@ IOReturn EMUUSBInputStream::update() {
     Boolean haveLock=IOLockTryLock(mLock);
     
     if (haveLock) {
-        GatherInputSamples(false);
+        GatherInputSamples();
         IOLockUnlock(mLock);
     }
     return kIOReturnSuccess;
 }
 
-IOReturn EMUUSBInputStream::GatherInputSamples(Boolean doTimeStamp) {
+IOReturn EMUUSBInputStream::GatherInputSamples() {
     ReturnIf(!started, kIOReturnNotOpen);
     
 	UInt32			numBytesToCopy = 0; // number of bytes to move the dest ptr by each time
@@ -94,19 +94,11 @@ IOReturn EMUUSBInputStream::GatherInputSamples(Boolean doTimeStamp) {
     debugIOLogRD("+GatherInputSamples %d", bufferOffset / multFactor);
     // check if we moved to the next frame. This is done when primary USB interrupt occurs.
     
-    // handle outstanding wraps so that we have it available for this round
-    if (doTimeStamp && frameListWrapTimeStamp!=0) {
-        usbRing->notifyWrap(frameListWrapTimeStamp) ; // HACK!!!! ring should call this itself.
-        frameListWrapTimeStamp = 0;
-    }
     
     if (previousFrameList != currentFrameList) {
         debugIOLogRD("GatherInputSamples going from framelist %d to %d. lastindex=%d",previousFrameList , currentFrameList,frameIndex);
         if (frameIndex != RECORD_NUM_USB_FRAMES_PER_LIST) {
             doLog("***** Previous framelist was not handled completely, only %d",frameIndex);
-        }
-        if (frameListWrapTimeStamp != 0) {
-            doLog("wrap is still open!!"); // we can't erase, we would loose sync point....
         }
         previousFrameList = currentFrameList;
         frameIndex=0;
@@ -165,10 +157,13 @@ IOReturn EMUUSBInputStream::GatherInputSamples(Boolean doTimeStamp) {
                 bufferOffset = overflow; // remember the location the dest ptr will be set to
                 if (overflow)	// copy the remaining bytes into the front of the dest buffer
                     memcpy(dest, source + numBytesToEnd, overflow);
-                frameListWrapTimeStamp = pFrames[frameIndex].frTimeStamp;
                 
+                usbRing->notifyWrap(pFrames[frameIndex].frTimeStamp) ; // HACK!!!! ring should call this itself.
+
                 numBytesToCopy = overflow;
             }
+            
+            
         }
         else if(pFrames[frameIndex].frActCount && mDropStartingFrames > 0) // first frames might have zero length
         {
@@ -181,18 +176,12 @@ IOReturn EMUUSBInputStream::GatherInputSamples(Boolean doTimeStamp) {
         dest += numBytesToCopy;
     }
     
-    // now check, why did we leave loop? Was all normal or failure? log failures.
+    //Don't restart reading here, that can be done only from readCompleted callback.
+    debugIOLogRD("-GatherInputSamples received %d first open frame=%d",totalreceived, frameIndex);
+
     if (frameIndex != RECORD_NUM_USB_FRAMES_PER_LIST) {
         return kIOReturnStillOpen; // caller has to decide what to do if this happens.
-    } else {
-        // reached end of list reached.
-        if (doTimeStamp && frameListWrapTimeStamp!=0) {
-            usbRing->notifyWrap(frameListWrapTimeStamp) ; // HACK!!!! ring should call this itself.
-            frameListWrapTimeStamp=0;
-        }
-        //Don't restart reading here, that can be done only from readCompleted callback.
     }
-    debugIOLogRD("-GatherInputSamples received %d first open frame=%d",totalreceived, frameIndex);
     return kIOReturnSuccess;
 }
 
@@ -277,7 +266,7 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
      */
     
 	if (kIOReturnAborted != result) {
-        if (GatherInputSamples(true) != kIOReturnSuccess) {
+        if (GatherInputSamples() != kIOReturnSuccess) {
             debugIOLog("***** EMUUSBAudioEngine::readCompleted failed to read all packets from USB stream!");
         }
 	}
