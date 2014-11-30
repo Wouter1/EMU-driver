@@ -2798,6 +2798,10 @@ void EMUUSBAudioEngine::OurUSBInputStream::notifyClosed() {
         theEngine->usbInputRing.free();
         
         if (TRUE == theEngine->terminatingDriver) {
+            IOReturn res = theEngine->mInput.free();
+            if (res != kIOReturnSuccess) {
+                doLog("problem freeing input stream:%x",res);
+            }
             // this one call is why we need this class
             theEngine->mInput.streamInterface->close(theEngine);
             theEngine->mInput.streamInterface = NULL;
