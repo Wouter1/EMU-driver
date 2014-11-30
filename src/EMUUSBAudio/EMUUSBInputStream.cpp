@@ -13,55 +13,78 @@
 #include "EMUUSBAudioCommon.h"
 
 
-void EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing) {
+IOReturn EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing, FrameSizeQueue *frameRing) {
+    ReturnIf(inputRing == 0, kIOReturnBadArgument);
+    ReturnIf(frameRing == 0, kIOReturnBadArgument);
+    
     usbRing = inputRing;
+    frameSizeQueue = frameRing;
+    
+    mLock = NULL;
+	mLock = IOLockAlloc();
+	ReturnIf(!mLock, kIOReturnNoMemory);
+    
+    initialized = true;
+    return kIOReturnSuccess;
 }
 
 
 IOReturn EMUUSBInputStream::start() {
+    ReturnIf(!initialized, kIOReturnNotReady);
+    
     shouldStop = 0;
     currentFrameList = 0;
-    mLock = NULL;
-	mLock = IOLockAlloc();
-	FailIf(!mLock, Exit);
     
-    FailIf(frameSizeQueue.init(FRAMESIZE_QUEUE_SIZE) != kIOReturnSuccess,Exit);
     
     // we start reading on all framelists. USB will figure it out and take the next one in order
     // when it has data. We restart each framelist immediately in readCompleted when we get data.
 	for (UInt32 frameListNum = currentFrameList; frameListNum < numUSBFrameListsToQueue; ++frameListNum) {
-		readFrameList(frameListNum);
+		readFrameList(frameListNum);         // FIXME handle failed call
 	}
-    
+    started = true;
     return kIOReturnSuccess;
-    
-Exit:
-    stopped();
-    return kIOReturnNoMemory;
 }
 
-void EMUUSBInputStream::stop() {
-    if (!mLock) return;
+
+IOReturn EMUUSBInputStream::stop() {
+    ReturnIf(!started, kIOReturnNotOpen);
     
-    if (shouldStop==0) {
+    if (shouldStop == 0) {
         shouldStop=1;
     }
+    return kIOReturnSuccess;
 }
 
-FrameSizeQueue * EMUUSBInputStream::getFrameSizeQueue() {
-    return &frameSizeQueue;
+
+
+IOReturn EMUUSBInputStream::free() {
+    ReturnIf(!initialized, kIOReturnNotReady);
+    ReturnIf(started, kIOReturnStillOpen);
+    
+    if (NULL != mLock) {
+		IOLockFree(mLock);
+		mLock = NULL;
+	}
+    return kIOReturnSuccess;
 }
 
-void EMUUSBInputStream::update() {
+
+
+IOReturn EMUUSBInputStream::update() {
+    ReturnIf(!started, kIOReturnNotOpen);
+    
     Boolean haveLock=IOLockTryLock(mLock);
+    
     if (haveLock) {
         GatherInputSamples(false);
         IOLockUnlock(mLock);
     }
-
+    return kIOReturnSuccess;
 }
 
 IOReturn EMUUSBInputStream::GatherInputSamples(Boolean doTimeStamp) {
+    ReturnIf(!started, kIOReturnNotOpen);
+    
 	UInt32			numBytesToCopy = 0; // number of bytes to move the dest ptr by each time
 	UInt8*			buffStart = (UInt8*) bufferPtr;
     UInt32         totalreceived=0;
@@ -175,6 +198,7 @@ IOReturn EMUUSBInputStream::GatherInputSamples(Boolean doTimeStamp) {
 
 
 IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
+    
     debugIOLogR("+ read frameList %d ", frameListNum);
     if (shouldStop) {
         debugIOLog("*** Read should have stopped. Who is calling this? Canceling call")
@@ -229,16 +253,12 @@ void EMUUSBInputStream::readCompleted (void * object, void * frameListNrPtr,
 
 
 void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
-                                  IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
-    if (!mLock) return;
-    
-    // at this point we assume shouldStop < RECORD_NUM_USB_FRAME_LISTS
-    // because we have only so many frame lists
+                                       IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
     
     // HACK we have numUSBFramesPerList frames, which one to check?? Print frame 0 info.
     debugIOLogR("+ readCompleted framelist %d  result %x ", currentFrameList, result);
     
-    startingEngine = FALSE; // HACK if we turn off the timer to start the  thing...
+    startingEngine = FALSE; // HACK this is old code...
     
     
     /* HACK we MUST have the lock now as we must restart reading the list.
@@ -252,7 +272,7 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
      Maybe we can  attach a state to framelists so that we can restart from gatherInputSamples.
      */
     IOLockLock(mLock);
-
+    
     /*An "underrun error" occurs when the UART transmitter has completed sending a character and the transmit buffer is empty. In asynchronous modes this is treated as an indication that no data remains to be transmitted, rather than an error, since additional stop bits can be appended. This error indication is commonly found in USARTs, since an underrun is more serious in synchronous systems.
      */
     
@@ -285,7 +305,8 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
 	IOLockUnlock(mLock);
     
     if (shouldStop > RECORD_NUM_USB_FRAME_LISTS) {
-        stopped();
+        debugIOLogR("All stopped");
+        started = false;
         notifyClosed();
     }
     
@@ -293,14 +314,3 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
 	return;
 }
 
-
-void EMUUSBInputStream::stopped() {
-    frameSizeQueue.free();
-    
-    if (NULL != mLock) {
-		IOLockFree(mLock);
-		mLock = NULL;
-	}
-
-    debugIOLogR("All stopped");
-}

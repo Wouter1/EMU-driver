@@ -86,6 +86,8 @@
 // max size of the globally unique descriptor ID. See getGlobalUniqueID()
 #define MAX_ID_SIZE 128
 
+// size of FrameSizeQueue
+#define FRAMESIZE_QUEUE_SIZE				    128
 
 
 

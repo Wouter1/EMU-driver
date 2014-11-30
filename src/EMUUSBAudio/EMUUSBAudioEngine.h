@@ -84,6 +84,7 @@ typedef struct FrameListWriteInfo {
 } FrameListWriteInfo;
 
 
+
 /*! connector from the input ring buffer to our IOAudioEngine.
  Collect and filter timestamps from wrap events in the ring
  and forward them to IOAudioEngine */
@@ -226,9 +227,11 @@ protected:
     /*! Connect  EMUUSBInputStream close event. Can this be done easier?  */
     struct OurUSBInputStream: public EMUUSBInputStream {
     public:
-        /*! init, pass parent pointer. The usbInputRing must be configured before this is called.
-         FIXME maybe pass usbInputRing as param then? */
-        void    init(EMUUSBAudioEngine * engine);
+        /*! init
+         @param engine ptr to the audio engine
+         @param ring  initialized UsbInputRing. Not started.
+         @param frameQueue fully initialized FrameSizeQueue. */
+        void    init(EMUUSBAudioEngine * engine, UsbInputRing * ring, FrameSizeQueue * frameQueue);
         void    notifyClosed();
         
     private:
@@ -242,6 +245,8 @@ protected:
 	OurUSBInputStream						mInput;
     /*! the USB input ring. We need to pass it downwards and handle time signals */
     UsbInputRing                        usbInputRing;
+    /*! Ring to store recent frame sizes */
+    FrameSizeQueue                      frameSizeQueue;
 
     /*! StreamInfo relevant for the writing-to-USB (playback) */
 	StreamInfo                          mOutput;

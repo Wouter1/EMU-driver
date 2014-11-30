@@ -15,21 +15,28 @@
 #include "RingBufferDefault.h"
 #include "kern/locks.h"
 
-#define FRAMESIZE_QUEUE_SIZE				    128
 
+/*! Ring to store recent frame sizes, to sync write to read speed */
 typedef RingBufferDefault<UInt32> FrameSizeQueue;
 
 
 
 /*! The USB Input stream handler. It pushes the data from the USB stream into the 
- input ring provided with the init call */
+ input ring provided with the init call.
+ 
+ Life cycle:
+ 
+ ( init ( start stop )* free )*
+ */
 struct EMUUSBInputStream: public StreamInfo {
 public:
     /*! initializes the ring buffer. Must be called before use.
      @param inputRing the initialized USBInputRing.
+     @param frameQueue a initialized FrameSizeQueue.
      */
-    virtual void                init(RingBufferDefault<UInt8> *inputRing);
+    virtual IOReturn                init(RingBufferDefault<UInt8> *inputRing, FrameSizeQueue *frameQueue);
     
+
     /*! starts the input stream. Must be called to start
      @return kIOReturnSuccess if all ok. */
     virtual IOReturn                start();
@@ -37,54 +44,23 @@ public:
     /*! stops the input stream. Must be called to stop.
      Stop takes some time (have to wait for callbacks from all streams). 
      A callback notifyClosed is done when close is complete.*/
-    virtual void                stop();
+    virtual IOReturn                stop();
 
+    /*! frees the stream. Only to be called after stop() FINISHED (which is notified
+     through the notifyClosed() call */
+    virtual IOReturn free();
     /*!
      Called when the Ring Buffer has closed all input streams.
      */
-    virtual void                notifyClosed() =0  ;
+    virtual void                    notifyClosed() =0  ;
     
-    /*! This can be called externally to check if USB input is already available.
-     The USB completion callback is a bit slow, this is to speed up the process and
-     lower the latency */
-    void                        update();
-    
-    /*! get the framesize queue */
-    FrameSizeQueue *            getFrameSizeQueue();
-    
-    /*!
-     @abstract initializes the read of a frameList (typ. 64 frames) from USB.
-     @discussion queues all numUSBFramesPerList frames in given frameListNum for reading.
-     The callback when the read is complete is readCompleted.
-     Also it is requested to update the info in the framelists every 1 ms to 
-     make it possible to achieve low latency (by reading the framelist before completion).
-     @param frameListNum the frame list to use, in range [0-numUSBFrameLists> which is usually 0-8.
-     orig docu said "frameListNum must be in the valid range 0 - 126".
-     This makes no sense to me. Maybe this is a hardware requirement.
-     */
-    IOReturn                    readFrameList (UInt32 frameListNum);
+    /*! This can be called externally to grab all available data from the streams.
+     This is to ensure low latency, because the normal USB completion callback
+     comes only after all has read. */
+    IOReturn                        update();
     
 
-    /*! static version of readCompleted, with first argument being 'this' */
-    static void         readCompleted (void * object, void * frameListIndex, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
-    
-    /*!readHandler is the callback from USB completion. Updates mInput.usbFrameToQueueAt.
-     
-     @discussion Wouter: This implements IOUSBLowLatencyIsocCompletionAction and the callback function for USB frameread.
-     Warning: This routine locks the IO. Probably because the code is not thread safe.
-     Note: The original code also calls it explicitly from convertInputSamples but that hangs the system (I think because of the lock).
-     
-     
-     @param object the parent audiohandler
-     @param frameListIndex the frameList number that completed and triggered this call.
-     @param result  this handler will do special actions if set values different from kIOReturnSuccess. This probably indicates the USB read status.
-     @param pFrames the frames that need checking. Expects that all RECORD_NUM_USB_FRAMES_PER_LIST frames are available completely.
-     
-     */
-    void            readCompleted (void * frameListIndex, IOReturn result,
-                                   IOUSBLowLatencyIsocFrame * pFrames);
-
-    // should become private. Right now it's still shared with EMUUSBAudioEngine.
+    // BELOW should become private. Right now it's still shared with EMUUSBAudioEngine.
     
     
     /*! Used in GatherInputSamples to keep track of which framelist we were converting. */
@@ -117,6 +93,8 @@ public:
     /*! number of initial frames that are dropped. See kNumberOfStartingFramesToDrop */
 	UInt32					mDropStartingFrames;
     
+    /*! if !=0 then we are busy stopping. Counts up till we reach RECORD_NUM_FRAMELISTS.
+     If stop complete, notifyStop is called and stopped=true */
     volatile UInt32			shouldStop;
     
     
@@ -125,9 +103,6 @@ public:
     
     
 private:
-    /*! internal function to complete the stopping procedure. Does not call notifyStopped as this
-     is also used internally to handle error conditions before even started. */
-    void stopped();
     
     /*!
      Copy input frames from given USB port framelist into the mInput and inform HAL about
@@ -158,9 +133,37 @@ private:
      this function is called on the same frame again but then with doTimeStamp=true (which happens at read completion)
      */
 	IOReturn                    GatherInputSamples(Boolean doTimeStamp);
+    
+    /*!
+     @abstract initializes the read of a frameList (typ. 64 frames) from USB.
+     @discussion queues all numUSBFramesPerList frames in given frameListNum for reading.
+     The callback when the read is complete is readCompleted.
+     Also it is requested to update the info in the framelists every 1 ms to
+     make it possible to achieve low latency (by reading the framelist before completion).
+     @param frameListNum the frame list to use, in range [0-numUSBFrameLists> which is usually 0-8.
+     orig docu said "frameListNum must be in the valid range 0 - 126".
+     This makes no sense to me. Maybe this is a hardware requirement.
+     */
+    IOReturn                    readFrameList (UInt32 frameListNum);
+    
+    
+    /*! static version of readCompleted, with first argument being 'this' */
+    static void         readCompleted (void * object, void * frameListIndex, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
+    
+    /*!readHandler is the callback from USB completion.
+     
+     @discussion Wouter: This implements IOUSBLowLatencyIsocCompletionAction and the callback function for USB frameread.
+     
+     @param frameListIndex the frameList number that completed and triggered this call.
+     @param result  this handler will do special actions if set values different from kIOReturnSuccess.
+     @param pFrames the frames that need checking. Expects that all RECORD_NUM_USB_FRAMES_PER_LIST frames are available completely.
+     */
+    void            readCompleted (void * frameListIndex, IOReturn result,
+                                   IOUSBLowLatencyIsocFrame * pFrames);
+
 
     
-    FrameSizeQueue              frameSizeQueue;
+    FrameSizeQueue *            frameSizeQueue;
     
     /*! the input ring. Received from the Engine */
     RingBufferDefault<UInt8> *  usbRing;
@@ -168,7 +171,11 @@ private:
     /* lock to ensure update and readHandler are never run together */
     IOLock*                     mLock;
     
-
+    /*! set to true after succesful init() */
+    bool initialized;
+    
+    /*! set to true after succesful start() */
+    bool started;
 };
 
 

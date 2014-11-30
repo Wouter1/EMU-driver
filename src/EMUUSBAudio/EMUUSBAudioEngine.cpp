@@ -67,7 +67,8 @@ void EMUUSBAudioEngine::free () {
 		IOLockFree(mFormatLock);
 		mFormatLock = NULL;
 	}
-	mInput.getFrameSizeQueue()->free();
+    
+    frameSizeQueue.free();
 	if (NULL != mInput.frameQueuedForList) {
 		delete [] mInput.frameQueuedForList;
 		mInput.frameQueuedForList = NULL;
@@ -1808,7 +1809,7 @@ IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 arrayIndex) {
 				fractionalSamplesRemaining -= 1000;
 			}
 			// get the size of the corresponding input packet (this will hopefully keep our sample counts in sync)
-			if (mInput.getFrameSizeQueue()->pop(&thisFrameSize) != kIOReturnSuccess) {
+			if (frameSizeQueue.pop(&thisFrameSize) != kIOReturnSuccess) {
 				thisFrameSize = stockSamplesInFrame;
 			}
 			
@@ -2101,8 +2102,9 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 
     resultCode =usbInputRing.init(mInput.bufferSize, this);
     FailIf( kIOReturnSuccess != resultCode, Exit);
+    FailIf( kIOReturnSuccess != frameSizeQueue.init(FRAMESIZE_QUEUE_SIZE), Exit);
            
-    mInput.init(this);
+    mInput.init(this, &usbInputRing, &frameSizeQueue);
     resultCode = mInput.start();
     FailIf (kIOReturnSuccess != resultCode, Exit)
 
@@ -2782,8 +2784,9 @@ void UsbInputRing::takeTimeStampNs(UInt64 timeStampNs, Boolean increment) {
 // OurUSBInputStream code
 
 
-void EMUUSBAudioEngine::OurUSBInputStream::init(EMUUSBAudioEngine * engine) {
-    EMUUSBInputStream::init(&engine->usbInputRing);
+void EMUUSBAudioEngine::OurUSBInputStream::init(EMUUSBAudioEngine * engine,
+                                                UsbInputRing * ring, FrameSizeQueue * frameQueue) {
+    EMUUSBInputStream::init(ring, frameQueue);
     theEngine = engine;
 }
 
