@@ -960,6 +960,12 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
     // "sophisticated techniques and extremely accurate timing mechanisms".
     // I don't like this black box approach but we have to live with it.
     
+    // get the bytes out of the ring. Don't use them yet.
+    IOReturn res=usbInputRing.pop(buf, numSampleFrames * mInput.multFactor);
+    if (res!=kIOReturnSuccess) {
+        debugIOLogR("EMUUSBAudioEngine::convertInputSamples err reading ring: %x",res);
+    }
+    
     debugIOLogRD("convertFromEMUUSBAudioInputStreamNoWrap destBuf = %p, firstSampleFrame = %d, numSampleFrames = %d", destBuf, firstSampleFrame, numSampleFrames);
     result = convertFromEMUUSBAudioInputStreamNoWrap (mInput.bufferPtr, destBuf, firstSampleFrame, numSampleFrames, streamFormat);
 	if (mPlugin)
