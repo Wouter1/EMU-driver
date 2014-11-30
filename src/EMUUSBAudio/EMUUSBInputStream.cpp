@@ -159,10 +159,13 @@ IOReturn EMUUSBInputStream::GatherInputSamples() {
                 if (overflow)	// copy the remaining bytes into the front of the dest buffer
                     memcpy(dest, source + numBytesToEnd, overflow);
                 
-                usbRing->notifyWrap(pFrames[frameIndex].frTimeStamp) ; // HACK!!!! ring should call this itself.
+                //usbRing->notifyWrap(pFrames[frameIndex].frTimeStamp) ; // HACK!!!! ring should call this itself.
 
                 numBytesToCopy = overflow;
             }
+            
+            // HACK. We should not call from inside locked area.
+            usbRing->push(source, byteCount,pFrames[frameIndex].frTimeStamp );
             
             
         }

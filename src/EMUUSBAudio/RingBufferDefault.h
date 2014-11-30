@@ -100,16 +100,18 @@ public:
             return kIOReturnNotReady;
         }
 
-        if (num > vacant()) { return kIOReturnOverrun ; }
-        
+        if (num > vacant()) {
+            doLog("warning. Ignoring overrun");
+            //return kIOReturnOverrun ; }
+        }
         for ( UInt32 n = 0; n<num; n++) {
             buffer[writehead++] = objects[n];
             if (writehead == size) { writehead = 0; notifyWrap(time); }
         }
         return kIOReturnSuccess;
     }
-    
-    
+
+
     IOReturn pop(TYPE *objects, UInt32 num) override{
         if (!buffer) {
             return kIOReturnNotReady;
