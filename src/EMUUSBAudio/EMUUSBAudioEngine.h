@@ -436,8 +436,8 @@ protected:
     /*! This is set true when we got signalled to terminate */
     Boolean								terminatingDriver;
     
-    UInt8 buf[73728]; // for testing ring conversion
-
+    /*! buffer to temporarily store ring buffer data  for conversion to float */
+    UInt8 *             buf;
 
 };
 

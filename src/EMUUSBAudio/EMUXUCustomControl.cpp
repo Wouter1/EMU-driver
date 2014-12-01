@@ -99,7 +99,7 @@ void EMUXUCustomControl::setValueChangeHandler(IntValueChangeHandler intValueCha
 IOReturn EMUXUCustomControl::addUserClient(IOAudioControlUserClient *newUserClient) {
 	IOReturn result =  super::addUserClient(newUserClient);
 	debugIOLog("EMUXUCustomControl::addUserClient %p, %d", newUserClient, result);
-    OSReportWithBacktrace("addUserClient");
+    //OSReportWithBacktrace("addUserClient");
     
 	return result;
 }

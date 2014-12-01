@@ -77,6 +77,10 @@ void EMUUSBAudioEngine::free () {
 		delete [] mOutput.frameQueuedForList;
 		mOutput.frameQueuedForList = NULL;
 	}
+    if (NULL != buf) {
+        IOFree(buf, mInput.bufferSize);
+        buf=NULL;
+    }
     
 	if (neededSampleRateDescriptor) {
 		neededSampleRateDescriptor->complete();
@@ -2510,6 +2514,9 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
         
 		mInput.bufferSize = numSamplesInBuffer * mInput.multFactor;
 		mOutput.bufferSize = numSamplesInBuffer * mOutput.multFactor;
+        
+        buf = (UInt8 *) IOMalloc(mInput.bufferSize);
+        FailIf(NULL == buf, Exit);
         
 		// setup the input buffer
 		if (NULL != mInput.bufferMemoryDescriptor) {
