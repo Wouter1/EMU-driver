@@ -963,7 +963,7 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
     // get the bytes out of the ring. Don't use them yet.
     IOReturn res=usbInputRing.pop(buf, numSampleFrames * mInput.multFactor);
     if (res!=kIOReturnSuccess) {
-        debugIOLogR("EMUUSBAudioEngine::convertInputSamples err reading ring: %x",res);
+        debugIOLog("EMUUSBAudioEngine::convertInputSamples err reading ring: %x",res);
     }
     
     debugIOLogRD("convertFromEMUUSBAudioInputStreamNoWrap destBuf = %p, firstSampleFrame = %d, numSampleFrames = %d", destBuf, firstSampleFrame, numSampleFrames);
@@ -2105,15 +2105,15 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 		//resultCode = mInput.associatedPipe->Read(neededSampleRateDescriptor, nextSynchReadFrame, 1,&(mSampleRateFrame), &sampleRateCompletion);
 		resultCode = mInput.associatedPipe->Read(neededSampleRateDescriptor, kAppleUSBSSIsocContinuousFrame, 1,&(mSampleRateFrame), &sampleRateCompletion);
 	}
-
+    
     resultCode =usbInputRing.init(mInput.bufferSize, this);
     FailIf( kIOReturnSuccess != resultCode, Exit);
     FailIf( kIOReturnSuccess != frameSizeQueue.init(FRAMESIZE_QUEUE_SIZE), Exit);
-           
+    
     mInput.init(this, &usbInputRing, &frameSizeQueue);
     resultCode = mInput.start();
     FailIf (kIOReturnSuccess != resultCode, Exit)
-
+    
 	
 	// and now the output
 	
@@ -2168,7 +2168,7 @@ IOReturn EMUUSBAudioEngine::stopUSBStream () {
 		RELEASEOBJ(mInput.pipe);
 	}
 	RELEASEOBJ(mInput.associatedPipe);
-
+    
     
 	if (FALSE == terminatingDriver) {
 		// Don't call USB if we are being terminated because we could deadlock their workloop.
@@ -2545,7 +2545,7 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
         
 		mInput.bufferSize = numSamplesInBuffer * mInput.multFactor;
 		mOutput.bufferSize = numSamplesInBuffer * mOutput.multFactor;
-
+        
 		// setup the input buffer
 		if (NULL != mInput.bufferMemoryDescriptor) {
 			mInput.audioStream->setSampleBuffer (NULL, 0);
@@ -2738,7 +2738,7 @@ IOReturn UsbInputRing::init(UInt32 newSize, IOAudioEngine *engine) {
     previousfrTimestampNs = 0;
     goodWraps = 0;
     debugIOLogR("-UsbInputRing::init")
-
+    
 }
 
 void UsbInputRing::free() {
