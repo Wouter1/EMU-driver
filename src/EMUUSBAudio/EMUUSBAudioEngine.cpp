@@ -921,67 +921,39 @@ IOReturn EMUUSBAudioEngine::softwareMuteChangedHandler(OSObject * target, IOAudi
 
 IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void *destBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat,
                                                  IOAudioStream *audioStream) {
-    
     // Since we don't tell IOAudioEngine about our sample buffer, we get null for sampleBufNull.
     
-	UInt32		lastSampleByte = (firstSampleFrame + numSampleFrames) * mInput.multFactor;
-    // max number of bytes to get
 	IOReturn	result;
     
-    debugIOLogRD("+convertInputSamples firstSampleFrame=%u, numSampleFrames=%d srcbuf=%p dest=%p byteorder=%d bitWidth=%d numchannels=%d",firstSampleFrame,numSampleFrames,sampleBufNull,destBuf,streamFormat->fByteOrder,streamFormat->fBitWidth,streamFormat->fNumChannels);
-    
+    debugIOLogRD("+convertInputSamples firstSampleFrame=%u, numSampleFrames=%d byteorder=%d bitWidth=%d numchannels=%d",firstSampleFrame,numSampleFrames,streamFormat->fByteOrder,streamFormat->fBitWidth,streamFormat->fNumChannels);
     
     if (mInput.startingEngine) {
         return kIOReturnUnderrun;
     }
     
-    //    // We don't care actually anymore, we run our own buffers.
-    //	if (firstSampleFrame != mInput.nextExpectedFrame) {
-    //		debugIOLogC("****** HICCUP firstSampleFrame=%d, nextExpectedFrame=%d",firstSampleFrame,nextExpectedFrame);
-    //    }
-    //
-    //
-    //    UInt32 firstSampleByte = firstSampleFrame * mInput.multFactor;
-    //    debugIOLogTD("C %d %d",firstSampleByte, mInput.bufferOffset);
-    
     if (!mInput.startingEngine && !mInput.shouldStop) {
-        // we try to gather all the bytes now: it may take long time before completion callback comes in the ring buffer.
         mInput.update();
     }
-    
-    //    // current write head inside that range? Then this is going to cause serious distortion!
-    //    if (firstSampleByte<=mInput.bufferOffset && mInput.bufferOffset<lastSampleByte) {
-    //        doLog("****** STUTTER IOAudioEngine convertInputSamples is reading over the write head");
-    //        // do not return, keep going and hope we will get in sync.... If we return, everything will start throwing above us.
-    //    }
     
     // at this point, mInput should contain sufficient info to handle the request.
     // It's the caller that "ensures" this using
     // "sophisticated techniques and extremely accurate timing mechanisms".
     // I don't like this black box approach but we have to live with it.
     
-    // get the bytes out of the ring. Don't use them yet.
     IOReturn res=usbInputRing.pop(buf, numSampleFrames * mInput.multFactor);
     if (res!=kIOReturnSuccess) {
         debugIOLog("EMUUSBAudioEngine::convertInputSamples err reading ring: %x",res);
+        // we never got here. Not sure what to do. For now, go on and feed the noise this will give.
     }
     
-    debugIOLogRD("convertFromEMUUSBAudioInputStreamNoWrap destBuf = %p, firstSampleFrame = %d, numSampleFrames = %d", destBuf, firstSampleFrame, numSampleFrames);
-    result = convertFromEMUUSBAudioInputStreamNoWrap (mInput.bufferPtr, destBuf, firstSampleFrame, numSampleFrames, streamFormat);
-	if (mPlugin)
+    result = convertFromEMUUSBAudioInputStreamNoWrap (buf, destBuf, 0, numSampleFrames, streamFormat);
+
+	if (mPlugin) {
 		mPlugin->pluginProcessInput ((float *)destBuf + (firstSampleFrame * streamFormat->fNumChannels), numSampleFrames, streamFormat->fNumChannels);
+    }
     
-    
-    // set the expected starting point for the next read. IOAudioDevice may jump around
-    // depending on timestamps we feed it....
-    // FIXME
-	mInput.nextExpectedFrame = firstSampleFrame + numSampleFrames;
-	if (mInput.nextExpectedFrame*mInput.multFactor >= mInput.bufferSize) {
-		mInput.nextExpectedFrame -= mInput.bufferSize / mInput.multFactor;
-	}
-	
     // software volume
-	if(mInputVolume) // should check for sample format if needed
+	if(mInputVolume)
 	{
 		UInt32 usedNumberOfSamples = numSampleFrames * streamFormat->fNumChannels;
 		
@@ -989,22 +961,15 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
 		{
 			mDidInputVolumeChange = false;
             
-			SmoothVolume(((Float32*)destBuf),
-                         mInputVolume->GetTargetVolume(),
-                         mInputVolume->GetLastVolume(),
-                         0,
-                         numSampleFrames,
-                         usedNumberOfSamples,
-                         streamFormat->fNumChannels);
+			SmoothVolume(((Float32*)destBuf), mInputVolume->GetTargetVolume(),
+                         mInputVolume->GetLastVolume(), 0, numSampleFrames,
+                         usedNumberOfSamples, streamFormat->fNumChannels);
             
 			mInputVolume->SetLastVolume(mInputVolume->GetTargetVolume());
 		}
 		else
 		{
-			Volume(((Float32*)destBuf),
-                   mInputVolume->GetTargetVolume(),
-                   0,
-                   usedNumberOfSamples);
+			Volume(((Float32*)destBuf), mInputVolume->GetTargetVolume(), 0, usedNumberOfSamples);
 		}
 	}
     debugIOLogRD("-convertInputSamples");

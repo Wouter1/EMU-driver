@@ -47,6 +47,8 @@ public:
         size=newSize;
 		readhead=0;
         writehead=0;
+    
+        // allocate buffer as last step as this is flag that ring is ready for use.
         buffer=(TYPE *)IOMalloc(size * sizeof(TYPE));
         if (buffer==0) {
             size=0;
