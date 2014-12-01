@@ -85,17 +85,9 @@ IOReturn EMUUSBInputStream::update() {
 }
 
 IOReturn EMUUSBInputStream::GatherInputSamples() {
-    
-	UInt32			numBytesToCopy = 0; // number of bytes to move the dest ptr by each time
-	UInt8*			buffStart = (UInt8*) bufferPtr;
-    UInt32         totalreceived=0;
-	UInt8*			dest = buffStart + bufferOffset;
-    UInt32 readHeadPos = nextExpectedFrame * multFactor;     // for OVERRUN checks
-    
     debugIOLogRD("+GatherInputSamples %d", bufferOffset / multFactor);
-    // check if we moved to the next frame. This is done when primary USB interrupt occurs.
-    
-    
+
+    // check if we moved to the next frame. This is done when callback happened.
     if (previousFrameList != currentFrameList) {
         debugIOLogRD("GatherInputSamples going from framelist %d to %d. lastindex=%d",previousFrameList , currentFrameList,frameIndex);
         if (frameIndex != RECORD_NUM_USB_FRAMES_PER_LIST) {
@@ -115,69 +107,21 @@ IOReturn EMUUSBInputStream::GatherInputSamples() {
     while(frameIndex < RECORD_NUM_USB_FRAMES_PER_LIST
           && -1 != pFrames[frameIndex].frStatus // no transport at all
           && kUSBLowLatencyIsochTransferKey != pFrames[frameIndex].frStatus // partially transported
-          //&& (doTimeStamp || frameIndex < 33) // for testing partial processing
           )
     {
-        UInt8*			source = (UInt8*) readBuffer + (currentFrameList * readUSBFrameListSize)
-        + maxFrameSize * frameIndex;
+        UInt8*			source = (UInt8*) readBuffer +
+            (currentFrameList * readUSBFrameListSize) + maxFrameSize * frameIndex;
         if (mDropStartingFrames <= 0)
         {
-            UInt32	byteCount = pFrames[frameIndex].frActCount;
-            if (byteCount != lastInputSize) {
-                debugIOLogR("Happy Leap Sample!  new size = %d, current size = %d",byteCount,lastInputSize);
-                lastInputSize = byteCount;
-                lastInputFrames = byteCount / multFactor;
-            }
-            totalreceived += byteCount;
-            
-            if (bufferOffset <  readHeadPos && bufferOffset + byteCount > readHeadPos) {
-                // this is not a water tight test but will catch most cases as
-                // the write head step sizes are small. Only when read head is at 0 we may miss.
-                doLog("****** OVERRUN: write head is overtaking read head!");
-            }
-            
-            runningInputCount += lastInputFrames;
-            // save the # of frames to the framesize queue so that we
-            // can generate an appropriately sized output packet
-            // HACK disabled for now, we don't have the DA running yet so this only
-            // causes queue overflows right now.
-            //            if (frameSizeQueue.push(&lastInputFrames) != kIOReturnSuccess) {
-            //                doLog("framesizequeue overflow");
-            //            }
-            
-            
-            SInt32	numBytesToEnd = bufferSize - bufferOffset; // assumes that bufferOffset <= bufferSize
-            if (byteCount < numBytesToEnd) { // no wrap
-                memcpy(dest, source, byteCount);
-                bufferOffset += byteCount;
-                numBytesToCopy = byteCount;// number of bytes the dest ptr will be moved by
-            } else { // wrapping around - end up at bufferStart or bufferStart + an offset
-                UInt32	overflow = byteCount - numBytesToEnd;
-                memcpy(dest, source, numBytesToEnd); // copy data into the remaining portion of the dest buffer
-                dest = (UInt8*) buffStart;	// wrap around to the start
-                bufferOffset = overflow; // remember the location the dest ptr will be set to
-                if (overflow)	// copy the remaining bytes into the front of the dest buffer
-                    memcpy(dest, source + numBytesToEnd, overflow);
-                
-                //usbRing->notifyWrap(pFrames[frameIndex].frTimeStamp) ; // HACK!!!! ring should call this itself.
-
-                numBytesToCopy = overflow;
-            }
-            
-            // HACK. We should not call from inside locked area.
-            usbRing->push(source, byteCount,pFrames[frameIndex].frTimeStamp );
-            
-            
+            // FIXME. We should not call from inside locked area.
+            usbRing->push(source, pFrames[frameIndex].frActCount ,pFrames[frameIndex].frTimeStamp );
         }
-        else if(pFrames[frameIndex].frActCount && mDropStartingFrames > 0) // first frames might have zero length
+        else if(pFrames[frameIndex].frActCount && mDropStartingFrames > 0)
         {
-            mDropStartingFrames--;
+            mDropStartingFrames--; // only skip frames of nonzero length.
         }
         
-        //		debugIOLogC("GatherInputSamples frameIndex is %d, numBytesToCopy %d", frameIndex, numBytesToCopy);
         frameIndex++;
-        //source += maxFrameSize; // each frame's frReqCount is set to maxFrameSize
-        dest += numBytesToCopy;
     }
     
     //Don't restart reading here, that can be done only from readCompleted callback.
@@ -221,7 +165,7 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
          We must keep these jumps small, to avoid timestamp errors and buffer overruns.
          */
 		result = pipe->Read(bufferDescriptors[frameListNum], kAppleUSBSSIsocContinuousFrame,
-                            numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
+                        numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
         if (result!=kIOReturnSuccess) {
             doLog("USB pipe READ error %x",result);
         }
