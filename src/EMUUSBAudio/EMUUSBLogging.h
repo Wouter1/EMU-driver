@@ -74,7 +74,7 @@ do { printf ( message ); printf ("\n" ); } while (0)
 #define debugIOLogTT(message...);//  debugIOLog(message);
 
 // debug USB read messages
-#define debugIOLogR(message...) debugIOLog(message);
+#define debugIOLogR(message...);// debugIOLog(message);
 
 // debug USB read messages details
 #define debugIOLogRD(message...);// debugIOLog(message);

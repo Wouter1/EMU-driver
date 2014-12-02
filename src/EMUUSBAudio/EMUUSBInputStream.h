@@ -70,15 +70,12 @@ public:
     UInt32                  frameIndex;
     
     
-    UInt32					lastInputSize;
 	UInt32					lastInputFrames;
-    /*! counter used to steer the DAStream (playback) */
+    
+    /*! counter used to steer the DAStream (playback). FIXME not here? */
 	UInt32					runningInputCount;
     
     
-    /*! The value we expect for firstSampleFrame in next call to convertInputSamples.
-     The reading of our input buffer should be continuous, not jump around. */
-	UInt32					nextExpectedFrame;
     
     /*! = maxFrameSize * numUSBFramesPerList; total byte size for buffering frameLists for USB reading. eg 582*64 = 37248.
      */

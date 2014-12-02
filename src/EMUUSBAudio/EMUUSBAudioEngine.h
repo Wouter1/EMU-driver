@@ -242,7 +242,7 @@ protected:
     
     
     /*! StreamInfo relevant for the reading-from-USB (recording). */
-	OurUSBInputStream						mInput;
+	OurUSBInputStream						usbInputStream;
     /*! the USB input ring. We need to pass it downwards and handle time signals */
     UsbInputRing                        usbInputRing;
     /*! Ring to store recent frame sizes */
