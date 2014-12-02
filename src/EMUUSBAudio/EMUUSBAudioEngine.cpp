@@ -2141,7 +2141,7 @@ IOReturn EMUUSBAudioEngine::stopUSBStream () {
     
 	if (FALSE == terminatingDriver) {
 		// Don't call USB if we are being terminated because we could deadlock their workloop.
-		if (NULL != mInput.streamInterface) // if we don't have an interface, message() got called and we are being terminated
+	      	if (NULL != mInput.streamInterface) // if we don't have an interface, message() got called and we are being terminated
 			mInput.streamInterface->SetAlternateInterface (this, kRootAlternateSetting);
 		if (NULL != mOutput.streamInterface) // if we don't have an interface, message() got called and we are being terminated
 			mOutput.streamInterface->SetAlternateInterface (this, kRootAlternateSetting);
@@ -2705,12 +2705,12 @@ IOReturn UsbInputRing::init(UInt32 newSize, IOAudioEngine *engine) {
     debugIOLogR("+UsbInputRing::init")
     theEngine = engine;
     isFirstWrap = true;
-    return RingBufferDefault<UInt8>::init(newSize);
     
     previousfrTimestampNs = 0;
     goodWraps = 0;
     debugIOLogR("-UsbInputRing::init")
     
+    return RingBufferDefault<UInt8>::init(newSize);
 }
 
 void UsbInputRing::free() {
@@ -2727,6 +2727,7 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
         // regular operation after initial wraps.
         takeTimeStampNs(lpfilter.filter(wrapTimeNs,FALSE),TRUE);
     } else {
+        debugIOLogR("UsbInputRing::notifyWrap %d",goodWraps);
         // setting up the timer. Find good wraps.
         if (goodWraps == 0) {
             goodWraps++;

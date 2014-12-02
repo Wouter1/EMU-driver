@@ -14,6 +14,7 @@ UInt64 LowPassFilter::filter(UInt64 inputx, Boolean initialize) {
     SInt64 unext,du,F;
     
     if (initialize) {
+        debugIOLog("LowPassFilter::filter init");
         x = inputx;
         dx = EXPECTED_WRAP_TIME;
         u=0;
