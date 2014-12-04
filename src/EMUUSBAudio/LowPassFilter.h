@@ -14,9 +14,6 @@
 #define M 10000 // mass for the filter
 #define DA 200  // 2 Sqrt[M K] for critical damping.
 
-//expected wrap time in ns.
-// HACK we need to do this more flexible. This depends on sample rate.
-#define EXPECTED_WRAP_TIME 128000000
 
 // HACK where is math.h ??
 #define abs(x) ( (x)<0? -(x): x)
@@ -34,11 +31,17 @@ public:
     /*!  This initializes internal vars x, dx, u.
      You can use the wrapTime as initial 'filtered' value as well.
      @param wrapTime the initial wrap time to use.
+     @param expected_dx the expected period of the input. Since we are mostly filtering the
+     wrap times here: here is an example. 
+     If we have set 96kHz, and our samplebuf at 96kHz is 12288 stereo samples long,
+     we expect a 'period' dx between two wraptimes of 12288/96000 between two wraps,
+     and since dx is in ns we provide here 10^9 *12288/96000 = 128000000
      */
-    void init(UInt64 wrapTime);
+    void init(UInt64 wrapTime, UInt64 expected_dx);
 
     /*! filter a given wrap time using a outlier reject and a mass-spring-damper filter
      @param wrapTime the time (ns) of the next wrap.
+     We will ignore wrapTime if it is more than about 0.1% away from expected_dx as provided init()
      @return the filtered value for this wrap time. This will be hardly influenced by
      the actual wrap time and be mostly the expected wrap time; but the filter will be
      adjusted over time to keep real and estimated wrap times in line.
@@ -52,6 +55,8 @@ private:
     UInt64 dx;
     /*! the deviation/drift for the filter (ns)*/
     UInt64 u;
+    /*! expected wrap time. see init() */
+    UInt64 expected_wrap_time;
     
 };
 

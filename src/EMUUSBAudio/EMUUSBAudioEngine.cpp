@@ -1980,6 +1980,8 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	UInt32	newOutputMultFactor = (outputFormat->fBitWidth / 8) * outputFormat->fNumChannels;
 	
 	UInt32	altFrameSampleSize = averageFrameSamples + 1;
+    
+    
 	mOutput.currentFrameList = 0;
     usbInputStream.previousFrameList = 3; //  different from currentFrameList.
     
@@ -2075,7 +2077,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 		resultCode = usbInputStream.associatedPipe->Read(neededSampleRateDescriptor, kAppleUSBSSIsocContinuousFrame, 1,&(mSampleRateFrame), &sampleRateCompletion);
 	}
     
-    resultCode =usbInputRing.init(usbInputStream.bufferSize, this);
+    resultCode =usbInputRing.init(usbInputStream.bufferSize, this, sampleRate.whole * usbInputStream.multFactor);
     FailIf( kIOReturnSuccess != resultCode, Exit);
     FailIf( kIOReturnSuccess != frameSizeQueue.init(FRAMESIZE_QUEUE_SIZE), Exit);
     
@@ -2342,7 +2344,7 @@ void EMUUSBAudioEngine::writeHandler (void * object, void * parameter, IOReturn 
 			int delta = self->usbInputStream.runningInputCount - self->runningOutputCount;
 			int drift = self->lastDelta - delta;
 			self->lastDelta = delta;
-			debugIOLogC("running counts: input %u, output %u, delta %d, drift %d",(unsigned int)self->runningInputCount,(unsigned int)self->runningOutputCount,delta, drift);
+			debugIOLogC("running counts: output %u, delta %d, drift %d",(unsigned int)self->runningOutputCount,delta, drift);
             //  FIXME drift should be accounted for??? Is this the source of our clicks??
 #if 0
 			if (drift < 100) { // should never be that big
@@ -2539,7 +2541,7 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 		}
 		// read buffer section
 		// following is the actual buffer that stuff gets read into
-		debugIOLogC("initBuffers readUSBFrameListSize %d numUSBFrameLists %d", readUSBFrameListSize, usbInputStream.numUSBFrameLists);
+		debugIOLogC("initBuffers numUSBFrameLists %d", usbInputStream.numUSBFrameLists);
 #ifdef CONTIGUOUS
 		usbInputStream.usbBufferDescriptor = IOBufferMemoryDescriptor::withOptions(kIOMemoryPhysicallyContiguous| kIODirectionInOut, usbInputStream.numUSBFrameLists * usbInputStream.readUSBFrameListSize, page_size);
 #else
@@ -2701,14 +2703,17 @@ void EMUUSBAudioEngine::setupChannelNames() {
 /*********************************************/
 // UsbInputRing code
 
-IOReturn UsbInputRing::init(UInt32 newSize, IOAudioEngine *engine) {
+
+IOReturn UsbInputRing::init(UInt32 newSize, IOAudioEngine *engine, UInt32 expected_byte_rate) {
     debugIOLogR("+UsbInputRing::init")
     theEngine = engine;
     isFirstWrap = true;
     
     previousfrTimestampNs = 0;
     goodWraps = 0;
-    debugIOLogR("-UsbInputRing::init")
+    debugIOLogR("-UsbInputRing::init");
+    
+    expected_wrap_time = 1000000000ull *  newSize / expected_byte_rate;
     
     return RingBufferDefault<UInt8>::init(newSize);
 }
@@ -2733,13 +2738,13 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
             goodWraps++;
         } else {
             // check if previous wrap had correct spacing deltaT.
-            SInt64 deltaT = wrapTimeNs - previousfrTimestampNs - EXPECTED_WRAP_TIME;
+            SInt64 deltaT = wrapTimeNs - previousfrTimestampNs - expected_wrap_time;
             UInt64 errorT = abs( deltaT );
             
-            if (errorT < EXPECTED_WRAP_TIME/1000) {
+            if (errorT < expected_wrap_time/1000) {
                 goodWraps ++;
                 if (goodWraps == 5) {
-                    lpfilter.init(wrapTimeNs);
+                    lpfilter.init(wrapTimeNs,expected_wrap_time);
                     takeTimeStampNs(wrapTimeNs,FALSE);
                     doLog("USB timer started");
                 }
@@ -2751,6 +2756,8 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
         previousfrTimestampNs = wrapTimeNs;
     }
 }
+
+
 
 
 void UsbInputRing::takeTimeStampNs(UInt64 timeStampNs, Boolean increment) {

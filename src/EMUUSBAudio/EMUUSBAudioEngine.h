@@ -90,7 +90,13 @@ typedef struct FrameListWriteInfo {
  and forward them to IOAudioEngine */
 struct UsbInputRing: RingBufferDefault<UInt8>
 {
-    IOReturn    init(UInt32 newSize, IOAudioEngine *engine);
+    /*!
+     @param newSize size of the ring in bytes
+     @param engine pointer to IOAudioEngine
+     @param expected_byte_rate expecte number of bytes per second for the buffer.
+     This is used to initialize our low pass filter 
+     */
+    IOReturn    init(UInt32 newSize, IOAudioEngine *engine,  UInt32 expected_byte_rate);
     
     void        free();
     
@@ -124,6 +130,9 @@ private:
     
     /*! last received frame timestamp */
     AbsoluteTime    previousfrTimestampNs;
+    
+    /*! expected wrap time in ns. See filter.init(). */
+    UInt64 expected_wrap_time;
 };
 
 
