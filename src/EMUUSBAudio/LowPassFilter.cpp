@@ -9,17 +9,19 @@
 #include "LowPassFilter.h"
 #include "EMUUSBLogging.h"
 
-UInt64 LowPassFilter::filter(UInt64 inputx, Boolean initialize) {
+void LowPassFilter::init(UInt64 inputx) {
+    debugIOLog("LowPassFilter::filter init");
+    x = inputx;
+    dx = EXPECTED_WRAP_TIME;
+    u=0;
+
+}
+
+
+UInt64 LowPassFilter::filter(UInt64 inputx) {
     UInt64 xnext;
     SInt64 unext,du,F;
     
-    if (initialize) {
-        debugIOLog("LowPassFilter::filter init");
-        x = inputx;
-        dx = EXPECTED_WRAP_TIME;
-        u=0;
-        return inputx;
-    }
     
     xnext = x + dx ; // the next filtered output
     unext = inputx - xnext; // error u

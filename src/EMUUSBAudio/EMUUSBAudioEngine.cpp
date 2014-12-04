@@ -2725,7 +2725,7 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
     
     if (goodWraps >= 5) {
         // regular operation after initial wraps.
-        takeTimeStampNs(lpfilter.filter(wrapTimeNs,FALSE),TRUE);
+        takeTimeStampNs(lpfilter.filter(wrapTimeNs),TRUE);
     } else {
         debugIOLogR("UsbInputRing::notifyWrap %d",goodWraps);
         // setting up the timer. Find good wraps.
@@ -2739,7 +2739,8 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
             if (errorT < EXPECTED_WRAP_TIME/1000) {
                 goodWraps ++;
                 if (goodWraps == 5) {
-                    takeTimeStampNs(lpfilter.filter(wrapTimeNs,TRUE),FALSE);
+                    lpfilter.init(wrapTimeNs);
+                    takeTimeStampNs(wrapTimeNs,FALSE);
                     doLog("USB timer started");
                 }
             } else {
