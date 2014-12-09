@@ -2711,15 +2711,16 @@ void EMUUSBAudioEngine::setupChannelNames() {
 
 
 IOReturn UsbInputRing::init(UInt32 newSize, IOAudioEngine *engine, UInt32 expected_byte_rate) {
-    debugIOLogR("+UsbInputRing::init")
+    debugIOLogC("+UsbInputRing::init %ld %ld", newSize,expected_byte_rate);
     theEngine = engine;
     isFirstWrap = true;
     
     previousfrTimestampNs = 0;
     goodWraps = 0;
-    debugIOLogR("-UsbInputRing::init");
     
     expected_wrap_time = 1000000000ull *  newSize / expected_byte_rate;
+
+    debugIOLogC("-UsbInputRing::init %lld", expected_wrap_time);
     
     return RingBufferDefault<UInt8>::init(newSize);
 }
@@ -2738,7 +2739,7 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
         // regular operation after initial wraps.
         takeTimeStampNs(lpfilter.filter(wrapTimeNs),TRUE);
     } else {
-        debugIOLogR("UsbInputRing::notifyWrap %d",goodWraps);
+        debugIOLogC("UsbInputRing::notifyWrap %d",goodWraps);
         // setting up the timer. Find good wraps.
         if (goodWraps == 0) {
             goodWraps++;
@@ -2747,7 +2748,7 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
             SInt64 deltaT = wrapTimeNs - previousfrTimestampNs - expected_wrap_time;
             UInt64 errorT = abs( deltaT );
             
-            if (errorT < expected_wrap_time/1000) {
+            if (errorT < expected_wrap_time/200) { //HACK  /1000 for 96kHz; /200 for 48kHz
                 goodWraps ++;
                 if (goodWraps == 5) {
                     lpfilter.init(wrapTimeNs,expected_wrap_time);
@@ -2756,7 +2757,8 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
                 }
             } else {
                 goodWraps = 0;
-                doLog("USB hick (%lld). timer re-syncing.",errorT);
+                doLog("USB hick (expected %lld, got %lld, error=%lld). timer re-syncing.",
+                      expected_wrap_time, wrapTimeNs - previousfrTimestampNs, errorT);
             }
         }
         previousfrTimestampNs = wrapTimeNs;

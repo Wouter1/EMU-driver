@@ -10,7 +10,7 @@
 #include "EMUUSBLogging.h"
 
 void LowPassFilter::init(UInt64 inputx, UInt64 expected_t) {
-    debugIOLog("LowPassFilter::filter init");
+    debugIOLog("LowPassFilter::filter init %lld", expected_t);
     x = inputx;
     expected_wrap_time = expected_t;
     dx = expected_wrap_time;
@@ -28,7 +28,7 @@ UInt64 LowPassFilter::filter(UInt64 inputx) {
     unext = inputx - xnext; // error u
     
     du = unext - u; // change of the error, for damping
-    if (abs(du) < expected_wrap_time/2000) {
+    if (abs(du) < expected_wrap_time/500) { // HACK 2000 for 96kHz, 500 for 48kHz
         F = K * unext + DA * du; // force on spring
         dx = dx + F/M ;
     }
