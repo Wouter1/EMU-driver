@@ -33,6 +33,16 @@ or
 2. manually copy EMUUSBAudio.kext into  /System/Library/Extensions/ 
 3. reboot
 
+Ext not loading
+======
+I never had an issue with this, but on the web I see that 
+the kernel may refuse to load kernel extensions if you are not a developer.
+A way to get around this is to use this command from the command line
+```
+sudo nvram boot-args="kext-dev-mode=1"
+```
+
+
 Usage
 ======
 

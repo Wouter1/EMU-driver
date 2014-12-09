@@ -2674,8 +2674,9 @@ void EMUUSBAudioDevice::addCustomAudioControls(IOAudioEngine* engine) {
 				setting = USBToHostLong(setting);
 			RELEASEOBJ(mClockSelector);
 			debugIOLogC("ClockSelector created");
-			mClockSelector = EMUXUCustomControl::create(setting, kIOAudioControlChannelIDAll, kIOAudioControlChannelNameAll,
-                                                        kClockSourceController, (kClockSourceSelector << 16 | mClockSrcXU), kCtrlUsage);
+			mClockSelector = EMUXUCustomControl::create(setting, kIOAudioControlChannelIDAll,
+                    kIOAudioControlChannelNameAll, kClockSourceController,
+                    (kClockSourceSelector << 16 | mClockSrcXU), kCtrlUsage);
 			if (mClockSelector) {
 				mClockSelector->setValueChangeHandler((EMUXUCustomControl::IntValueChangeHandler) deviceXUChangeHandler, this);
 				engine->addDefaultAudioControl(mClockSelector);
@@ -2693,19 +2694,21 @@ void EMUUSBAudioDevice::addCustomAudioControls(IOAudioEngine* engine) {
 			if (kIOReturnSuccess == getExtensionUnitSetting(mDigitalIOXU, kDigSampRateSel, &setting, kDigIOSampleRateLen)) // should succeed
 				setting = USBToHostLong(setting);
 			RELEASEOBJ(mDigitalIOStatus);
-			mDigitalIOStatus = EMUXUCustomControl::create(setting, kIOAudioControlChannelIDAll, kIOAudioControlChannelNameAll,
-                                                          kDigIOSampleRateController, (kDigSampRateSel << 16 | mDigitalIOXU), kCtrlUsage);
+			mDigitalIOStatus = EMUXUCustomControl::create(setting, kIOAudioControlChannelIDAll,
+                        kIOAudioControlChannelNameAll,kDigIOSampleRateController,
+                        (kDigSampRateSel << 16 | mDigitalIOXU), kCtrlUsage);
 			if (mDigitalIOStatus) {
 				debugIOLogC("DigitalIOStatus created");
 				mDigitalIOStatus->setValueChangeHandler((EMUXUCustomControl::IntValueChangeHandler)deviceXUChangeHandler, this);
 				engine->addDefaultAudioControl(mDigitalIOStatus);
 			}
 			setting = 0;
-			if (kIOReturnSuccess == getExtensionUnitSetting(mDigitalIOXU, kDigitalSyncLock, &setting, kStdDataLen)) 
+			if (kIOReturnSuccess == getExtensionUnitSetting(mDigitalIOXU, kDigitalSyncLock, &setting, kStdDataLen))
 				setting = USBToHostLong(setting);
 			RELEASEOBJ(mDigitalIOSyncSrc);
-			mDigitalIOSyncSrc = EMUXUCustomControl::create(setting, kIOAudioControlChannelIDAll, kIOAudioControlChannelNameAll,
-                                                           kDigIOSyncSrcController, (kDigitalSyncLock << 16 | mDigitalIOXU), kCtrlUsage);
+			mDigitalIOSyncSrc = EMUXUCustomControl::create(setting, kIOAudioControlChannelIDAll,
+                      kIOAudioControlChannelNameAll,kDigIOSyncSrcController,
+                      (kDigitalSyncLock << 16 | mDigitalIOXU), kCtrlUsage);
 			if (mDigitalIOSyncSrc) {
 				debugIOLogC("made kDigIOSyncSrcController");
 				mDigitalIOSyncSrc->setValueChangeHandler((EMUXUCustomControl::IntValueChangeHandler)deviceXUChangeHandler, this);
@@ -2715,8 +2718,9 @@ void EMUUSBAudioDevice::addCustomAudioControls(IOAudioEngine* engine) {
 			if (kIOReturnSuccess == getExtensionUnitSetting(mDigitalIOXU, kDigitalSRC, &setting, kStdDataLen)) 
 				setting = USBToHostLong(setting);
 			RELEASEOBJ(mDigitalIOAsyncSrc);
-			mDigitalIOAsyncSrc = EMUXUCustomControl::create(setting, kIOAudioControlChannelIDAll, kIOAudioControlChannelNameAll,
-                                                            kDigIOAsyncSrcController, (kDigitalSRC << 16 | mDigitalIOXU), kCtrlUsage);
+			mDigitalIOAsyncSrc = EMUXUCustomControl::create(setting, kIOAudioControlChannelIDAll,
+                    kIOAudioControlChannelNameAll,kDigIOAsyncSrcController,
+                    (kDigitalSRC << 16 | mDigitalIOXU), kCtrlUsage);
 			if (mDigitalIOAsyncSrc) {
 				debugIOLogC("made kDigIOAsyncSrcController");
 				mDigitalIOAsyncSrc->setValueChangeHandler((EMUXUCustomControl::IntValueChangeHandler)deviceXUChangeHandler, this);

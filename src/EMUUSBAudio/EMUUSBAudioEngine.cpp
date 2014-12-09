@@ -939,7 +939,8 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
         usbInputStream.update();
     }
     
-    // at this point, mInput should contain sufficient info to handle the request.
+    // at this point, usbInputRing should contain sufficient info to handle the request.
+    // of course this all depends on proper timing of this call.
     // It's the caller that "ensures" this using
     // "sophisticated techniques and extremely accurate timing mechanisms".
     // I don't like this black box approach but we have to live with it.
@@ -947,7 +948,7 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
     IOReturn res=usbInputRing.pop(buf, numSampleFrames * usbInputStream.multFactor);
     if (res!=kIOReturnSuccess) {
         debugIOLog("EMUUSBAudioEngine::convertInputSamples err reading ring: %x",res);
-        // we never got here. Not sure what to do. For now, go on and feed the noise this will give.
+        // Not sure what to do. For now, go on and feed the noise this will give.
     }
     
     result = convertFromEMUUSBAudioInputStreamNoWrap (buf, destBuf, 0, numSampleFrames, streamFormat);
@@ -1613,11 +1614,13 @@ IOReturn EMUUSBAudioEngine::performFormatChange (IOAudioStream *audioStream, con
 		}
 		if (newSampleRate) {
 			debugIOLog ("Changing sampling rate to %d", newSampleRate->whole);
-			// special hack to make sure input channel count stays in sync w/ output when changing sample rate
+			// special hack to ensure input channel count stays in sync w/ output when changing sample rate
 			// at least from AMS, sample-rate changes always come from output stream (go figure)
-			if (newFormat->fNumChannels != usbInputStream.audioStream->format.fNumChannels && audioStream != usbInputStream.audioStream) {
+            // Wouter: this is NOT true for EMU0404, there "new format from INPUT" can come first.
+			if (newFormat->fNumChannels != usbInputStream.audioStream->format.fNumChannels
+                    && audioStream != usbInputStream.audioStream) {
 				needToChangeChannels = true;
-				debugIOLog ("Need to adjust input channel controls, cur = %d, new = %d", usbInputStream.audioStream->format.fNumChannels, newFormat->fNumChannels);
+				debugIOLog ("Need to adjust input number of channels, cur = %d, new = %d", usbInputStream.audioStream->format.fNumChannels, newFormat->fNumChannels);
 				usbInputStream.audioStream->setFormat(newFormat,false);
             }
 			sampleRate = *newSampleRate;
@@ -1633,8 +1636,10 @@ IOReturn EMUUSBAudioEngine::performFormatChange (IOAudioStream *audioStream, con
 		{
             UInt8	newDirection = usbAudio->GetIsocEndpointDirection (usbInputStream.interfaceNumber, newAlternateSettingID);
             if (FALSE == usbAudio->VerifySampleRateIsSupported(usbInputStream.interfaceNumber, newAlternateSettingID, sampleRate.whole)) {
+                // find an alternative if requested rate not supported.
                 newAlternateSettingID = usbAudio->FindAltInterfaceWithSettings (usbInputStream.interfaceNumber, newFormat->fNumChannels, newFormat->fBitDepth, sampleRate.whole);
                 mPollInterval = (UInt32) (1 << ((UInt32) usbAudio->GetEndpointPollInterval(usbInputStream.interfaceNumber, newAlternateSettingID, newDirection) -1));
+                // Wouter: following test is broken, it always will succeed!
                 if ((1 != mPollInterval) || (8 != mPollInterval)) {// disallow selection of endpoints with sub ms polling interval NB - assumes that sub ms device will not use a poll interval of 1 (every microframe)
                     newAlternateSettingID = 255;
                 }
@@ -1951,6 +1956,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	IOReturn							resultCode = kIOReturnError;
 	IOUSBFindEndpointRequest			audioIsochEndpoint;
 	EMUUSBAudioConfigObject *			usbAudio = usbAudioDevice->GetUSBAudioConfigObject();
+    /*! usual number of stereo(quad)samples per frame. (the average is a little higher) */
 	UInt16								averageFrameSamples = 0;
 	UInt16								additionalSampleFrameFreq = 0;
     UInt8	address;

@@ -28,6 +28,9 @@ enum {
 	kDirectMonitorLen	= 20	// data length for direct monitor settings controller
 };
 
+/*! Controls. Probably these are elements to control the driver from outside the kernel.
+ See EMUUSBAudioDevice::addCustomAudioControls. Here, change listeners are connected to all these.
+ */
 enum {
 	kXUChangeNotifier				= 'Xmod',		// notification of change
 	kClockSourceController			= 'Csct',		// clock source controller
@@ -85,7 +88,7 @@ enum eDigitalFormat {
 	aes
 };
 
-/*! The extension unit ID */
+/*! The extension unit ID. Probably these are elements in the EMU device that cna be controlled. */
 enum eExtensionUnitCode {
 	kClockRate			= 0xe301,
 	kClockSource		= 0xe302,

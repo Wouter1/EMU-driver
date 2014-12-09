@@ -138,6 +138,7 @@ protected:
 	thread_call_t			mInitHardwareThread;
 	IOUSBController *		mBus;// DT
 	bool					mUHCI;
+    /*! unit ID, copied from mDeviceStatusBuffer periodically */
 	UInt32					mQueryXU;// the XU to query
 	UInt32					mCurSampleRate;
 	OSArray *				mMonoControlsArray;		// this flag is set by EMUUSBAudioEngine::performFormatChange
@@ -165,7 +166,10 @@ protected:
     /*! counter for number of USB frames. When we hit kRefreshCount we refresh mNewReferenceUSBFrame */
 	UInt32					mAnchorResetCount;
     
-    /*! original doc: device status buffer NOT XU setting */
+    /*! original doc: device status buffer NOT XU setting.
+     This is a temporary store of the device status. EMUUSBAudioDevice::statusHandler 
+     copies the unitID contained in here to mQueryXU.
+     */
 	UInt16*					mDeviceStatusBuffer;
     
 	/*! original doc: slots for the various XUs */
@@ -313,6 +317,7 @@ public:
 	IOReturn		doVolumeControlChange (IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);
 	IOReturn		doToggleControlChange (IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);
 	IOReturn		doPassThruSelectorChange (IOAudioControl * audioControl, SInt32 oldValue, SInt32 newValue);
+    /*! just calls mClockSelector->setValue(newValue) */
 	IOReturn		doClockSourceSelectorChange (IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);
     
 	void			setMonoState (Boolean state);

@@ -280,6 +280,7 @@ protected:
 	thread_call_t						mPluginInitThread;
 	IOAudioStream *						mainStream;
 	IONotifier *						mPluginNotification;
+    /*! if not null, convertInputSamples will call the plugin before adjusting the volume. */
 	EMUUSBAudioPlugin *					mPlugin;
 	
 	OSArray *							mStreamInterfaces; // array of streams
@@ -325,6 +326,10 @@ protected:
 	void	GetDeviceInfo (void);
 	IOReturn	PrepareWriteFrameList (UInt32 usbFrameListIndex);
 	IOReturn	SetSampleRate (EMUUSBAudioConfigObject *usbAudio, UInt32 sampleRate);
+    /*! Collect all details for all altInterfaces on given ourInterfaceNumber
+     @param usbAudio a EMUUSBAudioConfigObject holding all details
+     @param ourInterfaceNumber the interface number that should be unraveled 
+     */
 	IOReturn	AddAvailableFormatsFromDevice (EMUUSBAudioConfigObject *usbAudio,
                                                UInt8 ourInterfaceNumber);
 	IOReturn	CheckForAssociatedEndpoint (EMUUSBAudioConfigObject *usbAudio,
@@ -409,7 +414,11 @@ protected:
      */
     virtual IOReturn convertInputSamples (const void *sampleBuf, void *destBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream);
 	
-    /*! This gets called when the HAL wants to select one of the different formats that we made available via mainStream->addAvailableFormat */
+    /*! This gets called when the HAL wants to select one of the different formats that we made available via mainStream->addAvailableFormat 
+     @param audioStream
+     @param newformat the details for the requested format.
+     @param newSampleRate the requested sample rate.  Note that this is not part of the IOAudioStreamFormat.
+     */
     virtual IOReturn performFormatChange (IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate);
     
     /*! compute the averageFrameSamples

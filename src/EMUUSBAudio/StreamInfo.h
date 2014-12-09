@@ -145,6 +145,7 @@ struct StreamInfo {
     UInt32		numChannels;
     UInt32		frameOffset;
     UInt8		streamDirection;
+    /*! The interface number associated with this stream. */
     UInt8		interfaceNumber;
     UInt8		alternateSettingID;
     
