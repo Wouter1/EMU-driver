@@ -100,14 +100,14 @@ public:
 private:
     
     /*!
-     Copy input frames from given USB port framelist into the mInput and inform HAL about
-     timestamps when we recycle the ring buffer. Also updates mInput. bufferOffset.
+     Copy input frames from given USB port framelist into the ring buffer (which will 
+     give warnings on overrun). Also updates mInput. bufferOffset.
      
      THis function can be called any number of times while we are waiting
      for the framelist read to finish. This can be called both from readHandler and from
      convertInputSamples.
      
-     You must lock IO ( IOLockLock(mLock)) before calling this. We can not do this ourselves
+     Caller must lock IO (IOLockLock(mLock)) before calling this. We can not do this ourselves
      because readHandler (who will need to call us) has to lock before this point and
      locking multiple times ourselves will deadlock.
      
@@ -117,8 +117,6 @@ private:
      were still un-handled frames in the frame list.
      
      This code directly uses readBuffer to access the bytes.
-     
-     This function does NOT check for buffer overrun.
      
      This function modifies FrameIndex, lastInputSize, LastInputFrames, and runningInputCount. It may
      also alter bufferOffset but that will result in a warning in the logs.

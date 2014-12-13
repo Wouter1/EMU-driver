@@ -1589,160 +1589,8 @@ IOReturn EMUUSBAudioEngine::performFormatChange (IOAudioStream *audioStream, con
 		needToRestartEngine = true;
 	}
 	
-    {
-		EMUUSBAudioConfigObject*	usbAudio = usbAudioDevice->GetUSBAudioConfigObject();
-		UInt16					alternateFrameSize = 0;
-		//UInt8					ourInterfaceNumber = (UInt8)(newFormat->fDriverTag >> 16);
-		UInt8					newAlternateSettingID = (UInt8)(newFormat->fDriverTag);
-		bool					needToChangeChannels = false;// default
-		bool					sampleRateChanged = false;
-        
-		FailIf (NULL == usbAudio, Exit);
-		debugIOLog ("fDriverTag = 0x%x", newFormat->fDriverTag);
-        
-		bool needNewBuffers = false;
-		
-		if (newFormat->fNumChannels != audioStream->format.fNumChannels) {
-			
-			needToChangeChannels = true;
-			needNewBuffers = true;
-            
-			debugIOLog ("Need to adjust channel controls, cur = %d, new = %d", audioStream->format.fNumChannels, newFormat->fNumChannels);
-			
-			if (kIOAudioStreamDirectionOutput == streamDirection) // not currently required since we don't have mono
-				usbAudioDevice->setMonoState((1 == newFormat->fNumChannels));// mono when numChannels == 1
-		}
-		if (newSampleRate) {
-			debugIOLog ("Changing sampling rate to %d", newSampleRate->whole);
-			// special hack to ensure input channel count stays in sync w/ output when changing sample rate
-			// at least from AMS, sample-rate changes always come from output stream (go figure)
-            // Wouter: this is NOT true for EMU0404, there "new format from INPUT" can come first.
-			if (newFormat->fNumChannels != usbInputStream.audioStream->format.fNumChannels
-                    && audioStream != usbInputStream.audioStream) {
-				needToChangeChannels = true;
-				debugIOLog ("Need to adjust input number of channels, cur = %d, new = %d", usbInputStream.audioStream->format.fNumChannels, newFormat->fNumChannels);
-				usbInputStream.audioStream->setFormat(newFormat,false);
-            }
-			sampleRate = *newSampleRate;
-			sampleRateChanged = true;
-		}
-		
-		if (mPlugin) {
-			mPlugin->pluginSetFormat (newFormat, &sampleRate);
-		}
-		
-		
-		if (audioStream == usbInputStream.audioStream || sampleRateChanged)
-		{
-            UInt8	newDirection = usbAudio->GetIsocEndpointDirection (usbInputStream.interfaceNumber, newAlternateSettingID);
-            if (FALSE == usbAudio->VerifySampleRateIsSupported(usbInputStream.interfaceNumber, newAlternateSettingID, sampleRate.whole)) {
-                // find an alternative if requested rate not supported.
-                newAlternateSettingID = usbAudio->FindAltInterfaceWithSettings (usbInputStream.interfaceNumber, newFormat->fNumChannels, newFormat->fBitDepth, sampleRate.whole);
-                mPollInterval = (UInt32) (1 << ((UInt32) usbAudio->GetEndpointPollInterval(usbInputStream.interfaceNumber, newAlternateSettingID, newDirection) -1));
-                // Wouter: following test is broken, it always will succeed!
-                if ((1 != mPollInterval) || (8 != mPollInterval)) {// disallow selection of endpoints with sub ms polling interval NB - assumes that sub ms device will not use a poll interval of 1 (every microframe)
-                    newAlternateSettingID = 255;
-                }
-                debugIOLog ("%d channel %d bit @ %d Hz is not supported. Suggesting alternate setting %d", newFormat->fNumChannels,
-                            newFormat->fBitDepth, sampleRate.whole, newAlternateSettingID);
-                
-                FailIf (255 == newAlternateSettingID, Exit);
-            }
-            
-            FailIf (newDirection != usbInputStream.streamDirection, Exit);
-            debugIOLog ("++about to set input : ourInterfaceNumber = %d & newAlternateSettingID = %d", usbInputStream.interfaceNumber, newAlternateSettingID);
-            beginConfigurationChange();
-            
-            UInt8	address = usbAudio->GetIsocEndpointAddress(usbInputStream.interfaceNumber, newAlternateSettingID, usbInputStream.streamDirection);
-            alternateFrameSize = usbAudio->GetEndpointMaxPacketSize(usbInputStream.interfaceNumber, newAlternateSettingID, address);
-            averageSampleRate = sampleRate.whole;	// Set this as the default until we are told otherwise
-            debugIOLog ("averageSampleRate = %d", averageSampleRate);
-            
-            //if (streamDirection == usbInputStream.streamDirection) {
-			usbInputStream.numChannels = newFormat->fNumChannels;
-            //}
-            usbInputStream.alternateSettingID = newAlternateSettingID;
-            mChannelWidth = newFormat->fBitWidth;
-            usbInputStream.multFactor = usbInputStream.numChannels * (mChannelWidth / 8);
-            debugIOLogC("alternateFrameSize is %d", alternateFrameSize);
-            if (usbInputStream.maxFrameSize != alternateFrameSize) {
-                debugIOLogC("maxFrameSize %d alternateFrameSize %d", usbInputStream.maxFrameSize, alternateFrameSize);
-                usbInputStream.maxFrameSize = alternateFrameSize;
-                needNewBuffers = true;
-            }
-            
-            // set the format - JH
-			usbInputStream.audioStream->setFormat(newFormat,false);
-		}
-	    if (audioStream == mOutput.audioStream || sampleRateChanged) {
-            //now output
-            
-            UInt8 newDirection = usbAudio->GetIsocEndpointDirection (mOutput.interfaceNumber, newAlternateSettingID);
-            if (FALSE == usbAudio->VerifySampleRateIsSupported(mOutput.interfaceNumber, newAlternateSettingID, sampleRate.whole)) {
-                newAlternateSettingID = usbAudio->FindAltInterfaceWithSettings (mOutput.interfaceNumber, newFormat->fNumChannels, newFormat->fBitDepth, sampleRate.whole);
-                mPollInterval = (UInt32) (1 << ((UInt32) usbAudio->GetEndpointPollInterval(mOutput.interfaceNumber, newAlternateSettingID, newDirection) -1));
-                if ((1 != mPollInterval) || (8 != mPollInterval)) {// disallow selection of endpoints with sub ms polling interval NB - assumes that sub ms device will not use a poll interval of 1 (every microframe)
-                    newAlternateSettingID = 255;
-                }
-                debugIOLog ("%d channel %d bit @ %d Hz is not supported. Suggesting alternate setting %d", newFormat->fNumChannels,
-                            newFormat->fBitDepth, sampleRate.whole, newAlternateSettingID);
-                
-                FailIf (255 == newAlternateSettingID, Exit);
-            }
-            FailIf (newDirection != mOutput.streamDirection, Exit);
-            
-            
-            debugIOLog ("++about to set output : ourInterfaceNumber = %d & newAlternateSettingID = %d", mOutput.interfaceNumber, newAlternateSettingID);
-            
-            UInt8 address = usbAudio->GetIsocEndpointAddress(mOutput.interfaceNumber, newAlternateSettingID, mOutput.streamDirection);
-            alternateFrameSize = usbAudio->GetEndpointMaxPacketSize(mOutput.interfaceNumber, newAlternateSettingID, address);
-            
-            //if (streamDirection == mOutput.streamDirection) {
-			mOutput.numChannels = newFormat->fNumChannels;
-            //}
-            mOutput.alternateSettingID = newAlternateSettingID;
-            mChannelWidth = newFormat->fBitWidth;
-            mOutput.multFactor = mOutput.numChannels * (mChannelWidth / 8);
-            debugIOLogC("alternateFrameSize is %d", alternateFrameSize);
-            if (mOutput.maxFrameSize != alternateFrameSize) {
-                debugIOLogC("maxFrameSize %d alternateFrameSize %d", mOutput.maxFrameSize, alternateFrameSize);
-                mOutput.maxFrameSize = alternateFrameSize;
-                needNewBuffers = true;
-                
-            }
-            
-            // set the format - JH
-			mOutput.audioStream->setFormat(newFormat,false);
-		}
-        
-		
-		if (needNewBuffers) {
-			if (kIOReturnSuccess!= initBuffers()) {
-				debugIOLogC("problem with initBuffers in performFormatChange");
-				goto Exit;
-			}
-		}
-		
-		// Set the sampling rate on the device
-		SetSampleRate(usbAudio, sampleRate.whole);		// no need to check the error
-        
-		// I think this code is not needed, as we have no controls needing to be changed
-#if 0
-		if (needToChangeChannels) {
-			removeAllDefaultAudioControls();
-			usbAudioDevice->createControlsForInterface(this, usbInputStream.interfaceNumber, newAlternateSettingID);
-			usbAudioDevice->createControlsForInterface(this, mOutput.interfaceNumber, newAlternateSettingID);
-			//usbAudioDevice->createControlsForInterface(this, ourInterfaceNumber, newAlternateSettingID);
-		}
-#endif
-        
-        
-		debugIOLog ("called setNumSampleFramesPerBuffer with %d", usbInputStream.bufferSize / usbInputStream.multFactor);
-		debugIOLog ("newFormat->fNumChannels = %d, newFormat->fBitWidth %d", newFormat->fNumChannels, newFormat->fBitWidth);
-		// debugIOLog ("called setSampleOffset with %d", usbInputStream.numUSBFramesPerList);
-		completeConfigurationChange();
-		result = kIOReturnSuccess;
-	}
+    result = performFormatChangeInternal(audioStream, newFormat, newSampleRate, streamDirection);
+    
 Exit:
 	if (needToRestartEngine) {
 		performAudioEngineStart();
@@ -1751,6 +1599,167 @@ Exit:
 	debugIOLog ("-EMUUSBAudioEngine::performFormatChange, result = %x", result);
     return result;
 }
+
+
+IOReturn EMUUSBAudioEngine::performFormatChangeInternal (IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate, UInt8 streamDirection)
+{
+    EMUUSBAudioConfigObject*	usbAudio = usbAudioDevice->GetUSBAudioConfigObject();
+    UInt16					alternateFrameSize = 0;
+    //UInt8					ourInterfaceNumber = (UInt8)(newFormat->fDriverTag >> 16);
+    UInt8					newAlternateSettingID = (UInt8)(newFormat->fDriverTag);
+    bool					needToChangeChannels = false;// default
+    bool					sampleRateChanged = false;
+    
+    ReturnIf(NULL == usbAudio, kIOReturnError);
+    debugIOLog ("fDriverTag = 0x%x", newFormat->fDriverTag);
+    
+    bool needNewBuffers = false;
+    
+    if (newFormat->fNumChannels != audioStream->format.fNumChannels) {
+        
+        needToChangeChannels = true;
+        needNewBuffers = true;
+        
+        debugIOLog ("Need to adjust channel controls, cur = %d, new = %d", audioStream->format.fNumChannels, newFormat->fNumChannels);
+        
+        if (kIOAudioStreamDirectionOutput == streamDirection) // not currently required since we don't have mono
+            usbAudioDevice->setMonoState((1 == newFormat->fNumChannels));// mono when numChannels == 1
+    }
+    if (newSampleRate) {
+        debugIOLog ("Changing sampling rate to %d", newSampleRate->whole);
+        // special hack to ensure input channel count stays in sync w/ output when changing sample rate
+        // at least from AMS, sample-rate changes always come from output stream (go figure)
+        // Wouter: this is NOT true for EMU0404, there "new format from INPUT" can come first.
+        // However, the input format often does not arrive at all. #15
+        if (newFormat->fNumChannels != usbInputStream.audioStream->format.fNumChannels
+            && audioStream != usbInputStream.audioStream) {
+            needToChangeChannels = true;
+            debugIOLog ("Need to adjust input number of channels, cur = %d, new = %d", usbInputStream.audioStream->format.fNumChannels, newFormat->fNumChannels);
+            usbInputStream.audioStream->setFormat(newFormat,false);
+        }
+        sampleRate = *newSampleRate;
+        sampleRateChanged = true;
+    }
+    
+    if (mPlugin) {
+        mPlugin->pluginSetFormat (newFormat, &sampleRate);
+    }
+    
+    
+    if (audioStream == usbInputStream.audioStream || sampleRateChanged)
+    {
+        UInt8	newDirection = usbAudio->GetIsocEndpointDirection (usbInputStream.interfaceNumber, newAlternateSettingID);
+        if (FALSE == usbAudio->VerifySampleRateIsSupported(usbInputStream.interfaceNumber, newAlternateSettingID, sampleRate.whole)) {
+            // find an alternative if requested rate not supported.
+            newAlternateSettingID = usbAudio->FindAltInterfaceWithSettings (usbInputStream.interfaceNumber, newFormat->fNumChannels, newFormat->fBitDepth, sampleRate.whole);
+            mPollInterval = (UInt32) (1 << ((UInt32) usbAudio->GetEndpointPollInterval(usbInputStream.interfaceNumber, newAlternateSettingID, newDirection) -1));
+            // Wouter: following test is broken, it always will succeed!
+            if ((1 != mPollInterval) || (8 != mPollInterval)) {// disallow selection of endpoints with sub ms polling interval NB - assumes that sub ms device will not use a poll interval of 1 (every microframe)
+                newAlternateSettingID = 255;
+            }
+            debugIOLog ("%d channel %d bit @ %d Hz is not supported. Suggesting alternate setting %d", newFormat->fNumChannels,
+                        newFormat->fBitDepth, sampleRate.whole, newAlternateSettingID);
+            
+            ReturnIf (255 == newAlternateSettingID, kIOReturnError);
+        }
+        
+        ReturnIf (newDirection != usbInputStream.streamDirection, kIOReturnError);
+        debugIOLog ("++about to set input : ourInterfaceNumber = %d & newAlternateSettingID = %d", usbInputStream.interfaceNumber, newAlternateSettingID);
+        beginConfigurationChange();
+        
+        UInt8	address = usbAudio->GetIsocEndpointAddress(usbInputStream.interfaceNumber, newAlternateSettingID, usbInputStream.streamDirection);
+        alternateFrameSize = usbAudio->GetEndpointMaxPacketSize(usbInputStream.interfaceNumber, newAlternateSettingID, address);
+        averageSampleRate = sampleRate.whole;	// Set this as the default until we are told otherwise
+        debugIOLog ("averageSampleRate = %d", averageSampleRate);
+        
+        //if (streamDirection == usbInputStream.streamDirection) {
+        usbInputStream.numChannels = newFormat->fNumChannels;
+        //}
+        usbInputStream.alternateSettingID = newAlternateSettingID;
+        mChannelWidth = newFormat->fBitWidth;
+        usbInputStream.multFactor = usbInputStream.numChannels * (mChannelWidth / 8);
+        debugIOLogC("alternateFrameSize is %d", alternateFrameSize);
+        if (usbInputStream.maxFrameSize != alternateFrameSize) {
+            debugIOLogC("maxFrameSize %d alternateFrameSize %d", usbInputStream.maxFrameSize, alternateFrameSize);
+            usbInputStream.maxFrameSize = alternateFrameSize;
+            needNewBuffers = true;
+        }
+        
+        // set the format - JH
+        usbInputStream.audioStream->setFormat(newFormat,false);
+    }
+    if (audioStream == mOutput.audioStream || sampleRateChanged) {
+        //now output
+        
+        UInt8 newDirection = usbAudio->GetIsocEndpointDirection (mOutput.interfaceNumber, newAlternateSettingID);
+        if (FALSE == usbAudio->VerifySampleRateIsSupported(mOutput.interfaceNumber, newAlternateSettingID, sampleRate.whole)) {
+            newAlternateSettingID = usbAudio->FindAltInterfaceWithSettings (mOutput.interfaceNumber, newFormat->fNumChannels, newFormat->fBitDepth, sampleRate.whole);
+            mPollInterval = (UInt32) (1 << ((UInt32) usbAudio->GetEndpointPollInterval(mOutput.interfaceNumber, newAlternateSettingID, newDirection) -1));
+            if ((1 != mPollInterval) || (8 != mPollInterval)) {// disallow selection of endpoints with sub ms polling interval NB - assumes that sub ms device will not use a poll interval of 1 (every microframe)
+                newAlternateSettingID = 255;
+            }
+            debugIOLog ("%d channel %d bit @ %d Hz is not supported. Suggesting alternate setting %d", newFormat->fNumChannels,
+                        newFormat->fBitDepth, sampleRate.whole, newAlternateSettingID);
+            
+            ReturnIf (255 == newAlternateSettingID, kIOReturnError);
+        }
+        ReturnIf (newDirection != mOutput.streamDirection, kIOReturnError);
+        
+        
+        debugIOLog ("++about to set output : ourInterfaceNumber = %d & newAlternateSettingID = %d", mOutput.interfaceNumber, newAlternateSettingID);
+        
+        UInt8 address = usbAudio->GetIsocEndpointAddress(mOutput.interfaceNumber, newAlternateSettingID, mOutput.streamDirection);
+        alternateFrameSize = usbAudio->GetEndpointMaxPacketSize(mOutput.interfaceNumber, newAlternateSettingID, address);
+        
+        //if (streamDirection == mOutput.streamDirection) {
+        mOutput.numChannels = newFormat->fNumChannels;
+        //}
+        mOutput.alternateSettingID = newAlternateSettingID;
+        mChannelWidth = newFormat->fBitWidth;
+        mOutput.multFactor = mOutput.numChannels * (mChannelWidth / 8);
+        debugIOLogC("alternateFrameSize is %d", alternateFrameSize);
+        if (mOutput.maxFrameSize != alternateFrameSize) {
+            debugIOLogC("maxFrameSize %d alternateFrameSize %d", mOutput.maxFrameSize, alternateFrameSize);
+            mOutput.maxFrameSize = alternateFrameSize;
+            needNewBuffers = true;
+            
+        }
+        
+        // set the format - JH
+        mOutput.audioStream->setFormat(newFormat,false);
+    }
+    
+    
+    if (needNewBuffers) {
+        if (kIOReturnSuccess!= initBuffers()) {
+            debugIOLogC("problem with initBuffers in performFormatChange");
+            return kIOReturnError;
+        }
+    }
+    
+    // Set the sampling rate on the device
+    SetSampleRate(usbAudio, sampleRate.whole);		// no need to check the error
+    
+    // I think this code is not needed, as we have no controls needing to be changed
+#if 0
+    if (needToChangeChannels) {
+        removeAllDefaultAudioControls();
+        usbAudioDevice->createControlsForInterface(this, usbInputStream.interfaceNumber, newAlternateSettingID);
+        usbAudioDevice->createControlsForInterface(this, mOutput.interfaceNumber, newAlternateSettingID);
+        //usbAudioDevice->createControlsForInterface(this, ourInterfaceNumber, newAlternateSettingID);
+    }
+#endif
+    
+    
+    debugIOLog ("called setNumSampleFramesPerBuffer with %d", usbInputStream.bufferSize / usbInputStream.multFactor);
+    debugIOLog ("newFormat->fNumChannels = %d, newFormat->fBitWidth %d", newFormat->fNumChannels, newFormat->fBitWidth);
+    // debugIOLog ("called setSampleOffset with %d", usbInputStream.numUSBFramesPerList);
+    completeConfigurationChange();
+    return kIOReturnSuccess;
+}
+
+
+
 
 // called from writeFrameList
 IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 arrayIndex) {

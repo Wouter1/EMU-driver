@@ -421,6 +421,15 @@ protected:
      */
     virtual IOReturn performFormatChange (IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate);
     
+    /*! Internal call to change format. The audio engine MUST have been stopped before calling this.
+     @param audioStream
+     @param newformat the details for the requested format.
+     @param newSampleRate the requested sample rate.  Note that this is not part of the IOAudioStreamFormat.
+     @param stream direction. 0=out 1=in.
+     */
+    IOReturn performFormatChangeInternal (IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate, UInt8 streamDirection);
+
+    
     /*! compute the averageFrameSamples
      @param sampleRate the target samplerate, eg 96000
      @param averageFrameSize output: =inSampleRate / 1000 = the average #bytes for the frame. Eg 96 for 96kHz samplerate.
