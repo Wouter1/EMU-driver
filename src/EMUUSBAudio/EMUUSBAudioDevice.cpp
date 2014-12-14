@@ -312,8 +312,8 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
         //workLoop->addEventSource(mUpdateTimer);
 		TimerAction(this, mUpdateTimer);
 		
-        
-        setProperty(kIOAudioEngineCoreAudioPlugInKey, "EMUUSBAudio.kext/Contents/Plugins/EMUHALPlugin.bundle");	//"EMUUSBAudio.kext/Contents/Plugins/
+        // CHECK This bundle was removed as it is not clear what it is for.
+        // setProperty(kIOAudioEngineCoreAudioPlugInKey, "EMUUSBAudio.kext/Contents/Plugins/EMUHALPlugin.bundle");	//"EMUUSBAudio.kext/Contents/Plugins/
 		IOService::registerService();
 		//<AC mod>
 		// init engine - see what happens
@@ -2419,6 +2419,7 @@ EMUUSBAudioEngine*	EMUUSBAudioDevice::getOtherEngine(EMUUSBAudioEngine* curEngin
 	return otherEngine;
 }
 void EMUUSBAudioDevice::setOtherEngineSampleRate(EMUUSBAudioEngine* curEngine, UInt32 newSampleRate) {
+    debugIOLogC("EMUUSBAudioDevice::setOtherEngineSampleRate %ld; there are %ld engines",(unsigned int)newSampleRate, (unsigned int)mNumEngines);
 	if (mRegisteredEngines) {
 		UInt32	index = 0;
 		while (index < mNumEngines) {
@@ -2426,6 +2427,8 @@ void EMUUSBAudioDevice::setOtherEngineSampleRate(EMUUSBAudioEngine* curEngine, U
 			if (engineInfo) {
 				EMUUSBAudioEngine *engine = OSDynamicCast(EMUUSBAudioEngine, engineInfo->getObject(kEngine));
 				if (engine && (engine != curEngine)) {
+                    debugIOLogC("found other engine %p",engine);
+
 					IOAudioSampleRate	newEngineSampleRate;
 					newEngineSampleRate.whole = newSampleRate;
 					newEngineSampleRate.fraction = 0;// always set this to zero

@@ -2409,6 +2409,7 @@ Exit:
 
 IOReturn EMUUSBAudioEngine::hardwareSampleRateChanged(const IOAudioSampleRate *newSampleRate) {
 	IOReturn	result = kIOReturnError;
+    debugIOLogC("received hardewareSampleRateChanged notification");
     if (usbAudioDevice && ((newSampleRate->whole != sampleRate.whole) || (newSampleRate->fraction != sampleRate.fraction))) {
         bool	engineWasRunning = (kIOAudioEngineRunning == state);
 		
@@ -2431,6 +2432,7 @@ Exit:
     return result;
 }
 
+/*
 IOReturn EMUUSBAudioEngine::hardwareSampleRateChangedAux(const IOAudioSampleRate *newSampleRate, StreamInfo &info) {
 	IOReturn	result = kIOReturnError;
 	const IOAudioStreamFormat*			theFormat =info.audioStream->getFormat();
@@ -2512,6 +2514,7 @@ Exit:
     return result;
 	
 }
+*/
 
 IOReturn EMUUSBAudioEngine::initBuffers() {
 	IOReturn						result = kIOReturnError;

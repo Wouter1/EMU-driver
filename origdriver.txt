@@ -7929,6 +7929,8 @@ __ZN17EMUUSBAudioEngine30waitForFirstUSBFrameCompletionEP8OSObjectP18IOTimerEven
 0000000000008932	popq	%r12
 0000000000008934	leave
 0000000000008935	ret
+
+// IOReturn EMUUSBAudioEngine::SetSampleRate (EMUUSBAudioConfigObject *usbAudio, UInt32 inSampleRate)
 __ZN17EMUUSBAudioEngine13SetSampleRateEP23EMUUSBAudioConfigObjectj:
 0000000000008936	pushq	%rbp
 0000000000008937	movq	%rsp, %rbp
@@ -7944,34 +7946,35 @@ __ZN17EMUUSBAudioEngine13SetSampleRateEP23EMUUSBAudioConfigObjectj:
 000000000000895d	je	0x8aa9
 0000000000008963	cmpb	$0x0, 0x1f0(%rdi)
 000000000000896a	je	0x8aa9
-0000000000008970	cmpl	$0x15888, %edx
+0000000000008970	cmpl	$0x15888, %edx			// 88200
 0000000000008976	je	0x89ba
 0000000000008978	ja	0x8990
-000000000000897a	cmpl	$0xac44, %edx
+000000000000897a	cmpl	$0xac44, %edx			// 44100
 0000000000008980	je	0x89ae
-0000000000008982	cmpl	$0xbb80, %edx
+0000000000008982	cmpl	$0xbb80, %edx			// 48000
 0000000000008988	jne	0x8aa2
 000000000000898e	jmp	0x89b4
-0000000000008990	cmpl	$0x2b110, %edx
+0000000000008990	cmpl	$0x2b110, %edx			// 176400
 0000000000008996	je	0x89c6
-0000000000008998	cmpl	$0x2ee00, %edx
+0000000000008998	cmpl	$0x2ee00, %edx			// 192000
 000000000000899e	je	0x89cc
-00000000000089a0	cmpl	$0x17700, %edx
+00000000000089a0	cmpl	$0x17700, %edx			// 96000
 00000000000089a6	jne	0x8aa2
 00000000000089ac	jmp	0x89c0
-00000000000089ae	movb	$0x0, -0x24(%rbp)
+00000000000089ae	movb	$0x0, -0x24(%rbp)		// sampleRateToSet = sr_44kHz
 00000000000089b2	jmp	0x89d0
-00000000000089b4	movb	$0x1, -0x24(%rbp)
+00000000000089b4	movb	$0x1, -0x24(%rbp)		// sampleRateToSet = sr_48kHz
 00000000000089b8	jmp	0x89d0
-00000000000089ba	movb	$0x2, -0x24(%rbp)
+00000000000089ba	movb	$0x2, -0x24(%rbp)		// sampleRateToSet = sr_88kHz
 00000000000089be	jmp	0x89d0
-00000000000089c0	movb	$0x3, -0x24(%rbp)
+00000000000089c0	movb	$0x3, -0x24(%rbp)		// sampleRateToSet = sr_96kHz
 00000000000089c4	jmp	0x89d0
-00000000000089c6	movb	$0x4, -0x24(%rbp)
+00000000000089c6	movb	$0x4, -0x24(%rbp)		// sampleRateToSet = sr_176kHz
 00000000000089ca	jmp	0x89d0
-00000000000089cc	movb	$0x5, -0x24(%rbp)
+00000000000089cc	movb	$0x5, -0x24(%rbp)		// sampleRateToSet = sr_192kHz
 00000000000089d0	cmpl	0x188(%rdi), %r13d
 00000000000089d7	je	0x8aa2
+// if (inSampleRate != usbAudioDevice->getHardwareSampleRate())
 00000000000089dd	leaq	-0x24(%rbp), %rcx
 00000000000089e1	movl	$0x1, %r8d
 00000000000089e7	movl	$0x3, %edx
@@ -8017,6 +8020,7 @@ __ZN17EMUUSBAudioEngine13SetSampleRateEP23EMUUSBAudioConfigObjectj:
 0000000000008a97	movl	%r13d, 0x33c(%rbx)
 0000000000008a9e	xorl	%eax, %eax
 0000000000008aa0	jmp	0x8ac8
+// end of if (inSampleRate != usbAudioDevice->getHardwareSampleRate())
 0000000000008aa2	movl	$0xe00002bc, %eax
 0000000000008aa7	jmp	0x8ac8
 0000000000008aa9	movzbl	0x246(%rbx), %edx
@@ -11136,6 +11140,8 @@ __ZN17EMUUSBAudioEngine28hardwareSampleRateChangedAuxEPK18_IOAudioSampleRateRNS_
 000000000000be53	leave
 000000000000be54	ret
 000000000000be55	nop
+
+// IOReturn EMUUSBAudioEngine::performFormatChange (IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate) 
 __ZN17EMUUSBAudioEngine19performFormatChangeEP13IOAudioStreamPK20_IOAudioStreamFormatPK18_IOAudioSampleRate:
 000000000000be56	pushq	%rbp
 000000000000be57	movq	%rsp, %rbp
@@ -11145,15 +11151,15 @@ __ZN17EMUUSBAudioEngine19performFormatChangeEP13IOAudioStreamPK20_IOAudioStreamF
 000000000000be66	movq	%r13, -0x18(%rbp)
 000000000000be6a	movq	%r14, -0x10(%rbp)
 000000000000be6e	movq	%r15, -0x8(%rbp)
-000000000000be72	movq	%rdi, %r14
-000000000000be75	movq	%rsi, %r13
-000000000000be78	movq	%rdx, %r15
+000000000000be72	movq	%rdi, %r14					// probably %rdi = %r14 = *newFormat
+000000000000be75	movq	%rsi, %r13					// seems %rsi=%r13= *audioStream
+000000000000be78	movq	%rdx, %r15					// probably %r15 = %rdx = *newSampleRate
 000000000000be7b	movq	%rcx, %rbx
-000000000000be7e	testq	%rsi, %rsi
+000000000000be7e	testq	%rsi, %rsi					// if (!newFormat) return kIOReturnSuccess;
 000000000000be81	je	0xbe88
 000000000000be83	testq	%rdx, %rdx
 000000000000be86	jne	0xbe92
-000000000000be88	movl	$0xe00002c2, %ebx
+000000000000be88	movl	$0xe00002c2, %ebx			// result =  invalid argument
 000000000000be8d	jmpq	0xc33f
 000000000000be92	cmpq	$0x0, 0x2b8(%rdi)
 000000000000be9a	je	0xc33a
@@ -11181,12 +11187,12 @@ __ZN17EMUUSBAudioEngine19performFormatChangeEP13IOAudioStreamPK20_IOAudioStreamF
 000000000000bf08	cmpl	0xb0(%r13), %eax
 000000000000bf0f	je	0xbf2c
 000000000000bf11	movb	$0x1, -0x32(%rbp)
-000000000000bf15	testb	%r12b, %r12b
+000000000000bf15	testb	%r12b, %r12b				//if (kIOAudioStreamDirectionOutput == streamDirection)
 000000000000bf18	jne	0xbf2c
-000000000000bf1a	xorl	%esi, %esi
+000000000000bf1a	xorl	%esi, %esi					// 1 == newFormat->fNumChannels)
 000000000000bf1c	cmpl	$0x1, %eax
 000000000000bf1f	sete	%sil
-000000000000bf23	callq	__ZN17EMUUSBAudioDevice12setMonoStateEb
+000000000000bf23	callq	__ZN17EMUUSBAudioDevice12setMonoStateEb //usbAudioDevice->setMonoState(1 == newFormat->fNumChannels)
 000000000000bf28	movb	$0x1, -0x32(%rbp)
 000000000000bf2c	movb	$0x0, -0x33(%rbp)
 000000000000bf30	testq	%rbx, %rbx
@@ -11214,22 +11220,24 @@ __ZN17EMUUSBAudioEngine19performFormatChangeEP13IOAudioStreamPK20_IOAudioStreamF
 000000000000bf87	cmpq	%r13, 0x1c8(%r14)
 000000000000bf8e	je	0xbf9a
 000000000000bf90	cmpb	$0x0, -0x33(%rbp)
-000000000000bf94	je	0xc145
+000000000000bf94	je	0xc145							
+// 	if (audioStream == mInput.audioStream || sampleRateChanged) 
 000000000000bf9a	movzbl	0x14(%r15), %eax
 000000000000bf9f	movb	%al, -0x31(%rbp)
 000000000000bfa2	movzbl	%al, %ebx
 000000000000bfa5	movzbl	0x1b5(%r14), %esi
 000000000000bfad	movl	%ebx, %edx
 000000000000bfaf	movq	-0x40(%rbp), %rdi
-000000000000bfb3	callq	__ZN23EMUUSBAudioConfigObject24GetIsocEndpointDirectionEhh
-000000000000bfb8	movl	%eax, %r12d
+000000000000bfb3	callq	__ZN23EMUUSBAudioConfigObject24GetIsocEndpointDirectionEhh // newDirection = usbAudio->GetIsocEndpointDirection(..)
+000000000000bfb8	movl	%eax, %r12d					newDirection r12 = return value.
 000000000000bfbb	movl	0x8c(%r14), %ecx
 000000000000bfc2	movzbl	0x1b5(%r14), %esi
 000000000000bfca	movl	%ebx, %edx
 000000000000bfcc	movq	-0x40(%rbp), %rdi
-000000000000bfd0	callq	__ZN23EMUUSBAudioConfigObject27VerifySampleRateIsSupportedEhhj
+000000000000bfd0	callq	__ZN23EMUUSBAudioConfigObject27VerifySampleRateIsSupportedEhhj // Boolean usbAudio->VerifySampleRateIsSupported(UInt8 , UInt8 , UInt32 )
 000000000000bfd5	testb	%al, %al
-000000000000bfd7	jne	0xc073
+000000000000bfd7	jne	0xc073							
+// if (FALSE==usbAudio->VerifySampleRateIsSupported)
 000000000000bfdd	movzbl	0xc(%r15), %ecx
 000000000000bfe2	movzbl	(%r15), %edx
 000000000000bfe6	movzbl	0x1b5(%r14), %esi
@@ -11249,8 +11257,8 @@ __ZN17EMUUSBAudioEngine19performFormatChangeEP13IOAudioStreamPK20_IOAudioStreamF
 000000000000c029	movzbl	0x1b5(%r14), %esi
 000000000000c031	movl	%ebx, %edx
 000000000000c033	movq	-0x40(%rbp), %rdi
-000000000000c037	callq	__ZN23EMUUSBAudioConfigObject24GetIsocEndpointDirectionEhh
-000000000000c03c	movl	%eax, %r12d
+000000000000c037	callq	__ZN23EMUUSBAudioConfigObject24GetIsocEndpointDirectionEhh	
+000000000000c03c	movl	%eax, %r12d					// newDirection = r12
 000000000000c03f	movzbl	%al, %ecx
 000000000000c042	movzbl	0x1b5(%r14), %esi
 000000000000c04a	movl	%ebx, %edx
@@ -11263,7 +11271,8 @@ __ZN17EMUUSBAudioEngine19performFormatChangeEP13IOAudioStreamPK20_IOAudioStreamF
 000000000000c062	movb	%al, 0x350(%r14)
 000000000000c069	cmpb	$-0x1, -0x31(%rbp)
 000000000000c06d	je	0xc238
-000000000000c073	cmpb	%r12b, 0x1b4(%r14)
+// end of if (FALSE==usbAudio->VerifySampleRateIsSupported)
+000000000000c073	cmpb	%r12b, 0x1b4(%r14)			// newDirection != mInput.streamDirection
 000000000000c07a	jne	0xc238
 000000000000c080	movq	(%r14), %rax
 000000000000c083	movq	%r14, %rdi
@@ -11273,12 +11282,12 @@ __ZN17EMUUSBAudioEngine19performFormatChangeEP13IOAudioStreamPK20_IOAudioStreamF
 000000000000c098	movzbl	0x1b5(%r14), %esi
 000000000000c0a0	movl	%ebx, %edx
 000000000000c0a2	movq	-0x40(%rbp), %rdi
-000000000000c0a6	callq	__ZN23EMUUSBAudioConfigObject22GetIsocEndpointAddressEhhh
+000000000000c0a6	callq	__ZN23EMUUSBAudioConfigObject22GetIsocEndpointAddressEhhh // address = usbAudio->GetIsocEndpointAddress(..)
 000000000000c0ab	movzbl	%al, %ecx
 000000000000c0ae	movzbl	0x1b5(%r14), %esi
 000000000000c0b6	movl	%ebx, %edx
 000000000000c0b8	movq	-0x40(%rbp), %rdi
-000000000000c0bc	callq	__ZN23EMUUSBAudioConfigObject24GetEndpointMaxPacketSizeEhhh
+000000000000c0bc	callq	__ZN23EMUUSBAudioConfigObject24GetEndpointMaxPacketSizeEhhh // alternateFrameSize = usbAudio->GetEndpointMaxPacketSize(..)
 000000000000c0c1	movl	%eax, %r12d
 000000000000c0c4	movl	0x8c(%r14), %eax
 000000000000c0cb	movl	%eax, 0x338(%r14)
@@ -11292,11 +11301,11 @@ __ZN17EMUUSBAudioEngine19performFormatChangeEP13IOAudioStreamPK20_IOAudioStreamF
 000000000000c0f3	movb	%al, 0x1b6(%r14)
 000000000000c0fa	movzbl	0xd(%r15), %eax
 000000000000c0ff	movl	%eax, 0x340(%r14)
-000000000000c106	shrl	$0x3, %eax
-000000000000c109	imull	0x1ac(%r14), %eax
+000000000000c106	shrl	$0x3, %eax					// mChannelWidth / 8
+000000000000c109	imull	0x1ac(%r14), %eax			// mInput.multFactor = mInput.numChannels * (mChannelWidth / 8);
 000000000000c111	movl	%eax, 0x194(%r14)
 000000000000c118	movzwl	%r12w, %eax
-000000000000c11c	cmpl	%eax, 0x198(%r14)
+000000000000c11c	cmpl	%eax, 0x198(%r14)			// if (mInput.maxFrameSize != alternateFrameSize)
 000000000000c123	je	0xc130
 000000000000c125	movl	%eax, 0x198(%r14)
 000000000000c12c	movb	$0x1, -0x32(%rbp)
@@ -11304,11 +11313,13 @@ __ZN17EMUUSBAudioEngine19performFormatChangeEP13IOAudioStreamPK20_IOAudioStreamF
 000000000000c137	movq	(%rdi), %rax
 000000000000c13a	xorl	%edx, %edx
 000000000000c13c	movq	%r15, %rsi
-000000000000c13f	callq	*0xa38(%rax)
-000000000000c145	cmpq	%r13, 0x258(%r14)
+000000000000c13f	callq	*0xa38(%rax)				// guess: mInput.audioStream->setFormat(newFormat,false)
+// end of if (audioStream == mInput.audioStream || sampleRateChanged) 
+000000000000c145	cmpq	%r13, 0x258(%r14)			// audioStream == mOutput.audioStream 
 000000000000c14c	je	0xc158
-000000000000c14e	cmpb	$0x0, -0x33(%rbp)
+000000000000c14e	cmpb	$0x0, -0x33(%rbp)			// sampleRateChanged
 000000000000c152	je	0xc2ee
+//	if (audioStream == mOutput.audioStream || sampleRateChanged) {
 000000000000c158	movzbl	0x14(%r15), %r13d
 000000000000c15d	movzbl	%r13b, %ebx
 000000000000c161	movzbl	0x245(%r14), %esi
@@ -11360,7 +11371,7 @@ __ZN17EMUUSBAudioEngine19performFormatChangeEP13IOAudioStreamPK20_IOAudioStreamF
 000000000000c233	cmpb	%r12b, %al
 000000000000c236	je	0xc24c
 000000000000c238	movl	$0x14, %edi
-000000000000c23d	callq	_IOSleep
+000000000000c23d	callq	_IOSleep						// IOSleep?? This is not in our code!
 000000000000c242	movl	$0xe00002bc, %ebx
 000000000000c247	jmpq	0xc326
 000000000000c24c	movzbl	%r13b, %ebx
@@ -11407,7 +11418,7 @@ __ZN17EMUUSBAudioEngine19performFormatChangeEP13IOAudioStreamPK20_IOAudioStreamF
 000000000000c305	movl	0x8c(%r14), %edx
 000000000000c30c	movq	-0x40(%rbp), %rsi
 000000000000c310	movq	%r14, %rdi
-000000000000c313	callq	__ZN17EMUUSBAudioEngine13SetSampleRateEP23EMUUSBAudioConfigObjectj
+000000000000c313	callq	__ZN17EMUUSBAudioEngine13SetSampleRateEP23EMUUSBAudioConfigObjectj		// SetSampleRate(..)
 000000000000c318	movq	(%r14), %rax
 000000000000c31b	movq	%r14, %rdi
 000000000000c31e	callq	*0xb08(%rax)
@@ -11418,8 +11429,8 @@ __ZN17EMUUSBAudioEngine19performFormatChangeEP13IOAudioStreamPK20_IOAudioStreamF
 000000000000c32f	movq	%r14, %rdi
 000000000000c332	callq	*0xa60(%rax)
 000000000000c338	jmp	0xc33f
-000000000000c33a	movl	$0xe00002bc, %ebx
-000000000000c33f	movl	%ebx, %eax
+000000000000c33a	movl	$0xe00002bc, %ebx		// result = ebx = general error
+000000000000c33f	movl	%ebx, %eax				// return(result in ebx)
 000000000000c341	movq	-0x28(%rbp), %rbx
 000000000000c345	movq	-0x20(%rbp), %r12
 000000000000c349	movq	-0x18(%rbp), %r13

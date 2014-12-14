@@ -184,6 +184,8 @@ public:
     
     virtual IOReturn performAudioEngineStart ();
     virtual IOReturn performAudioEngineStop ();
+    /*! called from EMUUSBAudioDevice when rate changes. Apparently there can be multiple audio engines
+     and the others are informed through this when one engine detects changes. */
 	virtual IOReturn hardwareSampleRateChanged(const IOAudioSampleRate *sampleRate);
 	static void sampleRateHandler (void * target, void * parameter, IOReturn result, IOUSBIsocFrame * pFrames);
     
@@ -454,7 +456,9 @@ protected:
     
 	IOReturn eraseOutputSamples(const void *mixBuf, void *sampleBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream);
     
+    /* Not used
 	IOReturn hardwareSampleRateChangedAux(const IOAudioSampleRate *sampleRate, StreamInfo &info);
+    */
     
 	void				findAudioStreamInterfaces(IOUSBInterface *pAudioControlIfc); // AC mod
     

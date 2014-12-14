@@ -146,6 +146,7 @@ protected:
 	UInt32					mQueryXU;// the XU to query
 	UInt32					mCurSampleRate;
 	OSArray *				mMonoControlsArray;		// this flag is set by EMUUSBAudioEngine::performFormatChange
+    /*! array of registered engines. See also mNumEngines? */
 	OSArray *				mRegisteredEngines;
 	UInt32					mAvailXUs;			// what extension unit features are available
 	EMUXUCustomControl *	mXUChanged;//IOAudioSelectorControl
@@ -166,6 +167,7 @@ protected:
 	// values for the various XU settings arranged from largest to smallest
 	DirectMonCtrlBlock		mCurDirMonSettings;
 #endif
+    /*! number of EMUUSBAudioEngine's. Can there be more than one??*/
 	UInt32					mNumEngines;
     /*! counter for number of USB frames. When we hit kRefreshCount we refresh mNewReferenceUSBFrame */
 	UInt32					mAnchorResetCount;
@@ -350,6 +352,7 @@ public:
       and added each time when the default controls were removed. */
 	void					addCustomAudioControls(IOAudioEngine* engine);
 	void					removeCustomAudioControls(IOAudioEngine* engine);
+    /*! Tell all engines about a new sample rate */
 	void					setOtherEngineSampleRate(EMUUSBAudioEngine* curEngine, UInt32 newSampleRate);
 	void					doStatusCheck(IOTimerEventSource* timer);
     /*!  This seems to check if there were changes in the device: io status, sample rate, clock source, etc. */

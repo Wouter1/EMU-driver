@@ -112,6 +112,8 @@ enum {
 	VENDOR_SPECIFIC							= 0xff
 };
 
+/*! Probaly elements for IOAudioControls. IOAudioControls control the various attributes
+ of the audio engine: output volume, mute, input gain, input selection, analog passthru */
 enum {
     // Audio Control (AC) interface descriptor subtypes
     AC_DESCRIPTOR_UNDEFINED					= 0x00,
