@@ -881,6 +881,7 @@ public:
     UInt8							GetSampleSize (void) {return bitResolution;}
     UInt8							GetSubframeSize (void) {return subframeSize;}
     UInt32 *						GetSampleRates (void) {return sampleFreqs;}
+     /*! @return unitID of the terminal the endpoint goes with */
     UInt8							GetTerminalLink (void) {return terminalLink;}
     
 	Boolean							IsocEndpointDoesMaxPacketsOnly (void) {if (theIsocEndpointObject) return theIsocEndpointObject->DoesMaxPacketsOnly (); else return 0;}
@@ -925,6 +926,9 @@ public:
 #endif
 	UInt8							GetEndpointPollInt(UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 address);
 	UInt8							GetIsocEndpointAddress (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 direction);
+    
+     /*! Use GetTerminalLink to get the unit number of the input or output terminal that the endpoint is associated with.
+      With that terminal, you can figure out if it's an input or output terminal, and the direction of the endpoint. */
 	UInt8							GetIsocEndpointDirection (UInt8 interfaceNum, UInt8 altInterfaceNum);
 	UInt8							GetIsocEndpointSyncType (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 address);
 	UInt8							GetIndexedFeatureUnitID (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 featureUnitIndex);

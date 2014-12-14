@@ -97,7 +97,11 @@ enum {
 /*!
  * This class is the EMU device controller, implementing the IOAudioDevice.
  * It manages the inputs at a high level, like 
- * detecting changes in volume or sample rate which goes through extension units (XUs). A little bit of communication goes on with EMU device here,
+ * detecting changes in volume or sample rate which goes through extension units (XUs). 
+ * I could not find any documentation on XUs, but 
+ * Apparently an XU is something on the EMU, it probably has a number of registers that can be set
+ * to change the device behaviour (like sample rate and volume).
+ * A little bit of communication goes on with EMU device here,
  * this concerns only the control pipe.
  * Actual work regarding this is done in the other classes, particularly
  * AudioEngine for connecting to the device and reading and writing sample streams, converting them etc
@@ -172,7 +176,7 @@ protected:
      */
 	UInt16*					mDeviceStatusBuffer;
     
-	/*! original doc: slots for the various XUs */
+	/*! original doc: slots for the various XUs. These contain IDs for the extension units. see getExtensionUnitID */
 	UInt8					mClockRateXU;		// clock rate XU id
 	UInt8					mClockSrcXU;		// clock source XU id
 	UInt8					mDigitalIOXU;		// digital IO XU id
@@ -209,8 +213,8 @@ protected:
 	void					setupStatusFeedback();
     /*! called from TimerAction, scheduled as a timer */
 	void					doTimerAction(IOTimerEventSource * timer);
-    /*! get the extension unit unitID. Wouter: These are abbreviated with XU. FAIK these are software plugins */
 
+    /*! get the extension unit unitID. for some extension code. */
 	UInt8					getExtensionUnitID(UInt16 extCode);
     
 	IOReturn				protectedXUChangeHandler(IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);
@@ -284,8 +288,16 @@ public:
      @param controlSelector the extensionUnitControlSelector
     */
 	IOReturn		getExtensionUnitSettings(UInt16 extCode, UInt8 controlSelector, void* setting, UInt32 length);
+    /*! Send a new setting to the given extension unit and control.
+     @param extCode the code for the extension unit ID. The actual ID will be looked up.
+     */
 	IOReturn		setExtensionUnitSettings(UInt16 extCode, UInt8 controlSelector, void* setting, UInt32 length);
+    /*! Send a new setting to the given extension unit and control.
+     @param unitID the extension unit ID.
+     */
 	IOReturn		getExtensionUnitSetting(UInt8 unitID, UInt8 controlSelector, void* setting, UInt32 length);
+    /*! This is the real function that sets controls in the USB device. 
+     Builds a request structure and calls deviceRequest */
 	IOReturn		setExtensionUnitSetting(UInt8 unitID, UInt8 controlSelector, void* settings, UInt32 length);
 	IOReturn		doSelectorControlChange (IOAudioControl * audioControl, SInt32 oldValue, SInt32 newValue);
 	UInt8			getSelectorSetting (UInt8 selectorID);
@@ -325,7 +337,7 @@ public:
 	inline UInt32			getHardwareSampleRate() {return mCurSampleRate;}
 	inline void				setHardwareSampleRate(UInt32 inSampleRate) { mCurSampleRate = inSampleRate;}
 	//virtual	IOReturn		deviceRequest (IOUSBDevRequest * request, IOUSBCompletion * completion = NULL);			// Depricated, don't use
-    /*! // Pump a request to the USB device and get the result. */
+    /*! Send a request to the USB device and get the result. */
 	virtual	IOReturn		deviceRequest (IOUSBDevRequestDesc * request, IOUSBCompletion * completion = NULL);
 	static	IOReturn		deviceRequest (IOUSBDevRequest * request, EMUUSBAudioDevice * self, IOUSBCompletion * completion = 0);
 	static void				StatusAction(OSObject *owner, IOTimerEventSource *sender);

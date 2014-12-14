@@ -336,7 +336,7 @@ UInt8 EMUUSBAudioConfigObject::GetIsocEndpointDirection(UInt8 interfaceNum, UInt
   	debugIOLogPC("GetIsocEndpointDirection(%d, %d), thisStream = %p", interfaceNum, altInterfaceNum, thisStream);
  	debugIOLogPC("GetIsocEndpointDirection(%d, %d), thisControl = %p", interfaceNum, altInterfaceNum, thisControl);
 	if(NULL != thisStream && NULL != thisControl) {
-		UInt8	terminalLink = thisStream->GetTerminalLink();		// returns the unitID of the terminal the endpoint goes with
+		UInt8	terminalLink = thisStream->GetTerminalLink();	
 		debugIOLogPC("GetIsocEndpointDirection(%d, %d), terminalLink = %d", interfaceNum, altInterfaceNum, terminalLink);
 		if(0 != terminalLink) {
 			UInt8	numOutputs = thisControl->GetNumOutputTerminals();

@@ -1635,7 +1635,10 @@ IOReturn EMUUSBAudioEngine::performFormatChangeInternal (IOAudioStream *audioStr
             && audioStream != usbInputStream.audioStream) {
             needToChangeChannels = true;
             debugIOLog ("Need to adjust input number of channels, cur = %d, new = %d", usbInputStream.audioStream->format.fNumChannels, newFormat->fNumChannels);
-            usbInputStream.audioStream->setFormat(newFormat,false);
+            // FIXME this gives errors when switching to 4 channels. Maybe remove it?
+            // The error may be because beginConfigurationChange() was not yet called.
+            // this may be related to disabled code at end of this function?
+            // usbInputStream.audioStream->setFormat(newFormat,false);
         }
         sampleRate = *newSampleRate;
         sampleRateChanged = true;
@@ -1741,7 +1744,9 @@ IOReturn EMUUSBAudioEngine::performFormatChangeInternal (IOAudioStream *audioStr
     SetSampleRate(usbAudio, sampleRate.whole);		// no need to check the error
     
     // I think this code is not needed, as we have no controls needing to be changed
+    // Wouter: maybe we do. See comments inside if(newSampleRate) above .
 #if 0
+    // #6 this code is broken, don't enable.
     if (needToChangeChannels) {
         removeAllDefaultAudioControls();
         usbAudioDevice->createControlsForInterface(this, usbInputStream.interfaceNumber, newAlternateSettingID);
@@ -1905,8 +1910,12 @@ void EMUUSBAudioEngine::sampleRateHandler(void* target, void* parameter, IORetur
 
 IOReturn EMUUSBAudioEngine::SetSampleRate (EMUUSBAudioConfigObject *usbAudio, UInt32 inSampleRate) {
 	IOReturn				result = kIOReturnError;
+    
+    debugIOLogC("EMUUSBAudioEngine::SetSampleRate %d", inSampleRate);
 	
     if (usbAudioDevice && usbAudioDevice->hasSampleRateXU()) {// try using the XU method to set the sample rate before using the default
+        debugIOLogC("using SampleRateXU");
+
         UInt8	sampleRateToSet = 0;
         switch (inSampleRate) {// all the supported sample rates
             case 44100:
@@ -1933,6 +1942,7 @@ IOReturn EMUUSBAudioEngine::SetSampleRate (EMUUSBAudioConfigObject *usbAudio, UI
         }
         if (inSampleRate != usbAudioDevice->getHardwareSampleRate()) {
             result = usbAudioDevice->setExtensionUnitSettings(kClockRate, kClockRateSelector,(void*) &sampleRateToSet, kStdDataLen);
+            debugIOLogC("set result  = %x",result);
             if (kIOReturnSuccess == result) {// the engines are tied together
                 usbAudioDevice->setHardwareSampleRate(inSampleRate);
                 usbAudioDevice->setOtherEngineSampleRate(this, inSampleRate);
@@ -1941,6 +1951,8 @@ IOReturn EMUUSBAudioEngine::SetSampleRate (EMUUSBAudioConfigObject *usbAudio, UI
             }
         }
     } else if (usbAudio->IsocEndpointHasSampleFreqControl (mOutput.interfaceNumber, mOutput.alternateSettingID)) {// use the conventional method
+        debugIOLogC("using DeviceRequest");
+
 		IOUSBDevRequest		devReq;
 		UInt32				theSampleRate = OSSwapHostToLittleInt32 (inSampleRate);
         

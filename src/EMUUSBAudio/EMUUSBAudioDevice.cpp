@@ -2167,13 +2167,13 @@ IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequestDesc * request, IOUSBCo
 	IOReturn		result = kIOReturnSuccess;
     
 	if (mInterfaceLock) {
-        debugIOLogC("EMUUSBAudioDevice::deviceRequest locking");
+        //debugIOLogC("EMUUSBAudioDevice::deviceRequest locking");
 		IORecursiveLockLock(mInterfaceLock);
         
 		if(FALSE == mTerminatingDriver) {
 			UInt32	timeout = 5;
 			while(timeout && mControlInterface) {
-                debugIOLogC("EMUUSBAudioDevice::deviceRequest DeviceRequest");
+                //debugIOLogC("EMUUSBAudioDevice::deviceRequest DeviceRequest");
 				result = mControlInterface->DeviceRequest(request, completion);
                 debugIOLogC("EMUUSBAudioDevice::deviceRequest result=%d",result);
 				if(result != kIOReturnSuccess) {

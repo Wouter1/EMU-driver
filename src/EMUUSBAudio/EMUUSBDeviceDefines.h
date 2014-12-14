@@ -88,7 +88,8 @@ enum eDigitalFormat {
 	aes
 };
 
-/*! The extension unit ID. Probably these are elements in the EMU device that cna be controlled. */
+/*! The extension unit codes. XU's seem elements in the EMU device that cna be controlled.
+ See getExtensionUnitId to map these codes to IDs. */
 enum eExtensionUnitCode {
 	kClockRate			= 0xe301,
 	kClockSource		= 0xe302,
@@ -109,7 +110,7 @@ enum availableExtensionUnitSettinfs {
 	kXUDigitalSampleRate	= 0x80
 };
 
-/*!  The extension unit control selector  */
+/*!  The extension unit control selector. (why is this an enum ?)  */
 enum extensionUnitControlSelector {
 	kEnableProcessing		= 0x01,
 	kClockRateSupport		= 0x02,	// clock rate support
