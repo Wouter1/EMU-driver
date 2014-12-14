@@ -7972,16 +7972,18 @@ __ZN17EMUUSBAudioEngine13SetSampleRateEP23EMUUSBAudioConfigObjectj:
 00000000000089c6	movb	$0x4, -0x24(%rbp)		// sampleRateToSet = sr_176kHz
 00000000000089ca	jmp	0x89d0
 00000000000089cc	movb	$0x5, -0x24(%rbp)		// sampleRateToSet = sr_192kHz
-00000000000089d0	cmpl	0x188(%rdi), %r13d
+
+00000000000089d0	cmpl	0x188(%rdi), %r13d    //inSampleRate != usbAudioDevice->getHardwareSampleRate
 00000000000089d7	je	0x8aa2
 // if (inSampleRate != usbAudioDevice->getHardwareSampleRate())
-00000000000089dd	leaq	-0x24(%rbp), %rcx
-00000000000089e1	movl	$0x1, %r8d
-00000000000089e7	movl	$0x3, %edx
-00000000000089ec	movl	$0xe301, %esi
-00000000000089f1	callq	__ZN17EMUUSBAudioDevice24setExtensionUnitSettingsEthPvj
+00000000000089dd	leaq	-0x24(%rbp), %rcx		// &sampleRateToSet
+00000000000089e1	movl	$0x1, %r8d				// kStdDataLen 
+00000000000089e7	movl	$0x3, %edx				// kClockRateSelector
+00000000000089ec	movl	$0xe301, %esi			// kClockRate
+00000000000089f1	callq	__ZN17EMUUSBAudioDevice24setExtensionUnitSettingsEthPvj // IOReturn usbAudioDevice->setExtensionUnitSettings(..)
 00000000000089f6	testl	%eax, %eax
 00000000000089f8	jne	0x8a97
+// if (kIOReturnSuccess == result)
 00000000000089fe	movq	0x2b8(%rbx), %rax
 0000000000008a05	movl	%r13d, 0x188(%rax)
 0000000000008a0c	movq	0x2b8(%rbx), %rdi
@@ -7989,6 +7991,7 @@ __ZN17EMUUSBAudioEngine13SetSampleRateEP23EMUUSBAudioConfigObjectj:
 0000000000008a16	movq	%rbx, %rsi
 0000000000008a19	callq	__ZN17EMUUSBAudioDevice24setOtherEngineSampleRateEP17EMUUSBAudioEnginej
 0000000000008a1e	jmp	0x8a97
+// else part of if (inSampleRate != usbAudioDevice->getHardwareSampleRate())
 0000000000008a20	movl	%r13d, -0x24(%rbp)
 0000000000008a24	movb	$0x22, -0x40(%rbp)
 0000000000008a28	movb	$0x1, -0x3f(%rbp)
@@ -8017,11 +8020,11 @@ __ZN17EMUUSBAudioEngine13SetSampleRateEP23EMUUSBAudioConfigObjectj:
 0000000000008a8d	callq	*0x938(%rax)
 0000000000008a93	testl	%eax, %eax
 0000000000008a95	jne	0x8ac8
+// end of if-then-else usbAudioDevice && usbAudioDevice->hasSampleRateXU() ?? CHECK
 0000000000008a97	movl	%r13d, 0x33c(%rbx)
 0000000000008a9e	xorl	%eax, %eax
 0000000000008aa0	jmp	0x8ac8
-// end of if (inSampleRate != usbAudioDevice->getHardwareSampleRate())
-0000000000008aa2	movl	$0xe00002bc, %eax
+0000000000008aa2	movl	$0xe00002bc, %eax		// general error for the else case??
 0000000000008aa7	jmp	0x8ac8
 0000000000008aa9	movzbl	0x246(%rbx), %edx
 0000000000008ab0	movzbl	0x245(%rbx), %esi
@@ -8029,12 +8032,16 @@ __ZN17EMUUSBAudioEngine13SetSampleRateEP23EMUUSBAudioConfigObjectj:
 0000000000008aba	callq	__ZN23EMUUSBAudioConfigObject32IsocEndpointHasSampleFreqControlEhh
 0000000000008abf	testb	%al, %al
 0000000000008ac1	je	0x8aa2
+// if (usbAudio->IsocEndpointHasSampleFreqControl
 0000000000008ac3	jmpq	0x8a20
+// return
 0000000000008ac8	movq	-0x18(%rbp), %rbx
 0000000000008acc	movq	-0x10(%rbp), %r12
 0000000000008ad0	movq	-0x8(%rbp), %r13
 0000000000008ad4	leave
 0000000000008ad5	ret
+
+
 __ZN17EMUUSBAudioEngine21PrepareWriteFrameListEj:
 0000000000008ad6	pushq	%rbp
 0000000000008ad7	movq	%rsp, %rbp
