@@ -146,8 +146,10 @@ protected:
 	UInt32					mQueryXU;// the XU to query
 	UInt32					mCurSampleRate;
 	OSArray *				mMonoControlsArray;		// this flag is set by EMUUSBAudioEngine::performFormatChange
-    /*! array of registered engines. See also mNumEngines? */
+    /*! array of registered engines. I think this is about supporting multiple EMU devices. */
 	OSArray *				mRegisteredEngines;
+    /*! number of EMUUSBAudioEngine's. size of mRegisteredEngines. Seems always 1 */
+	UInt32					mNumEngines;
 	UInt32					mAvailXUs;			// what extension unit features are available
 	EMUXUCustomControl *	mXUChanged;//IOAudioSelectorControl
     /*! stores the selected clock source. 0= built-in 1=SPDif I think */
@@ -167,8 +169,6 @@ protected:
 	// values for the various XU settings arranged from largest to smallest
 	DirectMonCtrlBlock		mCurDirMonSettings;
 #endif
-    /*! number of EMUUSBAudioEngine's. Can there be more than one??*/
-	UInt32					mNumEngines;
     /*! counter for number of USB frames. When we hit kRefreshCount we refresh mNewReferenceUSBFrame */
 	UInt32					mAnchorResetCount;
     

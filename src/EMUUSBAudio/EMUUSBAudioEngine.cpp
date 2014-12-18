@@ -1913,6 +1913,10 @@ IOReturn EMUUSBAudioEngine::SetSampleRate (EMUUSBAudioConfigObject *usbAudio, UI
     
     debugIOLogC("EMUUSBAudioEngine::SetSampleRate %d", inSampleRate);
 	
+    if (usbAudio->IsocEndpointHasSampleFreqControl (mOutput.interfaceNumber, mOutput.alternateSettingID)) {
+        debugIOLogC("EMUUSBAudioEngine::SetSampleRate has IsocEndpointHasSampleFreqControl");
+    }
+    
     if (usbAudioDevice && usbAudioDevice->hasSampleRateXU()) {// try using the XU method to set the sample rate before using the default
         debugIOLogC("using SampleRateXU");
 

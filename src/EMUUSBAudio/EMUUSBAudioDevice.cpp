@@ -1599,6 +1599,7 @@ IOReturn EMUUSBAudioDevice::hardwareVolumeChangedHandler(OSObject * target, IOAu
 IOReturn EMUUSBAudioDevice::hardwareMuteChangedHandler(OSObject * target, IOAudioControl * audioControl, SInt32 oldValue, SInt32 newValue)
 {
     debugIOLogC("+EMUUSBAudioDevice::hardwareMuteChangedHandler");
+    return kIOReturnSuccess; // HACK the code below hangs up. #16
 	EMUUSBAudioDevice* device = OSDynamicCast(EMUUSBAudioDevice, target);
     
 	if (audioControl->getUsage() == kIOAudioControlUsageOutput)
