@@ -88,13 +88,14 @@ enum {
 	SYNCH_FRAME								= 0x0C
 };
 
+/*! Interface bDescriptorType values */
 enum {
     // For descriptor type
     CS_UNDEFINED							= 0x20,
     CS_DEVICE								= 0x21,
     CS_CONFIGURATION						= 0x22,
     CS_STRING								= 0x23,
-    CS_INTERFACE							= 0x24,
+    CS_INTERFACE							= 0x24, // block contains an ACInterfaceDescriptor
     CS_ENDPOINT								= 0x25
 };
 
@@ -112,12 +113,11 @@ enum {
 	VENDOR_SPECIFIC							= 0xff
 };
 
-/*! Probaly elements for IOAudioControls. IOAudioControls control the various attributes
- of the audio engine: output volume, mute, input gain, input selection, analog passthru */
+/*! Audio Control (AC) interface descriptor subtypes. 
+ See USBInterfaceDescriptorPtr.bDescriptorSubtype. Used for and thus part of an interface description.*/
 enum {
-    // Audio Control (AC) interface descriptor subtypes
     AC_DESCRIPTOR_UNDEFINED					= 0x00,
-    HEADER									= 0x01,
+    HEADER									= 0x01, // it's a = ACInterfaceHeaderDescriptorPtr
     INPUT_TERMINAL							= 0x02,
     OUTPUT_TERMINAL							= 0x03,
     MIXER_UNIT								= 0x04,
@@ -201,7 +201,7 @@ enum {
     EP_GENERAL								= 0x01
 };
 
-/*! requestType */
+/*! IOUSBDevRequestDesc -> bmRequestType */
 enum {
     REQUEST_CODE_UNDEFINED					= 0x00,
     SET_CUR									= 0x01,
@@ -241,6 +241,7 @@ enum {
 #define USB_AUDIO_IS_FUNCTION(subtype)	((subtype >= MIXER_UNIT) && (subtype <= EXTENSION_UNIT))
 #define USB_AUDIO_IS_TERMINAL(subtype)	((subtype == INPUT_TERMINAL) || (subtype == OUTPUT_TERMINAL))
 
+/*! see http://msdn.microsoft.com/en-us/library/windows/hardware/ff539280%28v=vs.85%29.aspx */
 typedef struct USBDeviceDescriptor {
     UInt8									bLength;
     UInt8									bDescriptorType;
@@ -258,6 +259,7 @@ typedef struct USBDeviceDescriptor {
     UInt8									bNumConfigurations;
 } USBDeviceDescriptor, *USBDeviceDescriptorPtr;
 
+/*! see http://msdn.microsoft.com/en-us/library/windows/hardware/ff539241%28v=vs.85%29.aspx */
 typedef struct USBConfigurationDescriptor {
     UInt8									bLength;
     UInt8									bDescriptorType;
@@ -269,6 +271,7 @@ typedef struct USBConfigurationDescriptor {
     UInt8									MaxPower;	// expressed in 2mA units
 } USBConfigurationDescriptor, *USBConfigurationDescriptorPtr;
 
+/*! see http://msdn.microsoft.com/en-us/library/windows/hardware/ff540065%28v=vs.85%29.aspx */
 typedef struct USBInterfaceDescriptor {
     UInt8									bLength;
     UInt8									bDescriptorType;
@@ -281,6 +284,7 @@ typedef struct USBInterfaceDescriptor {
     UInt8									iInterface;
 } USBInterfaceDescriptor, *USBInterfaceDescriptorPtr;
 
+/*! See http://msdn.microsoft.com/en-us/library/windows/hardware/ff539317%28v=vs.85%29.aspx */
 typedef struct USBEndpointDescriptor {
     UInt8									bLength;
     UInt8									bDescriptorType;
@@ -292,6 +296,7 @@ typedef struct USBEndpointDescriptor {
     UInt8									bSynchAddress;
 } USBEndpointDescriptor, *USBEndpointDescriptorPtr;
 
+/**************** Audio Control Structures **********************/
 typedef struct ACFunctionDescriptorHeader {
     UInt8									bLength;
     UInt8									bDescriptorType;

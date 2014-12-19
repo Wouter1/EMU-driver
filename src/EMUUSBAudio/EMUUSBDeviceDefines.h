@@ -56,12 +56,12 @@ enum eClockSourceType {
 };
 
 enum eSampleRate {
-	sr_44kHz,
-	sr_48kHz,
-	sr_88kHz,
-	sr_96kHz,
-	sr_176kHz,
-	sr_192kHz
+	sr_44kHz,       // 0
+	sr_48kHz,       // 1
+	sr_88kHz,       // 2
+	sr_96kHz,       // 3
+	sr_176kHz,      // 4
+	sr_192kHz       // 5
 };
 
 enum {

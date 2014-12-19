@@ -1395,6 +1395,7 @@ IOReturn EMUUSBAudioDevice::setExtensionUnitSetting(UInt8 unitID, UInt8 controlS
 		devReq.wLength = length;
 		devReq.pData = settingDesc;
 		FailIf((TRUE == isInactive()), Exit);
+        debugIOLogC("setExtensionUnitSetting bmRequestType=%x bRequest=%x wValue=%x wIndex=%x wLength=%x", devReq.bmRequestType, devReq.bRequest,devReq.wValue,devReq.wIndex,devReq.wLength);
 		result = deviceRequest(&devReq);
 	}
 Exit:
@@ -1599,7 +1600,7 @@ IOReturn EMUUSBAudioDevice::hardwareVolumeChangedHandler(OSObject * target, IOAu
 IOReturn EMUUSBAudioDevice::hardwareMuteChangedHandler(OSObject * target, IOAudioControl * audioControl, SInt32 oldValue, SInt32 newValue)
 {
     debugIOLogC("+EMUUSBAudioDevice::hardwareMuteChangedHandler");
-    return kIOReturnSuccess; // HACK the code below hangs up. #16
+    return kIOReturnSuccess; // HACK  the code below hangs up. #16
 	EMUUSBAudioDevice* device = OSDynamicCast(EMUUSBAudioDevice, target);
     
 	if (audioControl->getUsage() == kIOAudioControlUsageOutput)
