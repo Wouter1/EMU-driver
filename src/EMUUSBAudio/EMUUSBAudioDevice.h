@@ -113,6 +113,7 @@ class EMUUSBAudioDevice : public IOAudioDevice {
     OSDeclareDefaultStructors (EMUUSBAudioDevice);
     
 public:
+    /*! The USB control interface */
     IOUSBInterface *		mControlInterface;
     
 protected:
@@ -301,6 +302,17 @@ public:
     /*! This is the real function that sets controls in the USB device. 
      Builds a request structure and calls deviceRequest */
 	IOReturn		setExtensionUnitSetting(UInt8 unitID, UInt8 controlSelector, void* settings, UInt32 length);
+    
+    /*! General code that creates a request from a datablock of given length 
+     @param  unitID the unit ID. eg device->mHardwareOutputVolumeID
+     @param controlSelector control selector, eg VOLUME_CONTROL
+     @param requestType type of request, eg SET_CUR
+     @param channelNumber eg kMasterVolumeIndex
+     @param channelNr use 0 for general extension unit request, or the feature nr for feature unit request
+     @param data the data to add to the call
+     @param length the number of bytes in data */
+    IOReturn deviceRequest(UInt8 unitID, UInt8 controlSelector, UInt8 requestType,  UInt8 channelNr, UInt8* data, UInt32 length);
+
 	IOReturn		doSelectorControlChange (IOAudioControl * audioControl, SInt32 oldValue, SInt32 newValue);
 	UInt8			getSelectorSetting (UInt8 selectorID);
 	IOReturn		setSelectorSetting (UInt8 selectorID, UInt8 setting);
@@ -313,7 +325,7 @@ public:
      @param channelNumber eg kMasterVolumeIndex
      @param requestType type of request, eg SET_CUR
      @param newValue the value to set, an uint16
-     @param newValueLen bit weird, should always be 2??
+     @param newValueLen length of the data value (so always 2 as this sends uint16)
      */
 	IOReturn		setFeatureUnitSetting (UInt8 controlSelector, UInt8 unitID, UInt8 channelNumber, UInt8 requestType, UInt16 newValue, UInt16 newValueLen);
 	OSArray *		getPlaythroughPaths ();
@@ -339,7 +351,12 @@ public:
 	inline UInt32			getHardwareSampleRate() {return mCurSampleRate;}
 	inline void				setHardwareSampleRate(UInt32 inSampleRate) { mCurSampleRate = inSampleRate;}
 	//virtual	IOReturn		deviceRequest (IOUSBDevRequest * request, IOUSBCompletion * completion = NULL);			// Depricated, don't use
-    /*! Send a request to the USB device and get the result. */
+    
+    /*! Send a request to the USB device over mControlInterface (default pipe 0?)
+     and get the result. At most 5 attempts will be done if the call does not succeed immediately.
+     @param request The parameter block to send to the device (with the pData as an IOMemoryDesriptor)
+     @param completion optional on-completion callback. Default/null will execute request synchronously
+     */
 	virtual	IOReturn		deviceRequest (IOUSBDevRequestDesc * request, IOUSBCompletion * completion = NULL);
 	static	IOReturn		deviceRequest (IOUSBDevRequest * request, EMUUSBAudioDevice * self, IOUSBCompletion * completion = 0);
 	static void				StatusAction(OSObject *owner, IOTimerEventSource *sender);
@@ -369,6 +386,7 @@ public:
 	void	addHardVolumeControls(IOAudioEngine* audioEngine);
     /*! This function is called from IOAudioControl::setValue when user changes volume. */
 	static	IOReturn hardwareVolumeChangedHandler (OSObject *target, IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);
+    /*! This function is called from IOAudioControl::setValue when user changes mute setting. */
 	static	IOReturn hardwareMuteChangedHandler (OSObject *target, IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);
 	
 	void	SetUserClient(EMUUSBUserClient* userClient) { mUserClient = userClient; }

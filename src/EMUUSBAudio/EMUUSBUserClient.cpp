@@ -803,21 +803,17 @@ IOReturn EMUUSBUserClient::SetHeadPhoneSource(
 	
 	debugIOLog("EMUUSBUserClient::SetHeadPhoneSource: headphoneSource %d",headphoneSource);
 	
-	if (mDevice && mProcessingUnitID)
-	{
-		// use this extension unit API to send a processing unit request
-		mDevice->setExtensionUnitSetting(mProcessingUnitID,
-                                         0x2, // UD_MODE_SELECT_CONTROL
-                                         &headphoneSource,
-                                         sizeof(UInt16));
-	}
-	else {
-		debugIOLog("ERROR: EMUUSBUserClient::SetHeadPhoneSource: mProcessingUnitID %d mDevice %p",mProcessingUnitID, mDevice);
-		
-		return kIOReturnError;
-	}
     
-	return kIOReturnSuccess;
+	if (!(mDevice && mProcessingUnitID))
+	{
+        debugIOLog("ERROR: EMUUSBUserClient::SetHeadPhoneSource: mProcessingUnitID %d mDevice %p",mProcessingUnitID, mDevice);
+        
+        return kIOReturnError;
+    }
+    // use this extension unit API to send a processing unit request
+
+    return mDevice->deviceRequest(mProcessingUnitID, 0x2, // UD_MODE_SELECT_CONTROL
+                  SET_CUR, 0, (UInt8 *)&headphoneSource, sizeof(UInt16) );
 }
 
 IOReturn EMUUSBUserClient::GetMixerValue(
