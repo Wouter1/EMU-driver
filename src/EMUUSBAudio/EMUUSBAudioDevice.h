@@ -303,7 +303,7 @@ public:
      Builds a request structure and calls deviceRequest */
 	IOReturn		setExtensionUnitSetting(UInt8 unitID, UInt8 controlSelector, void* settings, UInt32 length);
     
-    /*! General code that creates a request from a datablock of given length 
+    /*! Sends an request with an outgoing datablock of given lengt.
      @param  unitID the unit ID. eg device->mHardwareOutputVolumeID
      @param controlSelector control selector, eg VOLUME_CONTROL
      @param requestType type of request, eg SET_CUR
@@ -311,7 +311,17 @@ public:
      @param channelNr use 0 for general extension unit request, or the feature nr for feature unit request
      @param data the data to add to the call
      @param length the number of bytes in data */
-    IOReturn deviceRequest(UInt8 unitID, UInt8 controlSelector, UInt8 requestType,  UInt8 channelNr, UInt8* data, UInt32 length);
+    IOReturn deviceRequestIn(UInt8 unitID, UInt8 controlSelector, UInt8 requestType,  UInt8 channelNr, UInt8* data, UInt32 length);
+    
+    /*! Sends an request with an outgoing datablock of given lengt.
+     @param  unitID the unit ID. eg device->mHardwareOutputVolumeID
+     @param controlSelector control selector, eg VOLUME_CONTROL
+     @param requestType type of request, eg SET_CUR
+     @param channelNumber eg kMasterVolumeIndex
+     @param channelNr use 0 for general extension unit request, or the feature nr for feature unit request
+     @param data the data to add to the call
+     @param length the number of bytes in data */
+    IOReturn deviceRequestOut(UInt8 unitID, UInt8 controlSelector, UInt8 requestType,  UInt8 channelNr, UInt8* data, UInt32 length);
 
 	IOReturn		doSelectorControlChange (IOAudioControl * audioControl, SInt32 oldValue, SInt32 newValue);
 	UInt8			getSelectorSetting (UInt8 selectorID);
