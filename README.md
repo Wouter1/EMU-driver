@@ -12,7 +12,8 @@ The present version is in a pretty bad shape. I did a major effort to refactor t
 it's on the way but not yet polished. The rest of the code is still in original state.
 The first goal here was to get the audio input working properly, without the clicking issues of the official driver when used in OSX10.6 and higher.
 
-* This version only works for audio RECORDING at 96kHz.
+* This version only works for audio RECORDING at 96kHz. 
+  * 88.2kHz seems ok but not extensively tested. 44.1 and 48kHz stutter. 
 * The audio output does not work. 
 * Only audio input stereo 96kHz was tested on EMU0404 USB. 
 
