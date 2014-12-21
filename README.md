@@ -21,17 +21,15 @@ Please notify me how my driver works on other EMU USB devices.
 
 Installation
 ========
-1. Use your original control panel to set the EMU speed to 96 kHz
-2. Turn off the EMU device
-3. Download (click on "Download ZIP") and unzip the driver
-4. Run the kextInstall script 
-5. enter your admin password at the prompt
+1. Turn off the EMU device
+2. Download (click on "Download ZIP") and unzip the driver
+3. Run the kextInstall script 
+4. enter your admin password at the prompt
 
 or
 
-1. Use your original control panel to set the EMU speed to 96 kHz
-2. manually copy EMUUSBAudio.kext into  /System/Library/Extensions/ 
-3. reboot
+1. manually copy EMUUSBAudio.kext into  /System/Library/Extensions/ 
+2. reboot
 
 Ext not loading
 ======
@@ -47,6 +45,7 @@ Usage
 ======
 
 1. Install the driver as above
+2. Use the EMU control panel to select 96kHz (88kHz seems ok too, 48 and 44.1 are still stuttering)
 2. Select the EMU input in your favourite tool (e.g., Audacity)
 3. Make your recording
 
