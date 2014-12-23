@@ -12,10 +12,9 @@ The present version is in a pretty bad shape. I did a major effort to refactor t
 it's on the way but not yet polished. The rest of the code is still in original state.
 The first goal here was to get the audio input working properly, without the clicking issues of the official driver when used in OSX10.6 and higher.
 
-* This version only works for audio RECORDING at 96kHz. 
-  * 88.2kHz seems ok but not extensively tested. 44.1 and 48kHz stutter. 
+* This version only works for audio RECORDING (44.1, 48, 88.2 and 96kHz).
 * The audio output does not work. 
-* Only audio input stereo 96kHz was tested on EMU0404 USB. 
+* I can only test on EMU0404 USB as I have no other EMU devices. 
 
 Please notify me how my driver works on other EMU USB devices.
 
@@ -46,9 +45,9 @@ Usage
 ======
 
 1. Install the driver as above
-2. Use the EMU control panel to select 96kHz (88kHz seems ok too, 48 and 44.1 are still stuttering)
-2. Select the EMU input in your favourite tool (e.g., Audacity)
-3. Make your recording
+2. Use the EMU control panel to select the sample rate you want
+3. Select the EMU input in your favourite tool (e.g., Audacity)
+4. Make your recording
 
 Uninstall
 =======
