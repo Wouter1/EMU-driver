@@ -2764,7 +2764,8 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
     absolutetime_to_nanoseconds(wt,&wrapTimeNs);
     
     if (goodWraps >= 5) {
-        // regular operation after initial wraps.
+        // regular operation after initial wraps. Enable debug line to check timestamping
+        //debugIOLogC("UsbInputRing::notifyWrap %lld",wrapTimeNs);
         takeTimeStampNs(lpfilter.filter(wrapTimeNs),TRUE);
     } else {
         debugIOLogC("UsbInputRing::notifyWrap %d",goodWraps);
@@ -2776,7 +2777,9 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
             SInt64 deltaT = wrapTimeNs - previousfrTimestampNs - expected_wrap_time;
             UInt64 errorT = abs( deltaT );
             
-            if (errorT < expected_wrap_time/200) { //HACK  /1000 for 96kHz; /200 for 48kHz
+            // since we check every ms for completion,
+            // we have floor(expected_wrap_time_ms) and ceil(expected_wrap_time_ms) as possibilities.
+            if (errorT < 10000000) { // 1ms = max deviation from expected wraptime.
                 goodWraps ++;
                 if (goodWraps == 5) {
                     lpfilter.init(wrapTimeNs,expected_wrap_time);

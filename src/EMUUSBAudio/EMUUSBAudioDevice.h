@@ -217,7 +217,9 @@ protected:
     /*! called from TimerAction, scheduled as a timer */
 	void					doTimerAction(IOTimerEventSource * timer);
 
-    /*! get the extension unit unitID. for some extension code. */
+    /*! get the extension unit unitID. for some extension code.
+     @param extCode the eExtensionUnitCode
+     */
 	UInt8					getExtensionUnitID(UInt16 extCode);
     
 	IOReturn				protectedXUChangeHandler(IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);

@@ -106,6 +106,11 @@ struct UsbInputRing: RingBufferDefault<UInt8>
      measurements showed no relation between this position and the time of 
      the frame that caused the wrap.
      
+     We check for outliers here. The input rate is very steady. 
+     And we request for timestamp updates on the USB input every millisecond.
+     Therefore the wrap time should vary never more than 1 millisecond from expected.
+     We reject outliers while starting up.
+     
      @param time the timestamp for the USB frame that wrapped the buffer.
      I guess that the timestamp is for completion of the frame but I can't find
      it in the USB documentations.

@@ -1308,9 +1308,6 @@ void EMUUSBAudioDevice::addMuteControl(EMUUSBAudioEngine * usbAudioEngine, UInt8
 	}
 }
 
-/*!
- @param extCode the eExtensionUnitCode
- */
 UInt8 EMUUSBAudioDevice::getExtensionUnitID(UInt16 extCode) {
 	UInt8	unitID = 0;
 	switch (extCode) {
@@ -1454,7 +1451,7 @@ IOReturn EMUUSBAudioDevice::deviceRequestOut(UInt8 unitID, UInt8 controlSelector
     
     ReturnIf(!data, kIOReturnBadArgument);
     
-    // CHECK kIODirectionOut is wrt user land. For kernel it means that the mem is readonly
+    // CHECK kIODirectionOut is wrt user land. For kernel it means kIODirectionOut that the mem is readonly
     // But we need both directions, here we write,  and USB device (also kernel) reads?
     settingDesc = IOBufferMemoryDescriptor::withBytes(data, length, kIODirectionOut, true);
     ReturnIf(!settingDesc, kIOReturnNoMemory);

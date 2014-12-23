@@ -55,8 +55,6 @@ private:
     UInt64 dx;
     /*! the deviation/drift for the filter (ns)*/
     UInt64 u;
-    /*! expected wrap time. see init() */
-    UInt64 expected_wrap_time;
     
 };
 
