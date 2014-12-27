@@ -33,12 +33,14 @@ or
 
 Ext not loading
 ======
-I never had an issue with this, but on the web I see that 
-the kernel may refuse to load kernel extensions if you are not a developer.
-A way to get around this is to use this command from the command line
+The driver is not signed and Yosemite refuses to load if you are not a developer. 
+To allow loading, open a console and give the following command
+
 ```
 sudo nvram boot-args="kext-dev-mode=1"
 ```
+
+and reboot the machine. 
 
 
 Usage
