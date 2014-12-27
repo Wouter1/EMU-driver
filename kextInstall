@@ -21,7 +21,8 @@ cd /System/Library/Extensions
 sudo chgrp -R wheel EMUUSBAudio.kext
 echo "loading new kext"
 sudo kextload -v EMUUSBAudio.kext
-kextutil -s ~/symbols/ -A EMUUSBAudio.kext/
+# enable following for debugging.
+# kextutil -s ~/symbols/ -A EMUUSBAudio.kext/
 echo "so long"
 
 
