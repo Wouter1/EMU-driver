@@ -31,6 +31,8 @@ or
 1. manually copy EMUUSBAudio.kext into  /System/Library/Extensions/ 
 2. reboot
 
+If you like you can also copy the control panel into your applications directory.
+
 Ext not loading
 ======
 The driver is not signed and Yosemite refuses to load if you are not a developer. 
