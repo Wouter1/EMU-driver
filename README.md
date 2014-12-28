@@ -12,6 +12,7 @@ The present version is in a pretty bad shape. I did a major effort to refactor t
 it's on the way but not yet polished. The rest of the code is still in original state.
 The first goal here was to get the audio input working properly, without the clicking issues of the official driver when used in OSX10.6 and higher.
 
+* This version works on Mavericks but not on Yosemite (see issue #18).
 * This version only works for audio RECORDING (44.1, 48, 88.2 and 96kHz).
 * The audio output does not work. 
 * I can only test on EMU0404 USB as I have no other EMU devices. 
