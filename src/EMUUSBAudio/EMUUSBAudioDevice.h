@@ -99,12 +99,9 @@ enum {
  * It manages the inputs at a high level, like 
  * detecting changes in volume or sample rate which goes through extension units (XUs). 
  * I could not find any documentation on XUs, but 
- * Apparently an XU is something on the EMU, it probably has a number of registers that can be set
- * to change the device behaviour (like sample rate and volume).
- * A little bit of communication goes on with EMU device here,
- * this concerns only the control pipe.
- * Actual work regarding this is done in the other classes, particularly
- * AudioEngine for connecting to the device and reading and writing sample streams, converting them etc
+ * an XU is something on the EMU, for the available units refer to extensionUnitControlSelector.
+ * Changes in XUs are detected through EMUUSBAudioDevice::deviceXUChangeHandler
+ * and then forwarded to a CustomControl object.
  * <XU>Control.cpp files: contain code to handle the <XU> control like volumelevel and mute.
  */
 class EMUUSBAudioDevice : public IOAudioDevice {

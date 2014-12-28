@@ -321,6 +321,7 @@ UInt8 EMUUSBAudioConfigObject::GetEndpointPollInterval(UInt8 interfaceNum, UInt8
 	return pollInterval;
 }
 
+
 // Use GetTerminalLink to get the unit number of the input or output terminal that the endpoint is associated with.
 // With that terminal, you can figure out if it's an input or output terminal, and the direction of the endpoint.
 
@@ -547,6 +548,8 @@ UInt8 EMUUSBAudioConfigObject::GetNumChannels(UInt8 interfaceNum, UInt8 altInter
 	}
     return numChannels;
 }
+
+
 
 UInt8 EMUUSBAudioConfigObject::GetNumControls(UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 featureUnitID) {
     EMUUSBAudioControlObject*		control = GetControlObject(interfaceNum, altInterfaceNum);
@@ -1822,6 +1825,8 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
         return assocEndpointRefresh;
     }
 #endif
+    
+    
     UInt8 EMUUSBAudioStreamObject::GetEndpointPollInt(UInt8 address) {
         EMUUSBEndpointObject*	thisEndpoint = GetEndpointByAddress(address);
         UInt8				pollInterval = 0;
@@ -1977,6 +1982,8 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                         EMUUSBEndpointObject*	endpoint = EMUUSBEndpointObject::create();
                         endpoint->SetAddress(((USBEndpointDescriptorPtr)theInterfacePtr)->bEndpointAddress);
                         endpoint->SetAttributes(((USBEndpointDescriptorPtr)theInterfacePtr)->bmAttributes);
+                        debugIOLogPC("attributes %x",endpoint->GetAttributes());
+
                         endpoint->SetMaxPacketSize(USBToHostWord(((USBEndpointDescriptorPtr)theInterfacePtr)->wMaxPacketSize));
                         endpoint->SetRefreshInt(((USBEndpointDescriptorPtr)theInterfacePtr)->bRefresh);
                         endpoint->SetPollInt(((USBEndpointDescriptorPtr)theInterfacePtr)->bInterval);
@@ -1999,7 +2006,10 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                         break;
                     case CS_ENDPOINT:
                         debugIOLogPC("in CS_ENDPOINT in ParseASInterfaceDescriptor");
+
                         if(EP_GENERAL ==((ASEndpointDescriptorPtr)theInterfacePtr)->bDescriptorSubtype) {
+                            debugIOLogPC("attributes! %x",((ASEndpointDescriptorPtr)theInterfacePtr)->bmAttributes);
+
                             theIsocEndpointObject = new EMUUSBCSASIsocADEndpointObject(((ASEndpointDescriptorPtr)theInterfacePtr)->bmAttributes &(1 << sampleFreqControlBit),
                                                                                        ((ASEndpointDescriptorPtr)theInterfacePtr)->bmAttributes &(1 << pitchControlBit),
                                                                                        ((ASEndpointDescriptorPtr)theInterfacePtr)->bmAttributes &(1 << maxPacketsOnlyBit),

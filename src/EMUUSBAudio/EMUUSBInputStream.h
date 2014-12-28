@@ -96,6 +96,9 @@ public:
     /*!  this is TRUE until we receive the first USB packet. */
 	Boolean					startingEngine;
     
+    /*! HACK for Yosemite #18 explicit counting of USB frame numbers */
+    UInt64                  nextFrameNr;
+    
     
 private:
     
@@ -166,6 +169,22 @@ private:
     
     /*! set to true after succesful start() */
     bool started;
+    
+//    /*! HACKS for trying to read feedback. Read errors... */
+//    UInt32 counter =0;
+//    UInt32 *							aveSampleRateBuf;		// 4 byte value
+//	IOMemoryDescriptor *				neededSampleRateDescriptor;
+//    /*! HACK a frame to communicate about sample rates. Callbacks are to sampleRateHandler */
+//	IOUSBIsocFrame						mSampleRateFrame;
+//    /*! HACK */
+//    IOUSBIsocCompletion					sampleRateCompletion;
+//
+//    /*! HACK */
+//	static void sampleRateHandler (void * target, void * parameter, IOReturn result, IOUSBIsocFrame * pFrames);
+//    /*! HACK */
+//    IOReturn CheckForAssociatedEndpoint (UInt8 ourInterfaceNumber, UInt8 alternateSettingID);
+
+
 };
 
 

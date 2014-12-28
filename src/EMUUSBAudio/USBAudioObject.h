@@ -773,6 +773,33 @@ public:
     virtual void					free (void);
     
 	UInt8							GetAddress (void) {return address;}
+    /*! Returns the attributes of this endpoint.
+     Bits 1..0: Transfer Type (see USB_ENDPOINT_TYPE_XXX).
+     Bits 7..2: Reserved.
+     
+     If isochronous endpoint:
+     
+     Bits 3..2: Synchronisation type
+     
+     00 = No synchronisation
+     
+     01 = Asynchronous
+     
+     10 = Adaptive
+     
+     11 = Synchronous
+     
+     Bits 5..4: Usage Type
+     
+     00 = Data endpoint
+     
+     01 = Feedback endpoint
+     
+     10 = Explicit feedback data endpoint
+     
+     11 = Reserved
+     
+     @return endpoint attributes, or null if no attributes. */
 	UInt8							GetAttributes (void) {return attributes;}
 	UInt8							GetDirection (void) {return ((address & 0x80) >> 7);}
 	UInt16							GetMaxPacketSize (void) {return maxPacketSize;}
@@ -817,6 +844,7 @@ class EMUUSBAudioStreamObject : public OSObject {
     OSDeclareDefaultStructors (EMUUSBAudioStreamObject);
     
 private:
+    /*!  array<EMUUSBEndpointObject> */
     OSArray *						theEndpointObjects;
     EMUUSBCSASIsocADEndpointObject *	theIsocEndpointObject;
     
@@ -927,6 +955,7 @@ public:
 	UInt32							GetHighestSampleRate (UInt8 interfaceNum, UInt8 altInterfaceNum);
 	UInt32							GetEndpointMaxPacketSize(UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 address);
 	UInt8							GetEndpointPollInterval(UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 direction);
+
 	UInt8							GetIsocAssociatedEndpointAddress (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 address);
 #if !CUSTOMDEVICE
 	UInt8							GetIsocAssociatedEndpointRefreshInt (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 address);

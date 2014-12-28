@@ -158,6 +158,7 @@ struct StreamInfo {
     IOAudioStream				  *audioStream;
     /*! IOUSBPipe used for isochronous reading input streams from USB*/
     IOUSBPipe					  *pipe;
+    /*! pipe for collecting status info from the main pipe */
     IOUSBPipe					  *associatedPipe;
     
     /*! @discussion array of IOUSBLowLatencyIsocFrame containing USB status for a frame.

@@ -138,6 +138,9 @@ private:
     
     /*! expected wrap time in ns. See filter.init(). */
     UInt64 expected_wrap_time;
+    
+    /*! Sum of number of wrap times, to estimate the average and max wrap time */
+    UInt64 timeSum;
 };
 
 
@@ -192,7 +195,8 @@ public:
     /*! called from EMUUSBAudioDevice when rate changes. Apparently there can be multiple audio engines
      and the others are informed through this when one engine detects changes. */
 	virtual IOReturn hardwareSampleRateChanged(const IOAudioSampleRate *sampleRate);
-	static void sampleRateHandler (void * target, void * parameter, IOReturn result, IOUSBIsocFrame * pFrames);
+	
+    //static void sampleRateHandler (void * target, void * parameter, IOReturn result, IOUSBIsocFrame * pFrames);
     
     /*!
      queue a write from clipOutputSamples. This is called from clipOutputSamples.
@@ -339,9 +343,9 @@ protected:
      */
 	IOReturn	AddAvailableFormatsFromDevice (EMUUSBAudioConfigObject *usbAudio,
                                                UInt8 ourInterfaceNumber);
-	IOReturn	CheckForAssociatedEndpoint (EMUUSBAudioConfigObject *usbAudio,
-                                            UInt8 ourInterfaceNumber,
-                                            UInt8 alernateSettingID);
+//	IOReturn	CheckForAssociatedEndpoint (EMUUSBAudioConfigObject *usbAudio,
+//                                            UInt8 ourInterfaceNumber,
+//                                            UInt8 alernateSettingID);
 	IOReturn	GetDefaultSettings (IOUSBInterface *streamInterface,
 								    IOAudioSampleRate * sampleRate);
     

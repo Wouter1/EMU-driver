@@ -157,16 +157,22 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
 		}
         
         /*The updatefrequency is not so well documented. But in IOUSBInterfaceInterface192 I read:
-         Specifies how often, in milliseconds, the frame list data should be updated. Valid range is 0 - 8. If 0, it means that the framelist should be updated at the end of the transfer.
+         Specifies how often, in milliseconds, the frame list data should be updated. Valid range is 0 - 8. 
+         If 0, it means that the framelist should be updated at the end of the transfer.
          It appears that this number also has impact on the timing details in the frame list.
          If you set this to 0, there happens an additional 8ms for a full framelist once in a
          few minutes in the timings.
          If you set this to 1, this jump is 8x more often, about once 30 seconds, but is only 1ms.
          We must keep these jumps small, to avoid timestamp errors and buffer overruns.
          */
-		result = pipe->Read(bufferDescriptors[frameListNum], kAppleUSBSSIsocContinuousFrame,
-                        numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
-        if (result!=kIOReturnSuccess) {
+        result = pipe->Read(bufferDescriptors[frameListNum], kAppleUSBSSIsocContinuousFrame, numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
+        
+        // kAppleUSBSSIsocContinuousFrame seems to give error e00002ef on Yosemite
+        // maybe something like engine->mBus->GetFrameNumber()?
+//        IOUSBController *	mBus = streamInterface->GetDevice()->GetBus();
+//		result = pipe->Read(bufferDescriptors[frameListNum], mBus->GetFrameNumber() + 1, numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
+        if (result != kIOReturnSuccess) {
+            // FIXME #17 if this goes wrong, why continue?
             doLog("USB pipe READ error %x",result);
         }
 		if (frameQueuedForList) {
@@ -246,8 +252,84 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
         started = false;
         notifyClosed();
     }
+
+// HACK attempt to read feedback from device.
+//    if (counter++==100) {
+//
+//        CheckForAssociatedEndpoint( interfaceNumber, alternateSettingID);
+//    }
     
 	debugIOLogR("- readCompleted currentFrameList=%d",currentFrameList);
 	return;
 }
+
+
+// Attempt to read the Feedback. Doesn't work, gives underflow errors 
+//IOReturn EMUUSBInputStream::CheckForAssociatedEndpoint (UInt8 ourInterfaceNumber, UInt8 alternateSettingID) {
+//	IOReturn		result = kIOReturnSuccess;
+//	IOUSBFindEndpointRequest	assocReq;
+//	assocReq.type = kUSBIsoc;
+//	assocReq.direction = kUSBIn;
+//	assocReq.maxPacketSize = 4;
+//	assocReq.interval = 0xff;
+//
+//	associatedPipe = streamInterface->FindNextPipe(NULL, &assocReq);
+//    ReturnIf(NULL == associatedPipe, kIOReturnError);
+//    
+//    //framesUntilRefresh = kEMURefreshRate;// hardcoded value
+//	//refreshInterval = 5;
+//	//debugIOLogC("framesUntilRefresh %d", framesUntilRefresh);
+//	//debugIOLogC("found sync endpoint");
+//	if (NULL == neededSampleRateDescriptor) {
+//		debugIOLogC("***********************************allocating neededSampleRateDescriptor");
+//		aveSampleRateBuf = (UInt32 *)IOMalloc (sizeof (UInt32));
+//		ReturnIf (NULL == aveSampleRateBuf, kIOReturnError);
+//		bzero(aveSampleRateBuf, 4);
+//		neededSampleRateDescriptor = IOMemoryDescriptor::withAddress(aveSampleRateBuf, 4, kIODirectionIn);
+//		ReturnIf(NULL == neededSampleRateDescriptor, kIOReturnError);
+//		neededSampleRateDescriptor->prepare();
+//	}
+//	mSampleRateFrame.frStatus = -1;//[0]
+//	mSampleRateFrame.frReqCount = 4; // USB 2.0
+//	mSampleRateFrame.frActCount = 0;
+//	sampleRateCompletion.target = (void *)this;
+//	sampleRateCompletion.action = sampleRateHandler;
+//	sampleRateCompletion.parameter = 0;
+//    
+//
+//    associatedPipe->retain();
+//    
+//    IOReturn res = associatedPipe->Read(neededSampleRateDescriptor, kAppleUSBSSIsocContinuousFrame, 1,&(mSampleRateFrame), &sampleRateCompletion);
+//    debugIOLog("Started associated pipe reading %x",res);
+//
+//    
+//	return result;
+//}
+//
+//
+//void EMUUSBInputStream::sampleRateHandler(void* target, void* parameter, IOReturn result, IOUSBIsocFrame* pFrames) {
+//    debugIOLog("+EMUUSBAudioEngine::sampleRateHandler %x",result);
+//	if (target) {
+//		EMUUSBInputStream*	inStream = (EMUUSBInputStream*) target;
+//		IOFixed				theSampleRate;
+//		UInt32				newSampleRate ;
+//        debugIOLog("read %d: %x",inStream->mSampleRateFrame.frActCount, *inStream->aveSampleRateBuf);
+//
+//		//if (kIOReturnSuccess == result) {
+//        { //always print this.
+//			IOFixed	fract;
+//			UInt16	fixed;
+//			newSampleRate = *(inStream->aveSampleRateBuf);
+//			theSampleRate = USBToHostLong(newSampleRate);
+//			fixed = theSampleRate >> 16;
+//			newSampleRate = fixed * 1000;
+//			fract = IOFixedMultiply(theSampleRate & 0x0000FFFF, 1000 << 16);
+//            
+//            debugIOLog("+EMUUSBAudioEngine::sampleRateHandler fixed=%ld fract=%ld",(long)newSampleRate,(long)fract);
+//            
+//			newSampleRate += (fract & 0xFFFF0000) >> 16;
+//        }
+//
+//	}
+//}
 
