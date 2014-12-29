@@ -143,9 +143,7 @@ private:
     /*! static version of readCompleted, with first argument being 'this' */
     static void         readCompleted (void * object, void * frameListIndex, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
     
-    /*!readHandler is the callback from USB completion.
-     
-     @discussion Wouter: This implements IOUSBLowLatencyIsocCompletionAction and the callback function for USB frameread.
+    /*!readHandler is the callback from USB completion. This implements IOUSBLowLatencyIsocCompletionAction and the callback function for USB frameread.
      
      @param frameListIndex the frameList number that completed and triggered this call.
      @param result  this handler will do special actions if set values different from kIOReturnSuccess.
@@ -153,8 +151,6 @@ private:
      */
     void            readCompleted (void * frameListIndex, IOReturn result,
                                    IOUSBLowLatencyIsocFrame * pFrames);
-
-
     
     FrameSizeQueue *            frameSizeQueue;
     
@@ -169,21 +165,6 @@ private:
     
     /*! set to true after succesful start() */
     bool started;
-    
-//    /*! HACKS for trying to read feedback. Read errors... */
-//    UInt32 counter =0;
-//    UInt32 *							aveSampleRateBuf;		// 4 byte value
-//	IOMemoryDescriptor *				neededSampleRateDescriptor;
-//    /*! HACK a frame to communicate about sample rates. Callbacks are to sampleRateHandler */
-//	IOUSBIsocFrame						mSampleRateFrame;
-//    /*! HACK */
-//    IOUSBIsocCompletion					sampleRateCompletion;
-//
-//    /*! HACK */
-//	static void sampleRateHandler (void * target, void * parameter, IOReturn result, IOUSBIsocFrame * pFrames);
-//    /*! HACK */
-//    IOReturn CheckForAssociatedEndpoint (UInt8 ourInterfaceNumber, UInt8 alternateSettingID);
-
 
 };
 

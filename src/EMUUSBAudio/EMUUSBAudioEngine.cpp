@@ -2780,42 +2780,35 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
     
     absolutetime_to_nanoseconds(wt,&wrapTimeNs);
     
-    if (goodWraps > CALIBRATION_NR) {
+    if (goodWraps >= 5) {
         // regular operation after initial wraps. Enable debug line to check timestamping
-        debugIOLogC("UsbInputRing::notifyWrap %lld. Buffer slack %u",wrapTimeNs,(unsigned int)vacant());
+        //debugIOLogC("UsbInputRing::notifyWrap %lld",wrapTimeNs);
         takeTimeStampNs(lpfilter.filter(wrapTimeNs),TRUE);
     } else {
         debugIOLogC("UsbInputRing::notifyWrap %d",goodWraps);
         // setting up the timer. Find good wraps.
         if (goodWraps == 0) {
-            // first time we can't compute delta, continue.
-            timeSum = 0; // reset the sum
-            debugIOLogC("UsbInputRing::Calibrating timer. Please wait (can take 10 sec)...");
-
+            goodWraps++;
         } else {
-            // compute deltaT. Take sum till we are at 10.
             // check if previous wrap had correct spacing deltaT.
-            // See Technical Note TN2274 - USB Audio on the Mac for restrictions.
-            // basically we can have N-1, N or N+1 stereo(or quad)samples in each USB packet.
-            // eg with 1ms packets and 44.1kHz we have N=44 or 45.
-            // see also EstimatingRate.pdf. We take the MAX possible period
-            // given 10 deltas.
-            // Even though all values are in ns here, the wrapTime are
-            // really milliseconds as that's the accuracy of the USB timestamps
-            // the nanosec accuracy is reached only after the filtering.
-            UInt64 deltaT = wrapTimeNs - previousfrTimestampNs;
-            timeSum += deltaT;
-            if (goodWraps == CALIBRATION_NR) {
-                // add 1 ms, as our measurement values are all ms in fact.
-                // CHECK should we round all measurements to nearest ms?
-                UInt64 estimatedmax = (timeSum + 1000000)/CALIBRATION_NR;
-                lpfilter.init(wrapTimeNs,estimatedmax);
-                takeTimeStampNs(wrapTimeNs,FALSE);
-                doLog("USB timer calibrated to %lld (expected was %lld)",estimatedmax,expected_wrap_time);
+            SInt64 deltaT = wrapTimeNs - previousfrTimestampNs - expected_wrap_time;
+            UInt64 errorT = abs( deltaT );
+            // since we check every ms for completion,
+            // we have floor(expected_wrap_time_ms) and ceil(expected_wrap_time_ms) as possibilities.
+            if (errorT < 10000000) { // 1ms = max deviation from expected wraptime.
+                goodWraps ++;
+                if (goodWraps == 5) {
+                    lpfilter.init(wrapTimeNs,expected_wrap_time);
+                    takeTimeStampNs(wrapTimeNs,FALSE);
+                    doLog("USB timer started");
+                }
+            } else {
+                goodWraps = 0;
+                doLog("USB hick (expected %lld, got %lld, error=%lld). timer re-syncing.",
+                      expected_wrap_time, wrapTimeNs - previousfrTimestampNs, errorT);
             }
         }
         previousfrTimestampNs = wrapTimeNs;
-        goodWraps ++;
     }
 }
 

@@ -138,9 +138,6 @@ private:
     
     /*! expected wrap time in ns. See filter.init(). */
     UInt64 expected_wrap_time;
-    
-    /*! Sum of number of wrap times, to estimate the average and max wrap time */
-    UInt64 timeSum;
 };
 
 
