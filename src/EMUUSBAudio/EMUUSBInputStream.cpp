@@ -85,6 +85,9 @@ IOReturn EMUUSBInputStream::update() {
 }
 
 IOReturn EMUUSBInputStream::GatherInputSamples() {
+    UInt16 size;
+    UInt8 *source;
+    
     debugIOLogRD("+GatherInputSamples %d", bufferOffset / multFactor);
 
     // check if we moved to the next frame. This is done when callback happened.
@@ -109,14 +112,21 @@ IOReturn EMUUSBInputStream::GatherInputSamples() {
           && kUSBLowLatencyIsochTransferKey != pFrames[frameIndex].frStatus // partially transported
           )
     {
-        UInt8*			source = (UInt8*) readBuffer +
-            (currentFrameList * readUSBFrameListSize) + maxFrameSize * frameIndex;
+        size = pFrames[frameIndex].frActCount;
+        source = (UInt8*) readBuffer + (currentFrameList * readUSBFrameListSize) + maxFrameSize * frameIndex;
+
+        if (size >=6  && size%6 != 0 ) {
+            size = size-4; // workaround for MICROSOFT_USB_EHCI_BUG_WORKAROUND
+            source = source + 4;
+        }
+
         if (mDropStartingFrames <= 0)
         {
+            
             // FIXME. We should not call from inside locked area.
-            usbRing->push(source, pFrames[frameIndex].frActCount ,pFrames[frameIndex].frTimeStamp );
+            usbRing->push(source, size ,pFrames[frameIndex].frTimeStamp );
         }
-        else if(pFrames[frameIndex].frActCount && mDropStartingFrames > 0)
+        else if(size && mDropStartingFrames > 0)
         {
             mDropStartingFrames--; // only skip frames of nonzero length.
         }
