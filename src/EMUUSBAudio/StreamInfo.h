@@ -198,7 +198,7 @@ struct StreamInfo {
     /*! shortcut to bufferMemoryDescriptor actual buffer bytes. Really UInt8*. */
     void *						bufferPtr;
     
-    /*! the expected USB MBus Frame number where we are looking for. Initially this is at frameOffset from the current frame number */
+    /*! the next USB MBus Frame number that can be used for read/write. Initially this is at frameOffset from the current frame number. Must be incremented with steps of size numUSBTimeFrames */
     UInt64						usbFrameToQueueAt;
     /*! an array of size [frameListnum] holding usbFrameToQueueAt for each frame when it was requested for read */
     UInt64 *					frameQueuedForList;

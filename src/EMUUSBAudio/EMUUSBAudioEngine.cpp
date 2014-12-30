@@ -2109,7 +2109,9 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     // NB - From testing and observation this work around does not help and has therefore been deleted.
 	usbInputStream.frameOffset = kMinimumFrameOffset + ((kUSBDeviceSpeedHigh == mHubSpeed) * kUSB2FrameOffset);
 	usbInputStream.usbFrameToQueueAt = mBus->GetFrameNumber() + usbInputStream.frameOffset;	// start on an offset usb frame
-    //	debugIOLogC("usbFrameToQueueAt is %x\n", usbFrameToQueueAt);
+    usbInputStream.usbFrameToQueueAt += 4096;
+    
+    debugIOLogC("usbFrameToQueueAt is %llx\n", usbInputStream.usbFrameToQueueAt);
 	
 	//IOLog("the buffers are %x and %x\n", buffers[0], buffers[1]);
 	

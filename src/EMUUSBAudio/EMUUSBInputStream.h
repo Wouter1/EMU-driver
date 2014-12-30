@@ -19,8 +19,6 @@
 /*! Ring to store recent frame sizes, to sync write to read speed */
 typedef RingBufferDefault<UInt32> FrameSizeQueue;
 
-
-
 /*! The USB Input stream handler. It pushes the data from the USB stream into the 
  input ring provided with the init call.
  
@@ -152,6 +150,10 @@ private:
     void            readCompleted (void * frameListIndex, IOReturn result,
                                    IOUSBLowLatencyIsocFrame * pFrames);
     
+    /*! get the first framenumber on which transfer can start. */
+    UInt64 getStartTransferFrameNr();
+
+        
     FrameSizeQueue *            frameSizeQueue;
     
     /*! the input ring. Received from the Engine */
