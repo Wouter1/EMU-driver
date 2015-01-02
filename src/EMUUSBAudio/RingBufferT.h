@@ -27,7 +27,7 @@ public:
      @param size the size of the ring buffer.   
      */
 	
-    virtual IOReturn init(UInt32 size) = 0;
+    virtual IOReturn init(UInt32 size, char *typeName) = 0;
     
     /*! put one object in the ring. May print warning if overflow 
      @param object the object to push

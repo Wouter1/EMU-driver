@@ -30,14 +30,16 @@ template <typename TYPE>
 class RingBufferDefault: public RingBufferT<TYPE> {
 private:
 	TYPE *buffer=0; //
+    char * typeName;
     UInt32 size=0; // number of elements in buffer.
     UInt32 readhead; // index of next read. range [0,SIZE>
     UInt32 writehead; // index of next write. range [0,SIZE>
     
 public:
     
-    IOReturn init(UInt32 newSize) override {
-        debugIOLogR("ring buffer allocate %d",newSize);
+    IOReturn init(UInt32 newSize, char* name) override {
+        typeName = name;
+        debugIOLogR("ringbuffer<%s> allocate %d",typeName, newSize);
         if (newSize<=0) {
             return kIOReturnBadArgument;
         }
@@ -103,7 +105,8 @@ public:
         }
 
         if (num > vacant()) {
-            doLog("warning. Ignoring overrun");
+            
+            doLog("RingBufferDefault<%s>::push warning. Ignoring overrun",typeName);
             //return kIOReturnOverrun ; }
         }
         for ( UInt32 n = 0; n<num; n++) {

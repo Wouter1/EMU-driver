@@ -669,10 +669,10 @@ IOReturn EMUUSBAudioEngine::clipOutputSamples (const void *mixBuf, void *sampleB
     
 	
 	SInt32 offsetFrames = previouslyPreparedBufferOffset / mOutput.multFactor;
-	debugIOLogW("clipOutputSamples firstSampleFrame=%u, numSampleFrames=%d, firstSampleFrame-offsetFrames =%d ",firstSampleFrame,numSampleFrames,firstSampleFrame-offsetFrames);
+	//debugIOLogW("clipOutputSamples firstSampleFrame=%u, numSampleFrames=%d, firstSampleFrame-offsetFrames =%d ",firstSampleFrame,numSampleFrames,firstSampleFrame-offsetFrames);
     
 	if (firstSampleFrame != nextExpectedOutputFrame) {
-		debugIOLogW("**** Output Hiccup!! firstSampleFrame=%d, nextExpectedOutputFrame=%d bufsize=%d",firstSampleFrame,nextExpectedOutputFrame,mOutput.bufferSize);
+		debugIOLog("**** Output Hiccup!! firstSampleFrame=%d, nextExpectedOutputFrame=%d bufsize=%d",firstSampleFrame,nextExpectedOutputFrame,mOutput.bufferSize);
 	}
     UInt32 samplesInBuffer = mOutput.bufferSize /mOutput.multFactor;
 	nextExpectedOutputFrame = (firstSampleFrame + numSampleFrames) % samplesInBuffer;
@@ -1821,7 +1821,7 @@ IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 listNr) {
         }
         
         //runningOutputCount += thisFrameSize;
-        debugIOLogW("thisFrameSize %d",thisFrameSize);
+        //debugIOLogW("thisFrameSize %d",thisFrameSize);
         //thisFrameSize *= mOutput.multFactor;
         //debugIOLogC("PrepareWriteFrameList fractionalSamplesRemaining %d thisFrameSize %d", fractionalSamplesRemaining, thisFrameSize);
         
@@ -2128,7 +2128,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     
     resultCode =usbInputRing.init(usbInputStream.bufferSize, this, sampleRate.whole * usbInputStream.multFactor);
     FailIf( kIOReturnSuccess != resultCode, Exit);
-    FailIf( kIOReturnSuccess != frameSizeQueue.init(FRAMESIZE_QUEUE_SIZE), Exit);
+    FailIf( kIOReturnSuccess != frameSizeQueue.init(FRAMESIZE_QUEUE_SIZE,"frameSizeQueue"), Exit);
     
     usbInputStream.init(this, &usbInputRing, &frameSizeQueue);
     resultCode = usbInputStream.start();
@@ -2820,7 +2820,7 @@ IOReturn UsbInputRing::init(UInt32 newSize, IOAudioEngine *engine, UInt32 expect
 
     debugIOLogC("-UsbInputRing::init %lld", expected_wrap_time);
     
-    return RingBufferDefault<UInt8>::init(newSize);
+    return RingBufferDefault<UInt8>::init(newSize,"USBInputRing");
 }
 
 void UsbInputRing::free() {
