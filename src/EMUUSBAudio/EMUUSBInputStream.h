@@ -71,7 +71,7 @@ public:
 	UInt32					lastInputFrames;
     
     /*! counter used to steer the DAStream (playback). FIXME not here? */
-	UInt32					runningInputCount;
+	//UInt32					runningInputCount;
     
     
     
@@ -167,6 +167,15 @@ private:
     
     /*! set to true after succesful start() */
     bool started;
+
+    /*! the next USB MBus Frame number that can be used for read/write. Initially this is at frameOffset from the current frame number. Must be incremented with steps of size numUSBTimeFrames. Currently we just set it to kAppleUSBSSIsocContinuousFrame after
+     the initial startup cycle. */
+    //UInt64						usbFrameToQueueAt;
+
+    /*! the framelist that we are expecting to complete from next.
+     Basically runs from 0 to numUSBFrameListsToQueue-1 and then
+     restarts at 0. Updated after readHandler handled the block. */
+    volatile UInt32						currentFrameList;
 
 };
 

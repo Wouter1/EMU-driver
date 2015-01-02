@@ -69,6 +69,7 @@
 
 #include "StreamInfo.h"
 #include "EMUUSBInputStream.h"
+#include "EMUUSBOutputStream.h"
 
 class EMUUSBAudioDevice;
 
@@ -142,33 +143,43 @@ private:
 
 
 /*!
- @abstract implements IOAudioEngine. Provides audio stream services.
- Uses USB services itself to read from EMU device.
+ Implements IOAudioEngine. Provides audio stream services.
+ Uses USB services to read from and write to EMU device.
  
- @discussion
+ This Audio engine handles the input stream from EMU to system (2 channels
+ from the AD converters and 2 channels from SP/DIF) and output from the system
+ to the EMU (2 channels for the DA converters and 2 channels for SP/DIF). 
+ 
+ The engine uses implicit synchronization to get the output clock at the correct
+ rate. This means that the clock is synchronized with the input stream, and that
+ this clock is then used to determine the output rate. Therefore, both input 
+ and output streams are opened always, even if only output is done.
+ 
  This engine currently combines a number of functionalities:
- 1. convert USB data to 32 bit float,
- 2. USB communication engine for input of isoc streams from EMU,
- 3. converter 32 bit float sample data to USB data
- 4. USB communication for output to EMU
- 5. timing generators so that HAL can call us at the right times.
+ 1. convert between 24-bit EMU USB data and the OS 32 bit float,
+ 2. USB communication for asynchronous isochronous streams to EMU,
+ 3. timing generators to synchronize the EMU internal clock to the OS clock.
  
  All data structures for all of these are stuffed into this structure.
  
- the current size of this structure IMHO shows
- that this code is in extremely bad shape. We have code duplication and many
- fields in here that are too detailed in this scope. ALso there basically
- was nothing documented. The amount of fields in this object is large (61)
- and the code is more than 3000 lines. There is a lot of redundancy in the fields as well.
+ Judging from the current size of this structure
+ this code is in bad shape. Refactoring was done to 
+  * modularize the code and reduce the size of class code
+  * reduce the number of variables in the classes
+  * moving variables to the proper scope
+  * remove code duplications.
+  * Document the code
+ But this is not yet finished.
  
  Note that apple (and maybe, USB) has quite hard requirements on how data should
  be allocated to USB packets over time. Details are here
  https://developer.apple.com/library/mac/technotes/tn2274/_index.html.
  Failure to comply with the bandwidth rules for the current sample rate
  and format may not only result in audio corruption for that particular stream,
- but for all of the other streams on the same engine.
+ but for all of the other streams on the same engine. Unfortunately some
+ requirements seem missing, leading to guess work to get things
+ working without hickups.
  
- Note2. Almost all comments in the code were reverse engineered. Wouter.
  */
 
 class EMUUSBAudioEngine : public IOAudioEngine {
@@ -196,12 +207,14 @@ public:
     //static void sampleRateHandler (void * target, void * parameter, IOReturn result, IOUSBIsocFrame * pFrames);
     
     /*!
-     queue a write from clipOutputSamples. This is called from clipOutputSamples.
-     @param parameter the framelistnumber. Actually is a void * that is coming
-     out of the StreamInfo struct in the kernel. This driver tries to put an UInt32 in it
-     in a hacky way. probably to avoid memory allocation. Wouter: fixed this to UInt64, *  to UInt32 is KO on 64bit archi.
+     Write-completion handler. Queues another a write. This is called from clipOutputSamples
+     and from the callback in PrepareWriteFrameList.
+     @param target pointer to EMUUSBAudioEngine
+     @param parameter
+     * low 16 bits: byteoffset.
+     * high 16 bits; framenumber.
      */
-    static void writeHandler (void * object, void * parameter, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
+    static void writeCompleted (void * object, void * parameter, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
 	virtual IOReturn pluginDeviceRequest (IOUSBDevRequest * request, IOUSBCompletion * completion);
 	virtual void pluginSetConfigurationApp (const char * bundleID);
 	virtual void registerPlugin (EMUUSBAudioPlugin * thePlugin);
@@ -262,11 +275,11 @@ protected:
 	OurUSBInputStream						usbInputStream;
     /*! the USB input ring. We need to pass it downwards and handle time signals */
     UsbInputRing                        usbInputRing;
-    /*! Ring to store recent frame sizes */
+    /*! Ring to store recent frame sizes (#bytes in a frame) */
     FrameSizeQueue                      frameSizeQueue;
 
     /*! StreamInfo relevant for the writing-to-USB (playback) */
-	StreamInfo                          mOutput;
+	EMUUSBOutputStream                  mOutput;
     
     
 	// engine data (i.e., not stream-specific)
@@ -274,7 +287,8 @@ protected:
 	EMUUSBAudioDevice *					usbAudioDevice;
     
     /*! IOUSBController, handling general USB properties like current frame nr */
-	IOUSBController *					mBus;// DT
+	//IOUSBController *					mBus;// DT
+    
 	IOMultiMemoryDescriptor *			theWrapRangeDescriptor;
 	IOSubMemoryDescriptor *				theWrapDescriptors[2];
 	IOMemoryDescriptor *				neededSampleRateDescriptor;
@@ -297,6 +311,8 @@ protected:
     static const long					kNumberOfStartingFramesToDrop = 2;
     
 	// parameters and variables common across streams (e.g., sample rate, bit resolution, etc.)
+    
+    /*! first byte to send from mOutput.usbBufferDescriptor */
 	UInt32								previouslyPreparedBufferOffset;
 	UInt32								safeToEraseTo;
 	UInt32								lastSafeErasePoint;
@@ -305,7 +321,9 @@ protected:
 	UInt32								hardwareSampleRate;
 	UInt32								mChannelWidth;	// 16 or 24 bit
 	UInt32								bytesPerSampleFrame;
-	UInt32								fractionalSamplesRemaining;
+	
+    // unused?
+    //UInt32								fractionalSamplesRemaining;
 	UInt8								refreshInterval;
 	UInt8								framesUntilRefresh;
 	UInt8								mAnchorResetCount;
@@ -318,32 +336,43 @@ protected:
 	Boolean								inWriteCompletion;
 	Boolean								usbStreamRunning;
     
-    
+    /*! Variable that is set TRUE every time a wrap occurs in the writeHandler  */
 	Boolean								needTimeStamps;
-	UInt32								runningOutputCount;
+    //	UInt32								runningOutputCount;
 	SInt32								lastDelta;
 	UInt32								lastNonZeroFrame;
     
 	UInt32								nextExpectedOutputFrame;
-	
+ 
     
     
     Boolean previousTimeWasFirstTime;
     
 	
 	void	GetDeviceInfo (void);
-	IOReturn	PrepareWriteFrameList (UInt32 usbFrameListIndex);
+    /*! Set up the given framelist for writing.  called from writeFrameList.
+     Assumes that frameSizeQueue contains at least mOutput.numUSBFramesPerList values
+     because the size of each frame must now be set.
+     @param listNr the list number to be prepared.
+     @return kIOReturnUnderrun if frameSizeQueue does not contain enough values.
+     kIOReturnNoDevice if mOutput.audioStream==0.
+     kIOReturnNoMemory if sampleBufferSize == 0*/
+	IOReturn	PrepareWriteFrameList (UInt32 listNr);
+    
 	IOReturn	SetSampleRate (EMUUSBAudioConfigObject *usbAudio, UInt32 sampleRate);
+    
     /*! Collect all details for all altInterfaces on given ourInterfaceNumber
      @param usbAudio a EMUUSBAudioConfigObject holding all details
      @param ourInterfaceNumber the interface number that should be unraveled 
      */
 	IOReturn	AddAvailableFormatsFromDevice (EMUUSBAudioConfigObject *usbAudio,
                                                UInt8 ourInterfaceNumber);
+    
 //	IOReturn	CheckForAssociatedEndpoint (EMUUSBAudioConfigObject *usbAudio,
 //                                            UInt8 ourInterfaceNumber,
 //                                            UInt8 alernateSettingID);
-	IOReturn	GetDefaultSettings (IOUSBInterface *streamInterface,
+	
+    IOReturn	GetDefaultSettings (IOUSBInterface *streamInterface,
 								    IOAudioSampleRate * sampleRate);
     
     static bool audioDevicePublished (EMUUSBAudioEngine *audioEngine, void *ref, IOService *newService);
@@ -368,7 +397,9 @@ protected:
 	virtual OSString * getGlobalUniqueID ();
     
     
-    /*!  initializes the write a of a frame list (typ. 64 frames) to USB. called from writeHandler */
+    /*!  Write frame list (typ. 64 frames) to USB. called from writeHandler.
+     Every time the frames in the list have to point to sub-memory blocks in the buffer
+     */
     IOReturn writeFrameList (UInt32 frameListNum);
     
     /*! called from performAudioEngineStart */
@@ -394,7 +425,7 @@ protected:
      the driver must clip any excess floating-point values under –1.0 and over 1.0 —which can happen when multiple clients are adding their values to existing values in the same frame—and then convert these values to whatever format is required by the hardware. When clipOutputSamples returns, the converted values have been written to the corresponding locations in the sample buffer. The DMA engine grabs the frames as it progresses through the sample buffer and the hardware plays them as sound.
      
      @param mixbuf a pointer to an array of sampleFrames. Each sampleFrame contains <numchan> floats, where <numchan> is the number of audio channels (eg, 2 for stereo). This is the audio that we need to play. The floats can be outside [-1,1] in which case we also need to clip the data.
-     @param sampleBuf
+     @param sampleBuf probably the buffer that we passed to the IOAudioEngine through audioStream->setSampleBuffer() = mOutput.bufferPtr
      @param firstSampleFrame
      @param numSampleFrames number of sampleFrames in the mixbuf
      @param streamFormat
@@ -458,7 +489,7 @@ protected:
      @param byteCount the total number of bytes in this frameList (including the ones before the wrap).
      byteCount MUST never == 0. If this computation is incorrect, we will encounter audio artifacts
      */
-	AbsoluteTime generateTimeStamp (UInt32 usbFrameIndex, UInt32 preWrapBytes, UInt32 byteCount);
+//	AbsoluteTime generateTimeStamp (UInt32 usbFrameIndex, UInt32 preWrapBytes, UInt32 byteCount);
     
 	IOReturn eraseOutputSamples(const void *mixBuf, void *sampleBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream);
     

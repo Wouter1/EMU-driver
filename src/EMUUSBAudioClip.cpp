@@ -340,6 +340,15 @@ extern "C" {
     }
 #endif
     
+    /*!
+     Copy block of data from mixBuf into sampleBuf.
+     @param mixBuf the direct pointer to the first frame for output. Call will read from mixBuf[0..numSampleFrames>.
+     @param sampleBuf the start of the samplebuf. Call will write to sampleBuf [firstSampleFrame... firstSampleFrame+numSampleFrames>
+     @param firstSampleFrame the first frame to write in samplebuf.
+     @param numSampleFrames the number of stereosamples to copy
+     @param streamFormat the IOAudioStreamFormat.
+     */
+
     IOReturn clipEMUUSBAudioToOutputStream(const void* mixBuf, void* sampleBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat)
     {
         if(!streamFormat)

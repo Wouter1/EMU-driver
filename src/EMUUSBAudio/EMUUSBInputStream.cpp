@@ -35,7 +35,7 @@ IOReturn EMUUSBInputStream::start() {
     shouldStop = 0;
     currentFrameList = 0;
     
-    usbFrameToQueueAt = 0;
+    //usbFrameToQueueAt = 0;
     
     // we start reading on all framelists. USB will figure it out and take the next one in order
     // when it has data. We restart each framelist immediately in readCompleted when we get data.
@@ -116,16 +116,16 @@ IOReturn EMUUSBInputStream::GatherInputSamples() {
         size = pFrames[frameIndex].frActCount;
         source = (UInt8*) readBuffer + (currentFrameList * readUSBFrameListSize) + maxFrameSize * frameIndex;
 
-        if (size >=6  && size%6 != 0 ) {
+        if (size%6 == 4 ) {
             size = size-4; // workaround for MICROSOFT_USB_EHCI_BUG_WORKAROUND
             source = source + 4;
         }
 
         if (mDropStartingFrames <= 0)
         {
-            
             // FIXME. We should not call from inside locked area.
-            usbRing->push(source, size ,pFrames[frameIndex].frTimeStamp );
+            usbRing-> push(source, size , pFrames[frameIndex].frTimeStamp );
+            frameSizeQueue-> push(size , pFrames[frameIndex].frTimeStamp);
         }
         else if(size && mDropStartingFrames > 0)
         {
@@ -178,12 +178,12 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
          */
         //result = pipe->Read(bufferDescriptors[frameListNum], kAppleUSBSSIsocContinuousFrame, numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
         
-        if (usbFrameToQueueAt == 0) {
-            usbFrameToQueueAt=streamInterface->GetDevice()->GetBus()->GetFrameNumber() + frameOffset;
-        } else {
-            usbFrameToQueueAt = kAppleUSBSSIsocContinuousFrame;
-        }
-        result = pipe->Read(bufferDescriptors[frameListNum], usbFrameToQueueAt, numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
+//        if (usbFrameToQueueAt == 0) {
+//            usbFrameToQueueAt=streamInterface->GetDevice()->GetBus()->GetFrameNumber() + frameOffset;
+//        } else {
+//            usbFrameToQueueAt = kAppleUSBSSIsocContinuousFrame;
+//        }
+        result = pipe->Read(bufferDescriptors[frameListNum], kAppleUSBSSIsocContinuousFrame, numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
         
         // kAppleUSBSSIsocContinuousFrame seems to give error e00002ef on Yosemite
         // maybe something like engine->mBus->GetFrameNumber()?
@@ -193,9 +193,6 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
             // FIXME #17 if this goes wrong, why continue?
             doLog("USB pipe READ error %x",result);
         }
-		if (frameQueuedForList) {
-			frameQueuedForList[frameListNum] = usbFrameToQueueAt;
-        }
         
 		//usbFrameToQueueAt += numUSBTimeFrames;
 	}
@@ -203,12 +200,12 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
 }
 
 
-UInt64 EMUUSBInputStream::getStartTransferFrameNr() {
-    UInt64 frameNr = streamInterface->GetDevice()->GetBus()->GetFrameNumber();
-    frameNr += frameOffset;
-    return frameNr;
-    
-}
+//UInt64 EMUUSBInputStream::getStartTransferFrameNr() {
+//    UInt64 frameNr = streamInterface->GetDevice()->GetBus()->GetFrameNumber();
+//    frameNr += frameOffset;
+//    return frameNr;
+//    
+//}
 
 
 

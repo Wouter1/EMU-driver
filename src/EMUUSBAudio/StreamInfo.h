@@ -51,9 +51,6 @@
  Note on the docu that I added: A number of functions here are obligatory implementations of the IOAudioEngine. Others are support functions for our convenience. It is unfortunate that the distinction is unclear and also that I have to document functions that should (and probably do) already have documentation in the interface definition.  Maybe I'm missing something?
  */
 
-/*! Number of USB frames per millisecond for USB2 */
-#define kNumberOfFramesPerMillisecond 8
-#define kPollIntervalShift 3 // log2 of kNumberOfFramesPerMillisecond
 /*! Number of frames that we transfer in a request to USB. USB transfers frames once per millisecond
  But we prepare NUMBER_FRAMES so that we do not have to deal with that every ms but only every NUMBER_FRAMES ms.
  These frames are grouped into a single request, the larger this number the larger the chunks we get from USB.
@@ -76,7 +73,10 @@
 #define RECORD_NUM_USB_FRAMES_PER_LIST			NUMBER_FRAMES
 #define RECORD_NUM_USB_FRAME_LISTS_TO_QUEUE		4
 
-#define PLAY_NUM_USB_FRAME_LISTS				4
+//#define PLAY_NUM_USB_FRAME_LISTS				4
+// HACK see #19, from code it seems that max is 2.
+#define PLAY_NUM_USB_FRAME_LISTS				2
+
 #define PLAY_NUM_USB_FRAMES_PER_LIST			NUMBER_FRAMES
 #define PLAY_NUM_USB_FRAME_LISTS_TO_QUEUE		2
 // was 2
@@ -86,8 +86,8 @@
 // max size of the globally unique descriptor ID. See getGlobalUniqueID()
 #define MAX_ID_SIZE 128
 
-// size of FrameSizeQueue
-#define FRAMESIZE_QUEUE_SIZE				    128
+// size of FrameSizeQueue FIXME make this smaller. 
+#define FRAMESIZE_QUEUE_SIZE				    1024
 
 
 
@@ -120,15 +120,14 @@ struct StreamInfo {
      // I think sizes of 4 and 8 are usual.*/
     UInt32		numUSBFrameLists;
     /*! The number of usb frames in our lists. Hard set to RECORD_NUM_USB_FRAMES_PER_LIST
-     or PLAY_NUM_USB_FRAMES_PER_LIST (64 usually). USB calls back to us only after 'completion'
-     (after all frames were read, or something went wrong), calling back to readHandler.
+     or PLAY_NUM_USB_FRAMES_PER_LIST (64 usually).
      */
     UInt32		numUSBFramesPerList;
     /*! = mInput.numUSBFramesPerList / kNumberOfFramesPerMillisecond = 8 usually.
      Used as increment for usbFrameToQueueAt*/
-    UInt32		numUSBTimeFrames;
+    //UInt32		numUSBTimeFrames;
     /*!
-     @abstract Number of frames we have in use for reading USB.
+     @abstract Number of frames we have in use for reading (writing) USB.
      @discussion Hard set to RECORD_NUM_USB_FRAME_LISTS_TO_QUEUE or PLAY_NUM_USB_FRAME_LISTS_TO_QUEUE. Typically 2 or 4.  */
     UInt32		numUSBFrameListsToQueue;
     
@@ -143,16 +142,13 @@ struct StreamInfo {
     
     /*! The nummer of channels coming in. Typically 1 (mono) or 2 (stereo). */
     UInt32		numChannels;
+    /*! the distance between USB frames. Should be 8 (<=96kHz) or 4 (>96kHz). */
     UInt32		frameOffset;
     UInt8		streamDirection;
     /*! The interface number associated with this stream. */
     UInt8		interfaceNumber;
     UInt8		alternateSettingID;
     
-    /*! the framelist that we are expecting to complete from next.
-     Basically runs from 0 to numUSBFrameListsToQueue-1 and then
-     restarts at 0. Updated after readHandler handled the block. */
-    volatile UInt32						currentFrameList;
     
     IOUSBInterface				  *streamInterface;
     IOAudioStream				  *audioStream;
@@ -176,18 +172,19 @@ struct StreamInfo {
     IOUSBLowLatencyIsocCompletion *usbCompletion;
     
     // you want ddescriptors? we got descriptors!
-    /*!  Big mem block to store all data from reading USB data according to the framelists.
-     size mOutput.bufferSize or mInput.numUSBFrameLists * readUSBFrameListSize bytes */
+    /*!  Big mem block to store all data from reading/writing USB data according to the framelists.
+     size (input/mOutput).bufferSize = (mInput/mOutput).numUSBFrameLists * readUSBFrameListSize bytes */
     IOBufferMemoryDescriptor	*usbBufferDescriptor;
     
     /*! The memory descriptor for the The intermediate ring buffer of size bufferSize.*/
     IOBufferMemoryDescriptor	*bufferMemoryDescriptor;
     
-    /*! array of pointers to IOMemoryDescriptor of length [frameListnum]. This is where raw USB data will come in.
+    /*! array of pointers to IOMemoryDescriptor of length [frameListnum]. This is where raw USB data will come in. For mOutput, these point directly into part of the main bufferPtr memory. 
      @discussion Contains copy of the received USB data.
      When a framelist is complete, readhHandler copies the data from the frame list
      to the mInput buffer so that the frameList can be redeployed.
-     We need this (1) to have a fixed ring buffer as HAL is expecting us to have
+     We need this 
+     (1) to have a fixed ring buffer as HAL is expecting us to have
      (2) to free up the framelist so that we can redeploy it to continue reading
      (3) so that we can do int-to-float conversion 'offline'.
      However it seems that these are no strong reasons, probably we could just simulate a ring buffer
@@ -198,10 +195,7 @@ struct StreamInfo {
     /*! shortcut to bufferMemoryDescriptor actual buffer bytes. Really UInt8*. */
     void *						bufferPtr;
     
-    /*! the next USB MBus Frame number that can be used for read/write. Initially this is at frameOffset from the current frame number. Must be incremented with steps of size numUSBTimeFrames */
-    UInt64						usbFrameToQueueAt;
-    /*! an array of size [frameListnum] holding usbFrameToQueueAt for each frame when it was requested for read */
-    UInt64 *					frameQueuedForList;
+
     
 };
 
