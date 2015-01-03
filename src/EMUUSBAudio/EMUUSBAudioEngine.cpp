@@ -415,7 +415,7 @@ IOReturn EMUUSBAudioEngine::AddAvailableFormatsFromDevice (EMUUSBAudioConfigObje
 //							streamFormat.fIsMixable = FALSE;
 //							audioStream->addAvailableFormat (&streamFormat, &streamFormatExtension, &lowSampleRate, &lowSampleRate);
 //							streamFormat.fIsMixable = TRUE;		// set it back to TRUE for next time through the loop
-//						}
+//						} 
 					}
 					debugIOLog ("");
 				} else if (sampleRates) {
