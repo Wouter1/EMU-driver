@@ -146,6 +146,7 @@ UInt8 EMUUSBAudioConfigObject::FindAltInterfaceWithSettings(UInt8 interfaceNum, 
 	UInt8			potentialAltInterface = 1;
 	UInt8			theAltInterface = 255;
     
+    // clumsy loop, straightforward write-out is lot smaller and readable. FIXME?
 	while(potentialAltInterface != 255) {
 		if((GetFormat(interfaceNum, potentialAltInterface) & 0x0FFF) != 0) {	// Make sure it's not an undefined format
 			potentialAltInterface = FindNextAltInterfaceWithNumChannels(interfaceNum, potentialAltInterface, numChannels);

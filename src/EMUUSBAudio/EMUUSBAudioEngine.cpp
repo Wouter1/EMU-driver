@@ -1096,6 +1096,7 @@ IOReturn EMUUSBAudioEngine::GetDefaultSettings(IOUSBInterface  *streamInterface,
 		mChannelWidth = kBitDepth_24bits;
 		UInt32	altChannelWidth = kBitDepth_16bits;
 		
+        // for info->numChannels = 10 down to 2 step -2
 		while (!found && info->numChannels >= kChannelCount_STEREO) {// will never be a mono device
 			debugIOLogC("Finding interface %d numChannels %d sampleRate %d", ourInterfaceNumber, info->numChannels, newSampleRate.whole);
 			newAltSettingID = usbAudio->FindAltInterfaceWithSettings (ourInterfaceNumber, info->numChannels, mChannelWidth, newSampleRate.whole);

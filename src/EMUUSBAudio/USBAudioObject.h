@@ -945,6 +945,12 @@ public:
 	UInt8							FindNextAltInterfaceWithNumChannels (UInt8 interfaceNum, UInt8 startingAltInterface, UInt8 numChannelsRequested);
 	UInt8							FindNextAltInterfaceWithSampleSize (UInt8 interfaceNum, UInt8 startingAltInterface, UInt8 sampleSizeRequested);
 	UInt8							FindNextAltInterfaceWithSampleRate (UInt8 interfaceNum, UInt8 startingAltInterface, UInt32 sampleRateRequested);
+    /*! Finds an setting ID with given numChannels, sampleSize and sampleRate. 
+     * @param numChannels required #channels
+     * @param sampleSize number of bits (8,16,24 etc) in each sample
+     * @param sampleRate required rate. Ignored if 0.
+     * @return setting ID with given settings.
+     */
 	UInt8							FindAltInterfaceWithSettings (UInt8 interfaceNum, UInt8 numChannels, UInt8 sampleSize, UInt32 sampleRate = 0);
 	UInt32							GetAC3BSID (UInt8 interfaceNum, UInt8 altInterfaceNum);
 	UInt8							GetFeatureUnitIDConnectedToOutputTerminal (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 outputTerminalID);
