@@ -61,7 +61,7 @@ public:
     
     void free() {
         if (buffer){
-            debugIOLogR("ring buffer freed %d",size);
+            debugIOLogR("ringbuffer<%s> freed %d",typeName,size);
             IOFree(buffer,size * sizeof(TYPE));
             buffer=0;
             size=0;

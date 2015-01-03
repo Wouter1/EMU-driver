@@ -410,11 +410,12 @@ IOReturn EMUUSBAudioEngine::AddAvailableFormatsFromDevice (EMUUSBAudioConfigObje
 						lowSampleRate.whole = sampleRates[rateIndx];
 						lowSampleRate.fraction = 0;
 						audioStream->addAvailableFormat (&streamFormat, &streamFormatExtension, &lowSampleRate, &lowSampleRate);
-						if (kIOAudioStreamSampleFormatLinearPCM == streamFormat.fSampleFormat) {
-							streamFormat.fIsMixable = FALSE;
-							audioStream->addAvailableFormat (&streamFormat, &streamFormatExtension, &lowSampleRate, &lowSampleRate);
-							streamFormat.fIsMixable = TRUE;		// set it back to TRUE for next time through the loop
-						}
+                        // What??
+//						if (kIOAudioStreamSampleFormatLinearPCM == streamFormat.fSampleFormat) {
+//							streamFormat.fIsMixable = FALSE;
+//							audioStream->addAvailableFormat (&streamFormat, &streamFormatExtension, &lowSampleRate, &lowSampleRate);
+//							streamFormat.fIsMixable = TRUE;		// set it back to TRUE for next time through the loop
+//						}
 					}
 					debugIOLog ("");
 				} else if (sampleRates) {
@@ -946,8 +947,8 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
     // "sophisticated techniques and extremely accurate timing mechanisms".
     // I don't like this black box approach but we have to live with it.
     
-    IOReturn res=usbInputRing.pop(buf, numSampleFrames * usbInputStream.multFactor);
-    if (res!=kIOReturnSuccess) {
+    IOReturn res = usbInputRing.pop(buf, numSampleFrames * usbInputStream.multFactor);
+    if (res != kIOReturnSuccess) {
         debugIOLog("EMUUSBAudioEngine::convertInputSamples err reading ring: %x",res);
         // Not sure what to do. For now, go on and feed the noise this will give.
     }
@@ -1859,7 +1860,7 @@ IOReturn EMUUSBAudioEngine::PrepareWriteFrameList (UInt32 listNr) {
         FailIf (NULL == mOutput.bufferDescriptors[listNr], Exit);
     }
     
-    debugIOLogW("EMUUSBAudioEngine::PrepareWriteFrameList %d size %d %s", listNr, thisFrameSize,haveWrapped?"-":"wrap");
+    //debugIOLogW("EMUUSBAudioEngine::PrepareWriteFrameList %d size %d %s", listNr, thisFrameSize,haveWrapped?"-":"wrap");
     //debugIOLogW("PrepareWriteFrameList: lastPrepareFrame %d safeToEraseTo %d",lastPreparedByte / mOutput.multFactor, safeToEraseTo / mOutput.multFactor);
     
     safeToEraseTo = lastSafeErasePoint;

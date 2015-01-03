@@ -9,7 +9,7 @@ echo "Installing EMU driver"
 set pathname=`dirname "$0"`
 cd "$pathname"
 
-echo "plz to turn off your device for loading of kext, you have 3 seconds to do so"
+echo "plz to turn off your EMU USB device for loading of kext, you have 3 seconds to do so"
 sleep 3
 sudo kextunload /System/Library/Extensions/EMUUSBAudio.kext
 echo "deleting old kext"
