@@ -79,11 +79,11 @@ After that the kExtInstall script is ready for use (see Installation)
 Technical Specifications
 ========================
 
-<img align="right" style="width: 50%" src="E-MU_0404_USB.jpg"/>
+<img align="right" style="width: 200px;" src="E-MU_0404_USB.jpg"/>
 
 
 General
-==
+------
 
  * Sample Rates: 44.1, 48, 88.2, 96, 176.4, 192kHz from internal crystal (no sample rate conversion)*
   * Bit Depth: 24-bit I/O, 32-bit processing
@@ -98,7 +98,7 @@ General
  * Ultra-low jitter clock subsystem: < 500ps RMS in PLL mode (48kHz, Coaxial S/PDIF Sync)
    
 Combo Microphone Preamplifier/Hi-Z/Line Inputs (2)
-==
+------
 
  * Type: E-MU XTC™ combo mic preamplifier and Hi-Z/line input w/ Soft Limiter
  * A/D converter: AK5385A
@@ -123,7 +123,7 @@ Combo Microphone Preamplifier/Hi-Z/Line Inputs (2)
   * Soft Limiter: 5dB max compression (software selectable)
   
 Analog Line Outputs (2)
-==
+------
 
  * Type: balanced, AC-coupled, 2-pole low-pass differential filter
  * D/A converter: AK4396
@@ -139,7 +139,7 @@ Analog Line Outputs (2)
  * Balanced/Unbalanced Output Impedance: 560 Ohms
  
 Headphone Amplifier
-==
+------
 
  * Type: Class-A power amplifier
  * D/A converter: AK4396 (shared with Line Out)
@@ -153,7 +153,7 @@ Headphone Amplifier
  * Stereo Crosstalk (1kHz at -1dBFS, 600 ohm load): < -85dB
  
 Digital I/O
-==
+------
 
  * S/PDIF*:
   * 2 in/2 out coaxial (transformer coupled)
@@ -163,7 +163,7 @@ Digital I/O
   * 1 in, 1 out
   
 Synchronization
-==
+------
 
  * Internal crystal sync at 44.1, 48, 88.2, 96, 176.4, 192kHz
  * External sample rate sync via
@@ -171,7 +171,7 @@ Synchronization
   * Coaxial S/PDIF (44.1 - 96kHz)
   
 System Requirements
-==
+------
 
  * Apple Macintosh 
  * Apple Macintosh OS X Mavericks (10.9) 64 bits
