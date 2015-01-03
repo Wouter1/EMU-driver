@@ -7,12 +7,12 @@ OSX driver for Creative Labs EMU USB
 
 The current version compiles with Xcode 5.1.1.
 Original comes from source forge revision 7. http://sourceforge.net/projects/zaudiodrivermac/
-But it does not compile on OSX 10.9 Mavericks. So I dumped part of the code and wrote new code
-to get audio recording working.
+But it did not compile on OSX 10.9 Mavericks. So I dumped part of the code, cleaned up, documented, 
+refactored and wrote new code to get it working.
 
 The present version is in a pretty bad shape. I did a major effort to refactor the input side of the code,
 it's on the way but not yet polished. The rest of the code is still in original state.
-The first goal here was to get the audio input working properly, without the clicking issues of the official driver when used in OSX10.6 and higher.
+The first priority here was to get the audio input working properly, without the clicking issues of the official driver when used in OSX10.6 and higher. The playback at this points works ok but there are still a few small issues.
 
 * This version works on Mavericks but not on Yosemite (see issue #18).
 * All sample rates are supported both for record and playback: 44.1, 48, 88.2, 96, 176.4 and 192 kHz
@@ -37,7 +37,7 @@ If you like you can also copy the control panel into your applications directory
 
 Ext not loading
 ======
-The driver is not signed and Yosemite refuses to load if you are not a developer. 
+The driver is not signed and OSX may refuse to load.
 To allow loading, open a console and give the following command
 
 ```
