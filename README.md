@@ -1,3 +1,5 @@
+<img align="right" width="400" src="E-MU_0404_USB.jpg"/>
+
 EMU-USB driver
 =============
 
@@ -78,8 +80,6 @@ After that the kExtInstall script is ready for use (see Installation)
 
 Technical Specifications
 ========================
-
-<img align="right" width="400" src="E-MU_0404_USB.jpg"/>
 
 
 General
