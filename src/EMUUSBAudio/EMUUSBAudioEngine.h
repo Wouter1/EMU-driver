@@ -296,9 +296,10 @@ protected:
 	UInt32 *							aveSampleRateBuf;		// 4 byte value
     /*!
      this is a timer with time kMinimumInterval that calls waitForFirstUSBFrameCompletion.
-     It is added to our workLoop for handling.
+     It is added to our workLoop for handling. thread to take first time stamp
      */
-	IOTimerEventSource *				startTimer;
+	//IOTimerEventSource *				startTimer;
+    
 	thread_call_t						mPluginInitThread;
 	IOAudioStream *						mainStream;
 	IONotifier *						mPluginNotification;
@@ -377,13 +378,6 @@ protected:
     
     static bool audioDevicePublished (EMUUSBAudioEngine *audioEngine, void *ref, IOService *newService);
     
-    /*!
-     @abstract detects start of USB and then sets startingEngine=FALSE
-     @discussion Check that the first USB frame has been read.
-     Uses a timer to check every 50 microseconds if first USB frame did complete.
-     After 60 tries this process time-outs.
-     */
- 	static void waitForFirstUSBFrameCompletion (OSObject * owner, IOTimerEventSource * sender);
     
 	virtual bool willTerminate (IOService * provider, IOOptionBits options);
     

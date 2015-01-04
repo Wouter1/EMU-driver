@@ -51,11 +51,11 @@ OSDefineMetaClassAndStructors(EMUUSBAudioEngine, IOAudioEngine)
 void EMUUSBAudioEngine::free () {
 	debugIOLog ("+EMUUSBAudioEngine[%p]::free ()", this);
     
-	if (NULL != startTimer) {
-		startTimer->cancelTimeout ();
-		startTimer->release ();
-		startTimer = NULL;
-	}
+//	if (NULL != startTimer) {
+//		startTimer->cancelTimeout ();
+//		startTimer->release ();
+//		startTimer = NULL;
+//	}
 	if (NULL != mWriteLock) {
 		IOLockFree(mWriteLock);
 		mWriteLock = NULL;
@@ -1458,9 +1458,6 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
 #endif
     FailIf (kUSBAudioStreamInterfaceSubclass != usbAudio->GetInterfaceSubClass (usbInputStream.interfaceNumber, usbInputStream.alternateSettingID), Exit);
     
-	startTimer = IOTimerEventSource::timerEventSource (this, waitForFirstUSBFrameCompletion);
-	FailIf (NULL == startTimer, Exit);
-	//workLoop->addEventSource (startTimer); //HACK testing if this screws up our timing.
     
 	usbAudioDevice->doControlStuff(this, mOutput.interfaceNumber, mOutput.alternateSettingID);
 	usbAudioDevice->doControlStuff(this, usbInputStream.interfaceNumber, usbInputStream.alternateSettingID);
@@ -2119,14 +2116,6 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	
 	*(UInt64 *) (&(usbInputStream.usbIsocFrames[0].frTimeStamp)) = 0xFFFFFFFFFFFFFFFFull;
     
-    // HACK disabled, this is for checking the associated pipe and
-    // it's only returning 0's at it is now.
-//	if (NULL != usbInputStream.associatedPipe) {
-//		nextSynchReadFrame = usbInputStream.usbFrameToQueueAt;
-//		debugIOLogC("read from associated input pipe");
-//		//resultCode = usbInputStream.associatedPipe->Read(neededSampleRateDescriptor, nextSynchReadFrame, 1,&(mSampleRateFrame), &sampleRateCompletion);
-//		resultCode = usbInputStream.associatedPipe->Read(neededSampleRateDescriptor, kAppleUSBSSIsocContinuousFrame, 1,&(mSampleRateFrame), &sampleRateCompletion);
-//	}
     
     resultCode =usbInputRing.init(usbInputStream.bufferSize, this, sampleRate.whole * usbInputStream.multFactor);
     FailIf( kIOReturnSuccess != resultCode, Exit);
@@ -2184,9 +2173,6 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	//setClockIsStable(FALSE);
     
     
-	// Spawn thread to take first time stamp
-	startTimer->enable();
-	startTimer->setTimeoutMS(kMinimumInterval);		// will call waitForFirstUSBFrameCompletion
     
     usbStreamRunning = TRUE;
     resultCode = kIOReturnSuccess;
@@ -2267,50 +2253,6 @@ IOReturn EMUUSBAudioEngine::getAnchor(UInt64* frame, AbsoluteTime*	time) {
 	return result;
 }
 
-void EMUUSBAudioEngine::waitForFirstUSBFrameCompletion (OSObject * owner, IOTimerEventSource * sender) {
-    
-    // Why do we need this? Can we just start reading right away and get rid of this whole test with timers?
-    // Is this to avoid a hang-up and have some time out mechanism? Does USB not have any time-out options?
-    
-    // we're inside timer call. Maybe that's why we need to pass 'owner'?
-	EMUUSBAudioEngine *				usbAudioEngineObject  = OSDynamicCast (EMUUSBAudioEngine, owner);
-    //	AbsoluteTime						timeOffset;
-	static UInt32					timeout = 60;
-    
-    
-	FailIf ((NULL == usbAudioEngineObject) || (usbAudioEngineObject->isInactive()) || (0 != usbAudioEngineObject->usbInputStream.shouldStop), Exit);
-    
-    
-    
-    
-	if (0 == timeout || ( * (UInt64 *) ( & (usbAudioEngineObject->usbInputStream.usbIsocFrames[0].frTimeStamp)) & 0xFFFFFFFF) != 0xFFFFFFFF) {
-		AbsoluteTime	timeOffset, uptime;
-		AbsoluteTime	systemTime;
-		nanoseconds_to_absolutetime (kMinimumFrameOffset * kWallTimeConstant,EmuAbsoluteTimePtr(&timeOffset));
-		clock_get_uptime(EmuAbsoluteTimePtr(&uptime));
-		SUB_ABSOLUTETIME(&uptime, &timeOffset);
-        // Init the time stamping in the audio engine.
-        // first arg is true if the loop count should be incremented.
-        // the 2nd arg is the AbsoluteTime.
-        
-        // HACK we now use previousfrTimesStamp.
-		//usbAudioEngineObject->takeTimeStamp(FALSE, &uptime);
-		clock_get_uptime(EmuAbsoluteTimePtr(&systemTime));
-		debugIOLogT("Audio running. first time stamp %llu at systemTime %llu", uptime, systemTime);
-        
-		usbAudioEngineObject->usbInputStream.startingEngine = FALSE;			// It's started now.
-		usbAudioEngineObject->startTimer->cancelTimeout();
-		usbAudioEngineObject->startTimer->disable ();
-	} else {
-		// Requeue timer to check for the first frame completing
-		usbAudioEngineObject->startTimer->setTimeoutUS (50);		// will call us back in 50 micoseconds
-		--timeout;
-        debugIOLogT ("AUDIO NOT RUNNING, time-out of get timer (%ld)", timeout);
-	}
-    
-Exit:
-	return;
-}
 
 bool EMUUSBAudioEngine::willTerminate (IOService * provider, IOOptionBits options) {
     
@@ -2353,10 +2295,6 @@ IOReturn EMUUSBAudioEngine::writeFrameList (UInt32 frameListNum) {
     result = PrepareWriteFrameList (frameListNum);
     ReturnIf (kIOReturnSuccess != result, result);
     
-//    if (!mOutput.usbFrameToQueueAt) {
-//        mOutput.usbFrameToQueueAt = mOutput.streamInterface->GetDevice()->GetBus()->GetFrameNumber() + 4;//mOutput.frameOffset;
-//    }
-    
     if (needTimeStamps) {
         result = mOutput.pipe->Write (theWrapRangeDescriptor,
                                       kAppleUSBSSIsocContinuousFrame,//mOutput.usbFrameToQueueAt,
@@ -2387,9 +2325,6 @@ void EMUUSBAudioEngine::writeCompleted (void * object, void * parameter, IORetur
     if (kIOReturnSuccess != result && kIOReturnAborted != result) {
         // skip ahead and see if that helps (say what? [AC])
         debugIOLogW("******** bad result system %d sub %d err %d",err_get_system(result),err_get_sub(result),err_get_code(result));
-        //			if (self->mOutput.usbFrameToQueueAt <= curUSBFrameNumber) {
-        //				self->mOutput.usbFrameToQueueAt = curUSBFrameNumber + self->mOutput.frameOffset;//kMinimumFrameOffset;
-        //			}
         return;
     }
 
@@ -2402,58 +2337,10 @@ void EMUUSBAudioEngine::writeCompleted (void * object, void * parameter, IORetur
     }
     self->inWriteCompletion = TRUE;
     
-    //AbsoluteTime		time;
-    //UInt64              curUSBFrameNumber;
-//		curUSBFrameNumber = self->mBus->GetFrameNumber();
-//		if ((SInt64)(self->mOutput.usbFrameToQueueAt - curUSBFrameNumber) > (SInt32)(self->mOutput.numUSBTimeFrames * (self->mOutput.numUSBFrameListsToQueue / 2) + 1)) {
-//			// The frame list that this would have queued has already been queued by clipOutputSamples
-//			debugIOLogC("In writehandler Exit");
-//			goto Exit;
-//		}
-    
     //		IOLockLock(self->mWriteLock);
     
     
-    //debugIOLogW("writehandler: frame %d, parameter %u",curUSBFrameNumber,(UInt32) parameter);
     
-//		if (0 != parameter) {
-//			// Take a timestamp
-//			AbsoluteTime systemTime;
-//			unsigned long long	/*systemTime,*/ stampTime;
-//			UInt32	byteOffset = ((UInt64)parameter) & 0x00FF;
-//			UInt32	frameIndex = (UInt32) (((UInt64) parameter >>16) - 1);
-//			if (kUSBDeviceSpeedHigh == self->mHubSpeed) {// consider the high speed bus case first
-//				//UInt32	byteCount = self->mOutput.maxFrameSize;
-//                // We just use the #input frames as measure for #output??
-//				UInt32	byteCount = self->usbInputStream.lastInputFrames * self->mOutput.multFactor;
-//				UInt32	preWrapBytes = byteCount - byteOffset;
-//				debugIOLog2("** writeHandler time stamp **");
-//				time = self->generateTimeStamp(frameIndex, preWrapBytes, byteCount);
-//				//UInt32 loopCount;
-//				//self->getLoopCountAndTimeStamp(&loopCount,&time);
-//			} else {// USB 1.1 nonsense
-//				AbsoluteTime	timeOffset;
-//				time = pFrames[frameIndex].frTimeStamp;
-//				UInt64	nanos = (byteOffset * 1000000)/ pFrames[frameIndex].frActCount;// compute fractional part of sample frame
-//				nanoseconds_to_absolutetime(nanos, EmuAbsoluteTimePtr(&timeOffset));
-//				SUB_ABSOLUTETIME(&time, &timeOffset);
-//			}
-//			clock_get_uptime(EmuAbsoluteTimePtr(&systemTime));
-//			stampTime = AbsoluteTime_to_scalar(&time);
-//			debugIOLogT("write frameIndex %ld stampTime %llu system time %llu \n", frameIndex, stampTime, systemTime);
-//			//self->takeTimeStamp(TRUE, &time);
-//			int delta = self->usbInputStream.runningInputCount - self->runningOutputCount;
-//			int drift = self->lastDelta - delta;
-//			self->lastDelta = delta;
-//			debugIOLogC("running counts: output %u, delta %d, drift %d",(unsigned int)self->runningOutputCount,delta, drift);
-//            //  FIXME drift should be accounted for??? Is this the source of our clicks??
-//#if 0
-//			if (drift < 100) { // should never be that big
-//				self->AddToLastFrameSize(-drift);
-//			}
-//#endif
-//            
-//		}
     
     // FIXME use '%' instead of this weird multiply trick
     // FIXME why update list already here?
