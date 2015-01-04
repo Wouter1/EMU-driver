@@ -2302,8 +2302,7 @@ IOReturn EMUUSBAudioEngine::writeFrameList (UInt32 frameListNum) {
         needTimeStamps = FALSE;
     } else {
         result = mOutput.pipe->Write(mOutput.bufferDescriptors[frameListNum],kAppleUSBSSIsocContinuousFrame,//mOutput.usbFrameToQueueAt, //
-            mOutput.numUSBFramesPerList,&mOutput.usbIsocFrames[frameListNum * mOutput.numUSBFramesPerList], &mOutput.usbCompletion[frameListNum], (TRUE == usbInputStream.startingEngine));
-        //mPollInterval);//(TRUE ==startingEngine) );
+            mOutput.numUSBFramesPerList,&mOutput.usbIsocFrames[frameListNum * mOutput.numUSBFramesPerList], &mOutput.usbCompletion[frameListNum], 1);
     }
 
 // keep track of this frame number for time stamping
