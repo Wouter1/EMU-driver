@@ -160,7 +160,7 @@ Digital I/O
   * 2 in/2 out coaxial (transformer coupled)
   * 2 in/2 out optical
   * AES/EBU or S/PDIF format (software selectable)
- * MIDI (not tested if this works)
+ * MIDI (currently not working, #23)
   * 1 in, 1 out
   
 Synchronization
