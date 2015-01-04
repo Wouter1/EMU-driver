@@ -130,7 +130,7 @@ void EMUUSBOutputStream::writeCompleted (void * object, void * parameter, IORetu
         self->writeFrameList (frameListToWrite);
     } else {
         self->shouldStop++;
-        //debugIOLogC("writeHandler: now stopped %d of %d",self->shouldStop,self->numUSBFrameListsToQueue);
+        // debugIOLogC("writeHandler: now stopped %d of %d",self->shouldStop,self->numUSBFrameListsToQueue);
     }
     
     // shouldStop counter starts at 1 when stop is initiated and increases 1 for
