@@ -16,9 +16,6 @@
 #include "kern/locks.h"
 
 
-/*! Ring to store recent frame sizes, to sync write to read speed */
-typedef RingBufferDefault<UInt32> FrameSizeQueue;
-
 /*! The USB Input stream handler. It pushes the data from the USB stream into the 
  input ring provided with the init call.
  
@@ -28,7 +25,7 @@ typedef RingBufferDefault<UInt32> FrameSizeQueue;
  */
 struct EMUUSBInputStream: public StreamInfo {
 public:
-    /*! initializes the ring buffer. Must be called before use.
+    /*! initializes the input stream. Must be called before use.
      @param inputRing the initialized USBInputRing.
      @param frameQueue a initialized FrameSizeQueue.
      */
@@ -42,18 +39,20 @@ public:
     /*! @return true iff the input stream is running */
     virtual bool isRunning();
     
-    /*! stops the input stream. Must be called to stop.
+    /*! stops the input stream.
      Stop takes some time (have to wait for callbacks from all streams). 
      A callback notifyClosed is done when close is complete.*/
     virtual IOReturn                stop();
 
+    
     /*! frees the stream. Only to be called after stop() FINISHED (which is notified
      through the notifyClosed() call */
     virtual IOReturn free();
+    
     /*!
-     Called when the Ring Buffer has closed all input streams.
+     Called when this inputstream has closed all input streams.
      */
-    virtual void                    notifyClosed() =0  ;
+    virtual void                notifyClosed() =0  ;
     
     /*! This can be called externally to grab all available data from the streams.
      This is to ensure low latency, because the normal USB completion callback

@@ -158,4 +158,10 @@ public:
     
 };
 
+
+// HACK move to better place?
+/*! Ring to store recent frame sizes, to sync write to read speed */
+typedef RingBufferDefault<UInt32> FrameSizeQueue;
+
+
 #endif

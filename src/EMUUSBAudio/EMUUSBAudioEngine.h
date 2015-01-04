@@ -206,15 +206,6 @@ public:
 	
     //static void sampleRateHandler (void * target, void * parameter, IOReturn result, IOUSBIsocFrame * pFrames);
     
-    /*!
-     Write-completion handler. Queues another a write. This is called from clipOutputSamples
-     and from the callback in PrepareWriteFrameList.
-     @param target pointer to EMUUSBAudioEngine
-     @param parameter
-     * low 16 bits: byteoffset.
-     * high 16 bits; framenumber.
-     */
-    static void writeCompleted (void * object, void * parameter, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
 	virtual IOReturn pluginDeviceRequest (IOUSBDevRequest * request, IOUSBCompletion * completion);
 	virtual void pluginSetConfigurationApp (const char * bundleID);
 	virtual void registerPlugin (EMUUSBAudioPlugin * thePlugin);
@@ -278,19 +269,29 @@ protected:
     /*! Ring to store recent frame sizes (#bytes in a frame) */
     FrameSizeQueue                      frameSizeQueue;
 
+    /*! Connect close event. */
+    struct OurUSBOutputStream: public EMUUSBOutputStream {
+    public:
+        /*! init
+         @param engine ptr to the audio engine
+         @param ring  initialized UsbInputRing. Not started.
+         @param frameQueue fully initialized FrameSizeQueue. */
+        IOReturn    init(EMUUSBAudioEngine * engine);
+        void    notifyClosed();
+        
+    private:
+        // pointer to the engine. This is just the parent
+        EMUUSBAudioEngine *             theEngine;
+    };
+    
     /*! StreamInfo relevant for the writing-to-USB (playback) */
-	EMUUSBOutputStream                  mOutput;
+	OurUSBOutputStream                  mOutput;
     
     
 	// engine data (i.e., not stream-specific)
 	IOSyncer *							mSyncer;
 	EMUUSBAudioDevice *					usbAudioDevice;
     
-    /*! IOUSBController, handling general USB properties like current frame nr */
-	//IOUSBController *					mBus;// DT
-    
-	IOMultiMemoryDescriptor *			theWrapRangeDescriptor;
-	IOSubMemoryDescriptor *				theWrapDescriptors[2];
 	IOMemoryDescriptor *				neededSampleRateDescriptor;
     
 	UInt32 *							aveSampleRateBuf;		// 4 byte value
@@ -313,11 +314,6 @@ protected:
     
 	// parameters and variables common across streams (e.g., sample rate, bit resolution, etc.)
     
-    /*! first byte to send from mOutput.usbBufferDescriptor */
-	UInt32								previouslyPreparedBufferOffset;
-	UInt32								safeToEraseTo;
-	UInt32								lastSafeErasePoint;
-	UInt32								averageSampleRate;
     /*! selected rate, eg 96000. WARNING usually this is PLAIN ZERO ==0 not clear why this is not set properly. Avoid this!!!!!! */
 	UInt32								hardwareSampleRate;
 	UInt32								mChannelWidth;	// 16 or 24 bit
@@ -333,12 +329,8 @@ protected:
      0=only at end. 1..8 means 1..8 refresh calls per millisecond. Wouter: I disabled this to get the stuff working at all. */
 	UInt8								mPollInterval;
     
-    /*! guess: flag that is iff while we are inside the writeHandler. */
-	Boolean								inWriteCompletion;
 	Boolean								usbStreamRunning;
     
-    /*! Variable that is set TRUE every time a wrap occurs in the writeHandler  */
-	Boolean								needTimeStamps;
     //	UInt32								runningOutputCount;
 	SInt32								lastDelta;
 	UInt32								lastNonZeroFrame;
@@ -351,14 +343,6 @@ protected:
     
 	
 	void	GetDeviceInfo (void);
-    /*! Set up the given framelist for writing.  called from writeFrameList.
-     Assumes that frameSizeQueue contains at least mOutput.numUSBFramesPerList values
-     because the size of each frame must now be set.
-     @param listNr the list number to be prepared.
-     @return kIOReturnUnderrun if frameSizeQueue does not contain enough values.
-     kIOReturnNoDevice if mOutput.audioStream==0.
-     kIOReturnNoMemory if sampleBufferSize == 0*/
-	IOReturn	PrepareWriteFrameList (UInt32 listNr);
     
 	IOReturn	SetSampleRate (EMUUSBAudioConfigObject *usbAudio, UInt32 sampleRate);
     
@@ -390,11 +374,7 @@ protected:
     
 	virtual OSString * getGlobalUniqueID ();
     
-    
-    /*!  Write frame list (typ. 64 frames) to USB. called from writeHandler.
-     Every time the frames in the list have to point to sub-memory blocks in the buffer
-     */
-    IOReturn writeFrameList (UInt32 frameListNum);
+ 
     
     /*! called from performAudioEngineStart */
     IOReturn startUSBStream();

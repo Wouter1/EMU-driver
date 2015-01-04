@@ -48,7 +48,7 @@ IOReturn EMUUSBInputStream::start() {
 
 
 IOReturn EMUUSBInputStream::stop() {
-    debugIOLogR("stop input stream");
+    debugIOLogC("+EMUUSBInputStream::stop");
     ReturnIf(!started, kIOReturnNotOpen);
     started = false;
     if (shouldStop == 0) {
@@ -273,7 +273,7 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
 	IOLockUnlock(mLock);
     
     if (shouldStop > RECORD_NUM_USB_FRAME_LISTS) {
-        debugIOLogR("All stopped");
+        debugIOLogC("EMUUSBInputStream::readCompleted all input streams stopped");
         started = false;
         notifyClosed();
     }
