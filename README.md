@@ -108,16 +108,16 @@ Combo Microphone Preamplifier/Hi-Z/Line Inputs (2)
  * Stereo Crosstalk (1kHz min gain, -1dBFS): < -110dB
  * Hi-Z Line Input:
 
-  * Input Impedance: 1M &Omega;
+  * Input Impedance: 1M&Omega;
   * Max Level: +12dBV (14.2dBu)
   * Dynamic Range (A-weighted, 1kHz, min gain): 113dB
   * Signal-to-Noise Ratio (A-weighted, min gain): 113dB
   * THD+N (1kHz at -1dBFS, min gain): -101dB (.0009%)
  * Microphone Preamplifier:
 
-  * Input Impedance: 1.5Kohms
+  * Input Impedance: 1.5k&Omega;
   * Max Level: +6dBV (+8.2dBu)
-  * EIN (20Hz-20kHz, 150ohm, unweighted): -127dBu
+  * EIN (20Hz-20kHz, 150&Omega;, unweighted): -127dBu
   * Signal-to-Noise Ratio (A-weighted, min gain): 112.5dB
   * THD+N (1kHz at -1dBFS, min gain): -101dB (.0009%)
   * Phantom Power: 48V
@@ -137,7 +137,7 @@ Analog Line Outputs (2)
  * Signal-to-Noise Ratio (A-weighted): 117dB
  * THD+N (1kHz at -1dBFS): -100dB (.001%)
  * Stereo Crosstalk (1kHz at -1dBFS): < -114.5dB
- * Balanced/Unbalanced Output Impedance: 560 Ohms
+ * Balanced/Unbalanced Output Impedance: 560&Omega;
  
 Headphone Amplifier
 ------
@@ -146,12 +146,12 @@ Headphone Amplifier
  * D/A converter: AK4396 (shared with Line Out)
  * Gain Range: 60dB
  * Maximum Output Power: 20mW
- * Output Impedance: 22ohms
+ * Output Impedance: 22&Omega;
  * Frequency Response (20Hz-20kHz): +0.06/-0.035dB
  * Dynamic Range (A-weighted): 114dB
  * Signal-to-Noise Ratio (A-weighted): 114dB
- * THD+N (1kHz, max gain): 600ohm load: -95.5dB (.0018%)
- * Stereo Crosstalk (1kHz at -1dBFS, 600 ohm load): < -85dB
+ * THD+N (1kHz, max gain): 600&Omega; load: -95.5dB (.0018%)
+ * Stereo Crosstalk (1kHz at -1dBFS, 600&Omega; load): < -85dB
  
 Digital I/O
 ------
