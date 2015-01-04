@@ -57,6 +57,9 @@ IOReturn EMUUSBInputStream::stop() {
     return kIOReturnSuccess;
 }
 
+bool EMUUSBInputStream::isRunning() {
+    return !startingEngine && !shouldStop;
+}
 
 
 IOReturn EMUUSBInputStream::free() {

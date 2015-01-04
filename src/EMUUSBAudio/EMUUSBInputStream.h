@@ -39,6 +39,9 @@ public:
      @return kIOReturnSuccess if all ok. */
     virtual IOReturn                start();
     
+    /*! @return true iff the input stream is running */
+    virtual bool isRunning();
+    
     /*! stops the input stream. Must be called to stop.
      Stop takes some time (have to wait for callbacks from all streams). 
      A callback notifyClosed is done when close is complete.*/

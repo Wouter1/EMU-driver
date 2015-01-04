@@ -933,14 +933,12 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
     
     debugIOLogRD("+convertInputSamples firstSampleFrame=%u, numSampleFrames=%d byteorder=%d bitWidth=%d numchannels=%d",firstSampleFrame,numSampleFrames,streamFormat->fByteOrder,streamFormat->fBitWidth,streamFormat->fNumChannels);
     
-    if (usbInputStream.startingEngine) {
-        return kIOReturnUnderrun;
+    if (!usbInputStream.isRunning()) {
+        return kIOReturnNotReady;
     }
-    
-    if (!usbInputStream.startingEngine && !usbInputStream.shouldStop) {
-        usbInputStream.update();
-    }
-    
+
+    usbInputStream.update();
+
     // at this point, usbInputRing should contain sufficient info to handle the request.
     // of course this all depends on proper timing of this call.
     // It's the caller that "ensures" this using
