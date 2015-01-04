@@ -17,6 +17,7 @@ The first priority here was to get the audio input working properly, without the
 * This version works on Mavericks but not on Yosemite (see issue #18).
 * All sample rates are supported both for record and playback: 44.1, 48, 88.2, 96, 176.4 and 192 kHz
 * I can only test on EMU0404 USB as I have no other EMU devices. 
+* Midi is currently not supported (#23).
 
 Please notify me how my driver works on other EMU USB devices.
 
@@ -85,14 +86,14 @@ Technical Specifications
 General
 ------
 
- * Sample Rates: 44.1, 48, 88.2, 96, 176.4, 192kHz from internal crystal (no sample rate conversion)*
+ * Sample Rates: 44.1, 48, 88.2, 96, 176.4, 192kHz from internal crystal (no sample rate conversion)
   * Bit Depth: 24-bit I/O, 32-bit processing
  * USB 2.0 Hi-Speed
   * Full 24-bit resolution at all sample rates
   * 4in/4 out channels from 44.1-96kHz
   * 2 in/2 out channels from 176.4-192kHz
  * Zero-latency direct hardware monitoring (disabled at 176.4-192kHz)
- * Apple CoreAudio and CoreMIDI 
+ * Apple CoreAudio (currently no CoreMIDI support).
   * AC3 and DTS Passthru supported (not tested if this works)
  * Anti-Pop speaker protection minimizes noise during power on/off
  * Ultra-low jitter clock subsystem: < 500ps RMS in PLL mode (48kHz, Coaxial S/PDIF Sync)
@@ -107,7 +108,7 @@ Combo Microphone Preamplifier/Hi-Z/Line Inputs (2)
  * Stereo Crosstalk (1kHz min gain, -1dBFS): < -110dB
  * Hi-Z Line Input:
 
-  * Input Impedance: 1Mohm
+  * Input Impedance: 1M &Omega;
   * Max Level: +12dBV (14.2dBu)
   * Dynamic Range (A-weighted, 1kHz, min gain): 113dB
   * Signal-to-Noise Ratio (A-weighted, min gain): 113dB
