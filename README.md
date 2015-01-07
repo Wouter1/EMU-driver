@@ -24,6 +24,15 @@ Please notify me how my driver works on other EMU USB devices.
 
 Installation
 ========
+
+First time installation only: prepare your machine to take developer kernel extensions:
+
+1. open a terminal and enter this command:
+    ```sudo nvram boot-args="kext-dev-mode=1"```
+2. reboot your machine. 
+
+Install the driver:
+
 1. Turn off the EMU device
 2. Download (click on "Download ZIP") and unzip the driver
 3. Run the kextInstall script 
@@ -36,17 +45,7 @@ or
 
 If you like you can also copy the control panel into your applications directory.
 
-Ext not loading
-======
-The driver is not signed and OSX may refuse to load.
-To allow loading, open a console and give the following command
-
-```
-sudo nvram boot-args="kext-dev-mode=1"
-```
-
-and reboot the machine. 
-
+NOTE: After the install, it takes OSX about a minute to incorporate the driver into the kernel.
 
 Usage
 ======
