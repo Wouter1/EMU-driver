@@ -86,7 +86,7 @@ General
 ------
 
  * Sample Rates: 44.1, 48, 88.2, 96, 176.4, 192kHz from internal crystal (no sample rate conversion)
-  * Bit Depth: 24-bit I/O, 32-bit processing
+  * Bit Depth: 24-bit I/O, 32-bit floating point processing
  * USB 2.0 Hi-Speed
   * Full 24-bit resolution at all sample rates
   * 4in/4 out channels from 44.1-96kHz
