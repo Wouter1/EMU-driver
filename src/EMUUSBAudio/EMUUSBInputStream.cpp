@@ -16,13 +16,17 @@
 IOReturn EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing, FrameSizeQueue *frameRing) {
     ReturnIf(inputRing == 0, kIOReturnBadArgument);
     ReturnIf(frameRing == 0, kIOReturnBadArgument);
+    ReturnIf(!pipe, kIOReturnNotOpen);
     
     usbRing = inputRing;
     frameSizeQueue = frameRing;
-    
+    UInt16 pollInterval  = 1 << (pipe->GetEndpointDescriptor()->bInterval - 1);
+    frameNumberIncreasePerRead  = (NUMBER_FRAMES / 8) * pollInterval; // 1 per frame
+	
     mLock = NULL;
 	mLock = IOLockAlloc();
-	ReturnIf(!mLock, kIOReturnNoMemory);
+    
+    ReturnIf(!mLock, kIOReturnNoMemory);
     
     initialized = true;
     return kIOReturnSuccess;
@@ -35,7 +39,7 @@ IOReturn EMUUSBInputStream::start() {
     shouldStop = 0;
     currentFrameList = 0;
     
-    //usbFrameToQueueAt = 0;
+    usbFrameToQueueAt = 0;
     
     // we start reading on all framelists. USB will figure it out and take the next one in order
     // when it has data. We restart each framelist immediately in readCompleted when we get data.
@@ -169,46 +173,38 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
 			usbIsocFrames[firstFrame+i].frReqCount = maxFrameSize; // #bytes to read.
 			*(UInt64 *)(&(usbIsocFrames[firstFrame + i].frTimeStamp)) = 	0ul; //time when frame was procesed
 		}
+
+        /* kAppleUSBSSIsocContinuousFrame seems to give error e00002ef on some computers
+           therefore we are doing this usbFrameToQueueAt stuff */
         
-        /*The updatefrequency is not so well documented. But in IOUSBInterfaceInterface192 I read:
-         Specifies how often, in milliseconds, the frame list data should be updated. Valid range is 0 - 8. 
+        if (usbFrameToQueueAt == 0) {
+            usbFrameToQueueAt=streamInterface->GetDevice()->GetBus()->GetFrameNumber() + frameOffset;
+        } else {
+            usbFrameToQueueAt += frameNumberIncreasePerRead;
+        }
+
+        /* The updatefrequency (last arg of Read) is not so well documented. But in IOUSBInterfaceInterface192:
+         Specifies how often, in milliseconds, the frame list data should be updated. Valid range is 0 - 8.
          If 0, it means that the framelist should be updated at the end of the transfer.
-         It appears that this number also has impact on the timing details in the frame list.
+         
+         It appears that this number also has impact on the timing details (latency) in the frame list.
          If you set this to 0, there happens an additional 8ms for a full framelist once in a
          few minutes in the timings.
          If you set this to 1, this jump is 8x more often, about once 30 seconds, but is only 1ms.
          We must keep these jumps small, to avoid timestamp errors and buffer overruns.
          */
-        //result = pipe->Read(bufferDescriptors[frameListNum], kAppleUSBSSIsocContinuousFrame, numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
+
+        result = pipe->Read(bufferDescriptors[frameListNum], usbFrameToQueueAt, numUSBFramesPerList,
+                            &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
         
-//        if (usbFrameToQueueAt == 0) {
-//            usbFrameToQueueAt=streamInterface->GetDevice()->GetBus()->GetFrameNumber() + frameOffset;
-//        } else {
-//            usbFrameToQueueAt = kAppleUSBSSIsocContinuousFrame;
-//        }
-        result = pipe->Read(bufferDescriptors[frameListNum], kAppleUSBSSIsocContinuousFrame, numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
-        
-        // kAppleUSBSSIsocContinuousFrame seems to give error e00002ef on Yosemite
-        // maybe something like engine->mBus->GetFrameNumber()?
-//        IOUSBController *	mBus = streamInterface->GetDevice()->GetBus();
-//		result = pipe->Read(bufferDescriptors[frameListNum], mBus->GetFrameNumber() + 1, numUSBFramesPerList, &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
         if (result != kIOReturnSuccess) {
             // FIXME #17 if this goes wrong, why continue?
             doLog("USB pipe READ error %x",result);
         }
-        
-		//usbFrameToQueueAt += numUSBTimeFrames;
 	}
 	return result;
 }
 
-
-//UInt64 EMUUSBInputStream::getStartTransferFrameNr() {
-//    UInt64 frameNr = streamInterface->GetDevice()->GetBus()->GetFrameNumber();
-//    frameNr += frameOffset;
-//    return frameNr;
-//    
-//}
 
 
 

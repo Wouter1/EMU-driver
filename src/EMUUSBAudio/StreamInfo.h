@@ -60,7 +60,7 @@
  
  However, it seems that the exact time at which we call takeTimeStamp is critical as well.
  
- 
+THIS NUMBER MUST BE MULTIPLE OF 8, see EMUUSBInputStream frameNumberIncreasePerRead. 
  */
 
 #define NUMBER_FRAMES 64

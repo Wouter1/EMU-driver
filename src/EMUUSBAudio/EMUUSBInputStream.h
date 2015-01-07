@@ -165,19 +165,23 @@ private:
     IOLock*                     mLock;
     
     /*! set to true after succesful init() */
-    bool initialized;
+    bool                        initialized;
     
     /*! set to true after succesful start() */
-    bool started;
+    bool                        started;
 
-    /*! the next USB MBus Frame number that can be used for read/write. Initially this is at frameOffset from the current frame number. Must be incremented with steps of size numUSBTimeFrames. Currently we just set it to kAppleUSBSSIsocContinuousFrame after
-     the initial startup cycle. */
-    //UInt64						usbFrameToQueueAt;
+    /*! the USB MBus Frame number that we are currently reading/writing. Initially this is at frameOffset from the current frame number. Must be incremented with steps of size frameNumberIncreasePerRead. This is necessary because
+        kAppleUSBSSIsocContinuousFrame seems to give pipe read error e00002ef on some computers #18 */
+    UInt64						usbFrameToQueueAt;
 
     /*! the framelist that we are expecting to complete from next.
      Basically runs from 0 to numUSBFrameListsToQueue-1 and then
      restarts at 0. Updated after readHandler handled the block. */
-    volatile UInt32						currentFrameList;
+    volatile UInt32				currentFrameList;
+    
+    /*! increase of USB frame number per read. frame number increases every 8 usb microframes = 1 normal frame 
+     and we read NUMBER_FRAMES every pollInterval. */
+    UInt16                      frameNumberIncreasePerRead;
 
 };
 
