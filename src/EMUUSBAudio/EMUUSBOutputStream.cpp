@@ -17,11 +17,14 @@ IOReturn   EMUUSBOutputStream::init() {
     IOReturn res = StreamInfo::init();
     ReturnIf(res != kIOReturnSuccess, res);
     
+    shouldStop = 0;
+
     // memleak if fail
     theWrapDescriptors[0] = OSTypeAlloc (IOSubMemoryDescriptor);
 	theWrapDescriptors[1] = OSTypeAlloc (IOSubMemoryDescriptor);
 	ReturnIf (((NULL == theWrapDescriptors[0]) || (NULL == theWrapDescriptors[1])), kIOReturnNoMemory);
 
+    
     frameSizeQueue = NULL;
     initialized=true;
     
@@ -30,12 +33,12 @@ IOReturn   EMUUSBOutputStream::init() {
 
 IOReturn EMUUSBOutputStream::start(FrameSizeQueue *frameQueue) {
     debugIOLogC("EMUUSBOutputStream::start");
-
+    ReturnIf(shouldStop, kIOReturnStillOpen); // still in closedown! Cancel start.
+    
     IOReturn res = StreamInfo::reset();
     ReturnIf(res != kIOReturnSuccess, res);
 
     started = true;
-    shouldStop = 0;
 	safeToEraseTo = 0;
 	lastSafeErasePoint = 0;
     currentFrameList = 0;
@@ -52,7 +55,7 @@ IOReturn EMUUSBOutputStream::start(FrameSizeQueue *frameQueue) {
 
 
 IOReturn EMUUSBOutputStream::stop() {
-   debugIOLogC("EMUUSBOutputStream::stop");
+    debugIOLogC("EMUUSBOutputStream::stop");
     
     ReturnIf(!started, kIOReturnNotOpen);
     started = false;
@@ -60,6 +63,29 @@ IOReturn EMUUSBOutputStream::stop() {
         shouldStop=1;
     }
     return kIOReturnSuccess;
+}
+
+
+void EMUUSBOutputStream::queueTerminated() {
+    started = false;
+    if (shouldStop==0) {
+        shouldStop = 2; // 1 stopped; force full stop
+    } else {
+        shouldStop ++;
+    }
+
+    debugIOLogC("writeHandler: now stopped %d of %d",shouldStop-1,numUSBFrameListsToQueue);
+    
+    // shouldStop counter starts at 1 when stop is initiated and increases 1 for
+    // every completed framelist
+    if (shouldStop == numUSBFrameListsToQueue + 1) {
+        debugIOLog("All playback streams stopped");
+        started = false;
+        shouldStop = 0;
+        notifyClosed();
+    }
+
+    
 }
 
 void EMUUSBOutputStream::free() {
@@ -96,10 +122,6 @@ IOReturn EMUUSBOutputStream::writeFrameList (UInt32 frameListNum) {
         result = pipe->Write(bufferDescriptors[frameListNum],getNextFrameNr(),numUSBFramesPerList,
                              &usbIsocFrames[frameListNum * numUSBFramesPerList], &usbCompletion[frameListNum], 1);
     }
-    
-    if (result != kIOReturnSuccess) {
-        debugIOLog("write failed:%x",result);
-    }
 	return result;
 }
 
@@ -117,17 +139,21 @@ void EMUUSBOutputStream::writeCompleted (void * parameter, IOReturn result, IOUS
         return;
     }
     
+    if (shouldStop) {
+        queueTerminated();
+        return;
+    }
+    
     
     // FIXME: simplistic, flawed locking mechanism
     // Seems we don't need a lock here anyway as this is only called as callback.
     if (inWriteCompletion)
     {
-        debugIOLog("*** Already in write completion!");
+        debugIOLog("*** BUG already in write completion!");
 		return;
     }
     inWriteCompletion = TRUE;
     
-    //		IOLockLock(self->mWriteLock);
     
     // FIXME use '%' instead of this weird multiply trick
     // FIXME why update list already here?
@@ -139,27 +165,15 @@ void EMUUSBOutputStream::writeCompleted (void * parameter, IOReturn result, IOUS
     // get this wrong.
     currentFrameList = (currentFrameList + 1) * (currentFrameList < (numUSBFrameLists - 1));
     
-    if (!shouldStop) {
-        // FIXME use % operator
-        UInt32	frameListToWrite = (currentFrameList - 1) + numUSBFrameListsToQueue;
-        frameListToWrite -= numUSBFrameLists * (frameListToWrite >= numUSBFrameLists);
-        writeFrameList (frameListToWrite);
-    } else {
-        shouldStop++;
-        debugIOLogC("writeHandler: now stopped %d of %d",shouldStop,numUSBFrameListsToQueue);
+    // FIXME use % operator
+    UInt32	frameListToWrite = (currentFrameList - 1) + numUSBFrameListsToQueue;
+    frameListToWrite -= numUSBFrameLists * (frameListToWrite >= numUSBFrameLists);
+    if (writeFrameList (frameListToWrite) != kIOReturnSuccess) {
+            // #29 if write fails, we can't keep running
+            debugIOLog("PIPE write error :%x. Stopping OutputStream.",result);
+            queueTerminated();
     }
     
-    // shouldStop counter starts at 1 when stop is initiated and increases 1 for
-    // every completed framelist
-    if (shouldStop == numUSBFrameListsToQueue + 1) {
-        debugIOLog("All playback streams stopped");
-        started = false;
-        notifyClosed();
-    }
-
-    //		IOLockUnlock(self->mWriteLock);
-    
-Exit:
 	inWriteCompletion = FALSE;
 	return;
 }
@@ -204,11 +218,11 @@ IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
             thisFrameSize = stockSamplesInFrame * multFactor;
         }
         
-        
         if (thisFrameSize >= numBytesToBufferEnd) {
             //debugIOLogC("param has something %d", numUSBFramesPrepared);
             lastPreparedByte = thisFrameSize - numBytesToBufferEnd;
             usbCompletion[listNr].parameter = (void *)(UInt64)(((numUSBFramesPrepared + 1) << 16) | lastPreparedByte);
+            // FIXME document haveWrapped and wrapDescriptor. Do we even need those?
             theWrapDescriptors[0]->initSubRange (usbBufferDescriptor, previouslyPreparedBufferOffset, sampleBufferSize - previouslyPreparedBufferOffset, kIODirectionInOut);
             numBytesToBufferEnd = sampleBufferSize - lastPreparedByte;// reset
             haveWrapped = true;

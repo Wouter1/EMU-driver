@@ -31,7 +31,7 @@ public:
      */
     virtual IOReturn                init();
 
-    IOReturn start(FrameSizeQueue *frameQueue);
+    IOReturn                        start(FrameSizeQueue *frameQueue);
     
     /*! Stop the output stream */
     IOReturn stop();
@@ -45,11 +45,27 @@ public:
      */
     virtual void                    notifyClosed() = 0  ;
 
+
+    UInt32							averageSampleRate;
+    
+    /*! first byte to send from mOutput.usbBufferDescriptor */
+	UInt32							previouslyPreparedBufferOffset;
+
+    /*! the framelist that was written last.
+     Basically runs from 0 to numUSBFrameListsToQueue-1 and then
+     restarts at 0. Updated after readHandler handled the block. */
+    volatile UInt32					currentFrameList;
+
+private:
+
+    /*! Called when a queue was terminated. Counts number of terminated queues and calls handler
+     when completely closed. */
+    void                            queueTerminated();
     
     /*!  Write frame list (typ. 64 frames) to USB. called from writeHandler.
      Every time the frames in the list have to point to sub-memory blocks in the buffer
      */
-    IOReturn writeFrameList (UInt32 frameListNum);
+    IOReturn                        writeFrameList (UInt32 frameListNum);
     
     /*!
      Write-completion handler. Queues another a write. This is called from clipOutputSamples
@@ -86,10 +102,6 @@ public:
      the initial startup cycle. */
     //UInt64						usbFrameToQueueAt;
 
-    /*! the framelist that was written last.
-     Basically runs from 0 to numUSBFrameListsToQueue-1 and then
-     restarts at 0. Updated after readHandler handled the block. */
-    volatile UInt32						currentFrameList;
 
     /*! set to true after succesful start() */
     bool started;
@@ -104,12 +116,7 @@ public:
 	IOMultiMemoryDescriptor *			theWrapRangeDescriptor;
 	IOSubMemoryDescriptor *				theWrapDescriptors[2];
     
-	UInt32								averageSampleRate;
 
-    /*! first byte to send from mOutput.usbBufferDescriptor */
-	UInt32								previouslyPreparedBufferOffset;
-
-private:
     /* frame size queue, holding sizes of incoming frames in the read stream */
     FrameSizeQueue *        frameSizeQueue;
     
