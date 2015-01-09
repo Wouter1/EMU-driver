@@ -16,16 +16,14 @@
 IOReturn EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing, FrameSizeQueue *frameRing) {
     ReturnIf(inputRing == 0, kIOReturnBadArgument);
     ReturnIf(frameRing == 0, kIOReturnBadArgument);
-    ReturnIf(!pipe, kIOReturnNotOpen);
+    
+    IOReturn res = StreamInfo::init();
+    ReturnIf(res != kIOReturnSuccess, res);
     
     usbRing = inputRing;
     frameSizeQueue = frameRing;
-    UInt16 pollInterval  = 1 << (pipe->GetEndpointDescriptor()->bInterval - 1);
-    frameNumberIncreasePerRead  = (NUMBER_FRAMES / 8) * pollInterval; // 1 per frame
 	
-    mLock = NULL;
 	mLock = IOLockAlloc();
-    
     ReturnIf(!mLock, kIOReturnNoMemory);
     
     initialized = true;
@@ -35,11 +33,12 @@ IOReturn EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing, FrameSizeQ
 
 IOReturn EMUUSBInputStream::start() {
     ReturnIf(!initialized, kIOReturnNotReady);
+    IOReturn res = StreamInfo::reset();
+    ReturnIf(res != kIOReturnSuccess, res);
     
     shouldStop = 0;
     currentFrameList = 0;
     
-    usbFrameToQueueAt = 0;
     
     // we start reading on all framelists. USB will figure it out and take the next one in order
     // when it has data. We restart each framelist immediately in readCompleted when we get data.
@@ -173,15 +172,7 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
 			usbIsocFrames[firstFrame+i].frReqCount = maxFrameSize; // #bytes to read.
 			*(UInt64 *)(&(usbIsocFrames[firstFrame + i].frTimeStamp)) = 	0ul; //time when frame was procesed
 		}
-
-        /* kAppleUSBSSIsocContinuousFrame seems to give error e00002ef on some computers
-           therefore we are doing this usbFrameToQueueAt stuff */
         
-        if (usbFrameToQueueAt == 0) {
-            usbFrameToQueueAt=streamInterface->GetDevice()->GetBus()->GetFrameNumber() + frameOffset;
-        } else {
-            usbFrameToQueueAt += frameNumberIncreasePerRead;
-        }
 
         /* The updatefrequency (last arg of Read) is not so well documented. But in IOUSBInterfaceInterface192:
          Specifies how often, in milliseconds, the frame list data should be updated. Valid range is 0 - 8.
@@ -194,7 +185,7 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
          We must keep these jumps small, to avoid timestamp errors and buffer overruns.
          */
 
-        result = pipe->Read(bufferDescriptors[frameListNum], usbFrameToQueueAt, numUSBFramesPerList,
+        result = pipe->Read(bufferDescriptors[frameListNum], getNextFrameNr(), numUSBFramesPerList,
                             &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
         
         if (result != kIOReturnSuccess) {

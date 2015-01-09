@@ -2315,7 +2315,7 @@ void EMUUSBAudioDevice::queryXU() {
 	//bool	devOptionsChange = (mQueryXU == mDeviceOptionsXU);// change to deviceOptions XU
 	bool	digitalChange = (mQueryXU == mDigitalIOXU);	// change to digitalIOXU
 	// set up the various parameters
-	debugIOLogC("+EMUUSBAudioDevice[%p]::QueryXU",this);
+	debugIOLogC("+EMUUSBAudioDevice[%p]::queryXU",this);
     
 	if (digitalChange) {
 		if (getProperty("bHasSPDIFClock")) {

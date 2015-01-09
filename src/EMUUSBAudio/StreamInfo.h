@@ -105,6 +105,17 @@ THIS NUMBER MUST BE MULTIPLE OF 8, see EMUUSBInputStream frameNumberIncreasePerR
  * frameList—A pointer to an array of structures that describe the frames. specifies the list of transfers you want to occur.
  */
 struct StreamInfo {
+public:
+    /*! initialize this stream info. */
+    IOReturn init();
+    
+    /*! reset fields when reading/writing (re)starts. Assumes that pipe has been set.  */
+    IOReturn reset();
+    
+    /*! get the next USB frame number for read/write. Needed because kAppleUSBSSIsocContinuousFrame 
+     gives error e00002ef on some computers */
+    UInt64 getNextFrameNr();
+    
     /*! The point where the next raw USB byte can be written in bufferPtr. Always in [0, bufferSize> */
     UInt32		bufferOffset;
     
@@ -195,8 +206,14 @@ struct StreamInfo {
     /*! shortcut to bufferMemoryDescriptor actual buffer bytes. Really UInt8*. */
     void *						bufferPtr;
     
+    /*! the USB MBus Frame number that we queued last for reading/writing. Initially this is at frameOffset from the current frame number. Must be incremented with steps of size frameNumberIncreasePerRead. This is necessary because
+     kAppleUSBSSIsocContinuousFrame seems to give pipe read error e00002ef on some computers #18 */
+    UInt64						lastQueuedUsbFrameNr;
 
-    
+    /*! increase of USB frame number per call to read/write. frame number increases every 8 usb microframes = 1 normal frame
+     and we read/write NUMBER_FRAMES every pollInterval. */
+    UInt16                      frameNumberIncreasePerCycle;
+
 };
 
 

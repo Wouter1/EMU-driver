@@ -59,8 +59,16 @@ public:
      * low 16 bits: byteoffset.
      * high 16 bits; framenumber.
      */
-    static void writeCompleted (void * object, void * parameter, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
+    static void writeCompletedStatic (void * object, void * parameter, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
 
+    /*! Write-completion handler. Queues another a write. This is called from writeCompletedStatic.
+    @param parameter
+    * low 16 bits: byteoffset.
+    * high 16 bits; framenumber.
+    */
+    void writeCompleted(void * parameter, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
+    
+    
     /*! Set up the given framelist for writing.  called from writeFrameList.
      Assumes that frameSizeQueue contains at least mOutput.numUSBFramesPerList values
      because the size of each frame must now be set.
@@ -116,6 +124,8 @@ private:
 	UInt32								lastSafeErasePoint;
     
     bool                                initialized=false;
+
+    
 
 };
 

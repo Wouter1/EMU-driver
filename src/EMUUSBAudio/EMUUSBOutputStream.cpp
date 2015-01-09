@@ -13,11 +13,15 @@
 
 IOReturn   EMUUSBOutputStream::init() {
     ReturnIf(initialized, kIOReturnStillOpen);
+    
+    IOReturn res = StreamInfo::init();
+    ReturnIf(res != kIOReturnSuccess, res);
+    
     // memleak if fail
     theWrapDescriptors[0] = OSTypeAlloc (IOSubMemoryDescriptor);
 	theWrapDescriptors[1] = OSTypeAlloc (IOSubMemoryDescriptor);
 	ReturnIf (((NULL == theWrapDescriptors[0]) || (NULL == theWrapDescriptors[1])), kIOReturnNoMemory);
-    
+
     frameSizeQueue = NULL;
     initialized=true;
     
@@ -27,10 +31,14 @@ IOReturn   EMUUSBOutputStream::init() {
 IOReturn EMUUSBOutputStream::start(FrameSizeQueue *frameQueue) {
     debugIOLogC("EMUUSBOutputStream::start");
 
+    IOReturn res = StreamInfo::reset();
+    ReturnIf(res != kIOReturnSuccess, res);
+
     started = true;
     shouldStop = 0;
 	safeToEraseTo = 0;
 	lastSafeErasePoint = 0;
+    currentFrameList = 0;
 
     frameSizeQueue = frameQueue;
     
@@ -77,15 +85,16 @@ IOReturn EMUUSBOutputStream::writeFrameList (UInt32 frameListNum) {
 	IOReturn	result = kIOReturnError;
     result = PrepareWriteFrameList (frameListNum);
     ReturnIf (kIOReturnSuccess != result, result);
+
+
     
     if (needTimeStamps) {
-        result = pipe->Write (theWrapRangeDescriptor,
-                                      kAppleUSBSSIsocContinuousFrame,//usbFrameToQueueAt,
-                                      numUSBFramesPerList, &usbIsocFrames[frameListNum * numUSBFramesPerList], &usbCompletion[frameListNum], 1);//mPollInterval);//1);
+        result = pipe->Write (theWrapRangeDescriptor,getNextFrameNr(),numUSBFramesPerList,
+                              &usbIsocFrames[frameListNum * numUSBFramesPerList], &usbCompletion[frameListNum], 1);
         needTimeStamps = FALSE;
     } else {
-        result = pipe->Write(bufferDescriptors[frameListNum],kAppleUSBSSIsocContinuousFrame,//usbFrameToQueueAt, //
-                                     numUSBFramesPerList,&usbIsocFrames[frameListNum * numUSBFramesPerList], &usbCompletion[frameListNum], 1);
+        result = pipe->Write(bufferDescriptors[frameListNum],getNextFrameNr(),numUSBFramesPerList,
+                             &usbIsocFrames[frameListNum * numUSBFramesPerList], &usbCompletion[frameListNum], 1);
     }
     
     if (result != kIOReturnSuccess) {
@@ -94,10 +103,15 @@ IOReturn EMUUSBOutputStream::writeFrameList (UInt32 frameListNum) {
 	return result;
 }
 
-void EMUUSBOutputStream::writeCompleted (void * object, void * parameter, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
-    //debugIOLogW("+EMUUSBAudioEngine::writeCompleted ");
-	EMUUSBOutputStream *	self = (EMUUSBOutputStream *) object;
-    if (!self->streamInterface) return;
+void EMUUSBOutputStream::writeCompletedStatic (void * object, void * parameter, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
+    if (object) {
+        ((EMUUSBOutputStream *) object)->writeCompleted(parameter, result, pFrames);
+    }
+}
+
+void EMUUSBOutputStream::writeCompleted (void * parameter, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
+    if (!streamInterface) return;
+    
     if (kIOReturnSuccess != result && kIOReturnAborted != result) {
         doLog("** writeCompleted bad result %x",result);
         return;
@@ -105,12 +119,13 @@ void EMUUSBOutputStream::writeCompleted (void * object, void * parameter, IORetu
     
     
     // FIXME: simplistic, flawed locking mechanism
-    if (self->inWriteCompletion)
+    // Seems we don't need a lock here anyway as this is only called as callback.
+    if (inWriteCompletion)
     {
-        debugIOLogW("*** Already in write completion!");
+        debugIOLog("*** Already in write completion!");
 		return;
     }
-    self->inWriteCompletion = TRUE;
+    inWriteCompletion = TRUE;
     
     //		IOLockLock(self->mWriteLock);
     
@@ -122,35 +137,36 @@ void EMUUSBOutputStream::writeCompleted (void * object, void * parameter, IORetu
     // the completion order is the same as the Write order. But recovering the real
     // list number is critical as we would restart an already running Write if we
     // get this wrong.
-    self->currentFrameList = (self->currentFrameList + 1) * (self->currentFrameList < (self->numUSBFrameLists - 1));
+    currentFrameList = (currentFrameList + 1) * (currentFrameList < (numUSBFrameLists - 1));
     
-    if (!self->shouldStop) {
-        UInt32	frameListToWrite = (self->currentFrameList - 1) + self->numUSBFrameListsToQueue;
-        frameListToWrite -= self->numUSBFrameLists * (frameListToWrite >= self->numUSBFrameLists);
-        self->writeFrameList (frameListToWrite);
+    if (!shouldStop) {
+        // FIXME use % operator
+        UInt32	frameListToWrite = (currentFrameList - 1) + numUSBFrameListsToQueue;
+        frameListToWrite -= numUSBFrameLists * (frameListToWrite >= numUSBFrameLists);
+        writeFrameList (frameListToWrite);
     } else {
-        self->shouldStop++;
-        // debugIOLogC("writeHandler: now stopped %d of %d",self->shouldStop,self->numUSBFrameListsToQueue);
+        shouldStop++;
+        debugIOLogC("writeHandler: now stopped %d of %d",shouldStop,numUSBFrameListsToQueue);
     }
     
     // shouldStop counter starts at 1 when stop is initiated and increases 1 for
     // every completed framelist
-    if (self->shouldStop == self->numUSBFrameListsToQueue + 1) {
-        debugIOLogW("All playback streams stopped");
-        self->started = false;
-        self->notifyClosed();
+    if (shouldStop == numUSBFrameListsToQueue + 1) {
+        debugIOLog("All playback streams stopped");
+        started = false;
+        notifyClosed();
     }
 
     //		IOLockUnlock(self->mWriteLock);
     
 Exit:
-	self->inWriteCompletion = FALSE;
+	inWriteCompletion = FALSE;
 	return;
 }
 
 
 IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
-    debugIOLogW ("+EMUUSBAudioEngine::PrepareWriteFrameList");
+    //debugIOLogW ("+EMUUSBAudioEngine::PrepareWriteFrameList");
     ReturnIf(!started, kIOReturnNoDevice);
     
     //ReturnIf(frameSizeQueue.available() < numUSBFramesPerList, kIOReturnUnderrun);
@@ -172,7 +188,7 @@ IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
     
     // Set to number of bytes from the 0 wrap, 0 if this buffer didn't wrap
     usbCompletion[listNr].target = (void *)this;
-    usbCompletion[listNr].action = writeCompleted;
+    usbCompletion[listNr].action = writeCompletedStatic;
     usbCompletion[listNr].parameter = 0;
     
     // FIXME this only works for cases where bInterval=8.
