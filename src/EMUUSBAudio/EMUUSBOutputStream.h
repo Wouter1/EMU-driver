@@ -20,6 +20,8 @@
  Life cycle:
  
  ( init ( start stop )* free )*
+ 
+ See discussion in EMUUSBAudioEngine for global explanation of input and output.
  */
 class EMUUSBOutputStream: public StreamInfo {
 

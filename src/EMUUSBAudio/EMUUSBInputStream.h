@@ -22,6 +22,9 @@
  Life cycle:
  
  ( init ( start stop )* free )*
+ 
+ See discussion in EMUUSBAudioEngine for global explanation of input and output.
+
  */
 struct EMUUSBInputStream: public StreamInfo {
 public:

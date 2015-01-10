@@ -155,21 +155,50 @@ private:
  this clock is then used to determine the output rate. Therefore, both input 
  and output streams are opened always, even if only output is done.
  
+ Because of this asymmetry, the resulting code is completely asymmetric.
+ 
+ THe input stream is a steady stream of data. All other clocks and applications 
+ have to be slaved to the data rate found here. Therefore, all incoming samples
+ are buffered into a RingBuffer. When the ring buffer is full and wraps back 
+ to the first sample, an event is triggered that is passed on to the system's
+ AudioEngine. The system's audio engine then controls the master clock and
+ the applications waiting for the data. 
+ 
+ The only thing we must do here is to ensure that the wrap events are passed at
+ extremely regular intervals. If the interval is not regular enough, 
+ the system's Audio engine will throw up and become unstable.
+ This is quite hard to do because USB callbacks are extremely jittery (10ms or even more
+ is no exception) and totally unusable for this purpose.
+ Instead, we use timestamps provided in the incoming datastream to compute
+ when the wrap occured 'in theory'. 
+ These timestamps have a jitter in the order of 1ms, which still is way too much
+ for the AudioEngine. Therefore, a low pass filter is applied to the timestamps
+ (it's more complex than that as we need to filter the intervals but
+ at the same time we can't go too far from the real wrap times).
+ 
+ The output stream is very different. Instead of buffering, all the data is directly pumped
+ into a single buffer just as the system's AudioEngine asks. A separate process
+ pumps the samples in the buffer into the USB output pipe, with exactly the same rate
+ as the samples are coming in in the input stream. That way we hope to keep
+ in exact sync, so that the wraps in the output stream happen exactly at the same time 
+ as the input stream.
+ 
+ The only timing aspect that is still open is the exact moment of starting the stream 
+ such that we are in sync with the input stream wraps.
+ This is critical as we don't do anything after the stream started but mimicking 
+ the input. This is done by starting the two engines at the same moment.
+ The tricky part here is that mimicking the input stream can't be done 
+ exactly during the first cycle, as the number of samples in the input stream are 
+ available only AFTER the first cycle. To get around this, we just guess the 
+ sizes the first round and hope for the best (which may cause a deviation of up to 32 
+ bytes).
+ 
+ 
  This engine currently combines a number of functionalities:
  1. convert between 24-bit EMU USB data and the OS 32 bit float,
  2. USB communication for asynchronous isochronous streams to EMU,
  3. timing generators to synchronize the EMU internal clock to the OS clock.
  
- All data structures for all of these are stuffed into this structure.
- 
- Judging from the current size of this structure
- this code is in bad shape. Refactoring was done to 
-  * modularize the code and reduce the size of class code
-  * reduce the number of variables in the classes
-  * moving variables to the proper scope
-  * remove code duplications.
-  * Document the code
- But this is not yet finished.
  
  Note that apple (and maybe, USB) has quite hard requirements on how data should
  be allocated to USB packets over time. Details are here
