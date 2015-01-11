@@ -126,6 +126,7 @@ bool EMUUSBAudioDevice::ControlsStreamNumber(UInt8 streamNumber) {
 	return doesControl;
 }
 
+// CHECK the OSX manuals recommend using start(IOService *, IOAudioDevice *) 
 bool EMUUSBAudioDevice::start(IOService * provider) {
 	bool			result = FALSE;
 	

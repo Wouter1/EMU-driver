@@ -83,6 +83,12 @@ AbsoluteTime_to_scalar(t2))
 #define SoundAssertionMessage( cond, file, line, handler ) \
 "Sound assertion \"" #cond "\" failed in " #file " at line " #line " goto " #handler ""
 
+#define FailureMessageStr( func, file, line ) \
+"call to  \"" #func "\" failed in " #file " at line " #line " : %x "
+
+#define EMUFailureMessage(func, file, line, err) \
+{ debugIOLog( FailureMessageStr(func, file, line) , err); } ;
+
 #define SoundAssertionFailed( cond, file, line, handler ) \
 {debugIOLog( SoundAssertionMessage( cond, file, line, handler )); IOSleep(20);};
 
@@ -115,5 +121,10 @@ SoundAssertionFailed( cond,  __FILE__, __LINE__, returnValue)                   
 return (returnValue);                                                           \
 }
 
+#define ReturnIfFail(func)                                                              \
+{                                                                                       \
+    IOReturn res = func;                                                                \
+    if (res != kIOReturnSuccess) { EMUFailureMessage( func, __FILE__, __LINE__, res); } \
+}                                                                                       \
 
 #endif

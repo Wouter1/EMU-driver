@@ -16,10 +16,15 @@ IOReturn StreamInfo::init() {
 
 }
 
+IOReturn StreamInfo::start(UInt64 startUsbFrame) {
+    ReturnIf(startUsbFrame < streamInterface->GetDevice()->GetBus()->GetFrameNumber() + 10, kIOReturnTimeout);
+    nextUsableUsbFrameNr = startUsbFrame;
+    
+    return kIOReturnSuccess;
+}
+
 IOReturn StreamInfo::reset() {
     ReturnIf(!pipe, kIOReturnNotOpen);
-
-    lastQueuedUsbFrameNr = 0;
         
     UInt16 pollInterval  = 1 << (pipe->GetEndpointDescriptor()->bInterval - 1);
     frameNumberIncreasePerCycle  = (NUMBER_FRAMES / 8) * pollInterval; // 1 per frame
@@ -28,11 +33,8 @@ IOReturn StreamInfo::reset() {
 }
 
 UInt64 StreamInfo::getNextFrameNr() {
-    if (lastQueuedUsbFrameNr == 0) {
-        lastQueuedUsbFrameNr = streamInterface->GetDevice()->GetBus()->GetFrameNumber() + frameOffset;
-    } else {
-        lastQueuedUsbFrameNr += frameNumberIncreasePerCycle;
-    }
+    UInt64 current = nextUsableUsbFrameNr;
+    nextUsableUsbFrameNr += frameNumberIncreasePerCycle;
     
-    return lastQueuedUsbFrameNr;
+    return current;
 }

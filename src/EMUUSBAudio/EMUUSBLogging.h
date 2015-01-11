@@ -61,7 +61,7 @@ do { printf ( message ); printf ("\n" ); } while (0)
 #define debugIOLog2(message...) ;//debugIOLog(message);
 
 // framelist write debug messages
-#define debugIOLogW(message...) debugIOLog(message);
+#define debugIOLogW(message...);// debugIOLog(message);
 
 // debug time stamps.
 #define debugIOLogT(message...);// debugIOLog(message);

@@ -97,9 +97,9 @@ struct UsbInputRing: RingBufferDefault<UInt8>
      @param expected_byte_rate expecte number of bytes per second for the buffer.
      This is used to initialize our low pass filter 
      */
-    IOReturn    init(UInt32 newSize, IOAudioEngine *engine,  UInt32 expected_byte_rate);
+    IOReturn            init(UInt32 newSize, IOAudioEngine *engine,  UInt32 expected_byte_rate);
     
-    void        free();
+    void                free();
     
     /*! callback when a ring wraps.
      Give IOAudioEngine a time stamp now.
@@ -116,11 +116,14 @@ struct UsbInputRing: RingBufferDefault<UInt8>
      I guess that the timestamp is for completion of the frame but I can't find
      it in the USB documentations.
      */
-    void        notifyWrap(AbsoluteTime time);
+    void                notifyWrap(AbsoluteTime time);
+    
+    /*! get time (Absolute time in nanoseconds) since last wrap */
+    UInt64              getLastWrapTime();
     
 private:
     /*! take timestamp, but in nanoseconds (instead of AbsoluteTime). */
-    void        takeTimeStampNs(UInt64 timeStampNs, Boolean increment);
+    void                takeTimeStampNs(UInt64 timeStampNs, Boolean increment);
     
     /*! pointer to the engine, for calling takeTimeStamp. */
     IOAudioEngine   *theEngine;
@@ -134,7 +137,7 @@ private:
     /*! good wraps since start of audio input */
     UInt16          goodWraps;
     
-    /*! last received frame timestamp */
+    /*! last received frame timestamp. Used for startup to check timing and for currentSampleFrame. */
     AbsoluteTime    previousfrTimestampNs;
     
     /*! expected wrap time in ns. See filter.init(). */
@@ -338,15 +341,13 @@ protected:
 	
 	OSArray *							mStreamInterfaces; // array of streams
     
-	/*! orig doc: we need to drop the first frames because the device can't flush the first frames. */
-    static const long					kNumberOfStartingFramesToDrop = 2;
     
 	// parameters and variables common across streams (e.g., sample rate, bit resolution, etc.)
     
-    /*! selected rate, eg 96000. WARNING usually this is PLAIN ZERO ==0 not clear why this is not set properly. Avoid this!!!!!! */
+    /*! selected rate, eg 96000. WARNING usually this is PLAIN ZERO ==0 not clear why this is not set properly. Avoid this!!!!!! Consider using   IOAudioEngine::sampleRate */
 	UInt32								hardwareSampleRate;
 	UInt32								mChannelWidth;	// 16 or 24 bit
-	UInt32								bytesPerSampleFrame;
+	//UInt32								bytesPerSampleFrame;
 	
     // unused?
     //UInt32								fractionalSamplesRemaining;
@@ -411,6 +412,14 @@ protected:
     /*! called from performAudioEngineStop */
     IOReturn stopUSBStream ();
     
+    /*! Implements IOAudioEngine::getCurrentSampleFrame(). 
+     The erase-head process uses this value; it erases (zeroes out) frames in the sample and mix 
+     buffers up to, but not including, the sample frame returned by this method. Thus, although 
+     the sample counter value returned doesn’t have to be exact, it should never be larger than 
+     the actual sample counter. If it is larger, audio data may be erased by the erase head 
+     before the hardware has a chance to play it.
+
+     @return the playback hardware’s current frame */
     virtual UInt32 getCurrentSampleFrame (void);
     
     virtual IOAudioStreamDirection getDirection ();
@@ -424,11 +433,21 @@ protected:
 	void CoalesceInputSamples(SInt32 numBytesToCoalesce, IOUSBLowLatencyIsocFrame * pFrames);
 	virtual void resetClipPosition (IOAudioStream *audioStream, UInt32 clipSampleFrame);
     
-    /*! implements the IOAudioEngine interface. Called by the HAL, who does timing according to our timestamps when it thinks we are ready to process more data.
-     the driver must clip any excess floating-point values under –1.0 and over 1.0 —which can happen when multiple clients are adding their values to existing values in the same frame—and then convert these values to whatever format is required by the hardware. When clipOutputSamples returns, the converted values have been written to the corresponding locations in the sample buffer. The DMA engine grabs the frames as it progresses through the sample buffer and the hardware plays them as sound.
+    /*! implements the IOAudioEngine interface. Called by the HAL, who does timing according to our 
+     timestamps when it thinks we are ready to process more data.
      
-     @param mixbuf a pointer to an array of sampleFrames. Each sampleFrame contains <numchan> floats, where <numchan> is the number of audio channels (eg, 2 for stereo). This is the audio that we need to play. The floats can be outside [-1,1] in which case we also need to clip the data.
-     @param sampleBuf probably the buffer that we passed to the IOAudioEngine through audioStream->setSampleBuffer() = mOutput.bufferPtr
+     the driver must clip any excess floating-point values under –1.0 and over 1.0 —which can happen 
+     when multiple clients are adding their values to existing values in the same frame—and then 
+     convert these values to whatever format is required by the hardware. When clipOutputSamples 
+     returns, the converted values have been written to the corresponding locations in the sample buffer. 
+     The DMA engine grabs the frames as it progresses through the sample buffer and the hardware plays 
+     them as sound.
+     
+     @param mixbuf a pointer to an array of sampleFrames. Each sampleFrame contains <numchan> floats, 
+     where <numchan> is the number of audio channels (eg, 2 for stereo). This is the audio that we 
+     need to play. The floats can be outside [-1,1] in which case we also need to clip the data.
+     @param sampleBuf probably the buffer that we passed to the IOAudioEngine through 
+     audioStream->setSampleBuffer() = mOutput.bufferPtr
      @param firstSampleFrame
      @param numSampleFrames number of sampleFrames in the mixbuf
      @param streamFormat

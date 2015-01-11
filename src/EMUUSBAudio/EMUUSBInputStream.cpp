@@ -31,15 +31,17 @@ IOReturn EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing, FrameSizeQ
 }
 
 
-IOReturn EMUUSBInputStream::start() {
+IOReturn EMUUSBInputStream::start(UInt64 startFrameNr) {
     ReturnIf(!initialized, kIOReturnNotReady);
-    IOReturn res = StreamInfo::reset();
-    ReturnIf(res != kIOReturnSuccess, res);
-    
+    ReturnIf(startFrameNr < streamInterface->GetDevice()->GetBus()->GetFrameNumber() + 10, kIOReturnTimeout);
+    ReturnIfFail(StreamInfo::reset());
+    ReturnIfFail(StreamInfo::start(startFrameNr));
+
     shouldStop = 0;
     currentFrameList = 0;
     
-    
+    mDropStartingFrames = kNumberOfStartingFramesToDrop;
+
     // we start reading on all framelists. USB will figure it out and take the next one in order
     // when it has data. We restart each framelist immediately in readCompleted when we get data.
 	for (UInt32 frameListNum = currentFrameList; frameListNum < numUSBFrameListsToQueue; ++frameListNum) {
@@ -129,6 +131,9 @@ IOReturn EMUUSBInputStream::GatherInputSamples() {
 
         if (mDropStartingFrames <= 0)
         {
+            if (size >= usbRing->size - usbRing->writehead  ) {
+                debugIOLogR("input wrap in list %d at frame %d",currentFrameList,frameIndex);
+            }
             // FIXME. We should not call from inside locked area.
             usbRing-> push(source, size , pFrames[frameIndex].frTimeStamp );
             frameSizeQueue-> push(size , pFrames[frameIndex].frTimeStamp);
@@ -154,6 +159,7 @@ IOReturn EMUUSBInputStream::GatherInputSamples() {
 IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
     
     debugIOLogR("+ read frameList %d ", frameListNum);
+    
     if (shouldStop) {
         debugIOLog("*** Read should have stopped. Who is calling this? Canceling call")
         return kIOReturnAborted;
@@ -184,10 +190,14 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
          If you set this to 1, this jump is 8x more often, about once 30 seconds, but is only 1ms.
          We must keep these jumps small, to avoid timestamp errors and buffer overruns.
          */
+        UInt64  frameNr = getNextFrameNr();
 
-        result = pipe->Read(bufferDescriptors[frameListNum], getNextFrameNr(), numUSBFramesPerList,
+        
+        result = pipe->Read(bufferDescriptors[frameListNum], frameNr, numUSBFramesPerList,
                             &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
         
+        debugIOLogR("READ framelist %d in framenr %lld at %lld",frameListNum, frameNr,mach_absolute_time());
+
         if (result != kIOReturnSuccess) {
             // FIXME #17 if this goes wrong, why continue?
             doLog("USB pipe READ error %x",result);

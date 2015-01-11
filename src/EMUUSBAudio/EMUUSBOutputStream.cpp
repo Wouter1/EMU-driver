@@ -31,24 +31,26 @@ IOReturn   EMUUSBOutputStream::init() {
     return kIOReturnSuccess;
 }
 
-IOReturn EMUUSBOutputStream::start(FrameSizeQueue *frameQueue) {
-    debugIOLogC("EMUUSBOutputStream::start");
+IOReturn EMUUSBOutputStream::start(FrameSizeQueue *frameQueue,UInt64 startUsbFrame) {
+    debugIOLogW("EMUUSBOutputStream::start at %lld",mach_absolute_time());
     ReturnIf(shouldStop, kIOReturnStillOpen); // still in closedown! Cancel start.
-    
-    IOReturn res = StreamInfo::reset();
-    ReturnIf(res != kIOReturnSuccess, res);
+    ReturnIfFail(StreamInfo::reset());
+    ReturnIfFail(StreamInfo::start(startUsbFrame));
 
-    started = true;
 	safeToEraseTo = 0;
 	lastSafeErasePoint = 0;
     currentFrameList = 0;
 
     frameSizeQueue = frameQueue;
     
-    for (UInt32 frameListNum = currentFrameList; frameListNum < numUSBFrameListsToQueue; frameListNum++)  {
-		debugIOLog("write frame list %d",frameListNum);
+    started = true; // must be true before we start writing to USB.
+    
+    for (UInt32 frameListNum = currentFrameList; frameListNum < numUSBFrameListsToQueue; frameListNum++) {
+		//debugIOLog("write frame list %d at %lld",frameListNum,mach_absolute_time());
+        // FIXME handle failures?
 		writeFrameList(frameListNum);
 	}
+
 
     return kIOReturnSuccess;
 }
@@ -113,15 +115,16 @@ IOReturn EMUUSBOutputStream::writeFrameList (UInt32 frameListNum) {
     ReturnIf (kIOReturnSuccess != result, result);
 
 
-    
+    UInt64  frameNr = getNextFrameNr();
     if (needTimeStamps) {
-        result = pipe->Write (theWrapRangeDescriptor,getNextFrameNr(),numUSBFramesPerList,
+        result = pipe->Write (theWrapRangeDescriptor,frameNr,numUSBFramesPerList,
                               &usbIsocFrames[frameListNum * numUSBFramesPerList], &usbCompletion[frameListNum], 1);
         needTimeStamps = FALSE;
     } else {
-        result = pipe->Write(bufferDescriptors[frameListNum],getNextFrameNr(),numUSBFramesPerList,
+        result = pipe->Write(bufferDescriptors[frameListNum],frameNr,numUSBFramesPerList,
                              &usbIsocFrames[frameListNum * numUSBFramesPerList], &usbCompletion[frameListNum], 1);
     }
+    debugIOLogW("WRITE framenr %lld at %lld",frameNr, mach_absolute_time());
 	return result;
 }
 
@@ -211,17 +214,18 @@ IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
     
     
     //debugIOLogW("PrepareWriteFrameList stockSamplesInFrame %d numUSBFramesPerList %d", stockSamplesInFrame, numUSBFramesPerList);
-    for (UInt32 numUSBFramesPrepared = 0; numUSBFramesPrepared < numUSBFramesPerList; ++numUSBFramesPrepared) {
+    for (UInt32 n = 0; n < numUSBFramesPerList; n++) {
         
         if (frameSizeQueue->pop(&thisFrameSize) != kIOReturnSuccess) {
             debugIOLog("frameSizeQueue empty, guessing some queue size. May need fix..");
-            thisFrameSize = stockSamplesInFrame * multFactor;
+            thisFrameSize = stockSamplesInFrame  * multFactor ;
         }
         
         if (thisFrameSize >= numBytesToBufferEnd) {
+            debugIOLogW("write wrap in usbframe %d list %d",nextUsableUsbFrameNr,n);
             //debugIOLogC("param has something %d", numUSBFramesPrepared);
             lastPreparedByte = thisFrameSize - numBytesToBufferEnd;
-            usbCompletion[listNr].parameter = (void *)(UInt64)(((numUSBFramesPrepared + 1) << 16) | lastPreparedByte);
+            usbCompletion[listNr].parameter = (void *)(UInt64)(((n + 1) << 16) | lastPreparedByte);
             // FIXME document haveWrapped and wrapDescriptor. Do we even need those?
             theWrapDescriptors[0]->initSubRange (usbBufferDescriptor, previouslyPreparedBufferOffset, sampleBufferSize - previouslyPreparedBufferOffset, kIODirectionInOut);
             numBytesToBufferEnd = sampleBufferSize - lastPreparedByte;// reset
@@ -232,9 +236,9 @@ IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
             numBytesToBufferEnd -= thisFrameSize;
             //			debugIOLogC("no param");
         }
-        usbIsocFrames[firstFrame + numUSBFramesPrepared].frStatus = -1;
-        usbIsocFrames[firstFrame + numUSBFramesPrepared].frActCount = 0;
-        usbIsocFrames[firstFrame + numUSBFramesPrepared].frReqCount = thisFrameSize;
+        usbIsocFrames[firstFrame + n].frStatus = -1;
+        usbIsocFrames[firstFrame + n].frActCount = 0;
+        usbIsocFrames[firstFrame + n].frReqCount = thisFrameSize;
     }
     //debugIOLogC("Done with the numUSBFrames loop");
     //debugIOLogW("num actual data frames in list %d",numUSBFramesPerList - contiguousZeroes);

@@ -28,7 +28,7 @@
 template <typename TYPE>
 
 class RingBufferDefault: public RingBufferT<TYPE> {
-private:
+public:
 	TYPE *buffer=0; //
     char * typeName;
     UInt32 size=0; // number of elements in buffer.

@@ -33,7 +33,7 @@ public:
      */
     virtual IOReturn                init();
 
-    IOReturn                        start(FrameSizeQueue *frameQueue);
+    IOReturn                        start(FrameSizeQueue *frameQueue, UInt64 startUsbFrame);
     
     /*! Stop the output stream */
     IOReturn stop();

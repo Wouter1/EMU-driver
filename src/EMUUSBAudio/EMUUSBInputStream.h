@@ -37,7 +37,7 @@ public:
 
     /*! starts the input stream. Must be called to start
      @return kIOReturnSuccess if all ok. */
-    virtual IOReturn                start();
+    virtual IOReturn                start(UInt64 startFrameNr);
     
     /*! @return true iff the input stream is running */
     virtual bool isRunning();
@@ -179,6 +179,9 @@ private:
      restarts at 0. Updated after readHandler handled the block. */
     volatile UInt32				currentFrameList;
     
+	/*! orig doc: we need to drop the first 2 frames because the device can't flush the first frames. 
+     However doing so de-syncs the pipes. */
+    static const long					kNumberOfStartingFramesToDrop = 0;
 
 };
 

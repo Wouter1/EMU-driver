@@ -185,9 +185,9 @@
 				6C5A3AF11A285C0200F4DC13 /* RingBufferT.h */,
 				6C5A3AFF1A28DF9700F4DC13 /* RingBufferDefault.h */,
 				6C5A3B001A290F4800F4DC13 /* EMUUSBInputStream.cpp */,
+				6C5A3B011A290F4800F4DC13 /* EMUUSBInputStream.h */,
 				6CB2722D1A54197B00FA8B61 /* EMUUSBOutputStream.cpp */,
 				6CB2722E1A54197B00FA8B61 /* EMUUSBOutputStream.h */,
-				6C5A3B011A290F4800F4DC13 /* EMUUSBInputStream.h */,
 			);
 			path = EMUUSBAudio;
 			sourceTree = "<group>";

@@ -666,7 +666,7 @@ IOReturn EMUUSBAudioEngine::clipOutputSamples (const void *mixBuf, void *sampleB
     
 	
 	SInt32 offsetFrames = mOutput.previouslyPreparedBufferOffset / mOutput.multFactor;
-	//debugIOLogW("clipOutputSamples firstSampleFrame=%u, numSampleFrames=%d, firstSampleFrame-offsetFrames =%d ",firstSampleFrame,numSampleFrames,firstSampleFrame-offsetFrames);
+	debugIOLogW("clipOutputSamples firstSampleFrame=%u, numSampleFrames=%d, firstSampleFrame-offsetFrames =%d ",firstSampleFrame,numSampleFrames,firstSampleFrame-offsetFrames);
     
 	if (firstSampleFrame != nextExpectedOutputFrame) {
 		debugIOLog("**** Output Hiccup!! firstSampleFrame=%d, nextExpectedOutputFrame=%d bufsize=%d",firstSampleFrame,nextExpectedOutputFrame,mOutput.bufferSize);
@@ -1039,7 +1039,17 @@ IOReturn EMUUSBAudioEngine::eraseOutputSamples(const void *mixBuf, void *sampleB
 
 
 UInt32 EMUUSBAudioEngine::getCurrentSampleFrame() {
-    return 0; // HACK don't use  erase head.
+    UInt64 now;
+    UInt64 delta;
+    absolutetime_to_nanoseconds(mach_absolute_time(), &now);
+    delta = now - usbInputRing.getLastWrapTime();
+    UInt64 estSample = delta * sampleRate.whole / 1000000000 ; // dt in seconds * rate
+    if (estSample >= usbInputStream.bufferSize / usbInputStream.multFactor) {
+        estSample = 0; // never point behind the buffer
+    }
+    //debugIOLogC("EMUUSBAudioEngine::getCurrentSampleFrame estimated current frame =%d",estSample);
+    
+    return  (UInt32)estSample;
 }
 
 IOReturn EMUUSBAudioEngine::GetDefaultSettings(IOUSBInterface  *streamInterface,
@@ -1891,6 +1901,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	UInt16								additionalSampleFrameFreq = 0;
     UInt8	address;
     UInt32	maxPacketSize;
+    UInt64 startFrameNr;
     
 	// if the stream is already running, get the heck out of here! (AC)
 	if (usbStreamRunning) {
@@ -1909,9 +1920,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	// bit width should be the same for both input and output
     //	FailIf(inputFormat->fBitWidth != outputFormat->fBitWidth, Exit);
 	mChannelWidth = inputFormat->fBitWidth;
-	
-	usbInputStream.mDropStartingFrames = kNumberOfStartingFramesToDrop;
-	
+		
 	UInt32	newInputMultFactor = (inputFormat->fBitWidth / 8) * inputFormat->fNumChannels;
 	UInt32	newOutputMultFactor = (outputFormat->fBitWidth / 8) * outputFormat->fNumChannels;
 	
@@ -1999,8 +2008,8 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     FailIf( kIOReturnSuccess != frameSizeQueue.init(FRAMESIZE_QUEUE_SIZE,"frameSizeQueue"), Exit);
     
     usbInputStream.init(this, &usbInputRing, &frameSizeQueue);
-    resultCode = usbInputStream.start();
-    FailIf (kIOReturnSuccess != resultCode, Exit)
+    
+    // delay actual start() till very end to get all start at once
     
 	
 	// and now the output
@@ -2008,7 +2017,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	resultCode = mOutput.streamInterface->SetAlternateInterface (this, mOutput.alternateSettingID);
 	FailIf (kIOReturnSuccess != resultCode, Exit);
     
-    debugIOLog("create output pipe");
+    debugIOLog("create output pipe ");
 	bzero(&audioIsochEndpoint,sizeof(audioIsochEndpoint));
 	audioIsochEndpoint.type = kUSBIsoc;
 	audioIsochEndpoint.direction = mOutput.streamDirection;
@@ -2040,14 +2049,27 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
      resultCode = mOutput.associatedPipe->Read(neededSampleRateDescriptor, nextSynchReadFrame, 1,
      &(mSampleRateFrame), &sampleRateCompletion);
      }*/
+
     
-    mOutput.start(&frameSizeQueue);
+    // Ok, all set, go!
+    // plan well in the future, so that we have time to start both streams before that point.
+    setRunEraseHead(false); // HACK something still wrong with the latency timing. #21 #30
+    startFrameNr = usbInputStream.streamInterface->GetDevice()->GetBus()->GetFrameNumber() + 64;
+    resultCode = usbInputStream.start(startFrameNr);
+    FailIf (kIOReturnSuccess != resultCode, Exit)
+
+    mOutput.start(&frameSizeQueue,startFrameNr);
+
     
-    
-	//don't know if this is useful or not
+    // It's actually not well defined what "stable" means.
+    // Therefore it is not clear what to do here.
+    // The EMU clock is very stable.
+    // Our PLL will take some time to exactly sync with the EMU clock.
+    // But it will be very stable too because of our low pass filter to
+    // filter out USB timing inaccuracy. The USB timing inaccuracy is
+    // in the order of 1ms because that's the max update rate we can request.
+    // This directly limits our sync accuracy. 
 	//setClockIsStable(FALSE);
-    
-    
     
     usbStreamRunning = TRUE;
     resultCode = kIOReturnSuccess;
@@ -2112,7 +2134,7 @@ IOReturn EMUUSBAudioEngine::getAnchor(UInt64* frame, AbsoluteTime*	time) {
 	IOReturn	result = kIOReturnError;// initialized to error
 	AbsoluteTime	theTime;
 	UInt32		attempts = kMaxAttempts;
-    // Wouter: why is this done so complex? What makes this different from
+    // Why is this done so complex? What makes this different from
     // just *frame = usbAudioDevice->mNewReferenceUSBFrame ?
 	if (usbAudioDevice) {
 		while(attempts && theFrame != usbAudioDevice->mNewReferenceUSBFrame) {
@@ -2393,6 +2415,8 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
         // HACK. This is the latency from read till end user. Not clear if IOEngine uses it.
         setInputSampleLatency(2* usbInputStream.numUSBFramesPerList * usbInputStream.maxFrameSize / usbInputStream.multFactor);
 		
+        //100 is too little.
+        setOutputSampleOffset(500); // HACK this is a very rough guess. Need prefs as well.
 		
 		//now the output buffer
 		if (mOutput.usbBufferDescriptor) {
@@ -2491,7 +2515,7 @@ void EMUUSBAudioEngine::setupChannelNames() {
 
 
 IOReturn UsbInputRing::init(UInt32 newSize, IOAudioEngine *engine, UInt32 expected_byte_rate) {
-    debugIOLogC("+UsbInputRing::init %ld %ld", newSize,expected_byte_rate);
+    debugIOLogC("+UsbInputRing::init bytesize=%d byterate=%d", newSize,expected_byte_rate);
     theEngine = engine;
     isFirstWrap = true;
     
@@ -2545,10 +2569,13 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
                       expected_wrap_time, wrapTimeNs - previousfrTimestampNs, errorT);
             }
         }
-        previousfrTimestampNs = wrapTimeNs;
     }
+    previousfrTimestampNs = wrapTimeNs;
 }
 
+UInt64 UsbInputRing::getLastWrapTime() {
+    return previousfrTimestampNs;
+}
 
 
 
