@@ -1025,6 +1025,8 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
 //	return time;
 //}
 
+
+//FIXME let's remove this, this is doing nothing now.
 IOReturn EMUUSBAudioEngine::eraseOutputSamples(const void *mixBuf, void *sampleBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream)
 {
 	super::eraseOutputSamples (mixBuf, sampleBuf, firstSampleFrame, numSampleFrames, streamFormat, audioStream);
@@ -1039,17 +1041,35 @@ IOReturn EMUUSBAudioEngine::eraseOutputSamples(const void *mixBuf, void *sampleB
 
 
 UInt32 EMUUSBAudioEngine::getCurrentSampleFrame() {
-    UInt64 now;
-    UInt64 delta;
-    absolutetime_to_nanoseconds(mach_absolute_time(), &now);
-    delta = now - usbInputRing.getLastWrapTime();
-    UInt64 estSample = delta * sampleRate.whole / 1000000000 ; // dt in seconds * rate
-    if (estSample >= usbInputStream.bufferSize / usbInputStream.multFactor) {
-        estSample = 0; // never point behind the buffer
+
+    UInt32 max = usbInputStream.bufferSize / usbInputStream.multFactor - 1;
+
+    // actual transfer can happen up to 1ms after estimated head pos
+    // because of jitter in the transmission times.
+    // 1.5ms seems to work in most cases but not at 192k
+    double pos = usbInputRing.estimatePositionAt(-1500000);
+
+    //debugIOLog("get current sampleframe %lld", (UInt64)(pos*1000000000));
+
+    // modulo 1, but for float. CHECK maybe getting the mantisse would work?
+    if (pos > 1) {
+        pos = pos-1;
+    } else if (pos < 0) {
+        pos = pos+1;
     }
-    //debugIOLogC("EMUUSBAudioEngine::getCurrentSampleFrame estimated current frame =%d",estSample);
+    if (pos < 0 || pos > 1) {
+        debugIOLog("warning way-out ring wrap position");
+        // safety catch. Should not happen in normal playback.
+        return 0;
+    }
     
-    return  (UInt32)estSample;
+    UInt32 framepos =  (UInt32)(pos * (double)usbInputStream.bufferSize) / usbInputStream.multFactor;
+    
+    if (framepos > max) {
+        return max;
+    }
+
+    return framepos;
 }
 
 IOReturn EMUUSBAudioEngine::GetDefaultSettings(IOUSBInterface  *streamInterface,
@@ -2403,10 +2423,10 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
         // maybe we could define something different there. Not now.
 		OSNumber *safetyOffsetObj = OSDynamicCast(OSNumber,usbAudioDevice->getProperty("SafetyOffset"));
 		if (safetyOffsetObj) {
-            debugIOLogT("using externally requested safety offset %d",safetyOffsetObj->unsigned32BitValue());
+            debugIOLogC("using externally requested safety offset %d",safetyOffsetObj->unsigned32BitValue());
 			setSampleOffset(safetyOffsetObj->unsigned32BitValue());
 		} else {
-            debugIOLogT("using our own estimated offset %d",offsetToSet);
+            debugIOLogC("using our own estimated offset %d",offsetToSet);
             // This is the offset for the playback head: min distance the IOAudioEngine keeps from our write head.
             setSampleOffset(offsetToSet);
 		}
@@ -2573,17 +2593,21 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
     previousfrTimestampNs = wrapTimeNs;
 }
 
-UInt64 UsbInputRing::getLastWrapTime() {
-    return previousfrTimestampNs;
-}
-
-
 
 void UsbInputRing::takeTimeStampNs(UInt64 timeStampNs, Boolean increment) {
     AbsoluteTime t;
     
     nanoseconds_to_absolutetime(timeStampNs, &t);
     theEngine->takeTimeStamp(increment, &t) ;
+}
+
+double UsbInputRing::estimatePositionAt(SInt64 offset) {
+    UInt64 now;
+    
+    absolutetime_to_nanoseconds(mach_absolute_time(), &now);
+
+    return lpfilter.getRelativeDist(now + offset);
+
 }
 
 /*********************************************/

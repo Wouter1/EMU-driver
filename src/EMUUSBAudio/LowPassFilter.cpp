@@ -36,3 +36,7 @@ UInt64 LowPassFilter::filter(UInt64 inputx) {
     debugIOLogT("filter %lld -> %lld", inputx, x);
     return x;
 }
+
+double LowPassFilter::getRelativeDist(SInt64 val) {
+    return (double)(val - (SInt64)x) / (double)dx;
+}

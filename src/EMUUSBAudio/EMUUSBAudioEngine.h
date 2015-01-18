@@ -87,8 +87,10 @@ typedef struct FrameListWriteInfo {
 
 
 /*! connector from the input ring buffer to our IOAudioEngine.
- Collect and filter timestamps from wrap events in the ring
- and forward them to IOAudioEngine */
+ It connects the inputring to the timestamp mechanism.
+ To do this it collect and filters timestamps from wrap events in the ring,
+ filters them and and forward them to IOAudioEngine. Also it can estimate the
+ USB headposition (read and write should have same position as we sync them)*/
 struct UsbInputRing: RingBufferDefault<UInt8>
 {
     /*!
@@ -119,7 +121,11 @@ struct UsbInputRing: RingBufferDefault<UInt8>
     void                notifyWrap(AbsoluteTime time);
     
     /*! get time (Absolute time in nanoseconds) since last wrap */
-    UInt64              getLastWrapTime();
+//    UInt64              getLastWrapTime();
+    
+    /*! get estimated sample position at time t as a fraction of the ring buffser.
+     @param offset the offset time (ns), this is added to current time. Can be negative. */
+    double              estimatePositionAt(SInt64 offset);
     
 private:
     /*! take timestamp, but in nanoseconds (instead of AbsoluteTime). */
@@ -419,7 +425,7 @@ protected:
      the actual sample counter. If it is larger, audio data may be erased by the erase head 
      before the hardware has a chance to play it.
 
-     @return the playback hardware’s current frame */
+     @return the current safe playback erase point */
     virtual UInt32 getCurrentSampleFrame (void);
     
     virtual IOAudioStreamDirection getDirection ();

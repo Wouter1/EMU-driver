@@ -34,7 +34,7 @@
     <node id="n1">
       <data key="d6">
         <y:SVGNode>
-          <y:Geometry height="45.56999588012695" width="67.49800109863281" x="734.0" y="424.5"/>
+          <y:Geometry height="45.56999588012695" width="67.49800109863281" x="711.2470016479492" y="366.5"/>
           <y:Fill color="#CCCCFF" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" hasText="false" height="4.0" modelName="custom" textColor="#000000" visible="true" width="4.0" x="31.749000549316406" y="49.56999588012695">
@@ -54,27 +54,6 @@
     </node>
     <node id="n2">
       <data key="d6">
-        <y:SVGNode>
-          <y:Geometry height="47.0" width="36.0" x="1274.1646677652993" y="-39.21500205993652"/>
-          <y:Fill color="#CCCCFF" transparent="false"/>
-          <y:BorderStyle color="#000000" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" hasText="false" height="4.0" modelName="custom" textColor="#000000" visible="true" width="4.0" x="16.0" y="51.0">
-            <y:LabelModel>
-              <y:SmartNodeLabelModel distance="4.0"/>
-            </y:LabelModel>
-            <y:ModelParameter>
-              <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="-0.5" nodeRatioX="0.0" nodeRatioY="0.5" offsetX="0.0" offsetY="4.0" upX="0.0" upY="-1.0"/>
-            </y:ModelParameter>
-          </y:NodeLabel>
-          <y:SVGNodeProperties usingVisualBounds="true"/>
-          <y:SVGModel svgBoundsPolicy="0">
-            <y:SVGContent refid="2"/>
-          </y:SVGModel>
-        </y:SVGNode>
-      </data>
-    </node>
-    <node id="n3">
-      <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="35.78499794006348" width="72.0" x="1079.4980010986328" y="-33.60750102996826"/>
           <y:Fill color="#FFCC00" transparent="false"/>
@@ -90,10 +69,10 @@
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n4">
+    <node id="n3">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="30.0" width="30.0" x="1205.1972045898438" y="-29.10750102996826"/>
+          <y:Geometry height="30.0" width="30.0" x="1183.8353322347007" y="-29.10750102996826"/>
           <y:Fill color="#FFCC00" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" modelName="custom" textColor="#000000" visible="true" width="29.248046875" x="0.3759765625" y="5.93359375">AMP<y:LabelModel>
@@ -107,7 +86,7 @@
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n5">
+    <node id="n4">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="32.0" width="30.0" x="955.9960021972656" y="91.65874433517456"/>
@@ -124,7 +103,7 @@
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n6">
+    <node id="n5">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="32.0" width="128.0" x="680.9960021972656" y="152.5512433052063"/>
@@ -141,7 +120,7 @@
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n7">
+    <node id="n6">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="32.10750102996826" width="72.0" x="828.4980010986328" y="-34.322503089904785"/>
@@ -158,7 +137,7 @@
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n8">
+    <node id="n7">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="30.0" x="117.0" y="252.28499794006348"/>
@@ -175,7 +154,7 @@
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n9">
+    <node id="n8">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="52.0" x="177.0" y="314.2849979400635"/>
@@ -192,7 +171,7 @@
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n10">
+    <node id="n9">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="100.0" x="153.0" y="374.2849979400635"/>
@@ -209,7 +188,7 @@
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n11">
+    <node id="n10">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="32.0" width="128.0" x="520.4980010986328" y="152.5512433052063"/>
@@ -226,7 +205,7 @@
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n12">
+    <node id="n11">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="29.0" width="72.0" x="-6.0" y="252.78499794006348"/>
@@ -243,7 +222,7 @@
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n13">
+    <node id="n12">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="37.0" width="59.0" x="173.5" y="177.28499794006348"/>
@@ -261,7 +240,7 @@ Control<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n14">
+    <node id="n13">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="35.78499794006348" width="128.0" x="337.5" y="371.39249897003174"/>
@@ -278,7 +257,7 @@ Control<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n15">
+    <node id="n14">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="30.0" x="188.0" y="252.28499794006348"/>
@@ -296,7 +275,7 @@ Control<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n16">
+    <node id="n15">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="30.0" x="569.4980010986328" y="-39.21500205993652"/>
@@ -314,7 +293,7 @@ Control<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n17">
+    <node id="n16">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="29.0" width="72.0" x="-6.0" y="82.81999588012695"/>
@@ -331,7 +310,7 @@ Control<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n18">
+    <node id="n17">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="89.0" x="337.5" y="82.31999588012695"/>
@@ -348,7 +327,7 @@ Control<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n19">
+    <node id="n18">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="84.0" x="337.5" y="-39.21500205993652"/>
@@ -365,14 +344,13 @@ Control<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n20">
+    <node id="n19">
       <data key="d6">
         <y:SVGNode>
-          <y:Geometry height="37.0" width="36.0" x="-84.0" y="-39.21500205993652"/>
+          <y:Geometry height="37.0" width="36.0" x="-140.25" y="-39.21500205993652"/>
           <y:Fill color="#CCCCFF" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" hasText="false" height="4.0" modelName="custom" textColor="#000000" visible="true" width="4.0" x="16.0" y="41.0">
-            <y:LabelModel>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" modelName="custom" textColor="#000000" visible="true" width="39.53125" x="-1.765625" y="41.0">mic in<y:LabelModel>
               <y:SmartNodeLabelModel distance="4.0"/>
             </y:LabelModel>
             <y:ModelParameter>
@@ -381,12 +359,12 @@ Control<y:LabelModel>
           </y:NodeLabel>
           <y:SVGNodeProperties usingVisualBounds="false"/>
           <y:SVGModel svgBoundsPolicy="0">
-            <y:SVGContent refid="3"/>
+            <y:SVGContent refid="2"/>
           </y:SVGModel>
         </y:SVGNode>
       </data>
     </node>
-    <node id="n21">
+    <node id="n20">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="30.0" x="9.0" y="-35.71500205993652"/>
@@ -403,7 +381,7 @@ Control<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n22">
+    <node id="n21">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="72.0" x="152.25" y="-35.71500205993652"/>
@@ -420,7 +398,7 @@ Control<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n23">
+    <node id="n22">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="29.0" width="84.0" x="-18.0" y="24.284997940063477"/>
@@ -437,7 +415,7 @@ Control<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n24">
+    <node id="n23">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="37.0" width="84.0" x="357.5" y="248.78499794006348"/>
@@ -455,19 +433,18 @@ Interface<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n25">
-      <data key="d5"/>
+    <node id="n24">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="30.0" x="814.4980010986328" y="-132.21500205993652"/>
           <y:Fill color="#FFCC00" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" hasText="false" height="4.0" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="4.0" x="13.0" y="13.0"/>
           <y:Shape type="diamond"/>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n26">
-      <data key="d5"/>
+    <node id="n25">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="30.0" x="612.9980010986328" y="-132.21500205993652"/>
@@ -484,8 +461,7 @@ Interface<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n27">
-      <data key="d5"/>
+    <node id="n26">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="29.0" width="100.0" x="779.4980010986328" y="-211.82250308990479"/>
@@ -503,8 +479,7 @@ Interface<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n28">
-      <data key="d5"/>
+    <node id="n27">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="29.0" width="89.0" x="583.4980010986328" y="-211.82250308990479"/>
@@ -522,8 +497,7 @@ level<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n29">
-      <data key="d5"/>
+    <node id="n28">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="30.0" x="367.0" y="152.5512433052063"/>
@@ -541,8 +515,7 @@ level<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n30">
-      <data key="d5"/>
+    <node id="n29">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="29.784997940063477" width="72.0" x="828.4980010986328" y="92.76624536514282"/>
@@ -559,8 +532,7 @@ level<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n31">
-      <data key="d5"/>
+    <node id="n30">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="30.0" x="955.9960021972656" y="-30.715002059936523"/>
@@ -577,8 +549,7 @@ level<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n32">
-      <data key="d5"/>
+    <node id="n31">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="30.0" x="849.4980010986328" y="153.5512433052063"/>
@@ -596,8 +567,7 @@ level<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n33">
-      <data key="d5"/>
+    <node id="n32">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="30.0" x="729.9960021972656" y="-33.268752574920654"/>
@@ -615,8 +585,7 @@ level<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n34">
-      <data key="d5"/>
+    <node id="n33">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="30.0" x="489.4980010986328" y="-132.21500205993652"/>
@@ -633,8 +602,7 @@ level<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n35">
-      <data key="d5"/>
+    <node id="n34">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="29.0" width="89.0" x="-18.0" y="-211.82250308990479"/>
@@ -651,8 +619,7 @@ level<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <node id="n36">
-      <data key="d5"/>
+    <node id="n35">
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="29.0" width="120.0" x="928.0" y="329.5"/>
@@ -669,7 +636,128 @@ level<y:LabelModel>
         </y:ShapeNode>
       </data>
     </node>
-    <edge id="e0" source="n10" target="n9">
+    <node id="n36">
+      <data key="d5"/>
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="29.0" width="100.0" x="1239.0" y="-106.5"/>
+          <y:Fill color="#00CCFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" modelName="custom" textColor="#000000" visible="true" width="86.271484375" x="6.8642578125" y="5.43359375">main level pot<y:LabelModel>
+              <y:SmartNodeLabelModel distance="4.0"/>
+            </y:LabelModel>
+            <y:ModelParameter>
+              <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+            </y:ModelParameter>
+          </y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n37">
+      <data key="d5"/>
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="30.0" width="30.0" x="1274.0" y="-28.5"/>
+          <y:Fill color="#FFCC00" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" modelName="custom" textColor="#000000" visible="true" width="29.248046875" x="0.3759765625" y="5.93359375">AMP<y:LabelModel>
+              <y:SmartNodeLabelModel distance="4.0"/>
+            </y:LabelModel>
+            <y:ModelParameter>
+              <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+            </y:ModelParameter>
+          </y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n38">
+      <data key="d5"/>
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="30.0" width="30.0" x="1275.0" y="24.5"/>
+          <y:Fill color="#FFCC00" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" modelName="custom" textColor="#000000" visible="true" width="29.248046875" x="0.3759765625" y="5.93359375">AMP<y:LabelModel>
+              <y:SmartNodeLabelModel distance="4.0"/>
+            </y:LabelModel>
+            <y:ModelParameter>
+              <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+            </y:ModelParameter>
+          </y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n39">
+      <data key="d5"/>
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="29.0" width="100.0" x="1240.0" y="94.65874433517456"/>
+          <y:Fill color="#00CCFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" modelName="custom" textColor="#000000" visible="true" width="92.025390625" x="3.9873046875" y="5.43359375">headphone pot<y:LabelModel>
+              <y:SmartNodeLabelModel distance="4.0"/>
+            </y:LabelModel>
+            <y:ModelParameter>
+              <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+            </y:ModelParameter>
+          </y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n40">
+      <data key="d5"/>
+      <data key="d6">
+        <y:SVGNode>
+          <y:Geometry height="69.94900512695312" width="56.554100036621094" x="1370.0" y="74.184241771698"/>
+          <y:Fill color="#CCCCFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" modelName="custom" textColor="#000000" visible="true" width="74.93359375" x="-9.189746856689453" y="73.94900512695312">headphones<y:LabelModel>
+              <y:SmartNodeLabelModel distance="4.0"/>
+            </y:LabelModel>
+            <y:ModelParameter>
+              <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="-0.5" nodeRatioX="0.0" nodeRatioY="0.5" offsetX="0.0" offsetY="4.0" upX="0.0" upY="-1.0"/>
+            </y:ModelParameter>
+          </y:NodeLabel>
+          <y:SVGNodeProperties usingVisualBounds="true"/>
+          <y:SVGModel svgBoundsPolicy="0">
+            <y:SVGContent refid="3"/>
+          </y:SVGModel>
+        </y:SVGNode>
+      </data>
+    </node>
+    <node id="n41">
+      <data key="d6">
+        <y:SVGNode>
+          <y:Geometry height="47.0" width="36.0" x="1380.2770500183105" y="-39.21500205993652"/>
+          <y:Fill color="#CCCCFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.1328125" modelName="custom" textColor="#000000" visible="true" width="27.4375" x="4.28125" y="51.0">jack<y:LabelModel>
+              <y:SmartNodeLabelModel distance="4.0"/>
+            </y:LabelModel>
+            <y:ModelParameter>
+              <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="-0.5" nodeRatioX="0.0" nodeRatioY="0.5" offsetX="0.0" offsetY="4.0" upX="0.0" upY="-1.0"/>
+            </y:ModelParameter>
+          </y:NodeLabel>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" hasText="false" height="4.0" modelName="custom" textColor="#000000" visible="true" width="4.0" x="16.0" y="21.5">
+            <y:LabelModel>
+              <y:SmartNodeLabelModel distance="4.0"/>
+            </y:LabelModel>
+            <y:ModelParameter>
+              <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+            </y:ModelParameter>
+          </y:NodeLabel>
+          <y:SVGNodeProperties usingVisualBounds="true"/>
+          <y:SVGModel svgBoundsPolicy="0">
+            <y:SVGContent refid="4"/>
+          </y:SVGModel>
+        </y:SVGNode>
+      </data>
+    </node>
+    <edge id="e0" source="n9" target="n8">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -679,7 +767,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e1" source="n10" target="n8">
+    <edge id="e1" source="n9" target="n7">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -689,7 +777,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e2" source="n17" target="n8">
+    <edge id="e2" source="n16" target="n7">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -699,7 +787,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e3" source="n17" target="n18">
+    <edge id="e3" source="n16" target="n17">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -709,7 +797,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e4" source="n8" target="n12">
+    <edge id="e4" source="n7" target="n11">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -719,7 +807,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e5" source="n22" target="n19">
+    <edge id="e5" source="n21" target="n18">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -729,7 +817,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e6" source="n5" target="n0">
+    <edge id="e6" source="n4" target="n0">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -739,7 +827,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e7" source="n11" target="n1">
+    <edge id="e7" source="n10" target="n1">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -749,7 +837,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e8" source="n1" target="n6">
+    <edge id="e8" source="n1" target="n5">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -759,7 +847,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e9" source="n20" target="n21">
+    <edge id="e9" source="n19" target="n20">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -769,7 +857,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e10" source="n21" target="n22">
+    <edge id="e10" source="n20" target="n21">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -779,7 +867,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e11" source="n3" target="n4">
+    <edge id="e11" source="n2" target="n3">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -789,7 +877,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e12" source="n4" target="n2">
+    <edge id="e12" source="n30" target="n2">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -799,7 +887,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e13" source="n31" target="n3">
+    <edge id="e13" source="n8" target="n14">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -809,7 +897,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e14" source="n9" target="n15">
+    <edge id="e14" source="n7" target="n14">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -819,7 +907,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e15" source="n8" target="n15">
+    <edge id="e15" source="n14" target="n12">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -829,7 +917,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e16" source="n15" target="n13">
+    <edge id="e16" source="n18" target="n15">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -839,7 +927,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e17" source="n19" target="n16">
+    <edge id="e17" source="n15" target="n10">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -849,17 +937,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e18" source="n16" target="n11">
-      <data key="d10">
-        <y:PolyLineEdge>
-          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
-          <y:LineStyle color="#000000" type="line" width="1.0"/>
-          <y:Arrows source="none" target="standard"/>
-          <y:BendStyle smoothed="false"/>
-        </y:PolyLineEdge>
-      </data>
-    </edge>
-    <edge id="e19" source="n13" target="n16">
+    <edge id="e18" source="n12" target="n15">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -869,7 +947,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e20" source="n1" target="n14">
+    <edge id="e19" source="n1" target="n13">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -879,7 +957,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e21" source="n23" target="n21">
+    <edge id="e20" source="n22" target="n20">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -889,7 +967,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e22" source="n20" target="n23">
+    <edge id="e21" source="n19" target="n22">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -899,7 +977,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e23" source="n13" target="n23">
+    <edge id="e22" source="n12" target="n22">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -909,7 +987,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e24" source="n14" target="n24">
+    <edge id="e23" source="n13" target="n23">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -919,8 +997,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e25" source="n28" target="n26">
-      <data key="d9"/>
+    <edge id="e24" source="n27" target="n25">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -930,8 +1007,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e26" source="n27" target="n25">
-      <data key="d9"/>
+    <edge id="e25" source="n26" target="n24">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -941,8 +1017,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e27" source="n29" target="n11">
-      <data key="d9"/>
+    <edge id="e26" source="n28" target="n10">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -952,8 +1027,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e28" source="n18" target="n29">
-      <data key="d9"/>
+    <edge id="e27" source="n17" target="n28">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -963,8 +1037,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e29" source="n13" target="n29">
-      <data key="d9"/>
+    <edge id="e28" source="n12" target="n28">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -974,8 +1047,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e30" source="n24" target="n10">
-      <data key="d9"/>
+    <edge id="e29" source="n23" target="n9">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -985,8 +1057,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e31" source="n24" target="n15">
-      <data key="d9"/>
+    <edge id="e30" source="n23" target="n14">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -996,8 +1067,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e32" source="n7" target="n31">
-      <data key="d9"/>
+    <edge id="e31" source="n6" target="n30">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -1007,8 +1077,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e33" source="n30" target="n5">
-      <data key="d9"/>
+    <edge id="e32" source="n29" target="n4">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -1018,8 +1087,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e34" source="n6" target="n32">
-      <data key="d9"/>
+    <edge id="e33" source="n5" target="n31">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -1029,8 +1097,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e35" source="n32" target="n30">
-      <data key="d9"/>
+    <edge id="e34" source="n31" target="n29">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -1040,8 +1107,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e36" source="n6" target="n33">
-      <data key="d9"/>
+    <edge id="e35" source="n5" target="n32">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -1051,8 +1117,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e37" source="n33" target="n7">
-      <data key="d9"/>
+    <edge id="e36" source="n32" target="n6">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -1062,8 +1127,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e38" source="n13" target="n32">
-      <data key="d9"/>
+    <edge id="e37" source="n12" target="n31">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -1073,8 +1137,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e39" source="n13" target="n33">
-      <data key="d9"/>
+    <edge id="e38" source="n12" target="n32">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -1084,7 +1147,77 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e40" source="n19" target="n34">
+    <edge id="e39" source="n18" target="n33">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e40" source="n17" target="n33">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e41" source="n33" target="n25">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e42" source="n25" target="n24">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e43" source="n24" target="n30">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e44" source="n24" target="n4">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e45" source="n34" target="n20">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e46" source="n36" target="n37">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -1095,7 +1228,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e41" source="n18" target="n34">
+    <edge id="e47" source="n3" target="n37">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -1106,7 +1239,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e42" source="n34" target="n26">
+    <edge id="e48" source="n37" target="n41">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -1117,7 +1250,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e43" source="n26" target="n25">
+    <edge id="e49" source="n3" target="n38">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -1128,7 +1261,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e44" source="n25" target="n31">
+    <edge id="e50" source="n39" target="n38">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -1139,18 +1272,7 @@ level<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e45" source="n25" target="n5">
-      <data key="d9"/>
-      <data key="d10">
-        <y:PolyLineEdge>
-          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
-          <y:LineStyle color="#000000" type="line" width="1.0"/>
-          <y:Arrows source="none" target="standard"/>
-          <y:BendStyle smoothed="false"/>
-        </y:PolyLineEdge>
-      </data>
-    </edge>
-    <edge id="e46" source="n35" target="n21">
+    <edge id="e51" source="n39" target="n40">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -1217,78 +1339,6 @@ level<y:LabelModel>
 &lt;/svg&gt;
 </y:Resource>
       <y:Resource id="2">&lt;?xml version="1.0" encoding="utf-8"?&gt;
-&lt;svg version="1.1"
-	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-	 x="0px" y="0px" width="36px" height="47px" viewBox="0 0 36 47" enable-background="new 0 0 36 47" xml:space="preserve"&gt;
-&lt;defs&gt;
-&lt;/defs&gt;
-&lt;linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="18.0005" y1="47" x2="18.0005" y2="-32.7535"&gt;
-	&lt;stop  offset="0" style="stop-color:#3C89C9"/&gt;
-	&lt;stop  offset="1" style="stop-color:#9CD7FF"/&gt;
-&lt;/linearGradient&gt;
-&lt;path fill="url(#SVGID_1_)" d="M36,45c0,1.1-0.9,2-2,2H2c-1.1,0-2-0.9-2-2V2c0-1.1,0.9-2,2-2h32c1.1,0,2,0.9,2,2V45z"/&gt;
-&lt;linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="7.5854" y1="40.416" x2="28.416" y2="19.5854"&gt;
-	&lt;stop  offset="0" style="stop-color:#8D8D8D"/&gt;
-	&lt;stop  offset="0.5" style="stop-color:#F2F2F2"/&gt;
-	&lt;stop  offset="1" style="stop-color:#8D8D8D"/&gt;
-&lt;/linearGradient&gt;
-&lt;path fill="url(#SVGID_2_)" d="M18,15.271C9.865,15.271,3.271,21.865,3.271,30S9.865,44.729,18,44.729S32.729,38.135,32.729,30
-	S26.135,15.271,18,15.271z M18,42.048c-6.654,0-12.047-5.395-12.047-12.048c0-6.654,5.394-12.047,12.047-12.047
-	c6.653,0,12.048,5.394,12.048,12.047C30.048,36.653,24.653,42.048,18,42.048z"/&gt;
-&lt;path opacity="0.24" fill="#D9F1FF" d="M36,18L0,35V2c0-1.1,0.9-2,2-2h32c1.1,0,2,0.9,2,2V18z"/&gt;
-&lt;linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="18.0005" y1="42" x2="18.0005" y2="6.0005"&gt;
-	&lt;stop  offset="0" style="stop-color:#515151"/&gt;
-	&lt;stop  offset="1" style="stop-color:#B8B8B8"/&gt;
-&lt;/linearGradient&gt;
-&lt;path display="none" fill="url(#SVGID_3_)" d="M36,40.14c0,1.023-0.837,1.86-1.86,1.86H1.86C0.837,42,0,41.163,0,40.14V7.86
-	C0,6.837,0.837,6,1.86,6H34.14C35.163,6,36,6.837,36,7.86V40.14z"/&gt;
-&lt;path fill="#515151" d="M18,17.953c-6.654,0-12.047,5.394-12.047,12.047c0,6.653,5.394,12.048,12.047,12.048
-	c6.653,0,12.048-5.395,12.048-12.048C30.048,23.346,24.653,17.953,18,17.953z M18,40.242c-5.657,0-10.242-4.586-10.242-10.242
-	c0-5.657,4.585-10.242,10.242-10.242c5.656,0,10.242,4.585,10.242,10.242C28.242,35.656,23.656,40.242,18,40.242z"/&gt;
-&lt;path fill="#B3B3B3" d="M18,19.758c-5.657,0-10.242,4.585-10.242,10.242c0,5.656,4.585,10.242,10.242,10.242
-	c5.656,0,10.242-4.586,10.242-10.242C28.242,24.343,23.656,19.758,18,19.758z M18,39.521c-5.259,0-9.522-4.264-9.522-9.521
-	c0-5.259,4.263-9.522,9.522-9.522c5.258,0,9.521,4.263,9.521,9.522C27.521,35.258,23.258,39.521,18,39.521z"/&gt;
-&lt;linearGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" x1="10.9429" y1="22.9429" x2="25.056" y2="37.056"&gt;
-	&lt;stop  offset="0" style="stop-color:#666666"/&gt;
-	&lt;stop  offset="1" style="stop-color:#A2A2A2"/&gt;
-	&lt;stop  offset="1" style="stop-color:#515151"/&gt;
-&lt;/linearGradient&gt;
-&lt;path fill="url(#SVGID_4_)" d="M18,20.02c-5.512,0-9.98,4.468-9.98,9.98c0,5.511,4.468,9.979,9.98,9.979
-	c5.511,0,9.979-4.469,9.979-9.979C27.979,24.488,23.511,20.02,18,20.02z M18,33.32c-1.833,0-3.32-1.485-3.32-3.32
-	c0-1.834,1.487-3.32,3.32-3.32c1.835,0,3.321,1.486,3.321,3.32C21.32,31.835,19.835,33.32,18,33.32z"/&gt;
-&lt;radialGradient id="SVGID_5_" cx="16.9878" cy="27.9512" r="5.019" gradientUnits="userSpaceOnUse"&gt;
-	&lt;stop  offset="0.2448" style="stop-color:#5D5D5D"/&gt;
-	&lt;stop  offset="1" style="stop-color:#A2A2A2"/&gt;
-&lt;/radialGradient&gt;
-&lt;path fill="url(#SVGID_5_)" d="M18,26.664c-1.842,0-3.336,1.493-3.336,3.336s1.494,3.336,3.336,3.336
-	c1.843,0,3.336-1.493,3.336-3.336S19.843,26.664,18,26.664z M18,32.467c-1.362,0-2.467-1.104-2.467-2.467s1.104-2.468,2.467-2.468
-	c1.363,0,2.467,1.105,2.467,2.468S19.362,32.467,18,32.467z"/&gt;
-&lt;radialGradient id="SVGID_6_" cx="18.0894" cy="28.8408" r="3.7664" gradientUnits="userSpaceOnUse"&gt;
-	&lt;stop  offset="0" style="stop-color:#C5C5C5"/&gt;
-	&lt;stop  offset="0.8424" style="stop-color:#515151"/&gt;
-&lt;/radialGradient&gt;
-&lt;circle fill="url(#SVGID_6_)" cx="18" cy="30" r="2.531"/&gt;
-&lt;circle fill="#717171" cx="8.758" cy="20.758" r="0.832"/&gt;
-&lt;circle fill="#717171" cx="27.242" cy="20.758" r="0.832"/&gt;
-&lt;circle fill="#717171" cx="27.242" cy="39.242" r="0.832"/&gt;
-&lt;circle fill="#717171" cx="8.758" cy="39.242" r="0.832"/&gt;
-&lt;path fill="#515151" d="M18,4.294c-2.599,0-4.706,2.107-4.706,4.706s2.107,4.707,4.706,4.707c2.599,0,4.706-2.107,4.706-4.707
-	S20.599,4.294,18,4.294z"/&gt;
-&lt;path fill="#999999" d="M18,6.601c-1.325,0-2.399,1.074-2.399,2.399c0,1.324,1.074,2.398,2.399,2.398
-	c1.324,0,2.398-1.074,2.398-2.398C20.398,7.675,19.324,6.601,18,6.601z M18,9.798c-0.441,0-0.798-0.357-0.798-0.798
-	S17.559,8.202,18,8.202S18.798,8.559,18.798,9S18.441,9.798,18,9.798z"/&gt;
-&lt;radialGradient id="SVGID_7_" cx="18.0605" cy="8.209" r="2.5698" gradientUnits="userSpaceOnUse"&gt;
-	&lt;stop  offset="0" style="stop-color:#C5C5C5"/&gt;
-	&lt;stop  offset="0.8424" style="stop-color:#515151"/&gt;
-&lt;/radialGradient&gt;
-&lt;circle fill="url(#SVGID_7_)" cx="18" cy="9" r="1.727"/&gt;
-&lt;circle fill="#2470A3" cx="2.758" cy="2.758" r="0.832"/&gt;
-&lt;circle fill="#2470A3" cx="33.242" cy="2.758" r="0.832"/&gt;
-&lt;circle fill="#2470A3" cx="33.242" cy="44.242" r="0.832"/&gt;
-&lt;circle fill="#2470A3" cx="2.758" cy="44.242" r="0.832"/&gt;
-&lt;/svg&gt;
-</y:Resource>
-      <y:Resource id="3">&lt;?xml version="1.0" encoding="utf-8"?&gt;
 &lt;svg version="1.1"
 	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
 	 x="0px" y="0px" width="67px" height="68px" viewBox="-0.815 -0.706 67 68" enable-background="new -0.815 -0.706 67 68"
@@ -1375,6 +1425,121 @@ level<y:LabelModel>
 	c0,0,17.324-5.49,22.371-8.121C42.753,52.517,45.126,50.106,45.115,50.095z M32.923,53.056c-0.046,0-0.092,0-0.137,0
 	c0.016,0,0.028,0,0.044,0C32.86,53.056,32.892,53.056,32.923,53.056z M32.095,53.058c-0.023,0-0.048,0-0.072,0
 	C32.046,53.058,32.07,53.058,32.095,53.058z"/&gt;
+&lt;/svg&gt;
+</y:Resource>
+      <y:Resource id="3">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="57px" height="65px" viewBox="0 0 57 65" enable-background="new 0 0 57 65" xml:space="preserve"&gt;
+&lt;g&gt;
+	
+		&lt;linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="26.3398" y1="3115.7266" x2="27.5807" y2="3145.5239" gradientTransform="matrix(1 0 0 1 0.3203 -3091.7656)"&gt;
+		&lt;stop  offset="0.2711" style="stop-color:#FFAB4F"/&gt;
+		&lt;stop  offset="1" style="stop-color:#FFD28F"/&gt;
+	&lt;/linearGradient&gt;
+	&lt;path fill="url(#SVGID_1_)" stroke="#ED9135" stroke-miterlimit="10" d="M49.529,51.225c-4.396-4.396-10.951-5.884-12.063-6.109
+		V37.8H19.278c0,0,0.038,6.903,0,6.868c0,0-6.874,0.997-12.308,6.432C1.378,56.691,0.5,62.77,0.5,62.77
+		c0,1.938,1.575,3.492,3.523,3.492h48.51c1.947,0,3.521-1.558,3.521-3.492C56.055,62.768,54.211,55.906,49.529,51.225z"/&gt;
+	
+		&lt;radialGradient id="face_x5F_white_1_" cx="27.5835" cy="3117.4922" r="23.425" fx="23.0139" fy="3115.0024" gradientTransform="matrix(1 0 0 1 0.3203 -3091.7656)" gradientUnits="userSpaceOnUse"&gt;
+		&lt;stop  offset="0" style="stop-color:#FFD28F"/&gt;
+		&lt;stop  offset="1" style="stop-color:#FFAB4F"/&gt;
+	&lt;/radialGradient&gt;
+	&lt;path id="face_x5F_white_3_" fill="url(#face_x5F_white_1_)" stroke="#ED9135" stroke-miterlimit="10" d="M43.676,23.357
+		c0.086,10.2-6.738,18.52-15.25,18.586c-8.5,0.068-15.464-8.146-15.55-18.344C12.794,13.4,19.618,5.079,28.123,5.012
+		C36.627,4.945,43.59,13.158,43.676,23.357z"/&gt;
+	
+		&lt;linearGradient id="face_highlight_1_" gradientUnits="userSpaceOnUse" x1="6468.501" y1="-12291.5195" x2="6492.1304" y2="-12384.9688" gradientTransform="matrix(0.275 0 0 -0.2733 -1752.8849 -3351.7349)"&gt;
+		&lt;stop  offset="0" style="stop-color:#FFFFFF;stop-opacity:0.24"/&gt;
+		&lt;stop  offset="1" style="stop-color:#FFFFFF;stop-opacity:0.16"/&gt;
+	&lt;/linearGradient&gt;
+	&lt;path id="face_highlight_3_" fill="url(#face_highlight_1_)" d="M28.415,5.625c-6.035,0.047-10.747,4.493-12.787,10.386
+		c-0.664,1.919-0.294,4.043,0.98,5.629c2.73,3.398,5.729,6.283,9.461,8.088c3.137,1.518,7.535,2.385,11.893,1.247
+		c2.274-0.592,3.988-2.459,4.375-4.766c0.187-1.094,0.293-2.289,0.283-3.553C42.54,13.244,36.729,5.56,28.415,5.625z"/&gt;
+	&lt;path fill="#5C5C5C" stroke="#353535" stroke-linecap="round" stroke-linejoin="round" d="M32.215,9.938
+		c0,0,5.688,2.75,7.688,8.125c2.104,5.652,4.123,8.232,4.188,8c1.875-6.794,1.063-21.438-10.17-21.587
+		c-20.455-7.663-25.58,11.962-23.893,19.65c1.078,4.911,2.234,6.686,3.938,8.08C13.966,32.205,15.028,17.563,32.215,9.938z"/&gt;
+	
+		&lt;linearGradient id="body_1_" gradientUnits="userSpaceOnUse" x1="95.9063" y1="-3136.23" x2="31.5133" y2="-3136.23" gradientTransform="matrix(0.9852 0 0 -0.9852 -34.4844 -3033.9702)"&gt;
+		&lt;stop  offset="0" style="stop-color:#49AD33"/&gt;
+		&lt;stop  offset="1" style="stop-color:#C2DA92"/&gt;
+	&lt;/linearGradient&gt;
+	&lt;path id="body_8_" fill="url(#body_1_)" stroke="#008D33" d="M0.5,62.768c0,1.938,1.575,3.494,3.523,3.494h48.51
+		c1.947,0,3.521-1.559,3.521-3.494c0,0-1.844-6.861-6.525-11.543c-4.815-4.813-8.244-5.146-8.244-5.146
+		c-1.444,6.983-8.555,8.786-13.007,8.786s-11.322-2.643-11.941-9.439c0,0-4.559,1.199-9.367,5.674
+		C1.378,56.689,0.5,62.768,0.5,62.768z"/&gt;
+&lt;/g&gt;
+&lt;/svg&gt;
+</y:Resource>
+      <y:Resource id="4">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;svg version="1.1"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+	 x="0px" y="0px" width="36px" height="47px" viewBox="0 0 36 47" enable-background="new 0 0 36 47" xml:space="preserve"&gt;
+&lt;defs&gt;
+&lt;/defs&gt;
+&lt;linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="18.0005" y1="47" x2="18.0005" y2="-32.7535"&gt;
+	&lt;stop  offset="0" style="stop-color:#3C89C9"/&gt;
+	&lt;stop  offset="1" style="stop-color:#9CD7FF"/&gt;
+&lt;/linearGradient&gt;
+&lt;path fill="url(#SVGID_1_)" d="M36,45c0,1.1-0.9,2-2,2H2c-1.1,0-2-0.9-2-2V2c0-1.1,0.9-2,2-2h32c1.1,0,2,0.9,2,2V45z"/&gt;
+&lt;linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="7.5854" y1="40.416" x2="28.416" y2="19.5854"&gt;
+	&lt;stop  offset="0" style="stop-color:#8D8D8D"/&gt;
+	&lt;stop  offset="0.5" style="stop-color:#F2F2F2"/&gt;
+	&lt;stop  offset="1" style="stop-color:#8D8D8D"/&gt;
+&lt;/linearGradient&gt;
+&lt;path fill="url(#SVGID_2_)" d="M18,15.271C9.865,15.271,3.271,21.865,3.271,30S9.865,44.729,18,44.729S32.729,38.135,32.729,30
+	S26.135,15.271,18,15.271z M18,42.048c-6.654,0-12.047-5.395-12.047-12.048c0-6.654,5.394-12.047,12.047-12.047
+	c6.653,0,12.048,5.394,12.048,12.047C30.048,36.653,24.653,42.048,18,42.048z"/&gt;
+&lt;path opacity="0.24" fill="#D9F1FF" d="M36,18L0,35V2c0-1.1,0.9-2,2-2h32c1.1,0,2,0.9,2,2V18z"/&gt;
+&lt;linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="18.0005" y1="42" x2="18.0005" y2="6.0005"&gt;
+	&lt;stop  offset="0" style="stop-color:#515151"/&gt;
+	&lt;stop  offset="1" style="stop-color:#B8B8B8"/&gt;
+&lt;/linearGradient&gt;
+&lt;path display="none" fill="url(#SVGID_3_)" d="M36,40.14c0,1.023-0.837,1.86-1.86,1.86H1.86C0.837,42,0,41.163,0,40.14V7.86
+	C0,6.837,0.837,6,1.86,6H34.14C35.163,6,36,6.837,36,7.86V40.14z"/&gt;
+&lt;path fill="#515151" d="M18,17.953c-6.654,0-12.047,5.394-12.047,12.047c0,6.653,5.394,12.048,12.047,12.048
+	c6.653,0,12.048-5.395,12.048-12.048C30.048,23.346,24.653,17.953,18,17.953z M18,40.242c-5.657,0-10.242-4.586-10.242-10.242
+	c0-5.657,4.585-10.242,10.242-10.242c5.656,0,10.242,4.585,10.242,10.242C28.242,35.656,23.656,40.242,18,40.242z"/&gt;
+&lt;path fill="#B3B3B3" d="M18,19.758c-5.657,0-10.242,4.585-10.242,10.242c0,5.656,4.585,10.242,10.242,10.242
+	c5.656,0,10.242-4.586,10.242-10.242C28.242,24.343,23.656,19.758,18,19.758z M18,39.521c-5.259,0-9.522-4.264-9.522-9.521
+	c0-5.259,4.263-9.522,9.522-9.522c5.258,0,9.521,4.263,9.521,9.522C27.521,35.258,23.258,39.521,18,39.521z"/&gt;
+&lt;linearGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" x1="10.9429" y1="22.9429" x2="25.056" y2="37.056"&gt;
+	&lt;stop  offset="0" style="stop-color:#666666"/&gt;
+	&lt;stop  offset="1" style="stop-color:#A2A2A2"/&gt;
+	&lt;stop  offset="1" style="stop-color:#515151"/&gt;
+&lt;/linearGradient&gt;
+&lt;path fill="url(#SVGID_4_)" d="M18,20.02c-5.512,0-9.98,4.468-9.98,9.98c0,5.511,4.468,9.979,9.98,9.979
+	c5.511,0,9.979-4.469,9.979-9.979C27.979,24.488,23.511,20.02,18,20.02z M18,33.32c-1.833,0-3.32-1.485-3.32-3.32
+	c0-1.834,1.487-3.32,3.32-3.32c1.835,0,3.321,1.486,3.321,3.32C21.32,31.835,19.835,33.32,18,33.32z"/&gt;
+&lt;radialGradient id="SVGID_5_" cx="16.9878" cy="27.9512" r="5.019" gradientUnits="userSpaceOnUse"&gt;
+	&lt;stop  offset="0.2448" style="stop-color:#5D5D5D"/&gt;
+	&lt;stop  offset="1" style="stop-color:#A2A2A2"/&gt;
+&lt;/radialGradient&gt;
+&lt;path fill="url(#SVGID_5_)" d="M18,26.664c-1.842,0-3.336,1.493-3.336,3.336s1.494,3.336,3.336,3.336
+	c1.843,0,3.336-1.493,3.336-3.336S19.843,26.664,18,26.664z M18,32.467c-1.362,0-2.467-1.104-2.467-2.467s1.104-2.468,2.467-2.468
+	c1.363,0,2.467,1.105,2.467,2.468S19.362,32.467,18,32.467z"/&gt;
+&lt;radialGradient id="SVGID_6_" cx="18.0894" cy="28.8408" r="3.7664" gradientUnits="userSpaceOnUse"&gt;
+	&lt;stop  offset="0" style="stop-color:#C5C5C5"/&gt;
+	&lt;stop  offset="0.8424" style="stop-color:#515151"/&gt;
+&lt;/radialGradient&gt;
+&lt;circle fill="url(#SVGID_6_)" cx="18" cy="30" r="2.531"/&gt;
+&lt;circle fill="#717171" cx="8.758" cy="20.758" r="0.832"/&gt;
+&lt;circle fill="#717171" cx="27.242" cy="20.758" r="0.832"/&gt;
+&lt;circle fill="#717171" cx="27.242" cy="39.242" r="0.832"/&gt;
+&lt;circle fill="#717171" cx="8.758" cy="39.242" r="0.832"/&gt;
+&lt;path fill="#515151" d="M18,4.294c-2.599,0-4.706,2.107-4.706,4.706s2.107,4.707,4.706,4.707c2.599,0,4.706-2.107,4.706-4.707
+	S20.599,4.294,18,4.294z"/&gt;
+&lt;path fill="#999999" d="M18,6.601c-1.325,0-2.399,1.074-2.399,2.399c0,1.324,1.074,2.398,2.399,2.398
+	c1.324,0,2.398-1.074,2.398-2.398C20.398,7.675,19.324,6.601,18,6.601z M18,9.798c-0.441,0-0.798-0.357-0.798-0.798
+	S17.559,8.202,18,8.202S18.798,8.559,18.798,9S18.441,9.798,18,9.798z"/&gt;
+&lt;radialGradient id="SVGID_7_" cx="18.0605" cy="8.209" r="2.5698" gradientUnits="userSpaceOnUse"&gt;
+	&lt;stop  offset="0" style="stop-color:#C5C5C5"/&gt;
+	&lt;stop  offset="0.8424" style="stop-color:#515151"/&gt;
+&lt;/radialGradient&gt;
+&lt;circle fill="url(#SVGID_7_)" cx="18" cy="9" r="1.727"/&gt;
+&lt;circle fill="#2470A3" cx="2.758" cy="2.758" r="0.832"/&gt;
+&lt;circle fill="#2470A3" cx="33.242" cy="2.758" r="0.832"/&gt;
+&lt;circle fill="#2470A3" cx="33.242" cy="44.242" r="0.832"/&gt;
+&lt;circle fill="#2470A3" cx="2.758" cy="44.242" r="0.832"/&gt;
 &lt;/svg&gt;
 </y:Resource>
     </y:Resources>

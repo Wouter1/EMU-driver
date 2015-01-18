@@ -52,6 +52,8 @@ public:
      through the notifyClosed() call */
     virtual IOReturn free();
     
+
+    
     /*!
      Called when this inputstream has closed all input streams.
      */
