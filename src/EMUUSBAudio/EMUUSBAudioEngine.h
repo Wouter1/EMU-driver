@@ -425,9 +425,14 @@ protected:
      the actual sample counter. If it is larger, audio data may be erased by the erase head 
      before the hardware has a chance to play it.
 
-     @return the current safe playback erase point */
+     @return the current safe playback erase point. See getCurrentSampleFrame(offset) */
     virtual UInt32 getCurrentSampleFrame (void);
     
+    /*!
+     * @param offset in ns relative to true estimation of head position.
+     */
+    virtual UInt32 getCurrentSampleFrame (SInt64 offsetns);
+
     virtual IOAudioStreamDirection getDirection ();
     virtual void *getSampleBuffer (void);
 	UInt32 getSampleBufferSize (void);

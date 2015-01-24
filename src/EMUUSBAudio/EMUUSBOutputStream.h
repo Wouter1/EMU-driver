@@ -33,7 +33,12 @@ public:
      */
     virtual IOReturn                init();
 
-    IOReturn                        start(FrameSizeQueue *frameQueue, UInt64 startUsbFrame);
+    /*!
+     * @param frameQueue
+     * @param startUsbFrame the usb frame number on which to start writing. used to sync with input stream
+     * @param franeSamples the normal number of samples per frame. The max samples per frame is frameSamples+1
+     */
+    IOReturn                        start(FrameSizeQueue *frameQueue, UInt64 startUsbFrame,UInt32 frameSamples);
     
     /*! Stop the output stream */
     IOReturn stop();
@@ -134,7 +139,8 @@ private:
     
     bool                                initialized=false;
 
-    
+    /*! number of samples normally in a frame. The maximum number is one more. */
+    UInt32                              stockSamplesInFrame;
 
 };
 

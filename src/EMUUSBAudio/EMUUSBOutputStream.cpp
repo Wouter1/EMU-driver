@@ -31,7 +31,7 @@ IOReturn   EMUUSBOutputStream::init() {
     return kIOReturnSuccess;
 }
 
-IOReturn EMUUSBOutputStream::start(FrameSizeQueue *frameQueue,UInt64 startUsbFrame) {
+IOReturn EMUUSBOutputStream::start(FrameSizeQueue *frameQueue,UInt64 startUsbFrame, UInt32 frameSamples) {
     debugIOLogW("EMUUSBOutputStream::start at %lld",mach_absolute_time());
     ReturnIf(shouldStop, kIOReturnStillOpen); // still in closedown! Cancel start.
     ReturnIfFail(StreamInfo::reset());
@@ -40,6 +40,8 @@ IOReturn EMUUSBOutputStream::start(FrameSizeQueue *frameQueue,UInt64 startUsbFra
 	safeToEraseTo = 0;
 	lastSafeErasePoint = 0;
     currentFrameList = 0;
+
+    stockSamplesInFrame = frameSamples;
 
     frameSizeQueue = frameQueue;
     
@@ -199,8 +201,6 @@ IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
     UInt32			numBytesToBufferEnd = sampleBufferSize - previouslyPreparedBufferOffset;
     UInt32			lastPreparedByte = previouslyPreparedBufferOffset;
     bool			haveWrapped = false;
-    //    UInt16			integerSamplesInFrame,
-    UInt16 stockSamplesInFrame;
     
     
     // Set to number of bytes from the 0 wrap, 0 if this buffer didn't wrap
@@ -208,9 +208,6 @@ IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
     usbCompletion[listNr].action = writeCompletedStatic;
     usbCompletion[listNr].parameter = 0;
     
-    // FIXME this only works for cases where bInterval=8.
-    const UInt16 stockSamplesInFrameDivisor = 1000; // * kNumberOfFramesPerMillisecond;
-    stockSamplesInFrame = averageSampleRate / stockSamplesInFrameDivisor;
     
     
     //debugIOLogW("PrepareWriteFrameList stockSamplesInFrame %d numUSBFramesPerList %d", stockSamplesInFrame, numUSBFramesPerList);
@@ -222,8 +219,7 @@ IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
         }
         
         if (thisFrameSize >= numBytesToBufferEnd) {
-            debugIOLogW("write wrap in usbframe %d list %d",nextUsableUsbFrameNr,n);
-            //debugIOLogC("param has something %d", numUSBFramesPrepared);
+            //debugIOLogW("write wrap in usbframe %lld list %d",nextUsableUsbFrameNr,n);
             lastPreparedByte = thisFrameSize - numBytesToBufferEnd;
             usbCompletion[listNr].parameter = (void *)(UInt64)(((n + 1) << 16) | lastPreparedByte);
             // FIXME document haveWrapped and wrapDescriptor. Do we even need those?

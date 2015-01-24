@@ -318,7 +318,10 @@ UInt8 EMUUSBAudioConfigObject::GetEndpointPollInterval(UInt8 interfaceNum, UInt8
 		EMUUSBEndpointObject*	endpoint = stream->GetEndpointByAddress(address);
 		if (endpoint)
 			pollInterval = endpoint->GetPollInt();
-	}
+	} else {
+        debugIOLog("EMUUSBAudioConfigObject::GetEndpointPollInterval stream not opening");
+    }
+    debugIOLogC("EMUUSBAudioConfigObject::GetEndpointPollInterval %d",pollInterval);
 	return pollInterval;
 }
 
