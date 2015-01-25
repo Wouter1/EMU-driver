@@ -313,14 +313,19 @@ UInt32 EMUUSBAudioConfigObject::GetEndpointMaxPacketSize(UInt8 interfaceNum, UIn
 UInt8 EMUUSBAudioConfigObject::GetEndpointPollInterval(UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 direction) {
 	UInt8	pollInterval = 1;	// default
 	EMUUSBAudioStreamObject*	stream = GetStreamObject(interfaceNum, altInterfaceNum);
-	if (stream) {
-		UInt8	address = stream->GetIsocEndpointAddress(direction);
-		EMUUSBEndpointObject*	endpoint = stream->GetEndpointByAddress(address);
-		if (endpoint)
-			pollInterval = endpoint->GetPollInt();
-	} else {
-        debugIOLog("EMUUSBAudioConfigObject::GetEndpointPollInterval stream not opening");
+    if (!stream) {
+        IOLog("Bug? EMUUSBAudioConfigObject::GetEndpointPollInterval stream not opening");
+        return 1; // can we cancel the whole thing?
     }
+
+    UInt8	address = stream->GetIsocEndpointAddress(direction);
+    EMUUSBEndpointObject*	endpoint = stream->GetEndpointByAddress(address);
+    if (!endpoint) {
+        IOLog("Bug? EMUUSBAudioConfigObject::GetEndpointPollInterval no endpoint");
+        return 1; // can we cancel the whole thing?
+    }
+
+    pollInterval = endpoint->GetPollInt();
     debugIOLogC("EMUUSBAudioConfigObject::GetEndpointPollInterval %d",pollInterval);
 	return pollInterval;
 }

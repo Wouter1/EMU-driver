@@ -595,7 +595,7 @@ IOReturn EMUUSBAudioEngine::clipOutputSamples (const void *mixBuf, void *sampleB
 		memcpy ((UInt8 *)sampleBuf + offset, (UInt8 *)mixBuf, numSampleFrames * mOutput.multFactor);
 		result = kIOReturnSuccess;
 	}
-    debugIOLogC("-clipOutput %d to %d estcur= %d", firstSampleFrame,firstSampleFrame+numSampleFrames, getCurrentSampleFrame(0l));
+    //debugIOLogC("-clipOutput %d to %d estcur= %d", firstSampleFrame,firstSampleFrame+numSampleFrames, getCurrentSampleFrame(0l));
     //	IOLockUnlock(mFormatLock);
 	return result;
 }
@@ -1558,7 +1558,10 @@ IOReturn EMUUSBAudioEngine::performFormatChangeInternal (IOAudioStream *audioStr
         // set the format - JH
         mOutput.audioStream->setFormat(newFormat,false);
     }
-    
+
+    // #30 update the poll interval.
+    mPollInterval = (UInt32) (1 << ((UInt32) usbAudio->GetEndpointPollInterval(usbInputStream.interfaceNumber, usbInputStream.alternateSettingID, usbInputStream.streamDirection) -1));
+
     
     if (needNewBuffers) {
         if (kIOReturnSuccess!= initBuffers()) {
@@ -1567,8 +1570,6 @@ IOReturn EMUUSBAudioEngine::performFormatChangeInternal (IOAudioStream *audioStr
         }
     }
     
-    // #30 update the poll interval. 
-    mPollInterval = (UInt32) (1 << ((UInt32) usbAudio->GetEndpointPollInterval(usbInputStream.interfaceNumber, usbInputStream.alternateSettingID, usbInputStream.streamDirection) -1));
     
 
     

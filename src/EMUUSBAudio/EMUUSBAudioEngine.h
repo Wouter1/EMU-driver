@@ -362,7 +362,7 @@ protected:
 	UInt8								mAnchorResetCount;
 	UInt8								mHubSpeed;
     /*! update frequency for IOUSBLowLatencyIsocFrame. see the documentation IOUSBPipe.
-     0=only at end. 1..8 means 1..8 refresh calls per millisecond. Wouter: I disabled this to get the stuff working at all. */
+     1=every microframe (1/8 ms). 2=every 2 microframes 8=every full frame (millisecond) etc */
 	UInt8								mPollInterval;
     
 	Boolean								usbStreamRunning;

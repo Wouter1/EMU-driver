@@ -135,7 +135,7 @@ IOReturn EMUUSBInputStream::GatherInputSamples() {
             //  if (size >= usbRing->size - usbRing->writehead  ) {
             //     debugIOLog("input wrap in list %d at frame %d",currentFrameList,frameIndex);
             //  }
-            
+
             // FIXME. We should not call from inside locked area.
             usbRing-> push(source, size , pFrames[frameIndex].frTimeStamp );
             frameSizeQueue-> push(size , pFrames[frameIndex].frTimeStamp);
@@ -198,7 +198,7 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
         result = pipe->Read(bufferDescriptors[frameListNum], frameNr, numUSBFramesPerList,
                             &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
         
-        //debugIOLogC("READ framelist %d in framenr %lld at %lld",frameListNum, frameNr,mach_absolute_time());
+        debugIOLogR("READ framelist %d in framenr %lld at %lld",frameListNum, frameNr,mach_absolute_time());
 
         if (result != kIOReturnSuccess) {
             // FIXME #17 if this goes wrong, why continue?
