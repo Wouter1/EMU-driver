@@ -19,11 +19,12 @@ The first priority here was to get the audio input working properly, without the
 * I can only test on EMU0404 USB as I have no other EMU devices.
 * Midi is not tested, no idea if it works (#23). 
 
+
+
+<img align="left" width="100" src="warning-sign.jpg"/>There is a bug in Quicktime 10, at least on Mavericks, that causes
+distortion in playback (see #26). We recommend to install Quicktime 7 (http://support.apple.com/kb/DL923).
+
 Please notify me how my driver works on other EMU USB devices.
-
-
-<img align="left" width="150" src="warning-sign.jpg"/>There is a bug in Quicktime 10, at least on Mavericks, that causes
-distortion in playback (see #30). We recommend to install Quicktime 7 (http://support.apple.com/kb/DL923).
 
 
 Installation
