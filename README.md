@@ -20,7 +20,6 @@ The first priority here was to get the audio input working properly, without the
 * Midi is not tested, no idea if it works (#23). 
 
 
---
 <img align="left" width="100" src="warning-sign.jpg"/>
 
 There is a bug in Quicktime 10, at least on Mavericks, that causes distortion in playback (see #26). We recommend to install Quicktime 7 (http://support.apple.com/kb/DL923).
