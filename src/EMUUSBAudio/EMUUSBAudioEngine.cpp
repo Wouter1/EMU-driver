@@ -2090,7 +2090,7 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
         // at the cost of increase in latency to 2ms or so. This depends a LOT on the initial accuracy of
         // the crystals - the difference between CPU crystal and EMU crystal.
         // I did not find any specs on the max difference for the crystals.
-        UInt32 offsetToSet = sampleRate.whole / 500; // 2 ms
+        UInt32 offsetToSet = sampleRate.whole / 450; // 2.22 ms, so that we can handle 2ms jitter.
 		
 		// use samplesPerFrame as our "safety offset" unless explicitly set as a driver property
         // You can set it in the properties .list file in EMUUSBAudioControl04:        SafetyOffset        Number 192
@@ -2239,7 +2239,7 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
     
     absolutetime_to_nanoseconds(wt,&wrapTimeNs);
     // center the wrap to middle of last 0.5ms as we don't know when wrap happened in last 1ms.
-    // wrapTimeNs = wrapTimeNs - 500000;
+    wrapTimeNs = wrapTimeNs - 500000;
     
     if (goodWraps >= 5) {
         // regular operation after initial wraps. Enable debug line to check timestamping
