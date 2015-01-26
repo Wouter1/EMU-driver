@@ -22,6 +22,10 @@ The first priority here was to get the audio input working properly, without the
 Please notify me how my driver works on other EMU USB devices.
 
 
+<img align="left" width="150" src="warning-sign.jpg"/>There is a bug in Quicktime 10, at least on Mavericks, that causes
+distortion in playback (see #30). We recommend to install Quicktime 7 (http://support.apple.com/kb/DL923).
+
+
 Installation
 ========
 
