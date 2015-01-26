@@ -1829,9 +1829,8 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	//mOutput.usbFrameToQueueAt = 0; // INIT as late as possible. mBus->GetFrameNumber() + mOutput.frameOffset;	// start on an offset usb frame
 	*(UInt64 *) (&(mOutput.usbIsocFrames[0].frTimeStamp)) = 0xFFFFFFFFFFFFFFFFull;
     
-
+    setRunEraseHead(true); // need it to avoid stutter at start&end and to allow multiple simultaneous playback.
     
-    setRunEraseHead(true); // HACK something sfffffffftill wrong with the latency timing. #21 #30
     // Ok, all set, go!
     // plan startFrameNr well in the future, so that we have time to start both streams before that point.
     startFrameNr = usbInputStream.streamInterface->GetDevice()->GetBus()->GetFrameNumber() + 64;
@@ -2085,16 +2084,13 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 		usbInputStream.bufferPtr = usbInputStream.bufferMemoryDescriptor->getBytesNoCopy();// get a valid pointer or NULL
 		FailIf(NULL == usbInputStream.bufferPtr, Exit);
 		
-        // HACK this is insufficient, we are doing block transfer with much larger blocks
-        // note, samplesPerFrame is really fields per frame
-        //UInt32	offsetToSet = samplesPerFrame;
-        // quarter a framelist is fine but gives 16ms latency.
-        // UInt32 offsetToSet = samplesPerFrame * usbInputStream.numUSBFramesPerList / 4;
         
         // actual jitter on the USB input is 0.01ms. But we have high latency pulses that have 1ms.
-        // The clock lock filter spreads out the effect of the pulse over a long time,
-        // at the cost of increase in latency to 3ms or so. We need to measure this all exactly.
-        UInt32 offsetToSet = sampleRate.whole / 200; // * 0.005 ms
+        // Out PLL (time filter) spreads out the effect of the pulse over a long time,
+        // at the cost of increase in latency to 2ms or so. This depends a LOT on the initial accuracy of
+        // the crystals - the difference between CPU crystal and EMU crystal.
+        // I did not find any specs on the max difference for the crystals.
+        UInt32 offsetToSet = sampleRate.whole / 500; // 2 ms
 		
 		// use samplesPerFrame as our "safety offset" unless explicitly set as a driver property
         // You can set it in the properties .list file in EMUUSBAudioControl04:        SafetyOffset        Number 192
@@ -2112,10 +2108,14 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
         // idem for the playback head.
 		//setInputSampleLatency(2*samplesPerFrame);
         // HACK. This is the latency from read till end user. Not clear if IOEngine uses it.
-        setInputSampleLatency(2* usbInputStream.numUSBFramesPerList * usbInputStream.maxFrameSize / usbInputStream.multFactor);
+        //setInputSampleLatency(2* usbInputStream.numUSBFramesPerList * usbInputStream.maxFrameSize / usbInputStream.multFactor);
 
-        //100 is too little. 500 seems ok.
-        setOutputSampleOffset(5); // HACK this is a very rough guess. Need prefs as well.
+        // This seems to work for quicktime7
+        //setOutputSampleOffset(100); // HACK this is a very rough guess. Need prefs as well. Bit noise@192k
+        //setInputSampleOffset(500); // HACK. wasn't there.
+        
+        
+        
         
 		//now the output buffer
 		if (mOutput.usbBufferDescriptor) {
@@ -2239,7 +2239,7 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
     
     absolutetime_to_nanoseconds(wt,&wrapTimeNs);
     // center the wrap to middle of last 0.5ms as we don't know when wrap happened in last 1ms.
-    wrapTimeNs = wrapTimeNs - 500000;
+    // wrapTimeNs = wrapTimeNs - 500000;
     
     if (goodWraps >= 5) {
         // regular operation after initial wraps. Enable debug line to check timestamping
