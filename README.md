@@ -189,4 +189,5 @@ refactored and wrote new code to get it working.
 
 The present version is in a pretty bad shape. I did a major effort to refactor the input side of the code,
 it's on the way but not yet polished. The rest of the code is still in original state.
-The first priority here was to get the audio input working properly, without the clicking issues of the official driver when used in OSX10.6 and higher. The playback at this points works ok but there are still a few small issues.
+Audio input and output (record and playback) are now working fine.
+There are a few small loose ends and I'd like to clean up the code further.
