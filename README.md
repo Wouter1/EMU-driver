@@ -5,28 +5,21 @@ EMU-USB driver
 
 OSX driver for Creative Labs EMU USB
 
-The current version compiles with Xcode 5.1.1.
-Original comes from source forge revision 7. http://sourceforge.net/projects/zaudiodrivermac/
-But it did not compile on OSX 10.9 Mavericks. So I dumped part of the code, cleaned up, documented, 
-refactored and wrote new code to get it working.
-
-The present version is in a pretty bad shape. I did a major effort to refactor the input side of the code,
-it's on the way but not yet polished. The rest of the code is still in original state.
-The first priority here was to get the audio input working properly, without the clicking issues of the official driver when used in OSX10.6 and higher. The playback at this points works ok but there are still a few small issues.
-
 * Tested on Mavericks and Yosemite. Probably also works on other versions of OSX. 
 * All sample rates are supported both for record and playback: 44.1, 48, 88.2, 96, 176.4 and 192 kHz
-* I can only test on EMU0404 USB as I have no other EMU devices.
+* I can only test on EMU0404 USB as I have no other EMU devices. I received feedback that it works on EMU0204 USB.
 * Midi is not tested, no idea if it works (#23). 
 
 
 --
-<img align="left" width="100" src="warning-sign.jpg"/>
+<img align="left" width="80" src="warning-sign.jpg"/>
 
 There is a bug in Quicktime 10, at least on Mavericks, that causes distortion in playback (see #26). We recommend to install Quicktime 7 (http://support.apple.com/kb/DL923).
 
 --
 Please notify me how my driver works on other EMU USB devices.
+
+
 
 
 Installation
@@ -184,3 +177,16 @@ System Requirements
  * Apple Macintosh OS X Mavericks (10.9) 64 bits
  * 1 available (Hi-speed) USB 2.0 port
  
+
+
+
+Tech notes
+==========
+The current version compiles with Xcode 5.1.1.
+Original comes from source forge revision 7. http://sourceforge.net/projects/zaudiodrivermac/
+But it did not compile on OSX 10.9 Mavericks. So I dumped part of the code, cleaned up, documented, 
+refactored and wrote new code to get it working.
+
+The present version is in a pretty bad shape. I did a major effort to refactor the input side of the code,
+it's on the way but not yet polished. The rest of the code is still in original state.
+The first priority here was to get the audio input working properly, without the clicking issues of the official driver when used in OSX10.6 and higher. The playback at this points works ok but there are still a few small issues.
