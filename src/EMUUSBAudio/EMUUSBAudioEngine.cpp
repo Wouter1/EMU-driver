@@ -1712,9 +1712,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	
 	UInt32	altFrameSampleSize = averageFrameSamples + 1;
     
-    usbInputStream.previousFrameList = 3; //  different from currentFrameList.
 	usbInputStream.bufferOffset = 0;
-	usbInputStream.startingEngine = TRUE;
     
 
     
@@ -1996,12 +1994,9 @@ Exit:
 IOReturn EMUUSBAudioEngine::initBuffers() {
 	IOReturn						result = kIOReturnError;
 	if (usbAudioDevice) {
-		//EMUUSBAudioConfigObject*		usbAudio = usbAudioDevice->GetUSBAudioConfigObject();
-		//UInt32	pollInterval = (UInt32) usbAudio->GetEndpointPollInterval(ourInterfaceNumber, alternateSettingID, mDirection);
-        //	maxFrameSize = usbAudio->GetEndpointMaxPacketSize(ourInterfaceNumber, alternateSettingID, address);
-		//mPollInterval = 1 << (pollInterval -1);
+        // poll interval should have been set when this is called.
 		debugIOLogC("initBuffers mPollInterval=%d",mPollInterval);
-		//, frameSize %d direction %d mPollInterval %d", frameSize, mDirection, mPollInterval);
+
 		// clear up any existing buffers
 		UInt32 inputSize = usbInputStream.maxFrameSize;
 		UInt32 outputSize = mOutput.maxFrameSize;
@@ -2015,13 +2010,7 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
         
         // Wouter: it seems that 0.1s buffer size is working ok.
         // I guess PAGE_SIZE helps to align buffer in memory.
-        //	UInt32	numSamplesInBuffer = samplesPerFrame * 256;//
-		//UInt32 numSamplesInBuffer = samplesPerFrame * 16;
 		UInt32	numSamplesInBuffer = PAGE_SIZE * (2 + (sampleRate.whole > 48000) + 3 * (sampleRate.whole > 96000) );
-        
-        // HACK notice that PAGE_SIZE is a hardware specific value for 32 bit intel machines.
-        // Why is this not related to the number of channels?
-        // I propose this should be computed more directly based on the framelist size.
         
 		usbInputStream.bufferSize = numSamplesInBuffer * usbInputStream.multFactor;
 		mOutput.bufferSize = numSamplesInBuffer * mOutput.multFactor;
@@ -2048,6 +2037,7 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 			usbInputStream.usbBufferDescriptor = NULL;
 			usbInputStream.readBuffer = NULL;
 		}
+        
 		// read buffer section
 		// following is the actual buffer that stuff gets read into
 		debugIOLogC("initBuffers numUSBFrameLists %d", usbInputStream.numUSBFrameLists);
@@ -2105,16 +2095,6 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
             // This is the offset for the playback head: min distance the IOAudioEngine keeps from our write head.
             setSampleOffset(offsetToSet);
 		}
-        // idem for the playback head.
-		//setInputSampleLatency(2*samplesPerFrame);
-        // HACK. This is the latency from read till end user. Not clear if IOEngine uses it.
-        //setInputSampleLatency(2* usbInputStream.numUSBFramesPerList * usbInputStream.maxFrameSize / usbInputStream.multFactor);
-
-        // This seems to work for quicktime7
-        //setOutputSampleOffset(100); // HACK this is a very rough guess. Need prefs as well. Bit noise@192k
-        //setInputSampleOffset(500); // HACK. wasn't there.
-        
-        
         
         
 		//now the output buffer

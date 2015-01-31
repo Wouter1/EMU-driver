@@ -65,8 +65,26 @@ public:
     IOReturn                        update();
     
 
+    
     // BELOW should become private. Right now it's still shared with EMUUSBAudioEngine.
     
+    /*! = maxFrameSize * numUSBFramesPerList; total byte size for buffering frameLists for USB reading. eg 582*64 = 37248.
+     */
+	UInt32					readUSBFrameListSize;
+    
+    /*!  direct ptr to USB data buffer = mInput. usbBufferDescriptor. These are
+     the buffers for each of the USB readFrameLists. Not clear why this is allocated as one big slot. */
+	void *					readBuffer;
+    
+    
+    
+    
+private:
+    
+    
+    
+    UInt32					lastInputFrames;
+
     
     /*! Used in GatherInputSamples to keep track of which framelist we were converting. */
     UInt64                  previousFrameList;
@@ -75,38 +93,18 @@ public:
     UInt32                  frameIndex;
     
     
-	UInt32					lastInputFrames;
-    
-    /*! counter used to steer the DAStream (playback). FIXME not here? */
-	//UInt32					runningInputCount;
-    
-    
-    
-    /*! = maxFrameSize * numUSBFramesPerList; total byte size for buffering frameLists for USB reading. eg 582*64 = 37248.
-     */
-	UInt32					readUSBFrameListSize;
-    
-    /*!  direct ptr to USB data buffer = mInput. usbBufferDescriptor. These are
-     the buffers for each of the USB readFrameLists. Not clear why this is allocated as one big slot. */
-	void *								readBuffer;
-    
     /*! number of initial frames that are dropped. See kNumberOfStartingFramesToDrop */
 	UInt32					mDropStartingFrames;
+
     
     /*! if !=0 then we are busy stopping. Counts up till we reach RECORD_NUM_FRAMELISTS.
      If stop complete, notifyStop is called and stopped=true */
     volatile UInt32			shouldStop;
-    
-    
-    /*!  this is TRUE until we receive the first USB packet. */
-	Boolean					startingEngine;
+
     
     /*! HACK for Yosemite #18 explicit counting of USB frame numbers */
     UInt64                  nextFrameNr;
-    
-    
-private:
-    
+
     /*!
      Copy input frames from given USB port framelist into the ring buffer (which will 
      give warnings on overrun). Also updates mInput. bufferOffset.
@@ -130,7 +128,7 @@ private:
      also alter bufferOffset but that will result in a warning in the logs.
      
      */
-	IOReturn                    GatherInputSamples();
+	IOReturn                GatherInputSamples();
     
     /*!
      @abstract initializes the read of a frameList (typ. 64 frames) from USB.
@@ -142,11 +140,11 @@ private:
      orig docu said "frameListNum must be in the valid range 0 - 126".
      This makes no sense to me. Maybe this is a hardware requirement.
      */
-    IOReturn                    readFrameList (UInt32 frameListNum);
+    IOReturn                readFrameList (UInt32 frameListNum);
     
     
     /*! static version of readCompleted, with first argument being 'this' */
-    static void         readCompleted (void * object, void * frameListIndex, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
+    static void             readCompleted (void * object, void * frameListIndex, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames);
     
     /*!readHandler is the callback from USB completion. This implements IOUSBLowLatencyIsocCompletionAction and the callback function for USB frameread.
      
@@ -154,14 +152,14 @@ private:
      @param result  this handler will do special actions if set values different from kIOReturnSuccess.
      @param pFrames the frames that need checking. Expects that all RECORD_NUM_USB_FRAMES_PER_LIST frames are available completely.
      */
-    void            readCompleted (void * frameListIndex, IOReturn result,
+    void                    readCompleted (void * frameListIndex, IOReturn result,
                                    IOUSBLowLatencyIsocFrame * pFrames);
     
     /*! get the first framenumber on which transfer can start. */
-    UInt64 getStartTransferFrameNr();
+    UInt64                  getStartTransferFrameNr();
 
         
-    FrameSizeQueue *            frameSizeQueue;
+    FrameSizeQueue *        frameSizeQueue;
     
     /*! the input ring. Received from the Engine */
     RingBufferDefault<UInt8> *  usbRing;
@@ -170,20 +168,25 @@ private:
     IOLock*                     mLock;
     
     /*! set to true after succesful init() */
-    bool                        initialized;
+    bool                    initialized;
     
     /*! set to true after succesful start() */
-    bool                        started;
+    bool                    started;
 
+    
+    /*!  this is TRUE until we receive the first USB packet.  Can we replace this wit started? */
+	Boolean					startingEngine;
+    
 
+    
     /*! the framelist that we are expecting to complete from next.
      Basically runs from 0 to numUSBFrameListsToQueue-1 and then
      restarts at 0. Updated after readHandler handled the block. */
-    volatile UInt32				currentFrameList;
+    volatile UInt32			currentFrameList;
     
 	/*! orig doc: we need to drop the first 2 frames because the device can't flush the first frames. 
      However doing so de-syncs the pipes. */
-    static const long					kNumberOfStartingFramesToDrop = 0;
+    static const long		kNumberOfStartingFramesToDrop = 0;
 
 };
 

@@ -23,6 +23,8 @@ IOReturn EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing, FrameSizeQ
     usbRing = inputRing;
     frameSizeQueue = frameRing;
 	
+	startingEngine = TRUE;
+
 	mLock = IOLockAlloc();
     ReturnIf(!mLock, kIOReturnNoMemory);
     
@@ -39,7 +41,8 @@ IOReturn EMUUSBInputStream::start(UInt64 startFrameNr) {
 
     shouldStop = 0;
     currentFrameList = 0;
-    
+    previousFrameList = 3; //  different from currentFrameList.
+
     mDropStartingFrames = kNumberOfStartingFramesToDrop;
 
     // we start reading on all framelists. USB will figure it out and take the next one in order
