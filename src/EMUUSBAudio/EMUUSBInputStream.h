@@ -192,3 +192,4 @@ private:
 
 
 #endif /* defined(__EMUUSBAudio__EMUUSBInputStream__) */
+ 

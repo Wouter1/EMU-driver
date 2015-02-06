@@ -1770,10 +1770,6 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	address = usbAudio->GetIsocEndpointAddress(usbInputStream.interfaceNumber, usbInputStream.alternateSettingID, usbInputStream.streamDirection);
 	maxPacketSize = usbAudio->GetEndpointMaxPacketSize(usbInputStream.interfaceNumber, usbInputStream.alternateSettingID, address);
     
-    // HACK try to start old code related to getting actual rate of a stream.
-    //CheckForAssociatedEndpoint(usbAudio, usbInputStream.interfaceNumber, usbInputStream.alternateSettingID);
-
-    
 	usbInputStream.maxFrameSize = altFrameSampleSize * usbInputStream.multFactor;
 	if (usbInputStream.maxFrameSize != maxPacketSize)
 		usbInputStream.maxFrameSize = maxPacketSize;
@@ -2075,27 +2071,27 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 		FailIf(NULL == usbInputStream.bufferPtr, Exit);
 		
         
-        // actual jitter on the USB input is 0.01ms. But we have high latency pulses that have 1ms.
-        // Out PLL (time filter) spreads out the effect of the pulse over a long time,
-        // at the cost of increase in latency to 2ms or so. This depends a LOT on the initial accuracy of
-        // the crystals - the difference between CPU crystal and EMU crystal.
-        // I did not find any specs on the max difference for the crystals.
-        UInt32 offsetToSet = sampleRate.whole / 450; // 2.22 ms, so that we can handle 2ms jitter.
-		
-		// use samplesPerFrame as our "safety offset" unless explicitly set as a driver property
-        // You can set it in the properties .list file in EMUUSBAudioControl04:        SafetyOffset        Number 192
-        // BUT, this is not recommended as this safety offset really depends on the settings we make here.
-        // maybe we could define something different there. Not now.
-		OSNumber *safetyOffsetObj = OSDynamicCast(OSNumber,usbAudioDevice->getProperty("SafetyOffset"));
-		if (safetyOffsetObj) {
-            debugIOLogC("using externally requested safety offset %d",safetyOffsetObj->unsigned32BitValue());
-			setSampleOffset(safetyOffsetObj->unsigned32BitValue());
-		} else {
-            debugIOLogC("using our own estimated offset %d",offsetToSet);
-            // This is the offset for the playback head: min distance the IOAudioEngine keeps from our write head.
-            setSampleOffset(offsetToSet);
-		}
+        // actual jitter on the USB input is 0.01ms. But we have high latency pulses that have 1ms,
+        // a few even higher latency pulses at 2ms, and very rare ones at 3ms from expected.
+        // Probably 4ms happens but extremely rare.
         
+        // Our PLL (time filter) filters out those, but the buffer may have an additional latency
+        // when this happens. This is where the offset comes in.
+        
+        UInt32 offsetMicros = 4200; // 2222 us gives very occasional tick
+
+		// #25 you can set another offset using the SafetyOffsetMicroSec in the plist
+        // You can set it in the properties .list file in
+        //EMUUSBAudioControl04:        SafetyOffset        Number 192
+        // 2222 us seems good choice for low latency applications
+
+		OSNumber *safetyOffsetObj = OSDynamicCast(OSNumber,usbAudioDevice->getProperty("SafetyOffsetMicroSec"));
+		if (safetyOffsetObj) {
+            offsetMicros = safetyOffsetObj->unsigned32BitValue();
+            debugIOLogC("using externally requested safety offset %d microseconds",offsetMicros);
+		}
+        UInt32 offsetToSet = sampleRate.whole * offsetMicros / 1000000;
+        setSampleOffset(offsetToSet);
         
 		//now the output buffer
 		if (mOutput.usbBufferDescriptor) {
