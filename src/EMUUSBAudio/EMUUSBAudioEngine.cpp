@@ -2082,9 +2082,9 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 
 		// #25 you can set another offset using the SafetyOffsetMicroSec in the plist
         // You can set it in the properties .list file in
-        //EMUUSBAudioControl04:        SafetyOffset        Number 192
-        // 2222 us seems good choice for low latency applications
-
+        //EMUUSBAudioControl04:        SafetyOffsetMicroSec        Number 4200
+        // 2222 us seems good choice for low latency applications. 4200 is the reliable value.
+        
 		OSNumber *safetyOffsetObj = OSDynamicCast(OSNumber,usbAudioDevice->getProperty("SafetyOffsetMicroSec"));
 		if (safetyOffsetObj) {
             offsetMicros = safetyOffsetObj->unsigned32BitValue();

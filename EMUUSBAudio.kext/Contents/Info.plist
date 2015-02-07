@@ -50,8 +50,8 @@
 			<string>IOUSBInterface</string>
 			<key>IOUserClientClass</key>
 			<string>EMUUSBUserClient</string>
-			<key>SafetyOffset</key>
-			<integer>192</integer>
+			<key>SafetyOffsetMicroSec</key>
+			<integer>4200</integer>
 			<key>bConfigurationValue</key>
 			<integer>1</integer>
 			<key>bInterfaceNumber</key>
@@ -106,8 +106,8 @@
 			<string>IOUSBInterface</string>
 			<key>IOUserClientClass</key>
 			<string>EMUUSBUserClient</string>
-			<key>SafetyOffset</key>
-			<integer>192</integer>
+			<key>SafetyOffsetMicroSec</key>
+			<integer>4200</integer>
 			<key>TransportTypeOverride</key>
 			<integer>1</integer>
 			<key>bConfigurationValue</key>
@@ -176,8 +176,8 @@
 			<string>IOUSBInterface</string>
 			<key>IOUserClientClass</key>
 			<string>EMUUSBUserClient</string>
-			<key>SafetyOffset</key>
-			<integer>192</integer>
+			<key>SafetyOffsetMicroSec</key>
+			<integer>4200</integer>
 			<key>TransportTypeOverride</key>
 			<integer>1</integer>
 			<key>bConfigurationValue</key>
@@ -260,6 +260,8 @@
 			<string>IOUSBInterface</string>
 			<key>IOUserClientClass</key>
 			<string>EMUUSBUserClient</string>
+			<key>SafetyOffsetMicroSec</key>
+			<integer>4200</integer>
 			<key>TransportTypeOverride</key>
 			<integer>1</integer>
 			<key>bConfigurationValue</key>

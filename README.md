@@ -20,6 +20,14 @@ There is a bug in Quicktime 10, at least on Mavericks, that causes distortion in
 Please notify me how my driver works on other EMU USB devices.
 
 
+Latency
+=======
+The default latency of the driver is set to 4.4ms. This is the 'high quality' setting, 
+to ensure that not even the highest jitter in the USB system affects the audio quality.
+However for some applications, low latency is more important than an occasional click in 
+the audio. Therefore, the latency can be adjusted as follows
+
+
 
 
 Installation
