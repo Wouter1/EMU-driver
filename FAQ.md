@@ -7,6 +7,7 @@ Here's the Frequently Asked Questions
 
 |question|answer|
 |---|---|
+|Is the driver bit accurate?|Yes, but bit accuracy is lost in the core audio system of the OS, where sample rate conversion is used to match slightly different data rates of CPU clock and EMU clock, sample rate conversion etc.|
 |Can your code be modified to report latencies ? | Yes input and output latency are both reported separately from the driver to the kernel. The driver picks the values from the plist, or picks default values of 4.2ms.|
 |Is the driver reported latency the real true latency?|No. It's only an estimation of the latency inside the driver and USB connection. I don't know the EMU internal latency. And your application will add latency on top of this.|
 |can the USB frame rate be changed?|Yes, by changing the sample rate with the Control panel|
