@@ -25,7 +25,7 @@ Here's the Frequently Asked Questions
 |what is the relationship between the baseline USB polling rate and the “frame rate” |The USB rate with the EMU is one or 2 frames per millisecond (maximum for USB2 is 8 per ms). I think this runs in hardware. The polling rate is the rate at which the computer checks if data has come in. This is done at most once per millisecond and in software. This polling rate determines the accuracy of the timestamps on the incoming data|
 |would 2 frames per millisecond give you a higher polling rate and better accuracy on the timing?| No, FAIK the polling rate stays once per millisecond. So the timer accuracy stays the same.|
 |does a faster cpu allow lower driver latencies?|no. USB polling rate is timer based. If your computer would be too slow to keep up with the datarate, the connection would probably break|
-|Is the polling rate fixed in hardware or software?| I think a hardware based interrupt is running behind this|
+|Is the polling rate fixed in hardware or software?| I don't know exactly. I would expect a hardware based interrupt is running behind this but the polling timestamping seems in software.|
 |Would latency lower if the DAW delivered 24 bit integers instead of float?|No. latency is caused by the timing uncertainty of the USB transport.|
 |it would presumably be easy in principle for a DAW to deliver 24bit integers in a single stream with sole control over the device|No delivery of data is actually pretty complex. This is because data has to be timed accurately to ensure there are no buffer over/underflows in the EMU|
 |What determines the exact data output rate|This is determined by the EMU. Or, if you have set the EMU to external sync, the source of the SPDIF input|
