@@ -2122,8 +2122,10 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 		}
 		mOutput.bufferPtr = mOutput.usbBufferDescriptor->getBytesNoCopy();
 		FailIf (NULL == mOutput.bufferPtr, Exit);
-		offsetToSet = samplesPerFrame; // appears to be the best possible
-		setOutputSampleLatency(2*samplesPerFrame);
+
+        setInputSampleLatency(offsetToSet);
+		setOutputSampleLatency(offsetToSet);
+        
 		mOutput.audioStream->setSampleBuffer(mOutput.bufferPtr, mOutput.bufferSize);
         
 		setNumSampleFramesPerBuffer(numSamplesInBuffer);
