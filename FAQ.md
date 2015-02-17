@@ -12,7 +12,7 @@ Here's the Frequently Asked Questions
 |can the USB frame rate be changed?|Yes, by changing the sample rate with the Control panel|
 |Are the buffers the driver uses one for input and one for output? |Yes, there are separate input and output buffers|
 |is latency round trip latency? |No, it's one way latency. For a roundtrip you have to add input and output latency, plus your application's latency|
-|A minimum round trip latency is 4.4ms? | Yes if you use the current low latency setting of 2.2ms, and have a program that does not add extra latency. The default would be 8.4ms roundtrip. You can lower the latency even further (check <a href="Latency.md"adjusting the latency</a>) but at the cost of more distortion.|
+|A minimum round trip latency is 4.4ms? | Yes if you use the current low latency setting of 2.2ms, and have a program that does not add extra latency. The default would be 8.4ms roundtrip. You can lower the latency even further (check <a href="Latency.md">adjusting the latency</a>) but at the cost of more distortion.|
 |Is there a hard lower limit or just that you start to get dropouts/buffer underruns? | Yes, USB has freedom of about 1ms in the transport times. This causes uncertainty in the exact data rate of the EMU clock which leads to extra buffer requirements. In all, it is quite unlikely but possible that we will get above 2ms from the actual datarate. 4ms is extremely unlikely and was never detected.|
 |Are the input and output latencies necessarily the same? |Not necessarily, but the driver has been designed to make them the same.|
 |Are the latencies constant?|No, there is fluctuation because we can not exactly determine the position of the USB stream due to the timing inaccuracies mentioned above|
