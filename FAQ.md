@@ -20,4 +20,13 @@ Here's the Frequently Asked Questions
 |Is the buffer in the DAW conceptually separate from the buffer in the driver? | yes |
 | Can you reduce the driver buffer to 0 and increase the buffer in the DAW to compensate? | No.|
 |Why do you need a separate buffer in the driver?| The driver needs its own buffer because (1) it has to be in kernel space (2) it needs to convert the incoming float samples into 24bit integers (3) it needs to mix various input sources into one stream to the EMU|
-
+|Can the 1ms USB polling rate be increased?|This is a hard maximum in Apple's USB driver. Maybe if you would install a different USB driver but even then it's doubtful as the USB protocol also has a 1ms freedom built in for streaming transport. |
+|what is the relationship between the baseline USB polling rate and the “framerate” |The USB rate with the EMU is one or 2 frames per millisecond. Combined with the selected datarate this gives you a fixed framesize.|
+|would 2 frames per millisecond give you a higher polling rate and better accuracy on the timing?| No, FAIK the polling rate stays once per millisecond. So the timer accuracy stays the same.|
+|does a faster cpu allow lower driver latencies?|no. USB polling rate is timer based. If your computer would be too slow to keep up with the datarate, the connection would probably break|
+|Is the polling rate fixed in hardware or software?| I think a hardware based interrupt is running behind this|
+|Would latency lower if the DAW delivered 24 bit integers instead of float?|No. latency is caused by the timing uncertainty of the USB transport.|
+|it would presumably be easy in principle for a DAW to deliver 24bit integers in a single stream with sole control over the device|No delivery of data is actually pretty complex. This is because data has to be timed accurately to ensure there are no buffer over/underflows in the EMU|
+|What determines the exact data output rate|This is determined by the EMU. Or, if you have set the EMU to external sync, the source of the SPDIF input|
+|How is the playback data output kept at exactly the correct rate|By also opening a data input channel and measuring the incoming data rate|
+|The extra processes and latency are the price we pay for the convenience of integrated system audio - is that correct?|Not exactly. The latency comes from timing uncertainty in the USB stream. The system indeed requires extra processes to synchronize multiple streams but the overhead here seems not so large|
