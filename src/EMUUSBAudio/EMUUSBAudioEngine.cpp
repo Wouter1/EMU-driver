@@ -790,6 +790,10 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
     // "sophisticated techniques and extremely accurate timing mechanisms".
     // I don't like this black box approach but we have to live with it.
     
+    if (usbInputRing.seek(firstSampleFrame * usbInputStream.multFactor) == kIOReturnUnderrun)  {
+        debugIOLog("EMUUSBAudioEngine::convertInputSamples READ HICKUP");
+    }
+    
     IOReturn res = usbInputRing.pop(buf, numSampleFrames * usbInputStream.multFactor);
     if (res != kIOReturnSuccess) {
         debugIOLog("EMUUSBAudioEngine::convertInputSamples err reading ring: %x",res);

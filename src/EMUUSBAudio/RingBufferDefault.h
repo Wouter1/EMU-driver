@@ -155,7 +155,19 @@ public:
         return vacant;
         
     }
-    
+
+    IOReturn seek(UInt32 position) override {
+        if (position>= size) {
+            return kIOReturnBadArgument;
+        }
+        if (readhead != position) {
+            readhead=position;
+            return kIOReturnUnderrun;
+        }
+        return kIOReturnSuccess;
+
+    }
+
 };
 
 
