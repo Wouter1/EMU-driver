@@ -776,13 +776,15 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
     
 	IOReturn	result;
     
-    debugIOLogRD("+convertInputSamples firstSampleFrame=%u, numSampleFrames=%d byteorder=%d bitWidth=%d numchannels=%d",firstSampleFrame,numSampleFrames,streamFormat->fByteOrder,streamFormat->fBitWidth,streamFormat->fNumChannels);
+    // debugIOLogRD("+convertInputSamples firstSampleFrame=%u, numSampleFrames=%d byteorder=%d bitWidth=%d numchannels=%d latency= %d",firstSampleFrame,numSampleFrames,streamFormat->fByteOrder,streamFormat->fBitWidth,streamFormat->fNumChannels, usbInputRing.available());
     
     if (!usbInputStream.isRunning()) {
         return kIOReturnNotReady;
     }
 
     usbInputStream.update();
+    //debugIOLogRD("+convertInputSamples firstSampleFrame=%u, numSampleFrames=%d byteorder=%d bitWidth=%d numchannels=%d latency= %d",firstSampleFrame,numSampleFrames,streamFormat->fByteOrder,streamFormat->fBitWidth,streamFormat->fNumChannels, usbInputRing.available());
+
 
     // at this point, usbInputRing should contain sufficient info to handle the request.
     // of course this all depends on proper timing of this call.
@@ -826,7 +828,7 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
 			Volume(((Float32*)destBuf), mInputVolume->GetTargetVolume(), 0, usedNumberOfSamples);
 		}
 	}
-    debugIOLogRD("-convertInputSamples");
+    debugIOLogRD("-convertInputSamples ");
     
 	return result;
 }
@@ -2094,8 +2096,11 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
             offsetMicros = safetyOffsetObj->unsigned32BitValue();
             debugIOLogC("using externally requested safety offset %d microseconds",offsetMicros);
 		}
-        UInt32 offsetToSet = sampleRate.whole * offsetMicros / 1000000;
-        setSampleOffset(offsetToSet);
+        UInt64 offsetToSet = sampleRate.whole * offsetMicros / 1000000;
+        if (offsetToSet >= UINT32_MAX) {
+            offsetToSet = UINT32_MAX;
+        }
+        setSampleOffset((UInt32)offsetToSet);
         
 		//now the output buffer
 		if (mOutput.usbBufferDescriptor) {

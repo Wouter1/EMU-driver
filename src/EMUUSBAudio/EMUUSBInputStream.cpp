@@ -104,7 +104,7 @@ IOReturn EMUUSBInputStream::GatherInputSamples() {
 
     // check if we moved to the next frame. This is done when callback happened.
     if (previousFrameList != currentFrameList) {
-        debugIOLogRD("GatherInputSamples going from framelist %d to %d. lastindex=%d",previousFrameList , currentFrameList,frameIndex);
+        //debugIOLogRD("GatherInputSamples going from framelist %d to %d. lastindex=%d",previousFrameList , currentFrameList,frameIndex);
         if (frameIndex != RECORD_NUM_USB_FRAMES_PER_LIST) {
             doLog("***** Previous framelist was not handled completely, only %d",frameIndex);
         }
@@ -142,6 +142,10 @@ IOReturn EMUUSBInputStream::GatherInputSamples() {
             // FIXME. We should not call from inside locked area.
             usbRing-> push(source, size , pFrames[frameIndex].frTimeStamp );
             frameSizeQueue-> push(size , pFrames[frameIndex].frTimeStamp);
+            
+            // if (frameIndex == 1) {
+            //   debugIOLogC("latency %d",usbRing->available());
+            // }
         }
         else if(size && mDropStartingFrames > 0)
         {
@@ -152,7 +156,7 @@ IOReturn EMUUSBInputStream::GatherInputSamples() {
     }
     
     //Don't restart reading here, that can be done only from readCompleted callback.
-    debugIOLogRD("-GatherInputSamples received %d first open frame=%d",totalreceived, frameIndex);
+    //debugIOLogRD("-GatherInputSamples received %d first open frame=%d",totalreceived, frameIndex);
 
     if (frameIndex != RECORD_NUM_USB_FRAMES_PER_LIST) {
         return kIOReturnStillOpen; // caller has to decide what to do if this happens.
