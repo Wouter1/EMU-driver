@@ -2097,9 +2097,6 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
             debugIOLogC("using externally requested safety offset %d microseconds",offsetMicros);
 		}
         UInt64 offsetToSet = sampleRate.whole * offsetMicros / 1000000;
-        if (offsetToSet >= UINT32_MAX) {
-            offsetToSet = UINT32_MAX;
-        }
         setSampleOffset((UInt32)offsetToSet);
         
 		//now the output buffer
