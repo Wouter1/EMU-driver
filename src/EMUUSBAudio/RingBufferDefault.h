@@ -165,7 +165,10 @@ public:
             return kIOReturnUnderrun;
         }
         return kIOReturnSuccess;
+    }
 
+    UInt32 currentWritePosition() override {
+        return writehead;
     }
 
 };

@@ -782,8 +782,15 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
         return kIOReturnNotReady;
     }
 
+    // #40 check if coreaudio keeps the specified offset
+    //debugIOLogC("+convertInputSamples distance %d", firstSampleFrame + numSampleFrames - getCurrentSampleFrame(0));
+    
+    
     usbInputStream.update();
     //debugIOLogRD("+convertInputSamples firstSampleFrame=%u, numSampleFrames=%d byteorder=%d bitWidth=%d numchannels=%d latency= %d",firstSampleFrame,numSampleFrames,streamFormat->fByteOrder,streamFormat->fBitWidth,streamFormat->fNumChannels, usbInputRing.available());
+
+    //#48 check if estimated and actual buffer pos match
+    //debugIOLogC("+convertInputSamples act-est %d", (SInt32)usbInputRing.currentWritePosition()/usbInputStream.multFactor - getCurrentSampleFrame(0));
 
 
     // at this point, usbInputRing should contain sufficient info to handle the request.
@@ -2086,10 +2093,15 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
         
         UInt32 offsetMicros = 4200; // 2222 us gives very occasional tick
 
-		// #25 you can set another offset using the SafetyOffsetMicroSec in the plist
-        // You can set it in the properties .list file in
-        //EMUUSBAudioControl04:        SafetyOffsetMicroSec        Number 4200
-        // 2222 us seems good choice for low latency applications. 4200 is the reliable value.
+		/* You can set another offset using the SafetyOffsetMicroSec in the plist
+          You can set it in the properties .list file in
+          EMUUSBAudioControl04:        SafetyOffsetMicroSec        Number 4200
+          2222 us seems good choice for low latency applications. 4200 is the reliable value.
+        
+          CoreAudio  converts the value in setSampleOffset to a time offset.
+          Then it estimates the input read position from the wrap timestamps.
+          Then it plans the calls to convertInputSamples such that the LAST read sample meets the time offset.
+        */
         
 		OSNumber *safetyOffsetObj = OSDynamicCast(OSNumber,usbAudioDevice->getProperty("SafetyOffsetMicroSec"));
 		if (safetyOffsetObj) {
@@ -2098,7 +2110,8 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 		}
         UInt64 offsetToSet = sampleRate.whole * offsetMicros / 1000000;
         setSampleOffset((UInt32)offsetToSet);
-        
+        debugIOLogC("sample offset %d samples",(UInt32)offsetToSet);
+
 		//now the output buffer
 		if (mOutput.usbBufferDescriptor) {
 			debugIOLogC("disposing the output mUSBBufferDescriptor");
@@ -2222,8 +2235,8 @@ void UsbInputRing::notifyWrap(AbsoluteTime wt) {
     UInt64 wrapTimeNs;
     
     absolutetime_to_nanoseconds(wt,&wrapTimeNs);
-    // center the wrap to middle of last 0.5ms as we don't know when wrap happened in last 1ms.
-    wrapTimeNs = wrapTimeNs - 500000;
+    // the timestamp that USB gives us apparently is more accurate than expected from a 1ms poll rate.
+    // There seem to be no consistent  offset on the timestamps.
     
     if (goodWraps >= 5) {
         // regular operation after initial wraps. Enable debug line to check timestamping

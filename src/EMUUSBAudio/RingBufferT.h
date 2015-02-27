@@ -80,6 +80,9 @@ public:
      returns kIOReturnUnderrun if the head was repositioned (by lack of better return possibility). */
     virtual IOReturn seek(UInt32 pos) = 0;
     
+    /*! get current write buffer position. Useful for debugging latencies */
+    virtual UInt32 currentWritePosition() = 0;
+    
 };
 
 
