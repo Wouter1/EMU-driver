@@ -83,7 +83,7 @@ private:
     
     
     
-    UInt32					lastInputFrames;
+    UInt32					lastInputFrames; 
 
     
     /*! Used in GatherInputSamples to keep track of which framelist we were converting. */
@@ -119,16 +119,22 @@ private:
      
      This function always uses mInput.currentFrameList as the framelist to handle.
      
-     @return kIOReturnSuccess if all frames were read properly, or kIOReturnStillOpen if there
-     were still un-handled frames in the frame list.
-     
      This code directly uses readBuffer to access the bytes.
      
      This function modifies FrameIndex, lastInputSize, LastInputFrames, and runningInputCount. It may
      also alter bufferOffset but that will result in a warning in the logs.
      
      */
-	IOReturn                GatherInputSamples();
+	void                GatherInputSamples();
+    
+    /*! the current list that we are reading from. Used in gatherFromReadList */
+    
+    UInt32 currentReadList;
+    /*! Gather input data from USB list <currentReadList>. 
+     @return kIOReturnStillOpen if the read ended halfway the list, or kIOReturnSuccess if all data in the list has
+     been read.
+     */
+    IOReturn                gatherFromReadList();
     
     /*!
      @abstract initializes the read of a frameList (typ. 64 frames) from USB.
@@ -182,7 +188,7 @@ private:
     /*! the framelist that we are expecting to complete from next.
      Basically runs from 0 to numUSBFrameListsToQueue-1 and then
      restarts at 0. Updated after readHandler handled the block. */
-    volatile UInt32			currentFrameList;
+    volatile UInt32			nextCompleteFrameList;
     
 	/*! orig doc: we need to drop the first 2 frames because the device can't flush the first frames. 
      However doing so de-syncs the pipes. */

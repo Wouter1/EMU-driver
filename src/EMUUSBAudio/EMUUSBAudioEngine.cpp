@@ -783,14 +783,14 @@ IOReturn EMUUSBAudioEngine::convertInputSamples (const void *sampleBufNull, void
     }
 
     // #40 check if coreaudio keeps the specified offset
-    //debugIOLogC("+convertInputSamples distance %d", firstSampleFrame + numSampleFrames - getCurrentSampleFrame(0));
+    //debugIOLogC("+convertInputSamples coreaudio distance %d", firstSampleFrame + numSampleFrames - getCurrentSampleFrame(0));
     
     
     usbInputStream.update();
     //debugIOLogRD("+convertInputSamples firstSampleFrame=%u, numSampleFrames=%d byteorder=%d bitWidth=%d numchannels=%d latency= %d",firstSampleFrame,numSampleFrames,streamFormat->fByteOrder,streamFormat->fBitWidth,streamFormat->fNumChannels, usbInputRing.available());
 
     //#48 check if estimated and actual buffer pos match
-    //debugIOLogC("+convertInputSamples act-est %d", (SInt32)usbInputRing.currentWritePosition()/usbInputStream.multFactor - getCurrentSampleFrame(0));
+    //debugIOLogC("+convertInputSamples act est %d %d", (SInt32)usbInputRing.currentWritePosition()/usbInputStream.multFactor  , getCurrentSampleFrame(0));
 
 
     // at this point, usbInputRing should contain sufficient info to handle the request.

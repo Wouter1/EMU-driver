@@ -40,14 +40,15 @@ IOReturn EMUUSBInputStream::start(UInt64 startFrameNr) {
     ReturnIfFail(StreamInfo::start(startFrameNr));
 
     shouldStop = 0;
-    currentFrameList = 0;
+    nextCompleteFrameList = 0;
     previousFrameList = 3; //  different from currentFrameList.
-
+    currentReadList = nextCompleteFrameList;
     mDropStartingFrames = kNumberOfStartingFramesToDrop;
 
     // we start reading on all framelists. USB will figure it out and take the next one in order
-    // when it has data. We restart each framelist immediately in readCompleted when we get data.
-	for (UInt32 frameListNum = currentFrameList; frameListNum < numUSBFrameListsToQueue; ++frameListNum) {
+    // when it has data. We restart each framelist in readCompleted when we get data.
+    // this restarting may take some time.
+	for (UInt32 frameListNum = nextCompleteFrameList; frameListNum < numUSBFrameListsToQueue; ++frameListNum) {
 		readFrameList(frameListNum);         // FIXME handle failed call
 	}
     started = true;
@@ -87,58 +88,60 @@ IOReturn EMUUSBInputStream::free() {
 IOReturn EMUUSBInputStream::update() {
     ReturnIf(!started, kIOReturnNotOpen);
     
+    IOLockLock(mLock);
+        GatherInputSamples();
+    IOLockUnlock(mLock);
+    return kIOReturnSuccess;
+
+    // old. Scrap it.
     Boolean haveLock=IOLockTryLock(mLock);
     
     if (haveLock) {
         GatherInputSamples();
         IOLockUnlock(mLock);
+    } else {
+        debugIOLog("skipping update, no lock");
     }
     return kIOReturnSuccess;
 }
 
-IOReturn EMUUSBInputStream::GatherInputSamples() {
-    UInt16 size;
-    UInt8 *source;
-    
+void EMUUSBInputStream::GatherInputSamples() {
     debugIOLogRD("+GatherInputSamples %d", bufferOffset / multFactor);
 
-    // check if we moved to the next frame. This is done when callback happened.
-    if (previousFrameList != currentFrameList) {
-        //debugIOLogRD("GatherInputSamples going from framelist %d to %d. lastindex=%d",previousFrameList , currentFrameList,frameIndex);
-        if (frameIndex != RECORD_NUM_USB_FRAMES_PER_LIST) {
-            doLog("***** Previous framelist was not handled completely, only %d",frameIndex);
-        }
-        previousFrameList = currentFrameList;
-        frameIndex=0;
-    }
+    while (gatherFromReadList() == kIOReturnSuccess);
+}
+
+IOReturn       EMUUSBInputStream::gatherFromReadList() {
+    if (shouldStop) return kIOServiceTerminate;
     
-    IOUSBLowLatencyIsocFrame * pFrames = &usbIsocFrames[currentFrameList * numUSBFramesPerList];
+    IOReturn result = kIOReturnStillOpen;
+    
+    IOUSBLowLatencyIsocFrame * pFrames = &usbIsocFrames[currentReadList * numUSBFramesPerList];
 	if (bufferSize <= bufferOffset) {
         // sanity checking to prevent going beyond the end of the allocated dest buffer
 		bufferOffset = 0;
         debugIOLogR("BUG EMUUSBAudioEngine::GatherInputSamples wrong offset");
     }
-    
     while(frameIndex < RECORD_NUM_USB_FRAMES_PER_LIST
           && -1 != pFrames[frameIndex].frStatus // no transport at all
           && kUSBLowLatencyIsochTransferKey != pFrames[frameIndex].frStatus // partially transported
           )
     {
-        size = pFrames[frameIndex].frActCount;
-        source = (UInt8*) readBuffer + (currentFrameList * readUSBFrameListSize) + maxFrameSize * frameIndex;
-
+        UInt16 size = pFrames[frameIndex].frActCount;
+        UInt8 *source = (UInt8*) readBuffer + (currentReadList * readUSBFrameListSize) + maxFrameSize * frameIndex;
+        
         if (size%6 == 4 ) {
             size = size-4; // workaround for MICROSOFT_USB_EHCI_BUG_WORKAROUND
             source = source + 4;
         }
-
+        
         if (mDropStartingFrames <= 0)
         {
             // for debug wraps
             //  if (size >= usbRing->size - usbRing->writehead  ) {
             //     debugIOLog("input wrap in list %d at frame %d",currentFrameList,frameIndex);
             //  }
-
+            
             // FIXME. We should not call from inside locked area.
             usbRing-> push(source, size , pFrames[frameIndex].frTimeStamp );
             frameSizeQueue-> push(size , pFrames[frameIndex].frTimeStamp);
@@ -154,15 +157,21 @@ IOReturn EMUUSBInputStream::GatherInputSamples() {
         
         frameIndex++;
     }
+
+    if (frameIndex == RECORD_NUM_USB_FRAMES_PER_LIST) {
+        // succes reading the entire frame! Continue with the next
+        currentReadList = (currentReadList + 1) % numUSBFrameListsToQueue;
+        frameIndex = 0;
+        result = kIOReturnSuccess;
+    }
     
     //Don't restart reading here, that can be done only from readCompleted callback.
     //debugIOLogRD("-GatherInputSamples received %d first open frame=%d",totalreceived, frameIndex);
-
-    if (frameIndex != RECORD_NUM_USB_FRAMES_PER_LIST) {
-        return kIOReturnStillOpen; // caller has to decide what to do if this happens.
-    }
-    return kIOReturnSuccess;
+    
+    return result;
 }
+
+
 
 
 IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
@@ -232,6 +241,7 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
     // HACK we have numUSBFramesPerList frames, which one to check?? Print frame 0 info.
     debugIOLogR("+ readCompleted framelist %d  result %x ", currentFrameList, result);
     
+    
     startingEngine = FALSE; // HACK this is old code...
     
     
@@ -251,7 +261,8 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
      */
     
 	if (kIOReturnAborted != result) {
-        if (GatherInputSamples() != kIOReturnSuccess) {
+        GatherInputSamples(); // also check if there is more in the buffer. 
+        if (currentReadList == nextCompleteFrameList) {
             debugIOLog("***** EMUUSBAudioEngine::readCompleted failed to read all packets from USB stream!");
         }
 	}
@@ -259,15 +270,16 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
     // Data collection from the USB read is complete.
     // Now start the read on the next block.
 	if (!shouldStop) {
-        UInt32	frameListToRead;
+        
 		// (orig doc) keep incrementing until limit of numUSBFrameLists - 1 is reached.
         // also, we can wonder if we want to do it this way. Why not just check what comes in instead
-        currentFrameList =(currentFrameList + 1) % RECORD_NUM_USB_FRAME_LISTS;
+        nextCompleteFrameList =(nextCompleteFrameList + 1) % RECORD_NUM_USB_FRAME_LISTS;
         
         // now we have already numUSBFrameListsToQueue-1 other framelist queues running.
         // We set our current list to the next one that is not yet running
+        // CHECK can we just use ALL framelists instead of queueing only part of them?
         
-        frameListToRead = currentFrameList - 1 + numUSBFrameListsToQueue;
+        UInt32 frameListToRead = nextCompleteFrameList - 1 + numUSBFrameListsToQueue;
         frameListToRead -= numUSBFrameLists * (frameListToRead >= numUSBFrameLists);// crop the number of framesToRead
         // seems something equal to frameListToRead = (frameListnr + usbstream->numUSBFrameListsToQueue) % usbstream->numUSBFrameLists;
         readFrameList(frameListToRead); // restart reading (but for different framelist).
