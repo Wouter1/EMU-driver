@@ -37,8 +37,6 @@ IOReturn EMUUSBOutputStream::start(FrameSizeQueue *frameQueue,UInt64 startUsbFra
     ReturnIfFail(StreamInfo::reset());
     ReturnIfFail(StreamInfo::start(startUsbFrame));
 
-	safeToEraseTo = 0;
-	lastSafeErasePoint = 0;
     currentFrameList = 0;
 
     stockSamplesInFrame = frameSamples;
@@ -219,7 +217,6 @@ IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
         }
         
         if (thisFrameSize >= numBytesToBufferEnd) {
-            debugIOLogW("write wrap in usbframe %lld list %d",nextUsableUsbFrameNr,n);
             lastPreparedByte = thisFrameSize - numBytesToBufferEnd;
             usbCompletion[listNr].parameter = (void *)(UInt64)(((n + 1) << 16) | lastPreparedByte);
             // FIXME document haveWrapped and wrapDescriptor. Do we even need those?
@@ -256,9 +253,6 @@ IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
     //debugIOLogW("EMUUSBAudioEngine::PrepareWriteFrameList %d size %d %s", listNr, thisFrameSize,haveWrapped?"-":"wrap");
     //debugIOLogW("PrepareWriteFrameList: lastPrepareFrame %d safeToEraseTo %d",lastPreparedByte / multFactor, safeToEraseTo / multFactor);
     
-    // maybe useful for the erase head?
-    safeToEraseTo = lastSafeErasePoint;
-    lastSafeErasePoint = previouslyPreparedBufferOffset;
     previouslyPreparedBufferOffset = lastPreparedByte;
     result = kIOReturnSuccess;
     

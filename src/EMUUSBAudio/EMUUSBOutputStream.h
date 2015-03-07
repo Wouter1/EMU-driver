@@ -55,7 +55,7 @@ public:
 
     UInt32							averageSampleRate;
     
-    /*! first byte to send from mOutput.usbBufferDescriptor */
+    /*! Place where we were left filling a USB frame. first byte to send from mOutput.usbBufferDescriptor */
 	UInt32							previouslyPreparedBufferOffset;
 
     /*! the framelist that was written last.
@@ -93,6 +93,7 @@ private:
     
     
     /*! Set up the given framelist for writing.  called from writeFrameList.
+     Copies all data from audioStream into the framelists for output.
      Assumes that frameSizeQueue contains at least mOutput.numUSBFramesPerList values
      because the size of each frame must now be set.
      @param listNr the list number to be prepared.
@@ -124,18 +125,17 @@ private:
 	IOSubMemoryDescriptor *				theWrapDescriptors[2];
     
 
-    /* frame size queue, holding sizes of incoming frames in the read stream */
+    /*! frame size queue, holding sizes of incoming frames in the read stream */
     FrameSizeQueue *        frameSizeQueue;
     
     /*! guess: flag that is iff while we are inside the writeHandler. */
 	Boolean								inWriteCompletion;
 
-    /*! Variable that is set TRUE every time a wrap occurs in the writeHandler  */
+    /*! Variable that is set TRUE every time a wrap occurs in the writeHandler and 
+        that theWrapDescriptors are used.*/
 	Boolean								needTimeStamps;
 
 
-    UInt32								safeToEraseTo;
-	UInt32								lastSafeErasePoint;
     
     bool                                initialized=false;
 
