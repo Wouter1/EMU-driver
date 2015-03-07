@@ -219,7 +219,6 @@ IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
         if (thisFrameSize >= numBytesToBufferEnd) {
             lastPreparedByte = thisFrameSize - numBytesToBufferEnd;
             usbCompletion[listNr].parameter = (void *)(UInt64)(((n + 1) << 16) | lastPreparedByte);
-            // FIXME document haveWrapped and wrapDescriptor. Do we even need those?
             theWrapDescriptors[0]->initSubRange (usbBufferDescriptor, previouslyPreparedBufferOffset, sampleBufferSize - previouslyPreparedBufferOffset, kIODirectionInOut);
             numBytesToBufferEnd = sampleBufferSize - lastPreparedByte;// reset
             haveWrapped = true;

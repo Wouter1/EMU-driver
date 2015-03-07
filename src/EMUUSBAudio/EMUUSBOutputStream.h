@@ -118,10 +118,10 @@ private:
      If stop complete, notifyStop is called and stopped=true */
     volatile UInt32			shouldStop;
     
-    /*! IOUSBController, handling general USB properties like current frame nr */
-	//IOUSBController *					mBus;// DT
-    
+
+    /*! When we wrap around in the output buffer, this connects the ends for the output usb data */
 	IOMultiMemoryDescriptor *			theWrapRangeDescriptor;
+    /*! the two parts of a datablock that contains a wrap */
 	IOSubMemoryDescriptor *				theWrapDescriptors[2];
     
 
