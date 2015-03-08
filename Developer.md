@@ -38,5 +38,5 @@ Note, this has gone wrong a few times in the past, see #49.
 2. Determine and update the version number in the plist.
 3. Commit and push the driver to git
 4. push a tag to git, as follows 
- ```git tag -a v3.5.1 9fceb02 -m "Message here"```
- ```git push --tags```
+ * ```git tag -a v3.5.1 9fceb02 -m "Message here"```
+ * ```git push --tags```
