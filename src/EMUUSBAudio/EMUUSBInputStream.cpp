@@ -88,27 +88,17 @@ IOReturn EMUUSBInputStream::free() {
 IOReturn EMUUSBInputStream::update() {
     ReturnIf(!started, kIOReturnNotOpen);
     
-    IOLockLock(mLock);
-        GatherInputSamples();
-    IOLockUnlock(mLock);
-    return kIOReturnSuccess;
-
-    // old. Scrap it.
-    Boolean haveLock=IOLockTryLock(mLock);
-    
-    if (haveLock) {
-        GatherInputSamples();
-        IOLockUnlock(mLock);
-    } else {
-        debugIOLog("skipping update, no lock");
-    }
+    GatherInputSamples();
     return kIOReturnSuccess;
 }
 
 void EMUUSBInputStream::GatherInputSamples() {
+    
     debugIOLogRD("+GatherInputSamples %d", bufferOffset / multFactor);
 
+    IOLockLock(mLock);
     while (gatherFromReadList() == kIOReturnSuccess);
+    IOLockUnlock(mLock);
 }
 
 IOReturn       EMUUSBInputStream::gatherFromReadList() {
@@ -244,27 +234,11 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
     
     startingEngine = FALSE; // HACK this is old code...
     
-    
-    /* HACK we MUST have the lock now as we must restart reading the list.
-     This means we may have to wait for GatherInputSamples to complete from a call from convertInputSamples.
-     Should return quick. And our call to GatherInputSamples will be very fast. Would be nice
-     if we can fix this better.
-     
-     CHECK it might be long if this thread is scheduled out. Not sure if that would matter
-     as we have a few more readlists running.
-     
-     Maybe we can  attach a state to framelists so that we can restart from gatherInputSamples.
-     */
-    IOLockLock(mLock);
-    
     /*An "underrun error" occurs when the UART transmitter has completed sending a character and the transmit buffer is empty. In asynchronous modes this is treated as an indication that no data remains to be transmitted, rather than an error, since additional stop bits can be appended. This error indication is commonly found in USARTs, since an underrun is more serious in synchronous systems.
      */
     
 	if (kIOReturnAborted != result) {
         GatherInputSamples(); // also check if there is more in the buffer. 
-        if (currentReadList == nextCompleteFrameList) {
-            debugIOLog("***** EMUUSBAudioEngine::readCompleted failed to read all packets from USB stream!");
-        }
 	}
 	
     // Data collection from the USB read is complete.
@@ -288,7 +262,6 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
 		debugIOLogR("++EMUUSBAudioEngine::readCompleted() - stopped: %d", shouldStop);
 		shouldStop++;
 	}
-	IOLockUnlock(mLock);
     
     if (shouldStop > RECORD_NUM_USB_FRAME_LISTS) {
         debugIOLogC("EMUUSBInputStream::readCompleted all input streams stopped");

@@ -338,6 +338,7 @@ IOReturn EMUUSBAudioEngine::AddAvailableFormatsFromDevice (EMUUSBAudioConfigObje
 			UInt32	pollInterval = (UInt32) (1 << ((UInt32) usbAudio->GetEndpointPollInterval(ourInterfaceNumber, altSettingIndx, direction) -1));
 			debugIOLogC("direction %d pollInterval %d", direction, pollInterval);
 			//if ((1 == pollInterval) || (8 == pollInterval)) {// exclude all interfaces that use microframes for now
+            if (pollInterval == 4) 
             {
 				numSampleRates = usbAudio->GetNumSampleRates(ourInterfaceNumber, altSettingIndx);
 				sampleRates = usbAudio->GetSampleRates (ourInterfaceNumber, altSettingIndx);

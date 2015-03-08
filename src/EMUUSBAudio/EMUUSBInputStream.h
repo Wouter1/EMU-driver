@@ -111,11 +111,7 @@ private:
      
      THis function can be called any number of times while we are waiting
      for the framelist read to finish. This can be called both from readHandler and from
-     convertInputSamples.
-     
-     Caller must lock IO (IOLockLock(mLock)) before calling this. We can not do this ourselves
-     because readHandler (who will need to call us) has to lock before this point and
-     locking multiple times ourselves will deadlock.
+     convertInputSamples. Thread safe - it will lock the caller till it can execute.
      
      This function always uses mInput.currentFrameList as the framelist to handle.
      
@@ -130,7 +126,7 @@ private:
     /*! the current list that we are reading from. Used in gatherFromReadList */
     
     UInt32 currentReadList;
-    /*! Gather input data from USB list <currentReadList>. 
+    /*! Gather input data from USB list <currentReadList>. NOT threadsafe.
      @return kIOReturnStillOpen if the read ended halfway the list, or kIOReturnSuccess if all data in the list has
      been read.
      */
