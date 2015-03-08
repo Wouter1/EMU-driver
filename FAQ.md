@@ -7,6 +7,7 @@ Here's the Frequently Asked Questions
 
 |question|answer|
 |---|---|
+| Which version of the driver do I have? | Go to Apple in the menu bar and select About this Mac. Then go More Info.../System Report/Extensions and scroll down to EMUUSBAudio. You can now read off the version in the Version column. |
 | Why do we need to set the sample rate of the driver? I can do this just from my application/DAW? | The driver determines the native sampling rate. If you select something different in your application, normally the system will *interpolate* to the requested frequency, and not change the actual sample rate in hardware. |
 |Is the driver bit accurate?|No. The driver takes floats (required by Core Audio) and has to deliver 24bit integers to the EMU. But bit accuracy is already lost earlier, in the core audio system of the OS, where sample rate conversion is used to match slightly different data rates of CPU clock and EMU clock, sample rate conversion etc.|
 |Can your code be modified to report latencies ? | Yes input and output latency are both reported separately from the driver to the kernel. The driver picks the values from the plist, or picks default values of 4.2ms.|
