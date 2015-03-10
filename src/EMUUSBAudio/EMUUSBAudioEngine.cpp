@@ -2143,8 +2143,11 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 		mOutput.bufferPtr = mOutput.usbBufferDescriptor->getBytesNoCopy();
 		FailIf (NULL == mOutput.bufferPtr, Exit);
 
-        setInputSampleLatency(offsetToSet);
-		setOutputSampleLatency(offsetToSet);
+        // this is formula for EMU0404. Waiting for measurements on Tracker Pre.
+        // here we set driver latency + half the emu internal roundtrip latency in each direction.
+        UInt32 emuInternalRoundtrip = 90 + sampleRate.whole / 591;
+        setInputSampleLatency((UInt32)offsetToSet + emuInternalRoundtrip/2);
+		setOutputSampleLatency((UInt32)offsetToSet + emuInternalRoundtrip/2);
         
 		mOutput.audioStream->setSampleBuffer(mOutput.bufferPtr, mOutput.bufferSize);
         
