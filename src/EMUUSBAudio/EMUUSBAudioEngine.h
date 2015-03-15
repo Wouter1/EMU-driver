@@ -526,6 +526,11 @@ protected:
     
 	IOReturn eraseOutputSamples(const void *mixBuf, void *sampleBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream);
     
+    /*! get the value for given field in the plist. see IORegistryEntry::getProperty 
+     @param field the name of the symbol to look up in the plist
+     @param defaultValue the value to use if the plist does not specify this field. */
+    UInt32 getPListNumber( const char *field, UInt32 defaultValue);
+
     /* Not used
 	IOReturn hardwareSampleRateChangedAux(const IOAudioSampleRate *sampleRate, StreamInfo &info);
     */

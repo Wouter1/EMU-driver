@@ -6,6 +6,10 @@
 	<dict>
 		<key>EMUSBAudioTrackerPre</key>
 		<dict>
+			<key>latencyADC</key>
+			<integer>53</integer>
+			<key>latencyDAC</key>
+			<integer>15</integer>
 			<key>CFBundleIdentifier</key>
 			<string>com.emu.driver.EMUUSBAudio</string>
 			<key>IOClass</key>
@@ -29,6 +33,10 @@
 		</dict>
 		<key>EMUUSBAudioControl02</key>
 		<dict>
+			<key>latencyADC</key>
+			<integer>53</integer>
+			<key>latencyDAC</key>
+			<integer>15</integer>
 			<key>CFBundleIdentifier</key>
 			<string>com.emu.driver.EMUUSBAudio</string>
 			<key>IOAudioEngineChannelCategoryNames</key>
@@ -87,6 +95,10 @@
 		</dict>
 		<key>EMUUSBAudioControl0204</key>
 		<dict>
+			<key>latencyADC</key>
+			<integer>53</integer>
+			<key>latencyDAC</key>
+			<integer>15</integer>
 			<key>CFBundleIdentifier</key>
 			<string>com.emu.driver.EMUUSBAudio</string>
 			<key>IOAudioEngineChannelCategoryNames</key>
@@ -159,6 +171,10 @@
 		</dict>
 		<key>EMUUSBAudioControl04</key>
 		<dict>
+			<key>latencyADC</key>
+			<integer>53</integer>
+			<key>latencyDAC</key>
+			<integer>38</integer>
 			<key>SafetyOffsetMicroSec</key>
 			<integer>4200</integer>
 			<key>CFBundleIdentifier</key>
@@ -261,11 +277,11 @@
 	<key>CFBundlePackageType</key>
 	<string>KEXT</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.5.2</string>
+	<string>3.5.3</string>
 	<key>CFBundleSignature</key>
 	<string>EMUU</string>
 	<key>CFBundleVersion</key>
-	<string>3.5.2</string>
+	<string>3.5.3</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2015 com.emu &amp; W.Pasman</string>
 	<key>OSBundleLibraries</key>

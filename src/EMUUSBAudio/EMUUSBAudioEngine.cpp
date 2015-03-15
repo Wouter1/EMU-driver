@@ -1038,6 +1038,7 @@ OSString * EMUUSBAudioEngine::getGlobalUniqueID () {
 	return uniqueID;
 }
 
+
 void * EMUUSBAudioEngine::getSampleBuffer (void) {
 	if (NULL != mainStream)
 		return mainStream->getSampleBuffer();
@@ -1431,11 +1432,12 @@ IOReturn EMUUSBAudioEngine::performFormatChange (IOAudioStream *audioStream, con
 	}
 	
     result = performFormatChangeInternal(audioStream, newFormat, newSampleRate, streamDirection);
-    
-Exit:
-	if (needToRestartEngine) {
+
+    if (needToRestartEngine) {
 		performAudioEngineStart();
 	}
+
+Exit:
     //	IOLockUnlock(mFormatLock);
 	debugIOLog ("-EMUUSBAudioEngine::performFormatChange, result = %x", result);
     return result;
@@ -2092,7 +2094,6 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
         // Our PLL (time filter) filters out those, but the buffer may have an additional latency
         // when this happens. This is where the offset comes in.
         
-        UInt32 offsetMicros = 4200; // 2222 us gives very occasional tick
 
 		/* You can set another offset using the SafetyOffsetMicroSec in the plist
           You can set it in the properties .list file in
@@ -2104,11 +2105,7 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
           Then it plans the calls to convertInputSamples such that the LAST read sample meets the time offset.
         */
         
-		OSNumber *safetyOffsetObj = OSDynamicCast(OSNumber,usbAudioDevice->getProperty("SafetyOffsetMicroSec"));
-		if (safetyOffsetObj) {
-            offsetMicros = safetyOffsetObj->unsigned32BitValue();
-            debugIOLogC("using externally requested safety offset %d microseconds",offsetMicros);
-		}
+        UInt32 offsetMicros = getPListNumber("SafetyOffsetMicroSec", 4200);
         UInt64 offsetToSet = sampleRate.whole * offsetMicros / 1000000;
         setSampleOffset((UInt32)offsetToSet);
         debugIOLogC("sample offset %d samples",(UInt32)offsetToSet);
@@ -2143,11 +2140,13 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 		mOutput.bufferPtr = mOutput.usbBufferDescriptor->getBytesNoCopy();
 		FailIf (NULL == mOutput.bufferPtr, Exit);
 
-        // this is formula for EMU0404. Waiting for measurements on Tracker Pre.
-        // here we set driver latency + half the emu internal roundtrip latency in each direction.
-        UInt32 emuInternalRoundtrip = 90 + sampleRate.whole / 591;
-        setInputSampleLatency((UInt32)offsetToSet + emuInternalRoundtrip/2);
-		setOutputSampleLatency((UInt32)offsetToSet + emuInternalRoundtrip/2);
+        // These numbers were estimated from measurements and then broken down according to DAC and ADC specs
+        UInt32 dacLatency = getPListNumber("latencyDAC", 15);
+        UInt32 adcLatency = getPListNumber("latencyADC", 53);
+        // just half of the measured roundtrip. Can we measure one-way directly?
+        UInt32 emuInternaloneWay = (sampleRate.whole / 591 ) / 2;
+        setInputSampleLatency((UInt32)offsetToSet + adcLatency + emuInternaloneWay);
+		setOutputSampleLatency((UInt32)offsetToSet + dacLatency + emuInternaloneWay);
         
 		mOutput.audioStream->setSampleBuffer(mOutput.bufferPtr, mOutput.bufferSize);
         
@@ -2158,6 +2157,19 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 	}
 Exit:
 	return result;
+}
+
+
+UInt32 EMUUSBAudioEngine::getPListNumber( const char *field, UInt32 defaultValue) {
+    OSNumber *numberobj = OSDynamicCast(OSNumber,usbAudioDevice->getProperty(field));
+    if (numberobj) {
+        UInt32 val = numberobj->unsigned32BitValue();
+        debugIOLogC("using plist value %s = %d",field,val);
+        return val;
+    }
+    debugIOLogC("using plist %s DEFAULT %d",field,defaultValue);
+    return defaultValue;
+
 }
 
 

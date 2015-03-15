@@ -2404,7 +2404,7 @@ EMUUSBAudioEngine*	EMUUSBAudioDevice::getOtherEngine(EMUUSBAudioEngine* curEngin
 	return otherEngine;
 }
 void EMUUSBAudioDevice::setOtherEngineSampleRate(EMUUSBAudioEngine* curEngine, UInt32 newSampleRate) {
-    debugIOLogC("EMUUSBAudioDevice::setOtherEngineSampleRate %ld; there are %ld engines",(unsigned int)newSampleRate, (unsigned int)mNumEngines);
+    debugIOLogC("+EMUUSBAudioDevice::setOtherEngineSampleRate %ld; there are %ld engines",(unsigned int)newSampleRate, (unsigned int)mNumEngines);
 	if (mRegisteredEngines) {
 		UInt32	index = 0;
 		while (index < mNumEngines) {
@@ -2425,6 +2425,8 @@ void EMUUSBAudioDevice::setOtherEngineSampleRate(EMUUSBAudioEngine* curEngine, U
 			++index;
 		}
 	}
+    debugIOLogC("-EMUUSBAudioDevice::setOtherEngineSampleRate");
+
 }
 
 void EMUUSBAudioDevice::statusHandler(void* target, void* parameter, IOReturn result, UInt32 bytesLeft) {
