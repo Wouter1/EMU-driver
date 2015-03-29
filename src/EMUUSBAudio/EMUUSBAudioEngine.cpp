@@ -544,7 +544,7 @@ IOReturn EMUUSBAudioEngine::clipOutputSamples (const void *mixBuf, void *sampleB
     
 
 	//SInt32 offsetFrames = mOutput.previouslyPreparedBufferOffset / mOutput.multFactor;
-	debugIOLogW("clipOutputSamples firstSampleFrame=%u, numSampleFrames=%d, firstSampleFrame-offsetFrames =%d ",firstSampleFrame,numSampleFrames,firstSampleFrame-offsetFrames);
+	debugIOLogW("clipOutputSamples firstSampleFrame=%u, numSampleFrames=%d, currentHead =%d ",firstSampleFrame,numSampleFrames,getCurrentSampleFrame(0));
     
 	if (firstSampleFrame != nextExpectedOutputFrame) {
 		debugIOLog("**** Output Hiccup!! firstSampleFrame=%d, nextExpectedOutputFrame=%d bufsize=%d",firstSampleFrame,nextExpectedOutputFrame,mOutput.bufferSize);
@@ -1453,6 +1453,7 @@ IOReturn EMUUSBAudioEngine::performFormatChangeInternal (IOAudioStream *audioStr
     bool					needToChangeChannels = false;// default
     bool					sampleRateChanged = false;
     
+    debugIOLogC("+performFormatChangeInternal");
     ReturnIf(NULL == usbAudio, kIOReturnError);
     debugIOLog ("fDriverTag = 0x%x", newFormat->fDriverTag);
     
@@ -1474,6 +1475,8 @@ IOReturn EMUUSBAudioEngine::performFormatChangeInternal (IOAudioStream *audioStr
         // at least from AMS, sample-rate changes always come from output stream (go figure)
         // Wouter: this is NOT true for EMU0404, there "new format from INPUT" can come first.
         // However, the input format often does not arrive at all. #15
+        // CHECK I have not seen INPUT first for a long time.
+        
         if (newFormat->fNumChannels != usbInputStream.audioStream->format.fNumChannels
             && audioStream != usbInputStream.audioStream) {
             needToChangeChannels = true;
@@ -1609,6 +1612,8 @@ IOReturn EMUUSBAudioEngine::performFormatChangeInternal (IOAudioStream *audioStr
     debugIOLog ("newFormat->fNumChannels = %d, newFormat->fBitWidth %d", newFormat->fNumChannels, newFormat->fBitWidth);
     // debugIOLog ("called setSampleOffset with %d", usbInputStream.numUSBFramesPerList);
     completeConfigurationChange();
+    
+    debugIOLogC("-performFormatChangeInternal");
     return kIOReturnSuccess;
 }
 
@@ -1847,7 +1852,8 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     resultCode = usbInputStream.start(startFrameNr);
     FailIf (kIOReturnSuccess != resultCode, Exit)
 
-    mOutput.start(&frameSizeQueue, startFrameNr, averageFrameSamples);
+    resultCode = mOutput.start(&frameSizeQueue, startFrameNr, averageFrameSamples);
+    FailIf (kIOReturnSuccess != resultCode, Exit)
 
     
     // It's actually not well defined what "stable" means.

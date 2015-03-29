@@ -128,9 +128,10 @@ IOReturn       EMUUSBInputStream::gatherFromReadList() {
         if (mDropStartingFrames <= 0)
         {
             // for debug wraps
-            //  if (size >= usbRing->size - usbRing->writehead  ) {
-            //     debugIOLog("input wrap in list %d at frame %d",currentFrameList,frameIndex);
-            //  }
+            //UInt32 remaining = usbRing->size - usbRing->writehead;
+            //if (size >= usbRing->size - usbRing->writehead  ) {
+            //debugIOLog("input wrap in list %d at frame %d byte %d",currentReadList,frameIndex, remaining);
+            //}
             
             // FIXME. We should not call from inside locked area.
             usbRing-> push(source, size , pFrames[frameIndex].frTimeStamp );
