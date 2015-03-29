@@ -33,3 +33,4 @@ Here's the Frequently Asked Questions
 |What determines the exact data output rate|This is determined by the EMU. Or, if you have set the EMU to external sync, the source of the SPDIF input|
 |How is the playback data output kept at exactly the correct rate|By also opening a data input channel and measuring the incoming data rate|
 |The extra processes and latency are the price we pay for the convenience of integrated system audio - is that correct?|Not exactly. The latency comes from timing uncertainty in the USB stream. The system indeed requires extra processes to synchronize multiple streams but the overhead here seems not so large|
+|The latency shown in the menu bar in Reaper are slightly lower than the actual latency? | Yes, it seems Reaper is truncating (not rounding) the latencies shown in the menu bar. Therefore actual values can be 0.1ms higher than reported, and the roundtrip even 0.2 ms. |
