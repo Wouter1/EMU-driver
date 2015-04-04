@@ -14,7 +14,9 @@ General
   * Full 24-bit resolution at all sample rates
   * 4in/4 out channels from 44.1-96kHz
   * 2 in/2 out channels from 176.4-192kHz
- * Zero-latency direct hardware monitoring (disabled at 176.4-192kHz)
+ * Latency:
+  * "Zero-latency" (~4.5ms latency roundtrip) direct hardware monitoring (disabled at 176.4-192kHz)
+  * One-way latency of driver+EMU internal: ~6.7ms (default) or ~3.7ms (low latency setting). 
  * Apple CoreAudio (currently no CoreMIDI support).
   * AC3 and DTS Passthru supported (not tested if this works)
  * Anti-Pop speaker protection minimizes noise during power on/off
