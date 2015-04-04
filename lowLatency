@@ -6,6 +6,6 @@
 echo "Adjusting driver for low latency"
 set pathname=`dirname "$0"`
 cd "$pathname"/EMUUSBAudio.kext/Contents/
-cat Info.plist  | sed -e 's/<integer>4200<\/integer>/<integer>2200<\/integer>/' > Info1.plist
+cat Info.plist  | sed -e 's/<integer>4200<\/integer>/<integer>1000<\/integer>/' > Info1.plist
 mv Info1.plist Info.plist
 
