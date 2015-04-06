@@ -40,3 +40,15 @@ It can help to see the latency by selecting a time period by dragging with the m
 
 You can set the time display units by right clicking on the time display at the bottom right of the screen.
 
+Further optimization
+=======
+If you really need the lowest possible latencies, you might consider hacking the lowLatency script before running it and replace the 1000 (microseconds) in there with an even lower value. You may have to do you own measurements (see #40) to see how far you can go without distortions. For the 0404 these seem absolute minimum values:
+
+| rate | min latency |
+| --- | --- |
+| 44k |  0.57ms |
+| 48k | 0.58ms |
+| 88k | 0.70ms |
+| 96k | 0.70ms |
+| 176k | 0.58ms |
+| 192k | 0.740ms |
