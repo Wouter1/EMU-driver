@@ -277,11 +277,11 @@
 	<key>CFBundlePackageType</key>
 	<string>KEXT</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.5.3</string>
+	<string>3.5.4</string>
 	<key>CFBundleSignature</key>
 	<string>EMUU</string>
 	<key>CFBundleVersion</key>
-	<string>3.5.3</string>
+	<string>3.5.4</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2015 com.emu &amp; W.Pasman</string>
 	<key>OSBundleLibraries</key>

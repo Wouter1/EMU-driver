@@ -22,7 +22,8 @@ IOReturn EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing, FrameSizeQ
     
     usbRing = inputRing;
     frameSizeQueue = frameRing;
-	
+    frameIndex = 0;
+
 	startingEngine = TRUE;
 
 	mLock = IOLockAlloc();
