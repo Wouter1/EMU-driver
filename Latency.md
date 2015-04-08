@@ -12,7 +12,7 @@ the audio. Therefore, the latency can be adjusted to 1.0ms (good low latency val
 
 Only run this script if you want to use the low latency version of the driver. You can use this low-latency version of the driver and increase your application's buffer size to get a more flexible way of adjusting the latency.
 
-The total latency is the sum of (1) the driver latency, (2) your application's latency (buffer setting) and (3) the EMU internal latency. The EMU one-way internal latency typically is 2.2ms (96k) to 2.7ms (44k), the exact value depends on the selected sample rate and the type of EMU device that you have. The roundtrip will be twice this. If you select the low latency driver and e.g. a 64 sample buffer in your application, this gives you around 8 ms (96k) to 10 ms (44k) total roundtrip latency. The driver reports the estimated latency to the system, and eg reaper shows it in its menu bar (including its own buffer latency). 
+The total latency is the sum of (1) the driver latency, (2) your application's latency (buffer setting) and (3) the EMU internal latency. The EMU one-way internal latency typically is 1.3 ms (96k) to 1.8 ms (44k), the exact value depends on the selected sample rate and the type of EMU device that you have. The roundtrip will be twice this. If you select the low latency driver and e.g. a 64 sample buffer in your application, this gives you around 5.9 ms (96k) to 8.5 ms (44k) total roundtrip latency. The driver reports the estimated latency to the system, and eg reaper shows it in its menu bar (including its own buffer latency). 
 
 How is it measured?
 ===================
