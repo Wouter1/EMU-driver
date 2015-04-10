@@ -16,7 +16,7 @@ General
   * 2 in/2 out channels from 176.4-192kHz
  * Latency:
   * "Zero-latency" (~4.5ms latency roundtrip) direct hardware monitoring (disabled at 176.4-192kHz)
-  * One-way latency of driver+EMU internal: ~6.7ms (default) or ~3.7ms (low latency setting). 
+  * One-way latency of driver+EMU internal: down to 5.5 ms (default) or 2.3 ms (low latency setting) at 96kHz rate. 
  * Apple CoreAudio (currently no CoreMIDI support).
   * AC3 and DTS Passthru supported (not tested if this works)
  * Anti-Pop speaker protection minimizes noise during power on/off
