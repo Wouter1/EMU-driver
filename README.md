@@ -22,13 +22,10 @@ Please notify me how my driver works on other EMU USB devices.
 Topics
 ========
  * <a href="Install.md">Installation, Usage, Uninstall</a>
+ * <a href="Latency.md">Adjusting the latency</a>
  * <a href="FAQ.md">frequently asked questions</a> 
  * <a href="TechSpecs.md">Technical Specifications</a>
- * <a href="Latency.md">Adjusting the latency</a>
  * <a href="Developer.md">Developer notes (build from source code, etc)</a>
-
-
-
-
+ * <a href="Acceptance.md">Acceptance Test procedure</a>
 
 
