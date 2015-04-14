@@ -12,6 +12,7 @@ The following tests should succeed for all available rates but in practice I oft
 There are two ways to do this. One is with reaper, one with Audacity. Both tests need the loopback cable (see <a href="Latency.md">latency test</a> attached and volume adjusted.
 
 The Audacity version goes as follows
+
 1. Set the test rate in the EMU Control Panel
 2. Set audacity project rate to the test rate
 3. Generate a 10 minute 440Hz sine tone, amplitude 0.8 (Generate/Tone)
@@ -28,6 +29,7 @@ The Audacity version goes as follows
 
 
 The reaper version goes as follows:
+
 1. open <a href="sinetest.RPP">the test setting</a> in reaper
 2. set the test rate in the reaper preferences/Audio/Device. For this test, use block size 128 or larger. 64 is too small for the slower computers.
 3. press "record"
