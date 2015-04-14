@@ -3,6 +3,7 @@
 
 Installation
 ========
+If you need a low-latency driver, first check the  <a href="Latency.md">latency</a> section.
 
 First time installation only: prepare your machine to take developer kernel extensions:
 
