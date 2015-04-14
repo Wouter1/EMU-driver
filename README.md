@@ -10,13 +10,6 @@ OSX driver for Creative Labs EMU USB
 * I can only test on EMU0404 USB as I have no other EMU devices. But users reported it works also on EMU0204 and Tracker Pre USB.
 * Midi is not tested, no idea if it works (#23). 
 
-
---
-<img align="left" width="80" src="warning-sign.jpg"/>
-
-There is a bug in Quicktime 10, at least on Mavericks, that causes distortion in playback (see #26). We recommend to install Quicktime 7 (http://support.apple.com/kb/DL923).
-
---
 Please notify me how my driver works on other EMU USB devices.
 
 Topics
