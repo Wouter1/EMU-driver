@@ -1864,7 +1864,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     // filter out USB timing inaccuracy. The USB timing inaccuracy is
     // in the order of 1ms because that's the max update rate we can request.
     // This directly limits our sync accuracy. 
-	//setClockIsStable(FALSE);
+	setClockIsStable(FALSE);
     
     usbStreamRunning = TRUE;
     resultCode = kIOReturnSuccess;

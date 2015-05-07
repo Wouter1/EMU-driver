@@ -58,7 +58,7 @@
 
 #define super IOAudioDevice
 #define	ENABLEHARDCONTROLS	0	// disable exposing hardware volume sliders to the OS
-#define	ENABLESOFTCONTROLS	0	// disable software volume
+#define	ENABLESOFTCONTROLS	1	
 
 OSDefineMetaClassAndStructors(EMUUSBAudioDevice, super)
 
@@ -793,7 +793,7 @@ IOReturn EMUUSBAudioDevice::doControlStuff(IOAudioEngine *audioEngine, UInt8 int
 	numOutputTerminals = mUSBAudioConfig->GetNumOutputTerminals(mInterfaceNum, 0);
 	
 #if ENABLESOFTCONTROLS
-	usbAudioEngine->addSoftVolumeControls(audioEngine);
+	usbAudioEngine->addSoftVolumeControls();
 #endif
     
 	addHardVolumeControls(audioEngine);

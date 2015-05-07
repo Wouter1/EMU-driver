@@ -41,6 +41,7 @@
 class IOMemoryDescriptor;
 
 #include <IOKit/audio/IOAudioTypes.h>
+#include "EMUUSBLogging.h"
 
 #include "EMUUSBAudioClip.h"
 //#include "EMUUSBAudioCommon.h"
@@ -3701,6 +3702,10 @@ void Volume(
             long theFirstSample,
             long usedNumberOfSamples)
 {
+    if (currentVolume == 1.0) {
+        return; // ensure no processing at max volume.
+    }
+    
 	for (long index = theFirstSample; index < usedNumberOfSamples; index++) 
 	{
 		theMixBuffer[index] *= currentVolume;
