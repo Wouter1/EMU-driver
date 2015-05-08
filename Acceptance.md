@@ -20,12 +20,13 @@ The Audacity version goes as follows
 5. open the wav in quicktime 7
 6. in system preferences/audio select the EMU as OUTPUT
 7. clean up audacity (remove that generated track)
-8. select the EMU as input in audacity
-9. start recording in audacity
-10. start playing in quicktime
-11. When the track is fully played after 10 minutes, stop audacity recording
-12. Apply in Audacity the Effect/Notch Filter. Set 440Hz and Q=11. 
-13. Check if there are any clicks between the moment of start and end of the quicktime playing. Zoom in a few times to make sure you do not miss clicks.
+8. select the EMU as input in audacity 
+9. set input and output volume to around 0.9
+10. start recording in audacity
+11. start playing in quicktime
+12. When the track is fully played after 10 minutes, stop audacity recording
+13. Apply in Audacity the Effect/Notch Filter. Set 440Hz and Q=11. 
+14. Check if there are any clicks between the moment of start and end of the quicktime playing. Zoom in a few times to make sure you do not miss clicks.
 
 
 The reaper version goes as follows:
