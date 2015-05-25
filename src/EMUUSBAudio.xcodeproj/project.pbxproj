@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6C0FED041B12FEC900DB305E /* MIDIDriverUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CCF787B1B1251F800B610A8 /* MIDIDriverUtils.h */; };
+		6C0FED051B13009F00DB305E /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C77360519E321F100ED3FAA /* CoreFoundation.framework */; };
+		6C0FED061B1300AA00DB305E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C77362B19E3261000ED3FAA /* IOKit.framework */; };
 		6C2C070819E4559800F1FD56 /* EMUUSBAudioDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C070619E4559800F1FD56 /* EMUUSBAudioDevice.cpp */; };
 		6C2C070919E4559800F1FD56 /* EMUUSBAudioDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C070719E4559800F1FD56 /* EMUUSBAudioDevice.h */; };
 		6C2C070C19E4562800F1FD56 /* EMUUSBAudioEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C070A19E4562800F1FD56 /* EMUUSBAudioEngine.cpp */; };
@@ -21,6 +24,14 @@
 		6C2C072219E4740700F1FD56 /* EMUUSBAudioPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C072019E4740700F1FD56 /* EMUUSBAudioPlugin.h */; };
 		6C2C072619E4755A00F1FD56 /* EMUUSBUserClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C072419E4755A00F1FD56 /* EMUUSBUserClient.h */; };
 		6C2C072D19E4864D00F1FD56 /* IOSyncer.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C072B19E4864D00F1FD56 /* IOSyncer.h */; };
+		6C3767CB1B13903B00B3496B /* USBVendorMIDIDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CCF78621B1241C700B610A8 /* USBVendorMIDIDriver.h */; };
+		6C3767CC1B13904200B3496B /* MIDIDriverClass.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CCF786D1B124C5C00B610A8 /* MIDIDriverClass.h */; };
+		6C3767CD1B13904700B3496B /* MIDIBackCompatible.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CCF786F1B124C9500B610A8 /* MIDIBackCompatible.h */; };
+		6C3767CE1B13905700B3496B /* MIDIDriverDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CCF78771B1251C200B610A8 /* MIDIDriverDevice.h */; };
+		6C3767CF1B13905F00B3496B /* CAHostTimeBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CCF78581B12411800B610A8 /* CAHostTimeBase.h */; };
+		6C3767D01B13906800B3496B /* CAMutex.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CCF785C1B12413900B610A8 /* CAMutex.h */; };
+		6C3767D11B13906E00B3496B /* CAException.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CCF785F1B12416900B610A8 /* CAException.h */; };
+		6C3767D21B13907300B3496B /* EMUUSBMIDI.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CCF78531B1240C900B610A8 /* EMUUSBMIDI.h */; };
 		6C39DF8919F2C3BD00D027FC /* EMUUSBAudioClip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C77361F19E3234900ED3FAA /* EMUUSBAudioClip.cpp */; };
 		6C5464221A15606C003C251B /* EMUUSBUserClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C072319E4755A00F1FD56 /* EMUUSBUserClient.cpp */; };
 		6C5A3AF31A285C0200F4DC13 /* RingBufferT.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C5A3AF11A285C0200F4DC13 /* RingBufferT.h */; };
@@ -34,6 +45,27 @@
 		6C97E7F919EDB4C900C376B9 /* EMUUSBAudioMuteControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C071B19E4714500F1FD56 /* EMUUSBAudioMuteControl.cpp */; };
 		6CB2722F1A54197B00FA8B61 /* EMUUSBOutputStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CB2722D1A54197B00FA8B61 /* EMUUSBOutputStream.cpp */; };
 		6CB272301A54197B00FA8B61 /* EMUUSBOutputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CB2722E1A54197B00FA8B61 /* EMUUSBOutputStream.h */; };
+		6CCF78801B1252DE00B610A8 /* USBDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF787E1B1252DE00B610A8 /* USBDevice.cpp */; };
+		6CCF78811B1252DE00B610A8 /* USBDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CCF787F1B1252DE00B610A8 /* USBDevice.h */; };
+		6CCF78841B12534C00B610A8 /* USBDeviceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF78821B12534C00B610A8 /* USBDeviceManager.cpp */; };
+		6CCF78851B12534C00B610A8 /* USBDeviceManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CCF78831B12534C00B610A8 /* USBDeviceManager.h */; };
+		6CCF78881B12537D00B610A8 /* USBInterfaceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF78861B12537D00B610A8 /* USBInterfaceManager.cpp */; };
+		6CCF78891B12537D00B610A8 /* USBInterfaceManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CCF78871B12537D00B610A8 /* USBInterfaceManager.h */; };
+		6CCF788C1B1254C900B610A8 /* USBMIDIDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF788A1B1254C900B610A8 /* USBMIDIDevice.cpp */; };
+		6CCF788D1B1254C900B610A8 /* USBMIDIDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CCF788B1B1254C900B610A8 /* USBMIDIDevice.h */; };
+		6CCF78901B12556B00B610A8 /* USBMIDIDeviceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF788E1B12556B00B610A8 /* USBMIDIDeviceManager.cpp */; };
+		6CCF78911B12556B00B610A8 /* USBMIDIDeviceManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CCF788F1B12556B00B610A8 /* USBMIDIDeviceManager.h */; };
+		6CCF78921B1255CE00B610A8 /* USBVendorMIDIDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF78611B1241C700B610A8 /* USBVendorMIDIDriver.cpp */; };
+		6CCF78941B1255CE00B610A8 /* USBMidiDriverBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF78651B1241ED00B610A8 /* USBMidiDriverBase.cpp */; };
+		6CCF78961B1255CE00B610A8 /* MIDIDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF78691B124C1100B610A8 /* MIDIDriver.cpp */; };
+		6CCF78981B1255CE00B610A8 /* MIDIBackCompatible.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF786E1B124C9500B610A8 /* MIDIBackCompatible.cpp */; };
+		6CCF789A1B1255CE00B610A8 /* IOServiceClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF78721B12513900B610A8 /* IOServiceClient.cpp */; };
+		6CCF789C1B1255CE00B610A8 /* MIDIDriverDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF78761B1251C200B610A8 /* MIDIDriverDevice.cpp */; };
+		6CCF789E1B1255CE00B610A8 /* MIDIDriverUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF787A1B1251F800B610A8 /* MIDIDriverUtils.cpp */; };
+		6CCF78A51B1255E200B610A8 /* CAHostTimeBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF78571B12411800B610A8 /* CAHostTimeBase.cpp */; };
+		6CCF78A71B1255E200B610A8 /* CAMutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF785B1B12413900B610A8 /* CAMutex.cpp */; };
+		6CCF78AA1B1255E200B610A8 /* EMUUSBMIDI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CCF78521B1240C900B610A8 /* EMUUSBMIDI.cpp */; };
+		6CCF78B11B12F34300B610A8 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CCF78AC1B12619400B610A8 /* CoreMIDI.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		6CE021FE1A5FCE9C00568A82 /* StreamInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CE021FD1A5FCE9C00568A82 /* StreamInfo.cpp */; };
 /* End PBXBuildFile section */
 
@@ -71,6 +103,7 @@
 		6C2C072719E475B700F1FD56 /* EMUUSBPlatform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EMUUSBPlatform.h; sourceTree = "<group>"; };
 		6C2C072819E475EE00F1FD56 /* EMUUSBAudioDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioDefines.h; sourceTree = "<group>"; };
 		6C2C072B19E4864D00F1FD56 /* IOSyncer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOSyncer.h; sourceTree = "<group>"; };
+		6C3767C91B138FA600B3496B /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		6C5A3AF11A285C0200F4DC13 /* RingBufferT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RingBufferT.h; sourceTree = "<group>"; };
 		6C5A3AFF1A28DF9700F4DC13 /* RingBufferDefault.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RingBufferDefault.h; sourceTree = "<group>"; };
 		6C5A3B001A290F4800F4DC13 /* EMUUSBInputStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBInputStream.cpp; sourceTree = "<group>"; };
@@ -92,6 +125,40 @@
 		6C966C7F19ED9E5000DBF618 /* EMUUSBDeviceDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EMUUSBDeviceDefines.h; sourceTree = "<group>"; };
 		6CB2722D1A54197B00FA8B61 /* EMUUSBOutputStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBOutputStream.cpp; sourceTree = "<group>"; };
 		6CB2722E1A54197B00FA8B61 /* EMUUSBOutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EMUUSBOutputStream.h; sourceTree = "<group>"; };
+		6CCF78431B123F7C00B610A8 /* EMUMIDIDriver.plugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EMUMIDIDriver.plugin; sourceTree = BUILT_PRODUCTS_DIR; };
+		6CCF78521B1240C900B610A8 /* EMUUSBMIDI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBMIDI.cpp; sourceTree = "<group>"; };
+		6CCF78531B1240C900B610A8 /* EMUUSBMIDI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EMUUSBMIDI.h; sourceTree = "<group>"; };
+		6CCF78571B12411800B610A8 /* CAHostTimeBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CAHostTimeBase.cpp; sourceTree = "<group>"; };
+		6CCF78581B12411800B610A8 /* CAHostTimeBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAHostTimeBase.h; sourceTree = "<group>"; };
+		6CCF785B1B12413900B610A8 /* CAMutex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CAMutex.cpp; sourceTree = "<group>"; };
+		6CCF785C1B12413900B610A8 /* CAMutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CAMutex.h; sourceTree = "<group>"; };
+		6CCF785F1B12416900B610A8 /* CAException.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CAException.h; sourceTree = "<group>"; };
+		6CCF78611B1241C700B610A8 /* USBVendorMIDIDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = USBVendorMIDIDriver.cpp; sourceTree = "<group>"; };
+		6CCF78621B1241C700B610A8 /* USBVendorMIDIDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = USBVendorMIDIDriver.h; sourceTree = "<group>"; };
+		6CCF78651B1241ED00B610A8 /* USBMidiDriverBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = USBMidiDriverBase.cpp; sourceTree = "<group>"; };
+		6CCF78661B1241ED00B610A8 /* USBMidiDriverBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = USBMidiDriverBase.h; sourceTree = "<group>"; };
+		6CCF78691B124C1100B610A8 /* MIDIDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MIDIDriver.cpp; sourceTree = "<group>"; };
+		6CCF786D1B124C5C00B610A8 /* MIDIDriverClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MIDIDriverClass.h; sourceTree = "<group>"; };
+		6CCF786E1B124C9500B610A8 /* MIDIBackCompatible.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MIDIBackCompatible.cpp; sourceTree = "<group>"; };
+		6CCF786F1B124C9500B610A8 /* MIDIBackCompatible.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIDIBackCompatible.h; sourceTree = "<group>"; };
+		6CCF78721B12513900B610A8 /* IOServiceClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IOServiceClient.cpp; sourceTree = "<group>"; };
+		6CCF78731B12513900B610A8 /* IOServiceClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOServiceClient.h; sourceTree = "<group>"; };
+		6CCF78761B1251C200B610A8 /* MIDIDriverDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MIDIDriverDevice.cpp; sourceTree = "<group>"; };
+		6CCF78771B1251C200B610A8 /* MIDIDriverDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIDIDriverDevice.h; sourceTree = "<group>"; };
+		6CCF787A1B1251F800B610A8 /* MIDIDriverUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MIDIDriverUtils.cpp; sourceTree = "<group>"; };
+		6CCF787B1B1251F800B610A8 /* MIDIDriverUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIDIDriverUtils.h; sourceTree = "<group>"; };
+		6CCF787E1B1252DE00B610A8 /* USBDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = USBDevice.cpp; sourceTree = "<group>"; };
+		6CCF787F1B1252DE00B610A8 /* USBDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = USBDevice.h; sourceTree = "<group>"; };
+		6CCF78821B12534C00B610A8 /* USBDeviceManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = USBDeviceManager.cpp; sourceTree = "<group>"; };
+		6CCF78831B12534C00B610A8 /* USBDeviceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = USBDeviceManager.h; sourceTree = "<group>"; };
+		6CCF78861B12537D00B610A8 /* USBInterfaceManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = USBInterfaceManager.cpp; sourceTree = "<group>"; };
+		6CCF78871B12537D00B610A8 /* USBInterfaceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = USBInterfaceManager.h; sourceTree = "<group>"; };
+		6CCF788A1B1254C900B610A8 /* USBMIDIDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = USBMIDIDevice.cpp; sourceTree = "<group>"; };
+		6CCF788B1B1254C900B610A8 /* USBMIDIDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = USBMIDIDevice.h; sourceTree = "<group>"; };
+		6CCF788E1B12556B00B610A8 /* USBMIDIDeviceManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = USBMIDIDeviceManager.cpp; sourceTree = "<group>"; };
+		6CCF788F1B12556B00B610A8 /* USBMIDIDeviceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = USBMIDIDeviceManager.h; sourceTree = "<group>"; };
+		6CCF78AC1B12619400B610A8 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
+		6CCF78AE1B12EF0A00B610A8 /* CoreMIDIServer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDIServer.framework; path = System/Library/Frameworks/CoreMIDIServer.framework; sourceTree = SDKROOT; };
 		6CE021FD1A5FCE9C00568A82 /* StreamInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StreamInfo.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -100,6 +167,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6CCF783E1B123F7C00B610A8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6C0FED061B1300AA00DB305E /* IOKit.framework in Frameworks */,
+				6C0FED051B13009F00DB305E /* CoreFoundation.framework in Frameworks */,
+				6CCF78B11B12F34300B610A8 /* CoreMIDI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -117,6 +194,7 @@
 		6C7735E219E320A000ED3FAA = {
 			isa = PBXGroup;
 			children = (
+				6CCF78511B1240AB00B610A8 /* MIDIClasses */,
 				6C2C072919E4862C00F1FD56 /* oldiokit */,
 				6C77361E19E3232800ED3FAA /* FloatLib */,
 				6C7735F219E320A000ED3FAA /* EMUUSBAudio */,
@@ -129,6 +207,7 @@
 			isa = PBXGroup;
 			children = (
 				6C7735ED19E320A000ED3FAA /* EMUUSBAudio.kext */,
+				6CCF78431B123F7C00B610A8 /* EMUMIDIDriver.plugin */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -136,6 +215,9 @@
 		6C7735EF19E320A000ED3FAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6C3767C91B138FA600B3496B /* CoreServices.framework */,
+				6CCF78AE1B12EF0A00B610A8 /* CoreMIDIServer.framework */,
+				6CCF78AC1B12619400B610A8 /* CoreMIDI.framework */,
 				6C022C8719E3AA090090651E /* CoreAudioKit.framework */,
 				6C77362B19E3261000ED3FAA /* IOKit.framework */,
 				6C77362919E325BA00ED3FAA /* CoreAudio.framework */,
@@ -211,6 +293,60 @@
 			name = FloatLib;
 			sourceTree = "<group>";
 		};
+		6CCF78511B1240AB00B610A8 /* MIDIClasses */ = {
+			isa = PBXGroup;
+			children = (
+				6CCF78601B1241B800B610A8 /* Shared */,
+				6CCF78561B1240E800B610A8 /* Public */,
+				6CCF78521B1240C900B610A8 /* EMUUSBMIDI.cpp */,
+				6CCF78531B1240C900B610A8 /* EMUUSBMIDI.h */,
+			);
+			name = MIDIClasses;
+			sourceTree = "<group>";
+		};
+		6CCF78561B1240E800B610A8 /* Public */ = {
+			isa = PBXGroup;
+			children = (
+				6CCF78571B12411800B610A8 /* CAHostTimeBase.cpp */,
+				6CCF78581B12411800B610A8 /* CAHostTimeBase.h */,
+				6CCF785B1B12413900B610A8 /* CAMutex.cpp */,
+				6CCF785C1B12413900B610A8 /* CAMutex.h */,
+				6CCF785F1B12416900B610A8 /* CAException.h */,
+			);
+			name = Public;
+			sourceTree = "<group>";
+		};
+		6CCF78601B1241B800B610A8 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				6CCF78611B1241C700B610A8 /* USBVendorMIDIDriver.cpp */,
+				6CCF78621B1241C700B610A8 /* USBVendorMIDIDriver.h */,
+				6CCF78651B1241ED00B610A8 /* USBMidiDriverBase.cpp */,
+				6CCF78661B1241ED00B610A8 /* USBMidiDriverBase.h */,
+				6CCF78691B124C1100B610A8 /* MIDIDriver.cpp */,
+				6CCF786D1B124C5C00B610A8 /* MIDIDriverClass.h */,
+				6CCF786E1B124C9500B610A8 /* MIDIBackCompatible.cpp */,
+				6CCF786F1B124C9500B610A8 /* MIDIBackCompatible.h */,
+				6CCF78721B12513900B610A8 /* IOServiceClient.cpp */,
+				6CCF78731B12513900B610A8 /* IOServiceClient.h */,
+				6CCF78761B1251C200B610A8 /* MIDIDriverDevice.cpp */,
+				6CCF78771B1251C200B610A8 /* MIDIDriverDevice.h */,
+				6CCF787A1B1251F800B610A8 /* MIDIDriverUtils.cpp */,
+				6CCF787B1B1251F800B610A8 /* MIDIDriverUtils.h */,
+				6CCF787E1B1252DE00B610A8 /* USBDevice.cpp */,
+				6CCF787F1B1252DE00B610A8 /* USBDevice.h */,
+				6CCF78821B12534C00B610A8 /* USBDeviceManager.cpp */,
+				6CCF78831B12534C00B610A8 /* USBDeviceManager.h */,
+				6CCF78861B12537D00B610A8 /* USBInterfaceManager.cpp */,
+				6CCF78871B12537D00B610A8 /* USBInterfaceManager.h */,
+				6CCF788A1B1254C900B610A8 /* USBMIDIDevice.cpp */,
+				6CCF788B1B1254C900B610A8 /* USBMIDIDevice.h */,
+				6CCF788E1B12556B00B610A8 /* USBMIDIDeviceManager.cpp */,
+				6CCF788F1B12556B00B610A8 /* USBMIDIDeviceManager.h */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -232,6 +368,27 @@
 				6C2C070919E4559800F1FD56 /* EMUUSBAudioDevice.h in Headers */,
 				6C2C072619E4755A00F1FD56 /* EMUUSBUserClient.h in Headers */,
 				6C2C072D19E4864D00F1FD56 /* IOSyncer.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6CCF783F1B123F7C00B610A8 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6C3767D21B13907300B3496B /* EMUUSBMIDI.h in Headers */,
+				6C3767D11B13906E00B3496B /* CAException.h in Headers */,
+				6C3767D01B13906800B3496B /* CAMutex.h in Headers */,
+				6C3767CF1B13905F00B3496B /* CAHostTimeBase.h in Headers */,
+				6C3767CE1B13905700B3496B /* MIDIDriverDevice.h in Headers */,
+				6C3767CD1B13904700B3496B /* MIDIBackCompatible.h in Headers */,
+				6C3767CC1B13904200B3496B /* MIDIDriverClass.h in Headers */,
+				6C3767CB1B13903B00B3496B /* USBVendorMIDIDriver.h in Headers */,
+				6C0FED041B12FEC900DB305E /* MIDIDriverUtils.h in Headers */,
+				6CCF78811B1252DE00B610A8 /* USBDevice.h in Headers */,
+				6CCF78891B12537D00B610A8 /* USBInterfaceManager.h in Headers */,
+				6CCF78911B12556B00B610A8 /* USBMIDIDeviceManager.h in Headers */,
+				6CCF788D1B1254C900B610A8 /* USBMIDIDevice.h in Headers */,
+				6CCF78851B12534C00B610A8 /* USBDeviceManager.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,6 +415,25 @@
 			productReference = 6C7735ED19E320A000ED3FAA /* EMUUSBAudio.kext */;
 			productType = "com.apple.product-type.kernel-extension";
 		};
+		6CCF78421B123F7C00B610A8 /* EMUMIDIDriver */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6CCF78501B123F7C00B610A8 /* Build configuration list for PBXNativeTarget "EMUMIDIDriver" */;
+			buildPhases = (
+				6CCF783D1B123F7C00B610A8 /* Sources */,
+				6CCF783E1B123F7C00B610A8 /* Frameworks */,
+				6CCF783F1B123F7C00B610A8 /* Headers */,
+				6CCF78401B123F7C00B610A8 /* Resources */,
+				6CCF78411B123F7C00B610A8 /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EMUMIDIDriver;
+			productName = EMUMIDIDriver;
+			productReference = 6CCF78431B123F7C00B610A8 /* EMUMIDIDriver.plugin */;
+			productType = "com.apple.product-type.kernel-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -280,6 +456,7 @@
 			projectRoot = "";
 			targets = (
 				6C7735EC19E320A000ED3FAA /* EMUUSBAudio */,
+				6CCF78421B123F7C00B610A8 /* EMUMIDIDriver */,
 			);
 		};
 /* End PBXProject section */
@@ -293,10 +470,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6CCF78401B123F7C00B610A8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXRezBuildPhase section */
 		6C7735EB19E320A000ED3FAA /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6CCF78411B123F7C00B610A8 /* Rez */ = {
 			isa = PBXRezBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -323,6 +514,28 @@
 				6C2C071119E4572600F1FD56 /* EMUXUCustomControl.cpp in Sources */,
 				6C8BF21C1A2507FC00F2052A /* LowPassFilter.cpp in Sources */,
 				6C5A3B021A290F4800F4DC13 /* EMUUSBInputStream.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6CCF783D1B123F7C00B610A8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6CCF789A1B1255CE00B610A8 /* IOServiceClient.cpp in Sources */,
+				6CCF78981B1255CE00B610A8 /* MIDIBackCompatible.cpp in Sources */,
+				6CCF78961B1255CE00B610A8 /* MIDIDriver.cpp in Sources */,
+				6CCF789C1B1255CE00B610A8 /* MIDIDriverDevice.cpp in Sources */,
+				6CCF789E1B1255CE00B610A8 /* MIDIDriverUtils.cpp in Sources */,
+				6CCF78801B1252DE00B610A8 /* USBDevice.cpp in Sources */,
+				6CCF78841B12534C00B610A8 /* USBDeviceManager.cpp in Sources */,
+				6CCF78881B12537D00B610A8 /* USBInterfaceManager.cpp in Sources */,
+				6CCF788C1B1254C900B610A8 /* USBMIDIDevice.cpp in Sources */,
+				6CCF78901B12556B00B610A8 /* USBMIDIDeviceManager.cpp in Sources */,
+				6CCF78941B1255CE00B610A8 /* USBMidiDriverBase.cpp in Sources */,
+				6CCF78921B1255CE00B610A8 /* USBVendorMIDIDriver.cpp in Sources */,
+				6CCF78A51B1255E200B610A8 /* CAHostTimeBase.cpp in Sources */,
+				6CCF78A71B1255E200B610A8 /* CAMutex.cpp in Sources */,
+				6CCF78AA1B1255E200B610A8 /* EMUUSBMIDI.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -452,6 +665,40 @@
 			};
 			name = Release;
 		};
+		6CCF784E1B123F7C00B610A8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1.0.0d1;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "EMUMIDIDriver/EMUMIDIDriver-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "EMUMIDIDriver/EMUMIDIDriver-Info.plist";
+				MODULE_NAME = com.emu.EMUMIDIDriver;
+				MODULE_VERSION = 1.0.0d1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = plugin;
+			};
+			name = Debug;
+		};
+		6CCF784F1B123F7C00B610A8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1.0.0d1;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "EMUMIDIDriver/EMUMIDIDriver-Prefix.pch";
+				INFOPLIST_FILE = "EMUMIDIDriver/EMUMIDIDriver-Info.plist";
+				MODULE_NAME = com.emu.EMUMIDIDriver;
+				MODULE_VERSION = 1.0.0d1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = plugin;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -469,6 +716,15 @@
 			buildConfigurations = (
 				6C7735FE19E320A000ED3FAA /* Debug */,
 				6C7735FF19E320A000ED3FAA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6CCF78501B123F7C00B610A8 /* Build configuration list for PBXNativeTarget "EMUMIDIDriver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6CCF784E1B123F7C00B610A8 /* Debug */,
+				6CCF784F1B123F7C00B610A8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
