@@ -14,15 +14,29 @@ sleep 3
 sudo kextunload /System/Library/Extensions/EMUUSBAudio.kext
 echo "deleting old kext"
 sudo rm -r /System/Library/Extensions/EMUUSBAudio.kext
-echo "moving things"
+echo "installing new kernel extension"
 sudo cp -r EMUUSBAudio.kext /System/Library/Extensions
+
+echo "deleting old midi plugin"
+sudo rm -rf /Library/Audio/MIDI\ Drivers/EMUMIDIDriver.plugin 
+echo "installing new midi plugin"
+sudo mkdir -p /Library/Audio/MIDI\ Drivers/
+sudo cp -R EMUMIDIDriver\ orig.plugin /Library/Audio/MIDI\ Drivers/EMUMIDIDriver.plugin
+
+
 echo "doing permissions stuff"
+cd /Library/Audio/MIDI\ Drivers/
+sudo chgrp -R wheel EMUMIDIDriver.plugin
 cd /System/Library/Extensions
 sudo chgrp -R wheel EMUUSBAudio.kext
+
 echo "loading new kext"
 sudo kextload -v EMUUSBAudio.kext
 # enable following for debugging.
 # kextutil -s ~/symbols/ -A EMUUSBAudio.kext/
+
+
+
 echo "so long"
 
 
