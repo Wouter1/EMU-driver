@@ -17,7 +17,7 @@ General
  * Latency:
   * "Zero-latency" (~4.5ms latency roundtrip) direct hardware monitoring (disabled at 176.4-192kHz)
   * One-way latency of driver+EMU internal: down to 5.5 ms (default) or 2.3 ms (low latency setting) at 96kHz rate. 
- * Apple CoreAudio (currently no CoreMIDI support).
+ * Apple CoreAudio and Apple CoreMIDI.
   * AC3 and DTS Passthru supported (not tested if this works)
  * Anti-Pop speaker protection minimizes noise during power on/off
  * Ultra-low jitter clock subsystem: < 500ps RMS in PLL mode (48kHz, Coaxial S/PDIF Sync)
@@ -84,7 +84,7 @@ Digital I/O
   * 2 in/2 out coaxial (transformer coupled)
   * 2 in/2 out optical
   * AES/EBU or S/PDIF format (software selectable)
- * MIDI (currently not working, #23)
+ * MIDI
   * 1 in, 1 out
   
 Synchronization
