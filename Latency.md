@@ -52,3 +52,23 @@ If you really need the lowest possible latencies, you might consider hacking the
 | 96k | 0.70ms |
 | 176k | 0.58ms |
 | 192k | 0.740ms |
+
+
+Comparison with other cards
+========
+
+The following table shows the EMU performance. All values with 128sample DAW buffer. All latencies are the total roundtrip latency in milliseconds.
+
+| device | latency @44k | latency @48k | latency @96k | latency @192k |
+|---|---|---|---|---|
+|Windows7 EMU0404 PCIe | 6.1 | - | - | - | 
+| RME Fireface 800| 9.7 | 8.9 | 6.0 | 5.5 |
+|Windows M-Audio 1010lt | 10.3 | 9.5 | 4.7 | - |
+| Windows7 Presonus Firestudio Mobile| 10.3 | 9.6 | 6.1 | - |
+| Alesis Photon 25 | 10.34 | 10.33 | - | - | 
+| EMU0404 | 11.5 | 10.8 | 7.2 | 5.4 | 
+| Native instr Kore 1| 12.4 | 11.9 | 7.1 | - |
+| Behringer FCA202 | 13.5 | 12.0 | 7.7 | - |
+|Windows7 Line 6 GX | 19.3 | 18.1 | - | - |
+| Windows7 Creative Sound Blaster X-Fi pci-e | 20.4 | 19.2 | 19.4 | - |
+
