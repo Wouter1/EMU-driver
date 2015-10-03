@@ -8,12 +8,14 @@ If you need a low-latency driver, first check the  <a href="Latency.md">latency<
 First time installation only: prepare your machine to take developer kernel extensions.
 
 On El Capitano:
+
 1. reboot in safe mode (hold cmd-R while booting)
 2. go to utilities-terminal
 3. enter this command:
     ```csrutil disable```
 
 On Yosemite and earlier:
+
 1. open a terminal and enter this command:
     ```sudo nvram boot-args="kext-dev-mode=1"```
 2. reboot your machine. 
