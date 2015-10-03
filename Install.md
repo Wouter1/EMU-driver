@@ -11,7 +11,7 @@ If you need a low-latency driver, first check the  <a href="Latency.md">latency<
 
 First time installation only: prepare your machine to take developer kernel extensions.
 
-On El Capitano (be aware of issue #65):
+On El Capitan (be aware of issue #65):
 
 1. reboot in recovery mode (hold cmd-R while booting)
 2. go to utilities-terminal
