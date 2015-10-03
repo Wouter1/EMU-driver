@@ -13,10 +13,11 @@ First time installation only: prepare your machine to take developer kernel exte
 
 On El Capitano:
 
-1. reboot in safe mode (hold cmd-R while booting)
+1. reboot in recovery mode (hold cmd-R while booting)
 2. go to utilities-terminal
 3. enter this command:
     ```csrutil disable```
+4. reboot your machine
 
 On Yosemite and earlier:
 
