@@ -5,13 +5,20 @@ Installation
 ========
 If you need a low-latency driver, first check the  <a href="Latency.md">latency</a> section.
 
-First time installation only: prepare your machine to take developer kernel extensions:
+First time installation only: prepare your machine to take developer kernel extensions.
 
+On El Capitano:
+1. reboot in safe mode (hold cmd-R while booting)
+2. go to utilities-terminal
+3. enter this command:
+    ```csrutil disable```
+
+On Yosemite and earlier:
 1. open a terminal and enter this command:
     ```sudo nvram boot-args="kext-dev-mode=1"```
 2. reboot your machine. 
 
-Install the driver:
+After preparation, you can install the driver:
 
 1. Turn off the EMU device
 2. Download (click on "Download ZIP") and unzip the driver
