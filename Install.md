@@ -39,7 +39,7 @@ or
 1. manually copy EMUUSBAudio.kext into  /System/Library/Extensions/ 
 2. reboot
 
-If you like you can also copy the control panel into your applications directory.
+If you like you can also copy the control panel into your applications directory. You also have to copy the Skins folder along with the app.
 
 NOTE: After the install, it takes OSX about a minute to incorporate the driver into the kernel.
 
