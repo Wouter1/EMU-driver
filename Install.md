@@ -16,7 +16,7 @@ On El Capitan (be aware of issue #65):
 1. reboot in recovery mode (hold cmd-R while booting)
 2. go to utilities-terminal
 3. enter this command:
-    ```csrutil disable```
+    ```csrutil enable --without kext```
 4. reboot your machine
 
 On Yosemite and earlier:
