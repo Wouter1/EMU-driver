@@ -61,13 +61,12 @@ OR
 2. Turn off your EMU device
 3. run the kextInstall script
 
- loose ends and I'd like to clean up the code further.
-
 Complete Removal
 ============
+
+WARNING. Be very careful with the ```rm -rf```, if you give it the wrong arguments you may remove essential system files.
+
 1. Turn off the EMU.
-2. Open a terminal
-3. execute ```cd /System/Library/Extensions/```
-4. execute ```sudo rm -rf EMUUSBAudio.kext``` 
-5. enter your admin password.
+2. ```rm -rf /System/Library/Extensions/EMUUSBAudio.kext``` (you need admin password).
+3. ```rm -rf /Library/Audio/MIDI\ Drivers/EMUMIDIDriver.plugin``` (you need admin password).
 
