@@ -67,6 +67,6 @@ Complete Removal
 WARNING. Be very careful with the ```rm -rf```, if you give it the wrong arguments you may remove essential system files.
 
 1. Turn off the EMU.
-2. ```rm -rf /System/Library/Extensions/EMUUSBAudio.kext``` (you need admin password).
-3. ```rm -rf /Library/Audio/MIDI\ Drivers/EMUMIDIDriver.plugin``` (you need admin password).
+2. ```sudo rm -rf /System/Library/Extensions/EMUUSBAudio.kext``` (you need admin password).
+3. ```sudo rm -rf /Library/Audio/MIDI\ Drivers/EMUMIDIDriver.plugin``` (you need admin password).
 
