@@ -43,6 +43,13 @@ If you like you can also copy the control panel into your applications directory
 
 NOTE: After the install, it takes OSX about a minute to incorporate the driver into the kernel.
 
+<h4>Using the control panel</h4>
+You may have to eenable running 3rd-party applications before you can run the Control Panel:
+
+1. Go into System Preferences->Security&Privacy
+2. Under the General tab, change Allow Downloaded Apps From to Anywhere
+3. Start the Control Panel
+
 Usage
 ======
 
