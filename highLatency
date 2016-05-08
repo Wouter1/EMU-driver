@@ -1,0 +1,11 @@
+#!/bin/tcsh
+#
+# Adjusts the driver's settings to use low latency.
+# W.Pasman 7feb2015
+#
+echo "Adjusting driver for low latency"
+set pathname=`dirname "$0"`
+cd "$pathname"/EMUUSBAudio.kext/Contents/
+cat Info.plist  | sed -e 's/<integer>4200<\/integer>/<integer>35000<\/integer>/' > Info1.plist
+mv Info1.plist Info.plist
+
