@@ -5,7 +5,7 @@ EMU-USB driver
 
 OSX driver for Creative Labs EMU USB
 
-* Tested on Mavericks and Yosemite. On El Capitan, midi and playback works, but recording is only available with 35 ms latency if you use the workaround for an Apple bug described here https://github.com/Wouter1/EMU-driver/issues/65
+* Tested on Mavericks and Yosemite. On El Capitan, midi and playback works, but recording is only available with 35 ms latency.
 * All sample rates are supported both for record and playback: 44.1, 48, 88.2, 96, 176.4 and 192 kHz
 * I can only test on EMU0404 USB as I have no other EMU devices. But users reported it works also on EMU0204 and Tracker Pre USB.
 * Midi support.
