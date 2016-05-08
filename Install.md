@@ -4,14 +4,14 @@
 Installation
 ========
 If you need a low-latency driver, first check the  <a href="Latency.md">latency</a> section.
+This can not be used on El Capitan (issue #65).
 
 
 <h4>Prepare the machine</h4>
 
-
 First time installation only: prepare your machine to take developer kernel extensions.
 
-On El Capitan (be aware of issue #65):
+On El Capitan:
 
 1. reboot in recovery mode (hold cmd-R while booting)
 2. go to utilities-terminal
@@ -31,13 +31,10 @@ After preparation, you can install the driver:
 
 1. Turn off the EMU device
 2. Download (click on "Download ZIP") and unzip the driver
-3. Run the kextInstall script 
-4. enter your admin password at the prompt
+3. If on El Capitan: run the highLatency script
+4. Run the kextInstall script 
+5. enter your admin password at the prompt
 
-or
-
-1. manually copy EMUUSBAudio.kext into  /System/Library/Extensions/ 
-2. reboot
 
 If you like you can also copy the control panel into your applications directory. You also have to copy the Skins folder along with the app.
 
