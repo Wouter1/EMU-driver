@@ -376,10 +376,10 @@ DeviceInactive:
 // @param *arg1 the pointer to the EMUUSBAudioLevelControl (this)
 // @param *arg2 the argument. Wouter: this void* was holding an SInt32 directly. That caused problems on 64bit. Changed to hold SInt64.
 void EMUUSBAudioLevelControl::updateValueCallback (void *arg1, void *arg2) {
-    EMUUSBAudioLevelControl 		*levelControl = OSDynamicCast (EMUUSBAudioLevelControl, (OSObject*)arg1);
-    SInt32							value = (SInt32)(SInt64)arg2;
+    //EMUUSBAudioLevelControl 		*levelControl = OSDynamicCast (EMUUSBAudioLevelControl, (OSObject*)arg1);
+    //SInt32							value = (SInt32)(SInt64)arg2;
     
-    debugIOLog ("+EMUUSBAudioLevelControl::updateValueCallback (%p, %lld)", (UInt32*)arg1, (SInt64)arg2);
+    debugIOLog ("EMUUSBAudioLevelControl::updateValueCallback (%p, %lld) DISABLED", (UInt32*)arg1, (SInt64)arg2);
     
 //    if (levelControl) {
 // Wouter: it seems there is no IODTPlatformExpert anymore. Removed the code, hoping it works...
@@ -399,7 +399,7 @@ void EMUUSBAudioLevelControl::updateValueCallback (void *arg1, void *arg2) {
 //		}
 //    }
     
-    debugIOLog ("-EMUUSBAudioLevelControl::updateValueCallback (%p, %lld)", (UInt32*)arg1, (SInt64)arg2);
+    //debugIOLog ("-EMUUSBAudioLevelControl::updateValueCallback (%p, %lld)", (UInt32*)arg1, (SInt64)arg2);
 }
 
 // This is how the thing is defined in the USB Audio spec (section 5.2.2.4.3.2 for the curious).

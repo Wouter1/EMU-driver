@@ -33,6 +33,7 @@
 #include "USBAudioObject.h"
 #include "EMUUSBAudioCommon.h"
 #include "EMUUSBDeviceDefines.h"
+#include "USB.h"
 
 OSDefineMetaClassAndStructors(EMUUSBAudioConfigObject, OSObject);
 

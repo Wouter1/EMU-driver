@@ -21,7 +21,8 @@
 
 
 #include <libkern/c++/OSArray.h>
-#include <IOKit/usb/IOUSBInterface.h>
+#include <IOUSBInterface.h>
+#include "USB.h"
 
 #include "EMUUSBAudioCommon.h"
 
@@ -517,7 +518,7 @@ private:
 	UInt8					descriptorSubType;
     
 public:
-    virtual void			free (void);
+    virtual void			free (void) override;
     
 	UInt8					GetDescriptorSubType (void) {return descriptorSubType;}
 	virtual UInt8			GetNumInPins (void) {return 1;}
@@ -713,7 +714,7 @@ private:
     
 public:
     static EMUUSBAudioControlObject * 	create (void);
-    virtual void					free (void);
+    virtual void					free (void) override;
     USBInterfaceDescriptorPtr		ParseACInterfaceDescriptor (USBInterfaceDescriptorPtr theInterfacePtr, UInt8 const currentInterface);
 	UInt8							GetExtensionUnitID(UInt16 extCode);
 	UInt8							GetNumControls (UInt8 featureUnitID);
@@ -770,7 +771,7 @@ private:
 	UInt8							pollInt;
 public:
     static EMUUSBEndpointObject * 		create (void);
-    virtual void					free (void);
+    virtual void					free (void) override;
     
 	UInt8							GetAddress (void) {return address;}
     /*! Returns the attributes of this endpoint.
@@ -884,7 +885,7 @@ private:
     
 public:
     static EMUUSBAudioStreamObject *	create (void);
-    virtual void					free (void);
+    virtual void					free (void) override;
     
     USBInterfaceDescriptorPtr		ParseASInterfaceDescriptor (USBInterfaceDescriptorPtr theInterfacePtr, UInt8 const currentInterface);
     
@@ -938,7 +939,7 @@ private:
 public:
     static EMUUSBAudioConfigObject *	create (const IOUSBConfigurationDescriptor * newConfigurationDescriptor, UInt8 controlInterfaceNum);
     virtual bool					init (const IOUSBConfigurationDescriptor * newConfigurationDescriptor, UInt8 controlInterfaceNum);
-    virtual void					free (void);
+    virtual void					free (void) override;
     
 	Boolean							ChannelHasMuteControl (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 featureUnitID, UInt8 channelNum);
 	Boolean							ChannelHasVolumeControl (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 featureUnitID, UInt8 channelNum);

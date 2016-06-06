@@ -33,8 +33,8 @@ __END_DECLS
 #include <IOKit/IOLib.h>
 //#include <IOKit/IOPlatformExpert.h>
 
-#include <IOKit/usb/USB.h>
-#include <IOKit/usb/IOUSBInterface.h>
+#include "USB.h"
+#include <IOUSBInterface.h>
 
 #include <IOKit/audio/IOAudioLevelControl.h>
 #include <IOKit/audio/IOAudioTypes.h>

@@ -19,6 +19,8 @@
  */
 #include "EMUUSBAudioMuteControl.h"
 
+
+
 #define super IOAudioToggleControl
 OSDefineMetaClassAndStructors(EMUUSBAudioMuteControl, IOAudioToggleControl)
 
@@ -134,7 +136,11 @@ UInt8 EMUUSBAudioMuteControl::GetCurMute (UInt8 interfaceNumber, UInt8 channelNu
     IOUSBDevRequest				devReq;
     UInt8						theMuteState;
     
+    #if __MAC_OS_X_VERSION_MIN_REQUIRED < 101100
     devReq.bmRequestType = USBmakebmRequestType (kUSBIn, kUSBClass, kUSBInterface);
+    #else
+    devReq.bmRequestType = makeDeviceRequestbmRequestType(kRequestDirectionIn, kRequestTypeClass, kRequestRecipientInterface);
+    #endif
     devReq.bRequest = GET_CUR;
     devReq.wValue = (MUTE_CONTROL << 8) | channelNumber;
     devReq.wIndex = (unitID << 8) | interfaceNumber;
@@ -151,11 +157,17 @@ Error:
 	goto Exit;
 }
 
+
 IOReturn EMUUSBAudioMuteControl::SetCurMute (UInt8 interfaceNumber, UInt8 channelNumber, UInt8 theMuteState) {
     IOUSBDevRequest				devReq;
 	IOReturn					error;
     
+    #if __MAC_OS_X_VERSION_MIN_REQUIRED < 101100
     devReq.bmRequestType = USBmakebmRequestType (kUSBOut, kUSBClass, kUSBInterface);
+    #else
+    devReq.bmRequestType = makeDeviceRequestbmRequestType(kRequestDirectionOut, kRequestTypeClass, kRequestRecipientInterface);
+    #endif
+    
     devReq.bRequest = SET_CUR;
     devReq.wValue = (MUTE_CONTROL << 8) | channelNumber;
     devReq.wIndex = (unitID << 8) | interfaceNumber;

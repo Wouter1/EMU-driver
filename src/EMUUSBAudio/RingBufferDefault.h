@@ -131,7 +131,7 @@ public:
         return kIOReturnSuccess;
     }
     
-    void notifyWrap(AbsoluteTime time) {
+    void notifyWrap(AbsoluteTime time) override {
         // default: do nothing
     }
     

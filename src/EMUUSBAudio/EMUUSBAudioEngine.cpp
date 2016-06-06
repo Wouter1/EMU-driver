@@ -307,7 +307,7 @@ void EMUUSBAudioEngine::detach(IOService *provider) {
 	super::detach(provider);
 }
 
-void EMUUSBAudioEngine::close(IOService *forClient, IOOptionBits options) {
+void EMUUSBAudioEngine::close(IOService *forClient, IOOptionBits options)  {
 	debugIOLogC("EMUUSBAudioEngine[%p]: closing for %p",this,forClient);
 	super::close(forClient,options);
 }
@@ -2017,8 +2017,8 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 
 		// clear up any existing buffers
 		UInt32 inputSize = usbInputStream.maxFrameSize;
-		UInt32 outputSize = mOutput.maxFrameSize;
-		UInt32	samplesPerFrame = inputSize / usbInputStream.multFactor;
+		//UInt32 outputSize = mOutput.maxFrameSize;
+		//UInt32	samplesPerFrame = inputSize / usbInputStream.multFactor;
 		debugIOLogC("inputSize= %d multFactor= %d", inputSize, usbInputStream.multFactor);
 		debugIOLogC("outputSize= %d multFactor= %d", outputSize, mOutput.multFactor);
 		

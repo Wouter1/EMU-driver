@@ -17,7 +17,12 @@ IOReturn StreamInfo::init() {
 }
 
 IOReturn StreamInfo::start(UInt64 startUsbFrame) {
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < 101100
     ReturnIf(startUsbFrame < streamInterface->GetDevice()->GetBus()->GetFrameNumber() + 10, kIOReturnTimeout);
+#else
+    ReturnIf(startUsbFrame < streamInterface->getFrameNumber() + 10, kIOReturnTimeout);
+#endif
+    
     nextUsableUsbFrameNr = startUsbFrame;
     
     return kIOReturnSuccess;

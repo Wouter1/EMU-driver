@@ -32,8 +32,8 @@ __END_DECLS
 
 #include <IOKit/IOLib.h>
 
-#include <IOKit/usb/USB.h>
-#include <IOKit/usb/IOUSBInterface.h>
+#include "USB.h"
+#include <IOUSBInterface.h>
 
 #include <IOKit/audio/IOAudioDefines.h>
 #include <IOKit/audio/IOAudioTypes.h>
@@ -64,9 +64,9 @@ public:
     static EMUUSBAudioMuteControl *create (UInt8 theUnit, UInt8 theInterfaceNumber, UInt8 theChannelNumber, USBDeviceRequest theUSBDeviceRequest, void *theCallerRefCon, UInt32 usage, UInt32 subType = kIOAudioToggleControlSubTypeMute, UInt32 controlID = 0);
     
     virtual bool init (UInt8 theUnit, UInt8 theInterfaceNumber, UInt8 theChannelNumber, USBDeviceRequest theUSBDeviceRequest, void *theCallerRefCon, UInt32 usage, UInt32 subType, UInt32 controlID = 0, OSDictionary *properties = NULL);
-    virtual void free ();
+    virtual void free () override;
     
-    virtual IOReturn performValueChange (OSObject * newValue);
+    virtual IOReturn performValueChange (OSObject * newValue) override;
     virtual void updateUSBValue ();
     virtual void updateUSBValue (SInt32 newValue);
     

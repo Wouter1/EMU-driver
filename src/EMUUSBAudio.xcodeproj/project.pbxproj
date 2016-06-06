@@ -28,6 +28,14 @@
 		6C5A3B031A290F4800F4DC13 /* EMUUSBInputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C5A3B011A290F4800F4DC13 /* EMUUSBInputStream.h */; };
 		6C7735F719E320A000ED3FAA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6C7735F519E320A000ED3FAA /* InfoPlist.strings */; };
 		6C77362219E3234900ED3FAA /* EMUUSBAudioClip.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C77362019E3234900ED3FAA /* EMUUSBAudioClip.h */; };
+		6C7861F31D03F7110087FD31 /* IOUSBPipe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7861F11D03F7110087FD31 /* IOUSBPipe.cpp */; };
+		6C7861F41D03F7110087FD31 /* IOUSBPipe.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7861F21D03F7110087FD31 /* IOUSBPipe.h */; };
+		6C7861F71D03F91D0087FD31 /* IOUSBDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7861F51D03F91D0087FD31 /* IOUSBDevice.cpp */; };
+		6C7861F81D03F91D0087FD31 /* IOUSBDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7861F61D03F91D0087FD31 /* IOUSBDevice.h */; };
+		6C7861FB1D03F96C0087FD31 /* IOUSBInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7861F91D03F96C0087FD31 /* IOUSBInterface.cpp */; };
+		6C7861FC1D03F96C0087FD31 /* IOUSBInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7861FA1D03F96C0087FD31 /* IOUSBInterface.h */; };
+		6C7B68831D0436E90059CA4C /* IOUSBController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7B68811D0436E90059CA4C /* IOUSBController.cpp */; settings = {ASSET_TAGS = (); }; };
+		6C7B68841D0436E90059CA4C /* IOUSBController.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7B68821D0436E90059CA4C /* IOUSBController.h */; settings = {ASSET_TAGS = (); }; };
 		6C8BF21C1A2507FC00F2052A /* LowPassFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C8BF21A1A2507FC00F2052A /* LowPassFilter.cpp */; };
 		6C8BF21D1A2507FC00F2052A /* LowPassFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C8BF21B1A2507FC00F2052A /* LowPassFilter.h */; };
 		6C97E7F819EDB4C400C376B9 /* EMUUSBAudioLevelControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C071319E4578A00F1FD56 /* EMUUSBAudioLevelControl.cpp */; };
@@ -86,13 +94,23 @@
 		6C77362019E3234900ED3FAA /* EMUUSBAudioClip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioClip.h; sourceTree = "<group>"; };
 		6C77362919E325BA00ED3FAA /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		6C77362B19E3261000ED3FAA /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		6C7861F11D03F7110087FD31 /* IOUSBPipe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IOUSBPipe.cpp; sourceTree = "<group>"; };
+		6C7861F21D03F7110087FD31 /* IOUSBPipe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOUSBPipe.h; sourceTree = "<group>"; };
+		6C7861F51D03F91D0087FD31 /* IOUSBDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IOUSBDevice.cpp; sourceTree = "<group>"; };
+		6C7861F61D03F91D0087FD31 /* IOUSBDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOUSBDevice.h; sourceTree = "<group>"; };
+		6C7861F91D03F96C0087FD31 /* IOUSBInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IOUSBInterface.cpp; sourceTree = "<group>"; };
+		6C7861FA1D03F96C0087FD31 /* IOUSBInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOUSBInterface.h; sourceTree = "<group>"; };
+		6C7B68811D0436E90059CA4C /* IOUSBController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IOUSBController.cpp; sourceTree = "<group>"; };
+		6C7B68821D0436E90059CA4C /* IOUSBController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOUSBController.h; sourceTree = "<group>"; };
 		6C8BF2191A2503F300F2052A /* StreamInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StreamInfo.h; sourceTree = "<group>"; };
 		6C8BF21A1A2507FC00F2052A /* LowPassFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LowPassFilter.cpp; sourceTree = "<group>"; };
 		6C8BF21B1A2507FC00F2052A /* LowPassFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LowPassFilter.h; sourceTree = "<group>"; };
 		6C966C7F19ED9E5000DBF618 /* EMUUSBDeviceDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EMUUSBDeviceDefines.h; sourceTree = "<group>"; };
 		6CB2722D1A54197B00FA8B61 /* EMUUSBOutputStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBOutputStream.cpp; sourceTree = "<group>"; };
 		6CB2722E1A54197B00FA8B61 /* EMUUSBOutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EMUUSBOutputStream.h; sourceTree = "<group>"; };
+		6CBB771E1D044C8900FED26D /* USB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = USB.h; sourceTree = "<group>"; };
 		6CE021FD1A5FCE9C00568A82 /* StreamInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StreamInfo.cpp; sourceTree = "<group>"; };
+		6CF65DF71D06085D0063C123 /* osxversion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = osxversion.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,6 +135,7 @@
 		6C7735E219E320A000ED3FAA = {
 			isa = PBXGroup;
 			children = (
+				6C7861F01D03F6F30087FD31 /* USBAdapter */,
 				6C2C072919E4862C00F1FD56 /* oldiokit */,
 				6C77361E19E3232800ED3FAA /* FloatLib */,
 				6C7735F219E320A000ED3FAA /* EMUUSBAudio */,
@@ -211,6 +230,23 @@
 			name = FloatLib;
 			sourceTree = "<group>";
 		};
+		6C7861F01D03F6F30087FD31 /* USBAdapter */ = {
+			isa = PBXGroup;
+			children = (
+				6C7861F11D03F7110087FD31 /* IOUSBPipe.cpp */,
+				6C7861F21D03F7110087FD31 /* IOUSBPipe.h */,
+				6C7861F51D03F91D0087FD31 /* IOUSBDevice.cpp */,
+				6C7861F61D03F91D0087FD31 /* IOUSBDevice.h */,
+				6C7861F91D03F96C0087FD31 /* IOUSBInterface.cpp */,
+				6C7861FA1D03F96C0087FD31 /* IOUSBInterface.h */,
+				6C7B68811D0436E90059CA4C /* IOUSBController.cpp */,
+				6C7B68821D0436E90059CA4C /* IOUSBController.h */,
+				6CBB771E1D044C8900FED26D /* USB.h */,
+				6CF65DF71D06085D0063C123 /* osxversion.h */,
+			);
+			name = USBAdapter;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -223,13 +259,17 @@
 				6CB272301A54197B00FA8B61 /* EMUUSBOutputStream.h in Headers */,
 				6C2C072219E4740700F1FD56 /* EMUUSBAudioPlugin.h in Headers */,
 				6C5A3AF31A285C0200F4DC13 /* RingBufferT.h in Headers */,
+				6C7861F81D03F91D0087FD31 /* IOUSBDevice.h in Headers */,
 				6C2C071619E4578A00F1FD56 /* EMUUSBAudioLevelControl.h in Headers */,
 				6C2C070D19E4562800F1FD56 /* EMUUSBAudioEngine.h in Headers */,
 				6C2C071219E4572600F1FD56 /* EMUXUCustomControl.h in Headers */,
 				6C5A3B031A290F4800F4DC13 /* EMUUSBInputStream.h in Headers */,
 				6C2C071E19E4714500F1FD56 /* EMUUSBAudioMuteControl.h in Headers */,
+				6C7B68841D0436E90059CA4C /* IOUSBController.h in Headers */,
 				6C2C071A19E4586700F1FD56 /* USBAudioObject.h in Headers */,
 				6C2C070919E4559800F1FD56 /* EMUUSBAudioDevice.h in Headers */,
+				6C7861F41D03F7110087FD31 /* IOUSBPipe.h in Headers */,
+				6C7861FC1D03F96C0087FD31 /* IOUSBInterface.h in Headers */,
 				6C2C072619E4755A00F1FD56 /* EMUUSBUserClient.h in Headers */,
 				6C2C072D19E4864D00F1FD56 /* IOSyncer.h in Headers */,
 			);
@@ -310,10 +350,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C7861F31D03F7110087FD31 /* IOUSBPipe.cpp in Sources */,
 				6C5464221A15606C003C251B /* EMUUSBUserClient.cpp in Sources */,
 				6CB2722F1A54197B00FA8B61 /* EMUUSBOutputStream.cpp in Sources */,
+				6C7861F71D03F91D0087FD31 /* IOUSBDevice.cpp in Sources */,
 				6C39DF8919F2C3BD00D027FC /* EMUUSBAudioClip.cpp in Sources */,
 				6C97E7F919EDB4C900C376B9 /* EMUUSBAudioMuteControl.cpp in Sources */,
+				6C7861FB1D03F96C0087FD31 /* IOUSBInterface.cpp in Sources */,
 				6C97E7F819EDB4C400C376B9 /* EMUUSBAudioLevelControl.cpp in Sources */,
 				6C2C071919E4586700F1FD56 /* USBAudioObject.cpp in Sources */,
 				6C2C070819E4559800F1FD56 /* EMUUSBAudioDevice.cpp in Sources */,
@@ -321,6 +364,7 @@
 				6CE021FE1A5FCE9C00568A82 /* StreamInfo.cpp in Sources */,
 				6C2C072119E4740700F1FD56 /* EMUUSBAudioPlugin.cpp in Sources */,
 				6C2C071119E4572600F1FD56 /* EMUXUCustomControl.cpp in Sources */,
+				6C7B68831D0436E90059CA4C /* IOUSBController.cpp in Sources */,
 				6C8BF21C1A2507FC00F2052A /* LowPassFilter.cpp in Sources */,
 				6C5A3B021A290F4800F4DC13 /* EMUUSBInputStream.cpp in Sources */,
 			);
@@ -423,12 +467,14 @@
 				GCC_PREFIX_HEADER = "EMUUSBAudio/EMUUSBAudio-Prefix.pch";
 				INFOPLIST_FILE = "EMUUSBAudio/EMUUSBAudio-Info.plist";
 				INFOPLIST_PREPROCESS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MODULE_NAME = com.emu.driver.EMUUSBAudio;
 				MODULE_START = 0;
 				MODULE_STOP = 0;
 				MODULE_VERSION = 1.0.0d1;
 				"OTHER_CFLAGS[arch=*]" = "-DDEBUGLOGGING";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -443,11 +489,13 @@
 				GCC_PREFIX_HEADER = "EMUUSBAudio/EMUUSBAudio-Prefix.pch";
 				INFOPLIST_FILE = "EMUUSBAudio/EMUUSBAudio-Info.plist";
 				INFOPLIST_PREPROCESS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MODULE_NAME = com.emu.driver.EMUUSBAudio;
 				MODULE_START = 0;
 				MODULE_STOP = 0;
 				MODULE_VERSION = 1.0.0d1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;

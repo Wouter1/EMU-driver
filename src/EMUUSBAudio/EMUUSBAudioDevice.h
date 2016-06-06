@@ -39,9 +39,9 @@
 #include <IOKit/audio/IOAudioSelectorControl.h>
 #include <IOKit/audio/IOAudioToggleControl.h>
 
-#include <IOKit/usb/USB.h>
-#include <IOKit/usb/IOUSBInterface.h>
-#include <IOKit/usb/IOUSBRootHubDevice.h>
+#include "USB.h"
+#include <IOUSBInterface.h>
+//#include <IOKit/usb/IOUSBRootHubDevice.h>
 
 #include "EMUUSBAudioEngine.h"
 #include "EMUUSBAudioCommon.h"

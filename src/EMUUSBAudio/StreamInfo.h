@@ -9,11 +9,14 @@
 #ifndef EMUUSBAudio_StreamInfo_h
 #define EMUUSBAudio_StreamInfo_h
 
-#include <IOKit/usb/IOUSBPipe.h>
-#include <IOKit/usb/IOUSBDevice.h>
-#include <IOKit/usb/IOUSBInterface.h>
+
+#include "IOUSBPipe.h"
+#include <IOUSBDevice.h>
+#include <IOUSBInterface.h>
 #include <IOKit/audio/IOAudioStream.h>
 #include <IOKit/IOSubMemoryDescriptor.h>
+
+
 
 
 //	-----------------------------------------------------------------

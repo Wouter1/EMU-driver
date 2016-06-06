@@ -74,7 +74,7 @@ public:
     
      */
     
-    virtual void notifyWrap(AbsoluteTime time) = 0;
+    virtual void notifyWrap(AbsoluteTime time) = 0 ;
     
     /*! set the current read head position. CoreAudio may start reading at weird positions.
      returns kIOReturnUnderrun if the head was repositioned (by lack of better return possibility). */

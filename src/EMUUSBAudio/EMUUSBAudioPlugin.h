@@ -25,7 +25,7 @@
 
 #include <IOKit/IOService.h>
 #include <IOKit/audio/IOAudioStream.h>
-#include <IOKit/usb/USB.h>
+#include "USB.h"
 
 #include "EMUUSBAudioEngine.h"
 

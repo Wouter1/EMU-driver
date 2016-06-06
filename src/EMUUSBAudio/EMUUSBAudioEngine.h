@@ -56,14 +56,14 @@
 #include <IOKit/audio/IOAudioEngine.h>
 #include <IOKit/audio/IOAudioStream.h>
 
-#include <IOKit/usb/IOUSBPipe.h>
-#include <IOKit/usb/IOUSBDevice.h>
-#include <IOKit/usb/IOUSBInterface.h>
+#include <IOUSBPipe.h>
+#include <IOUSBDevice.h>
+#include <IOUSBInterface.h>
 
 #include "EMUUSBAudioCommon.h"
 #include "EMUUSBAudioDevice.h"
 #include "EMUUSBAudioLevelControl.h"
-#include "EMUUSBAudioMuteControl.h"
+//#include "EMUUSBAudioMuteControl.h"
 #include "USBAudioObject.h"
 #include "EMUUSBAudioClip.h"
 
@@ -540,7 +540,7 @@ protected:
 	void                setupChannelNames();
     
     /*! This is set true when we got signalled to terminate */
-    Boolean								terminatingDriver;
+    Boolean				terminatingDriver;
     
     /*! buffer to temporarily store ring buffer data  for conversion to float */
     UInt8 *             buf;
