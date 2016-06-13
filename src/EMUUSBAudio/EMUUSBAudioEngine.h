@@ -70,6 +70,7 @@
 #include "StreamInfo.h"
 #include "EMUUSBInputStream.h"
 #include "EMUUSBOutputStream.h"
+#include "USB.h"
 
 class EMUUSBAudioDevice;
 
@@ -97,7 +98,7 @@ struct UsbInputRing: RingBufferDefault<UInt8>
      @param newSize size of the ring in bytes
      @param engine pointer to IOAudioEngine
      @param expected_byte_rate expecte number of bytes per second for the buffer.
-     This is used to initialize our low pass filter 
+     This is used to initialize our low pass filter
      */
     IOReturn            init(UInt32 newSize, IOAudioEngine *engine,  UInt32 expected_byte_rate);
     
@@ -105,11 +106,11 @@ struct UsbInputRing: RingBufferDefault<UInt8>
     
     /*! callback when a ring wraps.
      Give IOAudioEngine a time stamp now.
-     We ignore the exact pos of the sample in the frame because 
-     measurements showed no relation between this position and the time of 
+     We ignore the exact pos of the sample in the frame because
+     measurements showed no relation between this position and the time of
      the frame that caused the wrap.
      
-     We check for outliers here. The input rate is very steady. 
+     We check for outliers here. The input rate is very steady.
      And we request for timestamp updates on the USB input every millisecond.
      Therefore the wrap time should vary never more than 1 millisecond from expected.
      We reject outliers while starting up.
@@ -121,7 +122,7 @@ struct UsbInputRing: RingBufferDefault<UInt8>
     void                notifyWrap(AbsoluteTime time);
     
     /*! get time (Absolute time in nanoseconds) since last wrap */
-//    UInt64              getLastWrapTime();
+    //    UInt64              getLastWrapTime();
     
     /*! get estimated sample position at time t as a fraction of the ring buffser.
      @param offset the offset time (ns), this is added to current time. Can be negative. */
@@ -157,29 +158,29 @@ private:
  
  This Audio engine handles the input stream from EMU to system (2 channels
  from the AD converters and 2 channels from SP/DIF) and output from the system
- to the EMU (2 channels for the DA converters and 2 channels for SP/DIF). 
+ to the EMU (2 channels for the DA converters and 2 channels for SP/DIF).
  
  The engine uses implicit synchronization to get the output clock at the correct
  rate. This means that the clock is synchronized with the input stream, and that
- this clock is then used to determine the output rate. Therefore, both input 
+ this clock is then used to determine the output rate. Therefore, both input
  and output streams are opened always, even if only output is done.
  
  Because of this asymmetry, the resulting code is completely asymmetric.
  
- THe input stream is a steady stream of data. All other clocks and applications 
+ THe input stream is a steady stream of data. All other clocks and applications
  have to be slaved to the data rate found here. Therefore, all incoming samples
- are buffered into a RingBuffer. When the ring buffer is full and wraps back 
+ are buffered into a RingBuffer. When the ring buffer is full and wraps back
  to the first sample, an event is triggered that is passed on to the system's
  AudioEngine. The system's audio engine then controls the master clock and
- the applications waiting for the data. 
+ the applications waiting for the data.
  
  The only thing we must do here is to ensure that the wrap events are passed at
- extremely regular intervals. If the interval is not regular enough, 
+ extremely regular intervals. If the interval is not regular enough,
  the system's Audio engine will throw up and become unstable.
  This is quite hard to do because USB callbacks are extremely jittery (10ms or even more
  is no exception) and totally unusable for this purpose.
  Instead, we use timestamps provided in the incoming datastream to compute
- when the wrap occured 'in theory'. 
+ when the wrap occured 'in theory'.
  These timestamps have a jitter in the order of 1ms, which still is way too much
  for the AudioEngine. Therefore, a low pass filter is applied to the timestamps
  (it's more complex than that as we need to filter the intervals but
@@ -189,17 +190,17 @@ private:
  into a single buffer just as the system's AudioEngine asks. A separate process
  pumps the samples in the buffer into the USB output pipe, with exactly the same rate
  as the samples are coming in in the input stream. That way we hope to keep
- in exact sync, so that the wraps in the output stream happen exactly at the same time 
+ in exact sync, so that the wraps in the output stream happen exactly at the same time
  as the input stream.
  
- The only timing aspect that is still open is the exact moment of starting the stream 
+ The only timing aspect that is still open is the exact moment of starting the stream
  such that we are in sync with the input stream wraps.
- This is critical as we don't do anything after the stream started but mimicking 
+ This is critical as we don't do anything after the stream started but mimicking
  the input. This is done by starting the two engines at the same moment.
- The tricky part here is that mimicking the input stream can't be done 
- exactly during the first cycle, as the number of samples in the input stream are 
- available only AFTER the first cycle. To get around this, we just guess the 
- sizes the first round and hope for the best (which may cause a deviation of up to 32 
+ The tricky part here is that mimicking the input stream can't be done
+ exactly during the first cycle, as the number of samples in the input stream are
+ available only AFTER the first cycle. To get around this, we just guess the
+ sizes the first round and hope for the best (which may cause a deviation of up to 32
  bytes).
  
  
@@ -244,7 +245,7 @@ public:
 	
     //static void sampleRateHandler (void * target, void * parameter, IOReturn result, IOUSBIsocFrame * pFrames);
     
-	virtual IOReturn pluginDeviceRequest (IOUSBDevRequest * request, IOUSBCompletion * completion);
+	virtual IOReturn pluginDeviceRequest (IOUSBDevRequest * request, Completion * completion);
 	virtual void pluginSetConfigurationApp (const char * bundleID);
 	virtual void registerPlugin (EMUUSBAudioPlugin * thePlugin);
 	static void	pluginLoaded (EMUUSBAudioEngine * usbAudioEngineObject);
@@ -255,9 +256,9 @@ public:
 	static	IOReturn softwareMuteChangedHandler (OSObject *target, IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);
 	
 protected:
-	IOUSBIsocCompletion					sampleRateCompletion;
+	IsocCompletion					sampleRateCompletion;
     /*! a frame to communicate about sample rates. Callbacks are to sampleRateHandler */
-	IOUSBIsocFrame						mSampleRateFrame;
+	IsocFrame						mSampleRateFrame;
     /*! the last USB frame that has been called for Read */
 	UInt64								nextSynchReadFrame;
 	
@@ -306,7 +307,7 @@ protected:
     UsbInputRing                        usbInputRing;
     /*! Ring to store recent frame sizes (#bytes in a frame) */
     FrameSizeQueue                      frameSizeQueue;
-
+    
     /*! Connect close event. */
     struct OurUSBOutputStream: public EMUUSBOutputStream {
     public:
@@ -361,7 +362,7 @@ protected:
 	UInt8								framesUntilRefresh;
 	UInt8								mAnchorResetCount;
 	UInt8								mHubSpeed;
-    /*! update frequency for IOUSBLowLatencyIsocFrame. see the documentation IOUSBPipe.
+    /*! update frequency for LowLatencyIsocFrame. see the documentation IOUSBPipe.
      1=every microframe (1/8 ms). 2=every 2 microframes 8=every full frame (millisecond) etc */
 	UInt8								mPollInterval;
     
@@ -372,7 +373,7 @@ protected:
 	UInt32								lastNonZeroFrame;
     
 	UInt32								nextExpectedOutputFrame;
- 
+    
     
     
     Boolean previousTimeWasFirstTime;
@@ -384,14 +385,14 @@ protected:
     
     /*! Collect all details for all altInterfaces on given ourInterfaceNumber
      @param usbAudio a EMUUSBAudioConfigObject holding all details
-     @param ourInterfaceNumber the interface number that should be unraveled 
+     @param ourInterfaceNumber the interface number that should be unraveled
      */
 	IOReturn	AddAvailableFormatsFromDevice (EMUUSBAudioConfigObject *usbAudio,
                                                UInt8 ourInterfaceNumber);
     
-//	IOReturn	CheckForAssociatedEndpoint (EMUUSBAudioConfigObject *usbAudio,
-//                                            UInt8 ourInterfaceNumber,
-//                                            UInt8 alernateSettingID);
+    //	IOReturn	CheckForAssociatedEndpoint (EMUUSBAudioConfigObject *usbAudio,
+    //                                            UInt8 ourInterfaceNumber,
+    //                                            UInt8 alernateSettingID);
 	
     IOReturn	GetDefaultSettings (IOUSBInterface *streamInterface,
 								    IOAudioSampleRate * sampleRate);
@@ -410,7 +411,7 @@ protected:
     
 	virtual OSString * getGlobalUniqueID ();
     
- 
+    
     
     /*! called from performAudioEngineStart */
     IOReturn startUSBStream();
@@ -418,13 +419,13 @@ protected:
     /*! called from performAudioEngineStop */
     IOReturn stopUSBStream ();
     
-    /*! Implements IOAudioEngine::getCurrentSampleFrame(). 
-     The erase-head process uses this value; it erases (zeroes out) frames in the sample and mix 
-     buffers up to, but not including, the sample frame returned by this method. Thus, although 
-     the sample counter value returned doesn’t have to be exact, it should never be larger than 
-     the actual sample counter. If it is larger, audio data may be erased by the erase head 
+    /*! Implements IOAudioEngine::getCurrentSampleFrame().
+     The erase-head process uses this value; it erases (zeroes out) frames in the sample and mix
+     buffers up to, but not including, the sample frame returned by this method. Thus, although
+     the sample counter value returned doesn’t have to be exact, it should never be larger than
+     the actual sample counter. If it is larger, audio data may be erased by the erase head
      before the hardware has a chance to play it.
-
+     
      @return the current safe playback erase point. See getCurrentSampleFrame(offset) */
     virtual UInt32 getCurrentSampleFrame (void);
     
@@ -432,7 +433,7 @@ protected:
      * @param offset in ns relative to true estimation of head position.
      */
     virtual UInt32 getCurrentSampleFrame (SInt64 offsetns);
-
+    
     virtual IOAudioStreamDirection getDirection ();
     virtual void *getSampleBuffer (void);
 	UInt32 getSampleBufferSize (void);
@@ -441,23 +442,23 @@ protected:
      @discussion when convertInputSamples skips bytes, this code attempts to connect the ends.
      This code is referring to pFrames which is void inside convertInputSamples. Therefore this
      code seems not safe to use. */
-	void CoalesceInputSamples(SInt32 numBytesToCoalesce, IOUSBLowLatencyIsocFrame * pFrames);
+	void CoalesceInputSamples(SInt32 numBytesToCoalesce, LowLatencyIsocFrame * pFrames);
 	virtual void resetClipPosition (IOAudioStream *audioStream, UInt32 clipSampleFrame);
     
-    /*! implements the IOAudioEngine interface. Called by the HAL, who does timing according to our 
+    /*! implements the IOAudioEngine interface. Called by the HAL, who does timing according to our
      timestamps when it thinks we are ready to process more data.
      
-     the driver must clip any excess floating-point values under –1.0 and over 1.0 —which can happen 
-     when multiple clients are adding their values to existing values in the same frame—and then 
-     convert these values to whatever format is required by the hardware. When clipOutputSamples 
-     returns, the converted values have been written to the corresponding locations in the sample buffer. 
-     The DMA engine grabs the frames as it progresses through the sample buffer and the hardware plays 
+     the driver must clip any excess floating-point values under –1.0 and over 1.0 —which can happen
+     when multiple clients are adding their values to existing values in the same frame—and then
+     convert these values to whatever format is required by the hardware. When clipOutputSamples
+     returns, the converted values have been written to the corresponding locations in the sample buffer.
+     The DMA engine grabs the frames as it progresses through the sample buffer and the hardware plays
      them as sound.
      
-     @param mixbuf a pointer to an array of sampleFrames. Each sampleFrame contains <numchan> floats, 
-     where <numchan> is the number of audio channels (eg, 2 for stereo). This is the audio that we 
+     @param mixbuf a pointer to an array of sampleFrames. Each sampleFrame contains <numchan> floats,
+     where <numchan> is the number of audio channels (eg, 2 for stereo). This is the audio that we
      need to play. The floats can be outside [-1,1] in which case we also need to clip the data.
-     @param sampleBuf probably the buffer that we passed to the IOAudioEngine through 
+     @param sampleBuf probably the buffer that we passed to the IOAudioEngine through
      audioStream->setSampleBuffer() = mOutput.bufferPtr
      @param firstSampleFrame
      @param numSampleFrames number of sampleFrames in the mixbuf
@@ -486,7 +487,7 @@ protected:
      */
     virtual IOReturn convertInputSamples (const void *sampleBuf, void *destBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream);
 	
-    /*! This gets called when the HAL wants to select one of the different formats that we made available via mainStream->addAvailableFormat 
+    /*! This gets called when the HAL wants to select one of the different formats that we made available via mainStream->addAvailableFormat
      @param audioStream
      @param newformat the details for the requested format.
      @param newSampleRate the requested sample rate.  Note that this is not part of the IOAudioStreamFormat.
@@ -500,7 +501,7 @@ protected:
      @param stream direction. 0=out 1=in.
      */
     IOReturn performFormatChangeInternal (IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate, UInt8 streamDirection);
-
+    
     
     /*! compute the averageFrameSamples
      @param sampleRate the target samplerate, eg 96000
@@ -522,18 +523,18 @@ protected:
      @param byteCount the total number of bytes in this frameList (including the ones before the wrap).
      byteCount MUST never == 0. If this computation is incorrect, we will encounter audio artifacts
      */
-//	AbsoluteTime generateTimeStamp (UInt32 usbFrameIndex, UInt32 preWrapBytes, UInt32 byteCount);
+    //	AbsoluteTime generateTimeStamp (UInt32 usbFrameIndex, UInt32 preWrapBytes, UInt32 byteCount);
     
 	IOReturn eraseOutputSamples(const void *mixBuf, void *sampleBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream);
     
-    /*! get the value for given field in the plist. see IORegistryEntry::getProperty 
+    /*! get the value for given field in the plist. see IORegistryEntry::getProperty
      @param field the name of the symbol to look up in the plist
      @param defaultValue the value to use if the plist does not specify this field. */
     UInt32 getPListNumber( const char *field, UInt32 defaultValue);
-
+    
     /* Not used
-	IOReturn hardwareSampleRateChangedAux(const IOAudioSampleRate *sampleRate, StreamInfo &info);
-    */
+     IOReturn hardwareSampleRateChangedAux(const IOAudioSampleRate *sampleRate, StreamInfo &info);
+     */
     
 	void				findAudioStreamInterfaces(IOUSBInterface *pAudioControlIfc); // AC mod
     
@@ -544,7 +545,7 @@ protected:
     
     /*! buffer to temporarily store ring buffer data  for conversion to float */
     UInt8 *             buf;
-
+    
 };
 
 #endif /* defined(__EMUUSBAudio__EMUUSBAudioEngine__) */

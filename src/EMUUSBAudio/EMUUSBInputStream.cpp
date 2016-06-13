@@ -23,9 +23,9 @@ IOReturn EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing, FrameSizeQ
     usbRing = inputRing;
     frameSizeQueue = frameRing;
     frameIndex = 0;
-
+    
 	startingEngine = TRUE;
-
+    
 	mLock = IOLockAlloc();
     ReturnIf(!mLock, kIOReturnNoMemory);
     
@@ -36,16 +36,21 @@ IOReturn EMUUSBInputStream::init(RingBufferDefault<UInt8> *inputRing, FrameSizeQ
 
 IOReturn EMUUSBInputStream::start(UInt64 startFrameNr) {
     ReturnIf(!initialized, kIOReturnNotReady);
-    ReturnIf(startFrameNr < streamInterface->GetDevice()->GetBus()->GetFrameNumber() + 10, kIOReturnTimeout);
+#ifdef HAVE_OLD_USB_INTERFACE
+    ReturnIf(startFrameNr < streamInterface->GetDevice()->GetBus()->GetFrameNumber() + 10,
+             kIOReturnTimeout);
+#else
+    ReturnIf(startFrameNr < streamInterface->getFrameNumber() + 10, kIOReturnTimeout);
+#endif
     ReturnIfFail(StreamInfo::reset());
     ReturnIfFail(StreamInfo::start(startFrameNr));
-
+    
     shouldStop = 0;
     nextCompleteFrameList = 0;
     previousFrameList = 3; //  different from currentFrameList.
     currentReadList = nextCompleteFrameList;
     mDropStartingFrames = kNumberOfStartingFramesToDrop;
-
+    
     // we start reading on all framelists. USB will figure it out and take the next one in order
     // when it has data. We restart each framelist in readCompleted when we get data.
     // this restarting may take some time.
@@ -96,7 +101,7 @@ IOReturn EMUUSBInputStream::update() {
 void EMUUSBInputStream::GatherInputSamples() {
     
     debugIOLogRD("+GatherInputSamples %d", bufferOffset / multFactor);
-
+    
     IOLockLock(mLock);
     while (gatherFromReadList() == kIOReturnSuccess);
     IOLockUnlock(mLock);
@@ -107,7 +112,7 @@ IOReturn       EMUUSBInputStream::gatherFromReadList() {
     
     IOReturn result = kIOReturnStillOpen;
     
-    IOUSBLowLatencyIsocFrame * pFrames = &usbIsocFrames[currentReadList * numUSBFramesPerList];
+    LowLatencyIsocFrame * pFrames = &usbIsocFrames[currentReadList * numUSBFramesPerList];
 	if (bufferSize <= bufferOffset) {
         // sanity checking to prevent going beyond the end of the allocated dest buffer
 		bufferOffset = 0;
@@ -149,7 +154,7 @@ IOReturn       EMUUSBInputStream::gatherFromReadList() {
         
         frameIndex++;
     }
-
+    
     if (frameIndex == RECORD_NUM_USB_FRAMES_PER_LIST) {
         // succes reading the entire frame! Continue with the next
         currentReadList = (currentReadList + 1) % numUSBFrameListsToQueue;
@@ -179,7 +184,7 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
 	if (pipe) {
 		UInt32		firstFrame = frameListNum * numUSBFramesPerList;
 		usbCompletion[frameListNum].target = (void*) this;
-		usbCompletion[frameListNum].action = readCompleted;
+		usbCompletion[frameListNum].action = (LowLatencyCompletionAction)readCompletedStatic;
 		usbCompletion[frameListNum].parameter = (void*) (UInt64)frameListNum; // remember the frameListNum
         
 		for (int i = 0; i < numUSBFramesPerList; ++i) {
@@ -189,7 +194,7 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
 			*(UInt64 *)(&(usbIsocFrames[firstFrame + i].frTimeStamp)) = 	0ul; //time when frame was procesed
 		}
         
-
+        
         /* The updatefrequency (last arg of Read) is not so well documented. But in IOUSBInterfaceInterface192:
          Specifies how often, in milliseconds, the frame list data should be updated. Valid range is 0 - 8.
          If 0, it means that the framelist should be updated at the end of the transfer.
@@ -201,13 +206,13 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
          We must keep these jumps small, to avoid timestamp errors and buffer overruns.
          */
         UInt64  frameNr = getNextFrameNr();
-
+        
         
         result = pipe->Read(bufferDescriptors[frameListNum], frameNr, numUSBFramesPerList,
                             &usbIsocFrames[firstFrame], &usbCompletion[frameListNum],1);
         
         debugIOLogR("READ framelist %d in framenr %lld at %lld",frameListNum, frameNr,mach_absolute_time());
-
+        
         if (result != kIOReturnSuccess) {
             // FIXME #17 if this goes wrong, why continue?
             doLog("USB pipe READ error %x",result);
@@ -219,8 +224,8 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
 
 
 
-void EMUUSBInputStream::readCompleted (void * object, void * frameListNrPtr,
-                                       IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
+void EMUUSBInputStream::readCompletedStatic (void * object, void * frameListNrPtr,
+                                             IOReturn result, LowLatencyIsocFrame * pFrames) {
     ((EMUUSBInputStream *)object)->readCompleted(frameListNrPtr, result, pFrames);
 }
 
@@ -228,7 +233,7 @@ void EMUUSBInputStream::readCompleted (void * object, void * frameListNrPtr,
 
 
 void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
-                                       IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
+                                       IOReturn result, LowLatencyIsocFrame * pFrames) {
     
     // HACK we have numUSBFramesPerList frames, which one to check?? Print frame 0 info.
     debugIOLogR("+ readCompleted framelist %d  result %x ", currentFrameList, result);
@@ -240,7 +245,7 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
      */
     
 	if (kIOReturnAborted != result) {
-        GatherInputSamples(); // also check if there is more in the buffer. 
+        GatherInputSamples(); // also check if there is more in the buffer.
 	}
 	
     // Data collection from the USB read is complete.
@@ -270,12 +275,12 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
         started = false;
         notifyClosed();
     }
-
-// HACK attempt to read feedback from device.
-//    if (counter++==100) {
-//
-//        CheckForAssociatedEndpoint( interfaceNumber, alternateSettingID);
-//    }
+    
+    // HACK attempt to read feedback from device.
+    //    if (counter++==100) {
+    //
+    //        CheckForAssociatedEndpoint( interfaceNumber, alternateSettingID);
+    //    }
     
 	debugIOLogR("- readCompleted currentFrameList=%d",currentFrameList);
 	return;
