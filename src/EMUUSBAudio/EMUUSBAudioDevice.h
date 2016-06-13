@@ -96,9 +96,9 @@ enum {
 
 /*!
  * This class is the EMU device controller, implementing the IOAudioDevice.
- * It manages the inputs at a high level, like 
- * detecting changes in volume or sample rate which goes through extension units (XUs). 
- * I could not find any documentation on XUs, but 
+ * It manages the inputs at a high level, like
+ * detecting changes in volume or sample rate which goes through extension units (XUs).
+ * I could not find any documentation on XUs, but
  * an XU is something on the EMU, for the available units refer to extensionUnitControlSelector.
  * Changes in XUs are detected through EMUUSBAudioDevice::deviceXUChangeHandler
  * and then forwarded to a CustomControl object.
@@ -116,7 +116,7 @@ public:
 protected:
     /*! average time between USB frames (units: 0.1ns ). Typical value is eg 10000009268  */
 	UInt64						mWallTimePerUSBCycle;
-    /*! a reference frame number, taken the first time updateWallTimePerUSBCycle is called. 
+    /*! a reference frame number, taken the first time updateWallTimePerUSBCycle is called.
      It is used to calculate the average USB frame rate in the jitter filter.*/
 	UInt64						mReferenceUSBFrame;
     /*! wall time for the mReferenceUSBFrame.  */
@@ -136,7 +136,7 @@ protected:
 	IOTimerEventSource*		mStatusCheckTimer;
 	IOTimerEventSource *	mUpdateTimer;
 	IOMemoryDescriptor *	mStatusBufferDesc;
-	IOUSBCompletion			mStatusCheckCompletion;
+	Completion			mStatusCheckCompletion;
 	thread_call_t			mInitHardwareThread;
 	IOUSBController *		mBus;// DT
 	bool					mUHCI;
@@ -171,7 +171,7 @@ protected:
 	UInt32					mAnchorResetCount;
     
     /*! original doc: device status buffer NOT XU setting.
-     This is a temporary store of the device status. EMUUSBAudioDevice::statusHandler 
+     This is a temporary store of the device status. EMUUSBAudioDevice::statusHandler
      copies the unitID contained in here to mQueryXU.
      */
 	UInt16*					mDeviceStatusBuffer;
@@ -205,15 +205,15 @@ protected:
     /*! Sets up a timer to call back to statusHandler.
      find the feedback (USB) endpoint & start the feedback cycle going
      @discussion (in original code): possible ways to do this
-      start a read of the interrupt endpoint
-      in the completion routine, schedule the next read or start the timer
-      OR - add a timer that will fire off
-      and start the checking as done below
+     start a read of the interrupt endpoint
+     in the completion routine, schedule the next read or start the timer
+     OR - add a timer that will fire off
+     and start the checking as done below
      */
 	void					setupStatusFeedback();
     /*! called from TimerAction, scheduled as a timer */
 	void					doTimerAction(IOTimerEventSource * timer);
-
+    
     /*! get the extension unit unitID. for some extension code.
      @param extCode the eExtensionUnitCode
      */
@@ -234,7 +234,7 @@ protected:
      @discussion These settings are used by getFrameAndTimeStamp. I think this mechanism is needed bcause we need to pass timestamps about the moment the read stream turned back in the ring buffer. But we are not processing this input data in real time.
      @return true unless mControlInterface is null. */
 	bool					updateWallTimePerUSBCycle();
-    /*! 
+    /*!
      @abstract this watchdog times the rate with which USB frames arrive.
      @discussion This is called from the workloop, as a timer event. This then calls doTimerAction after a few basic checks.
      This TimerAction runs at a period of kRefreshInterval ms (typically 128ms).
@@ -288,7 +288,7 @@ public:
      get the settings of some XU by eExtensionUnitCode
      @param extCode the eExtensionUnitCode
      @param controlSelector the extensionUnitControlSelector
-    */
+     */
 	IOReturn		getExtensionUnitSettings(UInt16 extCode, UInt8 controlSelector, void* setting, UInt32 length);
     /*! Send a new setting to the given extension unit and control.
      @param extCode the code for the extension unit ID. The actual ID will be looked up.
@@ -298,7 +298,7 @@ public:
      @param unitID the extension unit ID.
      */
 	IOReturn		getExtensionUnitSetting(UInt8 unitID, UInt8 controlSelector, void* setting, UInt32 length);
-    /*! This is the real function that sets controls in the USB device. 
+    /*! This is the real function that sets controls in the USB device.
      Builds a request structure and calls deviceRequest */
 	IOReturn		setExtensionUnitSetting(UInt8 unitID, UInt8 controlSelector, void* settings, UInt32 length);
     
@@ -321,7 +321,7 @@ public:
      @param data the data to add to the call
      @param length the number of bytes in data */
     IOReturn deviceRequestOut(UInt8 unitID, UInt8 controlSelector, UInt8 requestType,  UInt8 channelNr, UInt8* data, UInt32 length);
-
+    
 	IOReturn		doSelectorControlChange (IOAudioControl * audioControl, SInt32 oldValue, SInt32 newValue);
 	UInt8			getSelectorSetting (UInt8 selectorID);
 	IOReturn		setSelectorSetting (UInt8 selectorID, UInt8 setting);
@@ -359,23 +359,23 @@ public:
 	UInt8			getHubSpeed ();
 	inline UInt32			getHardwareSampleRate() {return mCurSampleRate;}
 	inline void				setHardwareSampleRate(UInt32 inSampleRate) { mCurSampleRate = inSampleRate;}
-	//virtual	IOReturn		deviceRequest (IOUSBDevRequest * request, IOUSBCompletion * completion = NULL);			// Depricated, don't use
+	//virtual	IOReturn		deviceRequest (IOUSBDevRequest * request, Completion * completion = NULL);			// Depricated, don't use
     
     /*! Send a request to the USB device over mControlInterface (default pipe 0?)
      and get the result. At most 5 attempts will be done if the call does not succeed immediately.
      @param request The parameter block to send to the device (with the pData as an IOMemoryDesriptor)
      @param completion optional on-completion callback. Default/null will execute request synchronously
      */
-	virtual	IOReturn		deviceRequest (IOUSBDevRequestDesc * request, IOUSBCompletion * completion = NULL);
-	static	IOReturn		deviceRequest (IOUSBDevRequest * request, EMUUSBAudioDevice * self, IOUSBCompletion * completion = 0);
+	virtual	IOReturn		deviceRequest (IOUSBDevRequestDesc * request, Completion * completion = NULL);
+	static	IOReturn		deviceRequest (IOUSBDevRequest * request, EMUUSBAudioDevice * self, Completion * completion = 0);
 	static void				StatusAction(OSObject *owner, IOTimerEventSource *sender);
-
+    
     /*! function that is attached to timer, to periodically get USB status. see also setupStatusFeedback */
 	static 	void			statusHandler(void* target, void* parameter, IOReturn result, UInt32 bytesLeft);
     
     /*! original docu: Create and add the custom controls each time the default controls are removed.
-      This works better than the previous scheme where the custom controls were created just once
-      and added each time when the default controls were removed. */
+     This works better than the previous scheme where the custom controls were created just once
+     and added each time when the default controls were removed. */
 	void					addCustomAudioControls(IOAudioEngine* engine);
 	void					removeCustomAudioControls(IOAudioEngine* engine);
     /*! Tell all engines about a new sample rate */
