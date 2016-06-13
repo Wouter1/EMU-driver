@@ -1,9 +1,8 @@
 //
-//  USB.h extended version/adapter
-//  EMUUSBAudio
+// This defines general type names that point to equivalent USB structures,
+// regardless of whether we compile on 10.9 or 10.11.
 //
 //  Created by wouter on 05/06/16.
-//  Copyright © 2016 com.emu. All rights reserved.
 //
 
 #ifndef USB_EXT_h
@@ -12,131 +11,131 @@
 
 #include "osxversion.h"
 
+/********************* 10.9 DEFINITIONS **********************/
 #ifdef HAVE_OLD_USB_INTERFACE
 #include <IOKit/usb/USB.h>
-#else
 
-/************** Extended version to define old USB.h structures as well ***********/
+
+typedef IOUSBIsocFrame IsocFrame;
+class LowLatencyIsocFrame: public  IOUSBLowLatencyIsocFrame {
+public:
+    void set(IOReturn status, UInt16 reqCount, UInt16 actCount, AbsoluteTime t) {
+        frStatus = status;
+        frReqCount = reqCount;
+        frActCount = actCount;
+        frTimeStamp = t;
+    }
+    
+    
+    /*! @return true if the the status has been set, which means the transfer was completed.
+     */
+    inline bool isDone() {
+        return -1 != frStatus;
+    }
+};
+
+
+
+
+typedef IOUSBLowLatencyIsocCompletionAction LowLatencyCompletionAction;
+
+class LowLatencyCompletion : public IOUSBLowLatencyIsocCompletion{
+public:
+    /*!
+     * init target, action and parameter
+     * @param t the target
+     * @param a the action
+     * @param p the parameter
+     */
+    void set(void * t, LowLatencyCompletionAction a , void *p) {
+        target = t;
+        action = a;
+        parameter = p;
+    }
+    
+    
+};
+
+
+typedef IOUSBEndpointDescriptor EndpointDescriptor;
+typedef IOUSBConfigurationDescriptor  ConfigurationDescriptor;
+typedef IOUSBIsocCompletion IsocCompletion;
+typedef IOUSBCompletion Completion;
+
+typedef  IOUSBCompletionAction CompletionAction;
+typedef IOUSBLowLatencyIsocCompletionAction LowLatencyCompletionAction;
+
+#else
+/********************* 10.11 DEFINITIONS **********************/
+
+// SEE ALSO IOUSBHostInterface for the new functionality compared to 10.9
 
 #include <IOKit/usb/StandardUSB.h>
-#include <IOKit/IOMemoryDescriptor.h>
+// replaces IOKit/usb/USB.h
+#include <IOKit/usb/IOUSBHostIOSource.h>
+
+//definitions that were removed in 10.11.
+#define USBToHostWord OSSwapLittleToHostInt16
+#define HostToUSBWord OSSwapHostToLittleInt16
+#define USBToHostLong OSSwapLittleToHostInt32
+#define HostToUSBLong OSSwapHostToLittleInt32
+
+// map the old USBmakebmRequestType and its variables into the new type
+#define USBmakebmRequestType makeDeviceRequestbmRequestType
+#define kUSBIn kRequestDirectionIn
+#define kUSBOut kRequestDirectionOut
+#define kUSBClass kRequestTypeClass
+#define kUSBInterface kRequestRecipientInterface
 
 
-/*********** HACK HACK HACK the definitions below are straight copies from 10.9 ************/
-/********** These supposedly are useless in 10.11 ****************/
-/*** Or else, they should be in some proper file. USB.h that defines all these does not exist in 10.11 */
+typedef IOUSBHostIsochronousFrame IsocFrame;
+// CHECK are there no explit low latency versions anymore?
 
-
-
-/*!
- @typedef IOUSBLowLatencyIsocFrame
- @discussion    Structure used to encode information about each isoc frame that is processed
- at hardware interrupt time (low latency).
- @param frStatus Returns status associated with the frame.
- @param frReqCount Input specifiying how many bytes to read or write.
- @param frActCount Actual # of bytes transferred.
- @param frTimeStamp Time stamp that indicates time when frame was procesed.
- */
-struct IOUSBLowLatencyIsocFrame {
-    IOReturn                        frStatus;
-    UInt16                          frReqCount;
-    UInt16                          frActCount;
-    AbsoluteTime		    frTimeStamp;
+class LowLatencyIsocFrame: public IOUSBHostIsochronousFrame {
+public:
+    /*!
+     * init status, requestCount, completeCount and timestamp
+     * @param s the status
+     * @param rc the requestCount
+     * @param cc the completeCount
+     * @param t the AbsoluteTime
+     */
+    void set(IOReturn s, uint32_t rc, uint32_t cc, AbsoluteTime t) {
+        status=s;
+        requestCount=rc;
+        completeCount=cc;
+        timeStamp=t;
+    }
+    
+    /*! @return true if the the status has been set, which means the transfer was completed.
+     */
+    inline bool isDone() {
+        return -1 != status;
+    }
 };
-typedef struct IOUSBLowLatencyIsocFrame IOUSBLowLatencyIsocFrame;
-
-
-
-/*!
- @typedef IOUSBLowLatencyIsocCompletionAction
- @discussion Function called when Low Latency Isochronous USB I/O completes.
- @param target The target specified in the IOUSBLowLatencyIsocCompletion struct.
- @param parameter The parameter specified in the IOUSBLowLatencyIsocCompletion struct.
- @param status Completion status.
- @param pFrames Pointer to the low latency frame list containing the status for each frame transferred.
- */
-typedef void (*IOUSBLowLatencyIsocCompletionAction)(
-void *				target,
-void *				parameter,
-IOReturn			status,
-IOUSBLowLatencyIsocFrame	*pFrames);
-
-
-
-/*!
- @typedef IOUSBLowLatencyIsocCompletion
- @discussion Struct specifying action to perform when an Low Latency Isochronous USB I/O completes.
- @param target The target to pass to the action function.
- @param action The function to call.
- @param parameter The parameter to pass to the action function.
- */
-typedef struct IOUSBLowLatencyIsocCompletion {
-    void * 				target;
-    IOUSBLowLatencyIsocCompletionAction	action;
-    void *				parameter;
-} IOUSBLowLatencyIsocCompletion;
-
-/*!
- @typedef IOUSBEndpointDescriptor
- @discussion Descriptor for a USB Endpoint.  See the USB Specification at <a href="http://www.usb.org" target="_blank">http://www.usb.org</a>.
- */
-struct IOUSBEndpointDescriptor {
-    UInt8 			bLength;
-    UInt8 			bDescriptorType;
-    UInt8 			bEndpointAddress;
-    UInt8 			bmAttributes;
-    UInt16 			wMaxPacketSize;
-    UInt8 			bInterval;
+typedef IOUSBHostIsochronousCompletionAction LowLatencyCompletionAction;
+class LowLatencyCompletion : IOUSBHostIsochronousCompletion {
+public:
+    /*!
+     * init owner, action and parameter
+     * @param t the owner
+     * @param a the action
+     * @param p the parameter
+     */
+    
+    void set(void * t, LowLatencyCompletionAction a , void *p) {
+        owner = t;
+        action = a;
+        parameter = p;
+        
+    }
 };
-typedef struct IOUSBEndpointDescriptor	IOUSBEndpointDescriptor;
-typedef IOUSBEndpointDescriptor *	IOUSBEndpointDescriptorPtr;
+// EndpointDescriptor already exists in OSX11, and it is the one we need
+// ConfigurationDescriptor already exists in OSX11, and it is the one we need
+typedef IOUSBHostIsochronousCompletion IsocCompletion;
+typedef IOUSBHostCompletion Completion;
 
 
-/*!
- @typedef IOUSBConfigurationDescriptor
- @discussion Standard USB Configuration Descriptor.  It is variable length, so this only specifies the known fields.  We use the wTotalLength field to read the whole descriptor.
- See the USB Specification at <a href="http://www.usb.org" target="_blank">http://www.usb.org</a>.
- */
-struct IOUSBConfigurationDescriptor {
-    UInt8 			bLength;
-    UInt8 			bDescriptorType;
-    UInt16 			wTotalLength;
-    UInt8 			bNumInterfaces;
-    UInt8 			bConfigurationValue;
-    UInt8 			iConfiguration;
-    UInt8 			bmAttributes;
-    UInt8 			MaxPower;
-};
-typedef struct IOUSBConfigurationDescriptor 	IOUSBConfigurationDescriptor;
-typedef IOUSBConfigurationDescriptor *		IOUSBConfigurationDescriptorPtr;
-
-/*!
- @typedef IOUSBCompletionAction
- @discussion Function called when USB I/O completes.
- @param target The target specified in the IOUSBCompletion struct.
- @param parameter The parameter specified in the IOUSBCompletion struct.
- @param status Completion status.
- @param bufferSizeRemaining Bytes left to be transferred.
- */
-typedef void (*IOUSBCompletionAction)(
-void *			target,
-void *			parameter,
-IOReturn		status,
-UInt32			bufferSizeRemaining);
-
-
-/*!
- @typedef IOUSBCompletion
- @discussion Struct specifying action to perform when a USB I/O completes.
- @param target The target to pass to the action function.
- @param action The function to call.
- @param parameter The parameter to pass to the action function.
- */
-typedef struct IOUSBCompletion {
-    void * 			target;
-    IOUSBCompletionAction	action;
-    void *			parameter;
-} IOUSBCompletion;
 
 
 /*!
@@ -187,14 +186,6 @@ typedef struct {
     UInt32                  wLenDone;
 } IOUSBDevRequestDesc;
 
-/*!
- @defined USBmakebmRequestType
- @discussion Macro to encode the bRequest field of a Device Request.  It is used when constructing an IOUSBDevRequest.
- */
-#define USBmakebmRequestType(direction, type, recipient)		\
-(((direction & kUSBRqDirnMask) << kUSBRqDirnShift) |			\
-((type & kUSBRqTypeMask) << kUSBRqTypeShift) |			\
-(recipient & kUSBRqRecipientMask))
 
 
 #endif // 10.11+ extras

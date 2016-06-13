@@ -19,10 +19,8 @@
 //ADAPTER for 10.11 and higher
 #include <IOKit/usb/IOUSBHostInterface.h>
 #include <IOUSBDevice.h>
-class IOUSBInterface {
-private:
-    IOUSBHostInterface *interface;
-    
+
+class IOUSBInterface: public IOUSBHostInterface {
 public:
     /*!
      @function GetDevice
@@ -42,10 +40,10 @@ public:
      * @return The current frame number
      */
     uint64_t getFrameNumber(AbsoluteTime* theTime = NULL) const;
-
+    
     void        close(IOService* forClient, IOOptionBits options = 0);
-
-
+    
+    
 };
 #endif
 
