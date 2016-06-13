@@ -45,8 +45,8 @@ __END_DECLS
 class EMUUSBAudioDevice;
 //typedef struct call_entry *thread_call_t; // Wouter: removed, already defined in thread_call
 
-typedef IOReturn (*USBDeviceRequest)(IOUSBDevRequest * request, void * refCon , IOUSBCompletion * completion );
-//typedef IOReturn (*USBDeviceRequest)(IOUSBDevRequest * request, void * refCon = 0, IOUSBCompletion * completion = 0);
+typedef IOReturn (*USBDeviceRequest)(IOUSBDevRequest * request, void * refCon , Completion * completion );
+//typedef IOReturn (*USBDeviceRequest)(IOUSBDevRequest * request, void * refCon = 0, Completion * completion = 0);
 
 class EMUUSBAudioMuteControl : public IOAudioToggleControl
 {
