@@ -62,7 +62,7 @@ void EMUUSBAudioPlugin::stop (IOService * provider) {
 	super::stop (provider);
 }
 
-IOReturn EMUUSBAudioPlugin::pluginDeviceRequest (IOUSBDevRequest * request, IOUSBCompletion * completion) {
+IOReturn EMUUSBAudioPlugin::pluginDeviceRequest (IOUSBDevRequest * request, Completion * completion) {
 	IOReturn		result = kIOReturnError;
     debugIOLog("EMUUSBAudioPlugin::pluginDeviceRequest");
 	if (mOurProvider)
