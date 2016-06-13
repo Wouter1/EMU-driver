@@ -63,7 +63,7 @@
  
  However, it seems that the exact time at which we call takeTimeStamp is critical as well.
  
-THIS NUMBER MUST BE MULTIPLE OF 8, see EMUUSBInputStream frameNumberIncreasePerRead. 
+ THIS NUMBER MUST BE MULTIPLE OF 8, see EMUUSBInputStream frameNumberIncreasePerRead.
  */
 
 #define NUMBER_FRAMES 64
@@ -89,7 +89,7 @@ THIS NUMBER MUST BE MULTIPLE OF 8, see EMUUSBInputStream frameNumberIncreasePerR
 // max size of the globally unique descriptor ID. See getGlobalUniqueID()
 #define MAX_ID_SIZE 128
 
-// size of FrameSizeQueue FIXME make this smaller. 
+// size of FrameSizeQueue FIXME make this smaller.
 #define FRAMESIZE_QUEUE_SIZE				    1024
 
 
@@ -114,12 +114,12 @@ public:
     
     /*! stream is started now. Set the initial USB frame to given value. */
     IOReturn start(UInt64 startUsbFrame);
-
+    
     
     /*! reset fields when reading/writing (re)starts. Assumes that pipe has been set.  */
     IOReturn reset();
     
-    /*! get the next USB frame number for read/write. Needed because kAppleUSBSSIsocContinuousFrame 
+    /*! get the next USB frame number for read/write. Needed because kAppleUSBSSIsocContinuousFrame
      gives error e00002ef on some computers */
     UInt64 getNextFrameNr();
     
@@ -175,19 +175,19 @@ public:
     /*! pipe for collecting status info from the main pipe */
     IOUSBPipe					  *associatedPipe;
     
-    /*! @discussion array of IOUSBLowLatencyIsocFrame containing USB status for a frame.
+    /*! @discussion array of LowLatencyIsocFrame containing USB status for a frame.
      size (for mInput) = numUSBFrameLists * numUSBFramesPerList */
-    IOUSBLowLatencyIsocFrame	  *usbIsocFrames;
+    LowLatencyIsocFrame	  *usbIsocFrames;
     
     /*! @abstract
-     array IOUSBLowLatencyIsocCompletion[numUSBFrameLists]
+     array LowLatencyCompletion[numUSBFrameLists]
      @discussion for each frameList there is this callback on completion.
      each one also contains a parameter for the callback.
      The parameter is:
      - for write buffer: number of bytes from the 0 wrap, 0 if this buffer didn't wrap
      - for read buffer; the frameListNum
      */
-    IOUSBLowLatencyIsocCompletion *usbCompletion;
+    LowLatencyCompletion *usbCompletion;
     
     // you want ddescriptors? we got descriptors!
     /*!  Big mem block to store all data from reading/writing USB data according to the framelists.
@@ -197,11 +197,11 @@ public:
     /*! The memory descriptor for the The intermediate ring buffer of size bufferSize.*/
     IOBufferMemoryDescriptor	*bufferMemoryDescriptor;
     
-    /*! array of pointers to IOMemoryDescriptor of length [frameListnum]. This is where raw USB data will come in. For mOutput, these point directly into part of the main bufferPtr memory. 
+    /*! array of pointers to IOMemoryDescriptor of length [frameListnum]. This is where raw USB data will come in. For mOutput, these point directly into part of the main bufferPtr memory.
      @discussion Contains copy of the received USB data.
      When a framelist is complete, readhHandler copies the data from the frame list
      to the mInput buffer so that the frameList can be redeployed.
-     We need this 
+     We need this
      (1) to have a fixed ring buffer as HAL is expecting us to have
      (2) to free up the framelist so that we can redeploy it to continue reading
      (3) so that we can do int-to-float conversion 'offline'.
@@ -213,17 +213,17 @@ public:
     /*! shortcut to bufferMemoryDescriptor actual buffer bytes. Really UInt8*. */
     void *						bufferPtr;
     
-    /*! the USB MBus Frame number that is usable next read/write. 
+    /*! the USB MBus Frame number that is usable next read/write.
      Initially this is at by the call to start, which should ensure this number is far enough in the future.
      Must be incremented with steps of size frameNumberIncreasePerRead. This is necessary because
      kAppleUSBSSIsocContinuousFrame seems to give pipe read error e00002ef on some computers #18
      and also to get a hard sync between the two pipes. */
     UInt64						nextUsableUsbFrameNr;
-
+    
     /*! increase of USB frame number per call to read/write. frame number increases every 8 usb microframes = 1 normal frame
      and we read/write NUMBER_FRAMES every pollInterval. */
     UInt16                      frameNumberIncreasePerCycle;
-
+    
 };
 
 

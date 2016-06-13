@@ -13,11 +13,11 @@
 IOReturn StreamInfo::init() {
     
     return kIOReturnSuccess;
-
+    
 }
 
 IOReturn StreamInfo::start(UInt64 startUsbFrame) {
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < 101100
+#ifdef HAVE_OLD_USB_INTERFACE
     ReturnIf(startUsbFrame < streamInterface->GetDevice()->GetBus()->GetFrameNumber() + 10, kIOReturnTimeout);
 #else
     ReturnIf(startUsbFrame < streamInterface->getFrameNumber() + 10, kIOReturnTimeout);
@@ -30,10 +30,10 @@ IOReturn StreamInfo::start(UInt64 startUsbFrame) {
 
 IOReturn StreamInfo::reset() {
     ReturnIf(!pipe, kIOReturnNotOpen);
-        
+    
     UInt16 pollInterval  = 1 << (pipe->GetEndpointDescriptor()->bInterval - 1);
     frameNumberIncreasePerCycle  = (NUMBER_FRAMES / 8) * pollInterval; // 1 per frame
-
+    
     return kIOReturnSuccess;
 }
 
