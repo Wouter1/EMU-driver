@@ -128,13 +128,13 @@ IOReturn EMUUSBOutputStream::writeFrameList (UInt32 frameListNum) {
 	return result;
 }
 
-void EMUUSBOutputStream::writeCompletedStatic (void * object, void * parameter, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
+void EMUUSBOutputStream::writeCompletedStatic (void * object, void * parameter, IOReturn result, LowLatencyIsocFrame * pFrames) {
     if (object) {
         ((EMUUSBOutputStream *) object)->writeCompleted(parameter, result, pFrames);
     }
 }
 
-void EMUUSBOutputStream::writeCompleted (void * parameter, IOReturn result, IOUSBLowLatencyIsocFrame * pFrames) {
+void EMUUSBOutputStream::writeCompleted (void * parameter, IOReturn result, LowLatencyIsocFrame * pFrames) {
     if (!streamInterface) return;
     
     if (kIOReturnSuccess != result && kIOReturnAborted != result) {
@@ -203,7 +203,7 @@ IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
     
     // Set to number of bytes from the 0 wrap, 0 if this buffer didn't wrap
     usbCompletion[listNr].target = (void *)this;
-    usbCompletion[listNr].action = writeCompletedStatic;
+    usbCompletion[listNr].action = (LowLatencyCompletionAction)writeCompletedStatic;
     usbCompletion[listNr].parameter = 0;
     
     
