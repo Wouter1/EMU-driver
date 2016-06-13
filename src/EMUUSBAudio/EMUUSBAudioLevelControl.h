@@ -47,8 +47,8 @@ __END_DECLS
 class EMUUSBAudioDevice;
 //typedef struct call_entry *thread_call_t; // Wouter: disabled, already defined in libkern.
 
-typedef IOReturn (*USBDeviceRequest)(IOUSBDevRequest * request, void * refCon , IOUSBCompletion * completion );
-//typedef IOReturn (*USBDeviceRequest)(IOUSBDevRequest * request, void * refCon = 0, IOUSBCompletion * completion = 0);
+typedef IOReturn (*USBDeviceRequest)(IOUSBDevRequest * request, void * refCon , Completion * completion );
+//typedef IOReturn (*USBDeviceRequest)(IOUSBDevRequest * request, void * refCon = 0, Completion * completion = 0);
 
 // PRAM read write values
 enum{
@@ -86,9 +86,9 @@ public:
 	static EMUUSBAudioLevelControl *create(UInt8 theUnitID, UInt8 theInterfaceNumber, UInt8 theControlSelector, UInt8 theChannelNumber, Boolean shouldUpdatePRAM, USBDeviceRequest theUSBDeviceRequest, void *theCallerRefCon, UInt32 subType, UInt32 usage);
     
 	virtual bool init(UInt8 theUnitID, UInt8 theInterfaceNumber, UInt8 theControlSelector, UInt8 theChannelNumber, Boolean shouldUpdatePRAM, USBDeviceRequest theUSBDeviceRequest, void *theCallerRefCon, UInt32 subType, UInt32 usage, OSDictionary *properties = NULL);
-	virtual void free();
+	virtual void free() override;
     
-	virtual IOReturn performValueChange(OSObject * newValue);
+	virtual IOReturn performValueChange(OSObject * newValue) override;
 	virtual void updateUSBValue();
 	virtual void updateUSBValue(SInt32 newValue);
     
