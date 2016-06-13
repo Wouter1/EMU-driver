@@ -114,7 +114,7 @@ enum {
 	VENDOR_SPECIFIC							= 0xff
 };
 
-/*! Audio Control (AC) interface descriptor subtypes. 
+/*! Audio Control (AC) interface descriptor subtypes.
  See USBInterfaceDescriptorPtr.bDescriptorSubtype. Used for and thus part of an interface description.*/
 enum {
     AC_DESCRIPTOR_UNDEFINED					= 0x00,
@@ -917,7 +917,7 @@ public:
     UInt8							GetSampleSize (void) {return bitResolution;}
     UInt8							GetSubframeSize (void) {return subframeSize;}
     UInt32 *						GetSampleRates (void) {return sampleFreqs;}
-     /*! @return unitID of the terminal the endpoint goes with */
+    /*! @return unitID of the terminal the endpoint goes with */
     UInt8							GetTerminalLink (void) {return terminalLink;}
     
 	Boolean							IsocEndpointDoesMaxPacketsOnly (void) {if (theIsocEndpointObject) return theIsocEndpointObject->DoesMaxPacketsOnly (); else return 0;}
@@ -931,14 +931,14 @@ class EMUUSBAudioConfigObject : public OSObject {
     OSDeclareDefaultStructors (EMUUSBAudioConfigObject);
     
 private:
-    IOUSBConfigurationDescriptor *	theConfigurationDescriptorPtr;
+    ConfigurationDescriptor *	theConfigurationDescriptorPtr;
     OSArray *						theControls;
 	UInt8							theControlInterfaceNum;
     OSArray *						theStreams;
     
 public:
-    static EMUUSBAudioConfigObject *	create (const IOUSBConfigurationDescriptor * newConfigurationDescriptor, UInt8 controlInterfaceNum);
-    virtual bool					init (const IOUSBConfigurationDescriptor * newConfigurationDescriptor, UInt8 controlInterfaceNum);
+    static EMUUSBAudioConfigObject *	create (const ConfigurationDescriptor * newConfigurationDescriptor, UInt8 controlInterfaceNum);
+    virtual bool					init (const ConfigurationDescriptor * newConfigurationDescriptor, UInt8 controlInterfaceNum);
     virtual void					free (void) override;
     
 	Boolean							ChannelHasMuteControl (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 featureUnitID, UInt8 channelNum);
@@ -946,7 +946,7 @@ public:
 	UInt8							FindNextAltInterfaceWithNumChannels (UInt8 interfaceNum, UInt8 startingAltInterface, UInt8 numChannelsRequested);
 	UInt8							FindNextAltInterfaceWithSampleSize (UInt8 interfaceNum, UInt8 startingAltInterface, UInt8 sampleSizeRequested);
 	UInt8							FindNextAltInterfaceWithSampleRate (UInt8 interfaceNum, UInt8 startingAltInterface, UInt32 sampleRateRequested);
-    /*! Finds an setting ID with given numChannels, sampleSize and sampleRate. 
+    /*! Finds an setting ID with given numChannels, sampleSize and sampleRate.
      * @param numChannels required #channels
      * @param sampleSize number of bits (8,16,24 etc) in each sample
      * @param sampleRate required rate. Ignored if 0.
@@ -961,9 +961,9 @@ public:
 	UInt16							GetFormat (UInt8 interfaceNum, UInt8 altInterfaceNum);
 	UInt32							GetHighestSampleRate (UInt8 interfaceNum, UInt8 altInterfaceNum);
 	UInt32							GetEndpointMaxPacketSize(UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 address);
-    /*! get endpoint poll interval (bInterval), 1=every microframe, 2=every 2 microframes, 3=every 4 microframes, 4=every frame, etc */ 
+    /*! get endpoint poll interval (bInterval), 1=every microframe, 2=every 2 microframes, 3=every 4 microframes, 4=every frame, etc */
 	UInt8							GetEndpointPollInterval(UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 direction);
-
+    
 	UInt8							GetIsocAssociatedEndpointAddress (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 address);
 #if !CUSTOMDEVICE
 	UInt8							GetIsocAssociatedEndpointRefreshInt (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 address);
@@ -971,8 +971,8 @@ public:
 	UInt8							GetEndpointPollInt(UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 address);
 	UInt8							GetIsocEndpointAddress (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 direction);
     
-     /*! Use GetTerminalLink to get the unit number of the input or output terminal that the endpoint is associated with.
-      With that terminal, you can figure out if it's an input or output terminal, and the direction of the endpoint. */
+    /*! Use GetTerminalLink to get the unit number of the input or output terminal that the endpoint is associated with.
+     With that terminal, you can figure out if it's an input or output terminal, and the direction of the endpoint. */
 	UInt8							GetIsocEndpointDirection (UInt8 interfaceNum, UInt8 altInterfaceNum);
 	UInt8							GetIsocEndpointSyncType (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 address);
 	UInt8							GetIndexedFeatureUnitID (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 featureUnitIndex);
@@ -1021,7 +1021,7 @@ private:
 	EMUUSBAudioControlObject *			GetControlObject (UInt8 interfaceNum, UInt8 altInterfaceNum);
     EMUUSBAudioStreamObject *			GetStreamObject (UInt8 interfaceNum, UInt8 altInterfaceNum);
     /*! his parses the configuration descriptor (memory block?) as it comes from the device?*/
-
+    
     void							ParseConfigurationDescriptor (void);
     USBInterfaceDescriptorPtr		ParseInterfaceDescriptor (USBInterfaceDescriptorPtr theInterfacePtr, UInt8 * interfaceClass, UInt8 * interfaceSubClass);
 	void							DumpConfigMemoryToIOLog (void);

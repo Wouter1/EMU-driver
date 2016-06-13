@@ -38,7 +38,7 @@
 OSDefineMetaClassAndStructors(EMUUSBAudioConfigObject, OSObject);
 
 // 	Public methods
-EMUUSBAudioConfigObject * EMUUSBAudioConfigObject::create(const IOUSBConfigurationDescriptor * newConfigurationDescriptor, UInt8 controlInterfaceNum) {
+EMUUSBAudioConfigObject * EMUUSBAudioConfigObject::create(const ConfigurationDescriptor * newConfigurationDescriptor, UInt8 controlInterfaceNum) {
     EMUUSBAudioConfigObject*		configObject = new EMUUSBAudioConfigObject;
     debugIOLogPC("EMUUSBAudioConfigObject::create");
     if (configObject && !configObject->init(newConfigurationDescriptor, controlInterfaceNum)) {
@@ -49,15 +49,15 @@ EMUUSBAudioConfigObject * EMUUSBAudioConfigObject::create(const IOUSBConfigurati
 }
 
 // init the audio.
-//@param newConfigurationDescriptor an IOUSBConfigurationDescriptor describing the device
-bool EMUUSBAudioConfigObject::init(const IOUSBConfigurationDescriptor * newConfigurationDescriptor, UInt8 controlInterfaceNum) {
+//@param newConfigurationDescriptor an ConfigurationDescriptor describing the device
+bool EMUUSBAudioConfigObject::init(const ConfigurationDescriptor * newConfigurationDescriptor, UInt8 controlInterfaceNum) {
     bool	result = false;
     
 	if (OSObject::init() && newConfigurationDescriptor) {
 		debugIOLogPC("EMUUSBAudioConfigObject::init");
 		UInt32	length = USBToHostWord(newConfigurationDescriptor->wTotalLength);
 		theControlInterfaceNum = controlInterfaceNum;
-		theConfigurationDescriptorPtr = (IOUSBConfigurationDescriptor *)IOMalloc(length + 1);
+		theConfigurationDescriptorPtr = (ConfigurationDescriptor *)IOMalloc(length + 1);
 		if (theConfigurationDescriptorPtr) {
 			memcpy(theConfigurationDescriptorPtr, newConfigurationDescriptor, length);
 			((UInt8 *)theConfigurationDescriptorPtr)[length] = 0;
@@ -318,23 +318,24 @@ UInt8 EMUUSBAudioConfigObject::GetEndpointPollInterval(UInt8 interfaceNum, UInt8
         IOLog("Bug? EMUUSBAudioConfigObject::GetEndpointPollInterval stream not opening");
         return 1; // can we cancel the whole thing?
     }
-
+    
     UInt8	address = stream->GetIsocEndpointAddress(direction);
     EMUUSBEndpointObject*	endpoint = stream->GetEndpointByAddress(address);
     if (!endpoint) {
         IOLog("Bug? EMUUSBAudioConfigObject::GetEndpointPollInterval no endpoint");
         return 1; // can we cancel the whole thing?
     }
-
+    
     pollInterval = endpoint->GetPollInt();
     debugIOLogC("EMUUSBAudioConfigObject::GetEndpointPollInterval %d",pollInterval);
 	return pollInterval;
 }
 
 
-// Use GetTerminalLink to get the unit number of the input or output terminal that the endpoint is associated with.
-// With that terminal, you can figure out if it's an input or output terminal, and the direction of the endpoint.
-
+/*! Use GetTerminalLink to get the unit number of the input or output terminal that the
+ endpoint is associated with. With that terminal, you can figure out if it's an
+ input or output terminal, and the direction of the endpoint.
+ */
 UInt8 EMUUSBAudioConfigObject::GetIsocEndpointDirection(UInt8 interfaceNum, UInt8 altInterfaceNum) {
     EMUUSBAudioStreamObject * 				thisStream = GetStreamObject(interfaceNum, altInterfaceNum);
     EMUUSBAudioControlObject * 			thisControl = GetControlObject(theControlInterfaceNum, 0);
@@ -347,7 +348,7 @@ UInt8 EMUUSBAudioConfigObject::GetIsocEndpointDirection(UInt8 interfaceNum, UInt
   	debugIOLogPC("GetIsocEndpointDirection(%d, %d), thisStream = %p", interfaceNum, altInterfaceNum, thisStream);
  	debugIOLogPC("GetIsocEndpointDirection(%d, %d), thisControl = %p", interfaceNum, altInterfaceNum, thisControl);
 	if(NULL != thisStream && NULL != thisControl) {
-		UInt8	terminalLink = thisStream->GetTerminalLink();	
+		UInt8	terminalLink = thisStream->GetTerminalLink();
 		debugIOLogPC("GetIsocEndpointDirection(%d, %d), terminalLink = %d", interfaceNum, altInterfaceNum, terminalLink);
 		if(0 != terminalLink) {
 			UInt8	numOutputs = thisControl->GetNumOutputTerminals();
@@ -1004,9 +1005,9 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
             
             FailIf(NULL == theStreamObject, Exit);
             debugIOLogAS("stream parameters: subtype %d, alternate %d, endpoints %d, class %d, subclass %d, protocol %d",
-                       theInterfacePtr->bDescriptorSubtype, theInterfacePtr->bAlternateSetting,
-                       theInterfacePtr->bNumEndpoints,theInterfacePtr->bInterfaceClass,
-                       theInterfacePtr->bInterfaceSubClass, theInterfacePtr->bInterfaceProtocol);
+                         theInterfacePtr->bDescriptorSubtype, theInterfacePtr->bAlternateSetting,
+                         theInterfacePtr->bNumEndpoints,theInterfacePtr->bInterfaceClass,
+                         theInterfacePtr->bInterfaceSubClass, theInterfacePtr->bInterfaceProtocol);
             theStreamObject->SetInterfaceNumber(theInterfacePtr->bDescriptorSubtype);
             theStreamObject->SetAlternateSetting(theInterfacePtr->bAlternateSetting);
             theStreamObject->SetNumEndpoints(theInterfacePtr->bNumEndpoints);
@@ -1993,20 +1994,20 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                         endpoint->SetAddress(((USBEndpointDescriptorPtr)theInterfacePtr)->bEndpointAddress);
                         endpoint->SetAttributes(((USBEndpointDescriptorPtr)theInterfacePtr)->bmAttributes);
                         debugIOLogPC("attributes %x",endpoint->GetAttributes());
-
+                        
                         endpoint->SetMaxPacketSize(USBToHostWord(((USBEndpointDescriptorPtr)theInterfacePtr)->wMaxPacketSize));
                         endpoint->SetRefreshInt(((USBEndpointDescriptorPtr)theInterfacePtr)->bRefresh);
                         endpoint->SetPollInt(((USBEndpointDescriptorPtr)theInterfacePtr)->bInterval);
 #if !CUSTOMDEVICE
                         endpoint->SetSynchAddress((((USBEndpointDescriptorPtr)theInterfacePtr)->bSynchAddress | 0x80));
                         debugIOLogPC("in ENDPOINT in ParseASInterfaceDescriptor endpointAddress %d, maxPacketSize %d, bInterval %d, syncAddress %d",
-                                   ((USBEndpointDescriptorPtr)theInterfacePtr)->bEndpointAddress, USBToHostWord(((USBEndpointDescriptorPtr)theInterfacePtr)->wMaxPacketSize),
-                                   ((USBEndpointDescriptorPtr)theInterfacePtr)->bInterval, ((USBEndpointDescriptorPtr)theInterfacePtr)->bSynchAddress);
+                                     ((USBEndpointDescriptorPtr)theInterfacePtr)->bEndpointAddress, USBToHostWord(((USBEndpointDescriptorPtr)theInterfacePtr)->wMaxPacketSize),
+                                     ((USBEndpointDescriptorPtr)theInterfacePtr)->bInterval, ((USBEndpointDescriptorPtr)theInterfacePtr)->bSynchAddress);
 #endif
                         
-                        if(NULL == theEndpointObjects) 
+                        if(NULL == theEndpointObjects)
                             theEndpointObjects = OSArray::withObjects((const OSObject **)&endpoint, 1);
-                        else 
+                        else
                             theEndpointObjects->setObject(endpoint);
                         
                         endpoint->release();
@@ -2016,10 +2017,10 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                         break;
                     case CS_ENDPOINT:
                         debugIOLogPC("in CS_ENDPOINT in ParseASInterfaceDescriptor");
-
+                        
                         if(EP_GENERAL ==((ASEndpointDescriptorPtr)theInterfacePtr)->bDescriptorSubtype) {
                             debugIOLogPC("attributes! %x",((ASEndpointDescriptorPtr)theInterfacePtr)->bmAttributes);
-
+                            
                             theIsocEndpointObject = new EMUUSBCSASIsocADEndpointObject(((ASEndpointDescriptorPtr)theInterfacePtr)->bmAttributes &(1 << sampleFreqControlBit),
                                                                                        ((ASEndpointDescriptorPtr)theInterfacePtr)->bmAttributes &(1 << pitchControlBit),
                                                                                        ((ASEndpointDescriptorPtr)theInterfacePtr)->bmAttributes &(1 << maxPacketsOnlyBit),
@@ -2050,7 +2051,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
                 thisEndpoint = GetIndexedEndpointObject(indx);
                 if(thisEndpoint) {
                     UInt8	theAddress = thisEndpoint->GetAddress();
-                    if(theAddress == address) 
+                    if(theAddress == address)
                         return thisEndpoint;
                 }
                 ++indx;
@@ -2066,7 +2067,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
             UInt8				total = theEndpointObjects->getCount();
             while(indx < total) {
                 endpoint = OSDynamicCast(EMUUSBEndpointObject, theEndpointObjects->getObject(indx));
-                if(endpoint && address == endpoint->GetAddress()) 
+                if(endpoint && address == endpoint->GetAddress())
                     return endpoint;
                 ++indx;
             }
@@ -2229,7 +2230,7 @@ void EMUUSBAudioConfigObject::ParseConfigurationDescriptor(void) {
         if (bmaControls) {
             memcpy(bmaControls, bmaControlsArrary, numControls * controlSize);
             if (2 == controlSize) {
-                for (UInt32 bmaControlIndex = 0; bmaControlIndex < numControls; ++bmaControlIndex) 
+                for (UInt32 bmaControlIndex = 0; bmaControlIndex < numControls; ++bmaControlIndex)
                     ((UInt16 *)bmaControls)[bmaControlIndex] = USBToHostWord (((UInt16 *)bmaControls)[bmaControlIndex]);
             }
         }
