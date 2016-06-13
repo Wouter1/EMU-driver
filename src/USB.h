@@ -114,7 +114,8 @@ public:
     }
 };
 typedef IOUSBHostIsochronousCompletionAction LowLatencyCompletionAction;
-class LowLatencyCompletion : IOUSBHostIsochronousCompletion {
+
+class LowLatencyCompletion : public IOUSBHostIsochronousCompletion {
 public:
     /*!
      * init owner, action and parameter

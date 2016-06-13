@@ -215,8 +215,7 @@ bool EMUUSBAudioEngine::start (IOService * provider) {
 	// Find out what interface number the driver is being instantiated against so that we always ask about
 	// our particular interface and not some other interface the device might have.
     
-	//<AC mod>
-	IOUSBInterface *usbInterface = OSDynamicCast (IOUSBInterface, provider->getProvider()); // AC mod
+	IOUSBInterface1 *usbInterface = OSDynamicCast (IOUSBInterface1, provider->getProvider());
 	findAudioStreamInterfaces(usbInterface);
     
 	/*FailIf (NULL == streamInterface, Exit);
@@ -481,8 +480,8 @@ IOReturn EMUUSBAudioEngine::AddAvailableFormatsFromDevice (EMUUSBAudioConfigObje
 
 bool EMUUSBAudioEngine::audioDevicePublished (EMUUSBAudioEngine * audioEngine, void * ref, IOService * newService) {
 	EMUUSBAudioDevice *		audioDevice;
-	IOUSBInterface *		thisControlInterface;
-	IOUSBInterface *		thisStreamInterface;
+	IOUSBInterface1 *		thisControlInterface;
+	IOUSBInterface1 *		thisStreamInterface;
 	bool					resultCode = false;
     
 	debugIOLog ("+EMUUSBAudioEngine::audioDevicePublished (%p, %p, %p)", audioEngine, (UInt32*)ref, newService);
@@ -495,13 +494,13 @@ bool EMUUSBAudioEngine::audioDevicePublished (EMUUSBAudioEngine * audioEngine, v
 	audioDevice = OSDynamicCast (EMUUSBAudioDevice, newService);
 	FailIf (NULL == audioDevice, Exit);
     
-	thisControlInterface = OSDynamicCast (IOUSBInterface, audioDevice->getProvider ());
+	thisControlInterface = OSDynamicCast (IOUSBInterface1, audioDevice->getProvider ());
 	FailIf (NULL == thisControlInterface, Exit);
     
 	for (int i = 0; i < audioEngine->mStreamInterfaces->getCount(); ++i) {
-		thisStreamInterface = OSDynamicCast (IOUSBInterface, audioEngine->mStreamInterfaces->getObject(i)); // AC mod
+		thisStreamInterface = OSDynamicCast (IOUSBInterface1, audioEngine->mStreamInterfaces->getObject(i)); // AC mod
 		FailIf (NULL == thisStreamInterface, Exit);
-		UInt8 ourInterfaceNumber = thisStreamInterface->GetInterfaceNumber();
+		UInt8 ourInterfaceNumber = thisStreamInterface->getInterfaceNumber();
 		if (thisControlInterface->GetDevice () == thisStreamInterface->GetDevice ()) {
 			if (audioDevice->ControlsStreamNumber (ourInterfaceNumber)) {
 				debugIOLog ("++EMUUSBAudioEngine[%p]: found device (%p) for Audio Engine (%p)", audioEngine, audioDevice, audioEngine);
@@ -893,7 +892,7 @@ UInt32 EMUUSBAudioEngine::getCurrentSampleFrame(SInt64 offsetns) {
 
 
 
-IOReturn EMUUSBAudioEngine::GetDefaultSettings(IOUSBInterface  *streamInterface,
+IOReturn EMUUSBAudioEngine::GetDefaultSettings(IOUSBInterface1  *streamInterface,
 											   IOAudioSampleRate * defaultSampleRate) {
 	IOReturn				result = kIOReturnError;
 	if (!usbAudioDevice)
@@ -1091,7 +1090,7 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
 	// Iterate through our assocated streams and perform initialization on each
 	// This will also sort out which stream is input and which is output
     for (int i = 0; i < mStreamInterfaces->getCount(); ++i) {
-		IOUSBInterface *streamInterface = OSDynamicCast(IOUSBInterface,mStreamInterfaces->getObject(i));
+		IOUSBInterface1 *streamInterface = OSDynamicCast(IOUSBInterface1,mStreamInterfaces->getObject(i));
 		FailIf(NULL == streamInterface, Exit);
 		if (kIOReturnSuccess != GetDefaultSettings(streamInterface, &sampleRate)) {
 			usbInputStream.audioStream->release();
@@ -2181,7 +2180,7 @@ UInt32 EMUUSBAudioEngine::getPListNumber( const char *field, UInt32 defaultValue
 
 
 //<AC mod>
-void EMUUSBAudioEngine::findAudioStreamInterfaces(IOUSBInterface *pAudioControlIfc)
+void EMUUSBAudioEngine::findAudioStreamInterfaces(IOUSBInterface1 *pAudioControlIfc)
 {
     IOUSBDevice *pDevice = pAudioControlIfc->GetDevice();
     

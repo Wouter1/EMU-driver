@@ -202,9 +202,10 @@ IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
     
     
     // Set to number of bytes from the 0 wrap, 0 if this buffer didn't wrap
-    usbCompletion[listNr].target = (void *)this;
-    usbCompletion[listNr].action = (LowLatencyCompletionAction)writeCompletedStatic;
-    usbCompletion[listNr].parameter = 0;
+    usbCompletion[listNr].set((void *)this, (LowLatencyCompletionAction)writeCompletedStatic, 0);
+    // usbCompletion[listNr].target = (void *)this;
+    // usbCompletion[listNr].action = (LowLatencyCompletionAction)writeCompletedStatic;
+    // usbCompletion[listNr].parameter = 0;
     
     
     
@@ -229,9 +230,10 @@ IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
             numBytesToBufferEnd -= thisFrameSize;
             //			debugIOLogC("no param");
         }
-        usbIsocFrames[firstFrame + n].frStatus = -1;
-        usbIsocFrames[firstFrame + n].frActCount = 0;
-        usbIsocFrames[firstFrame + n].frReqCount = thisFrameSize;
+        usbIsocFrames[firstFrame + n].set(-1, thisFrameSize, 0, 0);
+        //  usbIsocFrames[firstFrame + n].frStatus = -1;
+        //  usbIsocFrames[firstFrame + n].frActCount = 0;
+        //  usbIsocFrames[firstFrame + n].frReqCount = thisFrameSize;
     }
     //debugIOLogC("Done with the numUSBFrames loop");
     //debugIOLogW("num actual data frames in list %d",numUSBFramesPerList - contiguousZeroes);

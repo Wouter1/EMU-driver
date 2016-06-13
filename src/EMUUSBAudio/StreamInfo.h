@@ -168,7 +168,7 @@ public:
     UInt8		alternateSettingID;
     
     
-    IOUSBInterface				  *streamInterface;
+    IOUSBInterface1				  *streamInterface;
     IOAudioStream				  *audioStream;
     /*! IOUSBPipe used for isochronous reading input streams from USB*/
     IOUSBPipe					  *pipe;

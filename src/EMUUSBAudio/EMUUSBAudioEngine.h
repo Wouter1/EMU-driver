@@ -394,7 +394,7 @@ protected:
     //                                            UInt8 ourInterfaceNumber,
     //                                            UInt8 alernateSettingID);
 	
-    IOReturn	GetDefaultSettings (IOUSBInterface *streamInterface,
+    IOReturn	GetDefaultSettings (IOUSBInterface1 *streamInterface,
 								    IOAudioSampleRate * sampleRate);
     
     static bool audioDevicePublished (EMUUSBAudioEngine *audioEngine, void *ref, IOService *newService);
@@ -536,7 +536,7 @@ protected:
      IOReturn hardwareSampleRateChangedAux(const IOAudioSampleRate *sampleRate, StreamInfo &info);
      */
     
-	void				findAudioStreamInterfaces(IOUSBInterface *pAudioControlIfc); // AC mod
+	void				findAudioStreamInterfaces(IOUSBInterface1 *pAudioControlIfc); // AC mod
     
 	void                setupChannelNames();
     

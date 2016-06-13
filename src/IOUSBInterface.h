@@ -14,13 +14,22 @@
 
 #ifdef HAVE_OLD_USB_INTERFACE
 #include <IOKit/usb/IOUSBInterface.h>
+
+class IOUSBInterface1: public IOUSBInterface {
+public:
+    UInt8 getInterfaceNumber() {
+        return GetInterfaceNumber();
+    }
+
+};
+
 #else
 
 //ADAPTER for 10.11 and higher
 #include <IOKit/usb/IOUSBHostInterface.h>
 #include <IOUSBDevice.h>
 
-class IOUSBInterface: public IOUSBHostInterface {
+class IOUSBInterface1: public IOUSBHostInterface {
 public:
     /*!
      @function GetDevice
@@ -40,6 +49,9 @@ public:
      * @return The current frame number
      */
     uint64_t getFrameNumber(AbsoluteTime* theTime = NULL) const;
+    
+    UInt8 getInterfaceNumber();
+
     
     void        close(IOService* forClient, IOOptionBits options = 0);
     
