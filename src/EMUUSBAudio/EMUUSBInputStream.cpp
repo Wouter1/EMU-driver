@@ -118,10 +118,10 @@ IOReturn       EMUUSBInputStream::gatherFromReadList() {
 		bufferOffset = 0;
         debugIOLogR("BUG EMUUSBAudioEngine::GatherInputSamples wrong offset");
     }
-    while(frameIndex < RECORD_NUM_USB_FRAMES_PER_LIST
-          && -1 != pFrames[frameIndex].frStatus // no transport at all
-          && kUSBLowLatencyIsochTransferKey != pFrames[frameIndex].frStatus // partially transported
-          )
+    while(frameIndex < RECORD_NUM_USB_FRAMES_PER_LIST && pFrames[frameIndex].isDone())
+//          && -1 != pFrames[frameIndex].frStatus // no transport at all
+//          && kUSBLowLatencyIsochTransferKey != pFrames[frameIndex].frStatus // partially transported
+//          )
     {
         UInt16 size = pFrames[frameIndex].frActCount;
         UInt8 *source = (UInt8*) readBuffer + (currentReadList * readUSBFrameListSize) + maxFrameSize * frameIndex;
@@ -183,15 +183,17 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
 	IOReturn	result = kIOReturnError;
 	if (pipe) {
 		UInt32		firstFrame = frameListNum * numUSBFramesPerList;
-		usbCompletion[frameListNum].target = (void*) this;
-		usbCompletion[frameListNum].action = (LowLatencyCompletionAction)readCompletedStatic;
-		usbCompletion[frameListNum].parameter = (void*) (UInt64)frameListNum; // remember the frameListNum
+        usbCompletion[frameListNum].set((void*) this, (LowLatencyCompletionAction)readCompletedStatic, (void*) (UInt64)frameListNum);
+//		usbCompletion[frameListNum].target = (void*) this;
+//		usbCompletion[frameListNum].action = (LowLatencyCompletionAction)readCompletedStatic;
+//		usbCompletion[frameListNum].parameter = (void*) (UInt64)frameListNum; // remember the frameListNum
         
 		for (int i = 0; i < numUSBFramesPerList; ++i) {
-			usbIsocFrames[firstFrame+i].frStatus = -1; // used to check if this frame was already received
-			usbIsocFrames[firstFrame+i].frActCount = 0; // actual #bytes transferred
-			usbIsocFrames[firstFrame+i].frReqCount = maxFrameSize; // #bytes to read.
-			*(UInt64 *)(&(usbIsocFrames[firstFrame + i].frTimeStamp)) = 	0ul; //time when frame was procesed
+            usbIsocFrames[firstFrame+i].set(-1, maxFrameSize, 0, 0);
+//			usbIsocFrames[firstFrame+i].frStatus = -1; // used to check if this frame was already received
+//			usbIsocFrames[firstFrame+i].frActCount = 0; // actual #bytes transferred
+//			usbIsocFrames[firstFrame+i].frReqCount = maxFrameSize; // #bytes to read.
+//			*(UInt64 *)(&(usbIsocFrames[firstFrame + i].frTimeStamp)) = 	0ul; //time when frame was procesed
 		}
         
         

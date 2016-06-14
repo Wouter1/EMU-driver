@@ -133,7 +133,7 @@ bool EMUUSBAudioDevice::start(IOService * provider) {
 	bool			result = FALSE;
 	
     debugIOLogC("+ EMUUSBAudioDevice[%p]::start(%p)", this, provider);
-	mControlInterface = OSDynamicCast(IOUSBInterface, provider);
+	mControlInterface = OSDynamicCast(IOUSBInterface1, provider);
 	FailIf(FALSE == mControlInterface->open(this), Exit);
 	mCurSampleRate = mNumEngines = 0;
 	mInitHardwareThread = thread_call_allocate((thread_call_func_t)EMUUSBAudioDevice::initHardwareThread,(thread_call_param_t)this);
@@ -187,7 +187,7 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 	mTerminatingDriver = FALSE;
 	if (mControlInterface) {//FailIf(NULL == mControlInterface, Exit);
 		checkUHCI();// see whether we're attached via a UHCI controller
-		mInterfaceNum = mControlInterface->GetInterfaceNumber();
+		mInterfaceNum = mControlInterface->getInterfaceNumber();
 		debugIOLogC("There are %d configurations on this device", mControlInterface->GetDevice()->GetNumConfigurations());
 		debugIOLogC("Our control interface number is %d", mInterfaceNum);
 		mUSBAudioConfig = EMUUSBAudioConfigObject::create(mControlInterface->GetDevice()->GetFullConfigurationDescriptor(0), mInterfaceNum);

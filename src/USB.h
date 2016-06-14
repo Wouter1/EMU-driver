@@ -17,8 +17,13 @@
 
 
 typedef IOUSBIsocFrame IsocFrame;
+
 class LowLatencyIsocFrame: public  IOUSBLowLatencyIsocFrame {
 public:
+    /*!
+     TODO DOC
+     FIXME remove unused params
+     */
     void set(IOReturn status, UInt16 reqCount, UInt16 actCount, AbsoluteTime t) {
         frStatus = status;
         frReqCount = reqCount;
@@ -27,10 +32,11 @@ public:
     }
     
     
+    
     /*! @return true if the the status has been set, which means the transfer was completed.
      */
     inline bool isDone() {
-        return -1 != frStatus;
+        return -1 != frStatus && kUSBLowLatencyIsochTransferKey != frStatus;
     }
 };
 
@@ -74,7 +80,7 @@ typedef IOUSBLowLatencyIsocCompletionAction LowLatencyCompletionAction;
 // replaces IOKit/usb/USB.h
 #include <IOKit/usb/IOUSBHostIOSource.h>
 
-//definitions that were removed in 10.11.
+//definitions that were removed in 10.11 but that we still need
 #define USBToHostWord OSSwapLittleToHostInt16
 #define HostToUSBWord OSSwapHostToLittleInt16
 #define USBToHostLong OSSwapLittleToHostInt32
@@ -96,21 +102,21 @@ public:
     /*!
      * init status, requestCount, completeCount and timestamp
      * @param s the status
-     * @param rc the requestCount
-     * @param cc the completeCount
+     * @param requestc the requestCount = #bytes to read
+     * @param actualcc the actual CompleteCount = #bytes actual read
      * @param t the AbsoluteTime
      */
-    void set(IOReturn s, uint32_t rc, uint32_t cc, AbsoluteTime t) {
+    void set(IOReturn s, uint32_t requestc, uint32_t actualcc, AbsoluteTime t) {
         status=s;
-        requestCount=rc;
-        completeCount=cc;
+        requestCount=requestc;
+        completeCount=actualcc;
         timeStamp=t;
     }
     
-    /*! @return true if the the status has been set, which means the transfer was completed.
+    /*! @return true if the the status has been set properly, which means the transfer was completed.
      */
     inline bool isDone() {
-        return -1 != status;
+        return -1 != status && kIOReturnInvalid != status;
     }
 };
 typedef IOUSBHostIsochronousCompletionAction LowLatencyCompletionAction;

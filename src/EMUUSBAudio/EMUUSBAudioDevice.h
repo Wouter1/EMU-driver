@@ -111,7 +111,7 @@ class EMUUSBAudioDevice : public IOAudioDevice {
     
 public:
     /*! The USB control interface */
-    IOUSBInterface *		mControlInterface;
+    IOUSBInterface1 *		mControlInterface;
     
 protected:
     /*! average time between USB frames (units: 0.1ns ). Typical value is eg 10000009268  */

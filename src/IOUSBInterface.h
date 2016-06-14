@@ -50,7 +50,9 @@ public:
      */
     uint64_t getFrameNumber(AbsoluteTime* theTime = NULL) const;
     
-    UInt8 getInterfaceNumber();
+    UInt8 getInterfaceNumber() {
+        return getInterfaceDescriptor()->bInterfaceNumber;
+    }
 
     
     void        close(IOService* forClient, IOOptionBits options = 0);
