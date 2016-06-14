@@ -38,6 +38,16 @@ public:
     inline bool isDone() {
         return -1 != frStatus && kUSBLowLatencyIsochTransferKey != frStatus;
     }
+    
+    inline AbsoluteTime getTime() {
+        return frTimeStamp;
+    }
+    
+    /*! @return nr of actually completed frames */
+    inline uint32_t getCompleteCount() {
+        return frActCount;
+    }
+    
 };
 
 
@@ -117,6 +127,15 @@ public:
      */
     inline bool isDone() {
         return -1 != status && kIOReturnInvalid != status;
+    }
+    
+    inline AbsoluteTime getTime() {
+        return timeStamp;
+    }
+    
+    /*! @return nr of actually completed frames */
+    inline uint32_t getCompleteCount() {
+        return completeCount;
     }
 };
 typedef IOUSBHostIsochronousCompletionAction LowLatencyCompletionAction;

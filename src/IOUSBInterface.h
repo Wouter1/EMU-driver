@@ -17,9 +17,15 @@
 
 class IOUSBInterface1: public IOUSBInterface {
 public:
-    UInt8 getInterfaceNumber() {
+    inline UInt8 getInterfaceNumber() {
         return GetInterfaceNumber();
     }
+
+    /*! @return the index of the string descriptor describing the interface
+     */
+    inline UInt8  getInterfaceStringIndex() {
+        return GetInterfaceStringIndex();
+    };
 
 };
 
@@ -36,7 +42,9 @@ public:
      returns the device the interface is part of.
      @result Pointer to the IOUSBDevice object which is the parent of this IOUSBInterface object.
      */
-    IOUSBDevice *GetDevice();
+    IOUSBDevice *GetDevice() {
+        return GetDevice();
+    }
     
     /*!
      * @brief Return the current frame number of the USB bus
@@ -48,14 +56,22 @@ public:
      *
      * @return The current frame number
      */
-    uint64_t getFrameNumber(AbsoluteTime* theTime = NULL) const;
+    inline uint64_t getFrameNumber(AbsoluteTime* theTime = NULL) const {
+        return getFrameNumber();
+    }
     
-    UInt8 getInterfaceNumber() {
+    inline UInt8 getInterfaceNumber() {
         return getInterfaceDescriptor()->bInterfaceNumber;
     }
+    
+    /*! @return the index of the string descriptor describing the interface
+     */
+    inline UInt8  getInterfaceStringIndex() {
+        return getInterfaceDescriptor()->iInterface;
+    };
 
     
-    void        close(IOService* forClient, IOOptionBits options = 0);
+    void close(IOService* forClient, IOOptionBits options = 0);
     
     
 };

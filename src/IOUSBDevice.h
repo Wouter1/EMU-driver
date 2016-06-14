@@ -19,14 +19,56 @@
 #else
 
 
-// ADAPTER
+/********* 10.11 *************/
 #include <IOUSBController.h>
-#include <IOKit/usb/IOUSBHostHIDDevice.h>
 
-class IOUSBDevice {
-private:
-    IOUSBHostHIDDevice *device;
+// which one do we really need?
+//#include <IOKit/usb/IOUSBHostHIDDevice.h>
+
+// I suppose we need this, because here many changes wrt 10.9 are explained.
+#include <IOKit/usb/IOUSBHostDevice.h>
+#include <sys/utfconv.h>
+
+
+class IOUSBDevice: IOUSBHostDevice {
 public:
+    UInt8 GetProductStringIndex(void ) {
+        return getDeviceDescriptor()->iProduct;
+    };
+    
+    /*!
+     @function GetFullConfigurationDescriptor
+     return a pointer to all the descriptors for the requested configuration.
+     @param configIndex The configuration index (not the configuration value)
+     @result Pointer to the descriptors, which are cached in the IOUSBDevice object.
+     */
+    const ConfigurationDescriptor * GetFullConfigurationDescriptor(UInt8 configIndex) {
+        return getConfigurationDescriptor(configIndex);
+    }
+    
+    /*!
+     @function GetStringDescriptor
+     Get a string descriptor as ASCII, in the specified language (default is US English)
+     @param index Index of the string descriptor to get.
+     @param buf Pointer to place to store ASCII string
+     @param maxLen Size of buffer pointed to by buf
+     @param lang Language to get string in (default is US English)
+     */
+    IOReturn GetStringDescriptor(UInt8 index, char* buf, int maxLen, UInt16 lang = 0x409) {
+        size_t utf8len = 0;
+        const StringDescriptor* stringDescriptor = getStringDescriptor(index, lang);
+        if (stringDescriptor != NULL && stringDescriptor->bLength > StandardUSB::kDescriptorSize)
+        {
+            utf8_encodestr(reinterpret_cast<const u_int16_t*>(stringDescriptor->bString),
+                    stringDescriptor->bLength - kDescriptorSize,
+                    reinterpret_cast<u_int8_t*>(buf), &utf8len, maxLen,
+                    '/', UTF_LITTLE_ENDIAN);
+            return kIOReturnSuccess;
+        }
+        return kIOReturnError;
+    }
+    
+    
 };
 #endif
 

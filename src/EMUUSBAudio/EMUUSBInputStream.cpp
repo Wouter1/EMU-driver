@@ -123,7 +123,7 @@ IOReturn       EMUUSBInputStream::gatherFromReadList() {
 //          && kUSBLowLatencyIsochTransferKey != pFrames[frameIndex].frStatus // partially transported
 //          )
     {
-        UInt16 size = pFrames[frameIndex].frActCount;
+        UInt16 size = pFrames[frameIndex].getCompleteCount();
         UInt8 *source = (UInt8*) readBuffer + (currentReadList * readUSBFrameListSize) + maxFrameSize * frameIndex;
         
         if (size%6 == 4 ) {
@@ -140,8 +140,8 @@ IOReturn       EMUUSBInputStream::gatherFromReadList() {
             //}
             
             // FIXME. We should not call from inside locked area.
-            usbRing-> push(source, size , pFrames[frameIndex].frTimeStamp );
-            frameSizeQueue-> push(size , pFrames[frameIndex].frTimeStamp);
+            usbRing-> push(source, size , pFrames[frameIndex].getTime() );
+            frameSizeQueue-> push(size , pFrames[frameIndex].getTime());
             
             // if (frameIndex == 1) {
             //   debugIOLogC("latency %d",usbRing->available());

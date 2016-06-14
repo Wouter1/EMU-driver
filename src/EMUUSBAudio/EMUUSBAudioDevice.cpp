@@ -214,10 +214,10 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 		}
         
 		string[0] = 0;
-		stringIndex = mControlInterface->GetInterfaceStringIndex(); // try getting this first
+		stringIndex = mControlInterface->getInterfaceStringIndex(); // try getting this first
 		IOUSBDevice*	device = mControlInterface->GetDevice();	// this must always work
-		mBus = device->GetBus();// get the bus
-		if (!stringIndex)
+
+        if (!stringIndex)
 			stringIndex = device->GetProductStringIndex();
         
 		if(0 != stringIndex) {

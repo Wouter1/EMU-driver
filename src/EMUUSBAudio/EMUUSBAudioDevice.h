@@ -138,8 +138,8 @@ protected:
 	IOMemoryDescriptor *	mStatusBufferDesc;
 	Completion			mStatusCheckCompletion;
 	thread_call_t			mInitHardwareThread;
-	IOUSBController *		mBus;// DT
-	bool					mUHCI;
+
+    bool					mUHCI;
     /*! unit ID, copied from mDeviceStatusBuffer periodically */
 	UInt32					mQueryXU;// the XU to query
 	UInt32					mCurSampleRate;
