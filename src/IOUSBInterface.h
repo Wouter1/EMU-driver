@@ -13,6 +13,8 @@
 
 
 #ifdef HAVE_OLD_USB_INTERFACE
+/******************** 10.9 *********************/
+
 #include <IOKit/usb/IOUSBInterface.h>
 
 class IOUSBInterface1: public IOUSBInterface {
@@ -21,17 +23,27 @@ public:
         return GetInterfaceNumber();
     }
 
-    /*! @return the index of the string descriptor describing the interface
+    /*! @result the index of the string descriptor describing the interface
      */
     inline UInt8  getInterfaceStringIndex() {
         return GetInterfaceStringIndex();
     };
+    
+    /*!
+     @function GetDevice
+     returns the device the interface is part of.
+     @result Pointer to the IOUSBDevice object which is the parent of this IOUSBInterface object.
+     */
+    inline IOUSBDevice *getDevice1() {
+        return OSDynamicCast(IOUSBDevice, GetDevice());
+    }
+
 
 };
 
 #else
 
-//ADAPTER for 10.11 and higher
+/******************** 10.11 and higher *********************/
 #include <IOKit/usb/IOUSBHostInterface.h>
 #include <IOUSBDevice.h>
 
@@ -42,8 +54,8 @@ public:
      returns the device the interface is part of.
      @result Pointer to the IOUSBDevice object which is the parent of this IOUSBInterface object.
      */
-    IOUSBDevice *GetDevice() {
-        return GetDevice();
+    inline IOUSBDevice *getDevice1() {
+        return OSDynamicCast(IOUSBDevice ,getDevice());
     }
     
     /*!
@@ -54,7 +66,7 @@ public:
      *
      * @param theTime If not NULL, this will be updated with the current system time
      *
-     * @return The current frame number
+     * @result The current frame number
      */
     inline uint64_t getFrameNumber(AbsoluteTime* theTime = NULL) const {
         return getFrameNumber();
@@ -64,15 +76,17 @@ public:
         return getInterfaceDescriptor()->bInterfaceNumber;
     }
     
-    /*! @return the index of the string descriptor describing the interface
+    /*! @result the index of the string descriptor describing the interface
      */
     inline UInt8  getInterfaceStringIndex() {
         return getInterfaceDescriptor()->iInterface;
     };
-
     
-    void close(IOService* forClient, IOOptionBits options = 0);
-    
+    IOUSBHostPipe* FindNextPipe(IOUSBHostPipe* current, IOUSBFindEndpointRequest* request) {
+        
+    // Replacement: getInterfaceDescriptor and StandardUSB::getNextAssociatedDescriptorWithType to find an endpoint descriptor,
+    // then use copyPipe to retrieve the pipe object
+    }
     
 };
 #endif

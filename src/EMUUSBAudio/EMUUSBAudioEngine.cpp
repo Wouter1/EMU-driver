@@ -501,7 +501,7 @@ bool EMUUSBAudioEngine::audioDevicePublished (EMUUSBAudioEngine * audioEngine, v
 		thisStreamInterface = OSDynamicCast (IOUSBInterface1, audioEngine->mStreamInterfaces->getObject(i)); // AC mod
 		FailIf (NULL == thisStreamInterface, Exit);
 		UInt8 ourInterfaceNumber = thisStreamInterface->getInterfaceNumber();
-		if (thisControlInterface->GetDevice () == thisStreamInterface->GetDevice ()) {
+		if (thisControlInterface->getDevice1() == thisStreamInterface->getDevice1()) {
 			if (audioDevice->ControlsStreamNumber (ourInterfaceNumber)) {
 				debugIOLog ("++EMUUSBAudioEngine[%p]: found device (%p) for Audio Engine (%p)", audioEngine, audioDevice, audioEngine);
 				audioEngine->usbAudioDevice = audioDevice;

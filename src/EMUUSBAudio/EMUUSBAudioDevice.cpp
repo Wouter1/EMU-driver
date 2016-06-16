@@ -190,7 +190,7 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 		mInterfaceNum = mControlInterface->getInterfaceNumber();
 		debugIOLogC("There are %d configurations on this device", mControlInterface->GetDevice()->GetNumConfigurations());
 		debugIOLogC("Our control interface number is %d", mInterfaceNum);
-		mUSBAudioConfig = EMUUSBAudioConfigObject::create(mControlInterface->GetDevice()->GetFullConfigurationDescriptor(0), mInterfaceNum);
+		mUSBAudioConfig = EMUUSBAudioConfigObject::create(mControlInterface->getDevice1()->GetFullConfigurationDescriptor(0), mInterfaceNum);
 		FailIf(NULL == mUSBAudioConfig, Exit);
 		mQueryXU = 0;// initialized
 		mXUChanged = mClockSelector = mDigitalIOStatus = mDigitalIOSyncSrc = mDigitalIOAsyncSrc = mDigitalIOSPDIF = mDevOptionCtrl = NULL;
@@ -215,7 +215,7 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
         
 		string[0] = 0;
 		stringIndex = mControlInterface->getInterfaceStringIndex(); // try getting this first
-		IOUSBDevice*	device = mControlInterface->GetDevice();	// this must always work
+		IOUSBDevice*	device = mControlInterface->getDevice1();	// this must always work
 
         if (!stringIndex)
 			stringIndex = device->GetProductStringIndex();
@@ -350,7 +350,7 @@ Exit:
 
 void EMUUSBAudioDevice::checkUHCI() {
 	const IORegistryPlane*	svcPlane = getPlane(kIOServicePlane);
-	IOUSBDevice*			device = OSDynamicCast(IOUSBDevice, mControlInterface->GetDevice());
+	IOUSBDevice* device = mControlInterface->getDevice1();
 	mUHCI = false;
 	if (device) {
 		IORegistryEntry*	parent = device->getParentEntry(svcPlane);

@@ -30,7 +30,7 @@
 #include <sys/utfconv.h>
 
 
-class IOUSBDevice: IOUSBHostDevice {
+class IOUSBDevice: public IOUSBHostDevice {
 public:
     UInt8 GetProductStringIndex(void ) {
         return getDeviceDescriptor()->iProduct;
@@ -67,6 +67,24 @@ public:
         }
         return kIOReturnError;
     }
+    
+    /*!
+     @function ResetDevice
+     Reset the device, returning it to the addressed, unconfigured state.
+     This is useful if a device has got badly confused. Note that the AppleUSBComposite driver will automatically reconfigure the device if it is a composite device.
+     */
+    IOReturn ResetDevice() {
+        return kIOReturnSuccess; //Replacement: none...
+    }
+    
+    /*!
+     @function GetManufacturerStringIndex
+     returns the index of string descriptor describing manufacturer
+     */
+    UInt8 GetManufacturerStringIndex() {
+        return getDeviceDescriptor()->iManufacturer;
+    }
+
     
     
 };
