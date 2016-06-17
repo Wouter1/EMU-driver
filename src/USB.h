@@ -162,6 +162,25 @@ typedef IOUSBHostIsochronousCompletion IsocCompletion;
 typedef IOUSBHostCompletion Completion;
 
 
+/*!
+ Used in combination with IOUSBInterface FindNextPipe and we restore that function
+ @typedef IOUSBFindEndpointRequest
+ @discussion Struct used to find endpoints of an interface
+ type and direction are used to match endpoints,
+ type, direction, maxPacketSize and interval are updated
+ with the properties of the found endpoint.
+ @field type Type of endpoint: kUSBControl, kUSBIsoc, kUSBBulk, kUSBInterrupt, kUSBAnyType.  If kUSBAnyType is specified, this field is treated as a don't care.
+ @field direction Direction of endpoint: kUSBOut, kUSBIn, kUSBAnyDirn.   If kUSBAnyDirn is specified, this field is treated as a don't care.
+ @field maxPacketSize maximum packet size of endpoint.
+ @field interval Polling interval in mSec for endpoint.
+ */
+typedef struct {
+    UInt8 type;
+    UInt8 direction;
+    UInt16 maxPacketSize;
+    UInt8 interval;
+} IOUSBFindEndpointRequest;
+
 
 
 /*!

@@ -38,14 +38,33 @@ public:
         return OSDynamicCast(IOUSBDevice, GetDevice());
     }
 
+    /*!
+     @function findPipe
+     Find a pipe of the interface that matches the requirements,
+     starting from the beginning of the interface's pipe list
+     @param request Requirements for pipe to match, updated with the found pipe's
+     properties.
+     @result Pointer to the pipe, or NULL if no pipe matches the request.
+     */
+    IOUSBPipe* findPipe(uint8_t direction, uint8_t type) {
+        IOUSBFindEndpointRequest request;
+        request.direction = direction;
+        request.type = type;
+        request.interval = 0xFF;
+        request.maxPacketSize = 0;
+        return FindNextPipe(NULL, &request);
+    }
 
 };
+
 
 #else
 
 /******************** 10.11 and higher *********************/
 #include <IOKit/usb/IOUSBHostInterface.h>
 #include <IOUSBDevice.h>
+#include "EMUUSBLogging.h"
+#include <IOKit/usb/USBSpec.h>
 
 class IOUSBInterface1: public IOUSBHostInterface {
 public:
@@ -82,10 +101,55 @@ public:
         return getInterfaceDescriptor()->iInterface;
     };
     
-    IOUSBHostPipe* FindNextPipe(IOUSBHostPipe* current, IOUSBFindEndpointRequest* request) {
+    /*!
+     @function findPipe
+     Find a pipe of the interface that matches the requirements,
+     starting from the beginning of the interface's pipe list
+     @param direction the direction for the required pipe. eg kUSBInterrupt or kUSBIsoc or kUSBAnyType
+     @param type the type of the required pipe: kUSBIn or kUSBOut or kUSBAnyDirn
+     @result Pointer to the pipe, or NULL if no pipe matches the request.
+     */
+    IOUSBHostPipe* findPipe(uint8_t direction, uint8_t type) {
+        debugIOLog("+findPipe: dir=%d, type = %d", direction, type);
+
+        const StandardUSB::ConfigurationDescriptor* configDesc = getConfigurationDescriptor();
+        if (configDesc==NULL)
+        {
+            debugIOLog("-findpipe: fail, no config descriptor available!");
+            return NULL;
+        }
+        const StandardUSB::InterfaceDescriptor* ifaceDesc = getInterfaceDescriptor();
+        if (ifaceDesc==NULL)
+        {
+            debugIOLog("-findpipe: fail, no interface descriptor available!");
+            return NULL;
+        }
         
-    // Replacement: getInterfaceDescriptor and StandardUSB::getNextAssociatedDescriptorWithType to find an endpoint descriptor,
-    // then use copyPipe to retrieve the pipe object
+        const EndpointDescriptor* ep = NULL;
+        while ((ep = StandardUSB::getNextEndpointDescriptor(configDesc, ifaceDesc, ep)))
+        {
+            // check if endpoint matches type and direction
+            uint8_t epDirection = StandardUSB::getEndpointDirection(ep);
+            uint8_t epType = StandardUSB::getEndpointType(ep);
+            
+            debugIOLog("endpoint found: epDirection = %d, epType = %d", epDirection, epType);
+            
+            if ( (direction == epDirection || direction == kUSBAnyDirn)
+                && (type == epType || type ==kUSBAnyDirn) )
+            {
+                IOUSBHostPipe* pipe = copyPipe(StandardUSB::getEndpointAddress(ep));
+                if (pipe == NULL)
+                {
+                    debugIOLog("-findpipe: found matching pipe but copyPipe failed");
+                    return NULL;
+                }
+                debugIOLog("-findpipe: success");
+                pipe->release();
+                return pipe;
+            }
+        }
+        debugIOLog("findPipe: no matching endpoint found");
+        return NULL;
     }
     
 };

@@ -369,14 +369,16 @@ void EMUUSBAudioDevice::checkUHCI() {
 
 
 void EMUUSBAudioDevice::setupStatusFeedback() {
-	IOUSBFindEndpointRequest	statusEndpoint;
+//	IOUSBFindEndpointRequest	statusEndpoint;
 	
-	statusEndpoint.type = kUSBInterrupt;
-	statusEndpoint.direction = kUSBIn;
-	statusEndpoint.maxPacketSize = kStatusPacketSize; // is this sizeof(UInt16)
-	statusEndpoint.interval = 0xFF;
+//	statusEndpoint.type = kUSBInterrupt;
+//	statusEndpoint.direction = kUSBIn;
+//	statusEndpoint.maxPacketSize = kStatusPacketSize; // is this sizeof(UInt16)
+//	statusEndpoint.interval = 0xFF;
     
-	mStatusPipe = mControlInterface->FindNextPipe(NULL, &statusEndpoint);
+    //mStatusPipe = mControlInterface->findPipe(&statusEndpoint);
+    
+    mStatusPipe = mControlInterface->findPipe(kUSBIn,kUSBInterrupt);
 	if (mStatusPipe) {// the endpoint exists
 		mStatusPipe->retain();// retain until tear down
 		mDeviceStatusBuffer = (UInt16*) IOMalloc(sizeof(UInt16)); // Is this kStatusPacketSize?

@@ -1699,7 +1699,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	const IOAudioStreamFormat *			outputFormat = mOutput.audioStream->getFormat();
 	
 	IOReturn							resultCode = kIOReturnError;
-	IOUSBFindEndpointRequest			audioIsochEndpoint;
+	//IOUSBFindEndpointRequest			audioIsochEndpoint;
 	EMUUSBAudioConfigObject *			usbAudio = usbAudioDevice->GetUSBAudioConfigObject();
     /*! usual number of stereo(quad)samples per frame. (the average is a little higher) */
 	UInt16								averageFrameSamples = 0;
@@ -1778,11 +1778,13 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	FailIf (kIOReturnSuccess != resultCode, Exit);
 	
 	// Acquire a PIPE for the isochronous stream.
-	audioIsochEndpoint.type = kUSBIsoc;
-	audioIsochEndpoint.direction = usbInputStream.streamDirection;
+	//audioIsochEndpoint.type = kUSBIsoc;
+	//audioIsochEndpoint.direction = usbInputStream.streamDirection;
 	{
 		debugIOLogC("createInputPipe");
-		usbInputStream.pipe = usbInputStream.streamInterface->FindNextPipe (NULL, &audioIsochEndpoint);
+//        usbInputStream.pipe = usbInputStream.streamInterface->findPipe ( &audioIsochEndpoint);
+        usbInputStream.pipe =
+            usbInputStream.streamInterface->findPipe (usbInputStream.streamDirection,  kUSBIsoc);
 		FailIf (NULL == usbInputStream.pipe, Exit);
 		usbInputStream.pipe->retain ();
 	}
@@ -1818,10 +1820,11 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	FailIf (kIOReturnSuccess != resultCode, Exit);
     
     debugIOLog("create output pipe ");
-	bzero(&audioIsochEndpoint,sizeof(audioIsochEndpoint));
-	audioIsochEndpoint.type = kUSBIsoc;
-	audioIsochEndpoint.direction = mOutput.streamDirection;
-	mOutput.pipe = mOutput.streamInterface->FindNextPipe (NULL, &audioIsochEndpoint);
+	//bzero(&audioIsochEndpoint,sizeof(audioIsochEndpoint));
+	//audioIsochEndpoint.type = kUSBIsoc;
+	//audioIsochEndpoint.direction = mOutput.streamDirection;
+    //mOutput.pipe = mOutput.streamInterface->findPipe ( &audioIsochEndpoint);
+    mOutput.pipe = mOutput.streamInterface->findPipe (mOutput.streamDirection, kUSBIsoc);
 	FailIf (NULL == mOutput.pipe, Exit);
 	mOutput.pipe->retain ();
 	debugIOLog("check for associated endpoint");
