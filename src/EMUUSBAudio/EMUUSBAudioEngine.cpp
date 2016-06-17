@@ -903,7 +903,7 @@ IOReturn EMUUSBAudioEngine::GetDefaultSettings(IOUSBInterface1  *streamInterface
 		UInt8				newAltSettingID = 0;
 		IOAudioSampleRate	newSampleRate;
 		
-		UInt8 ourInterfaceNumber = streamInterface->GetInterfaceNumber ();
+		UInt8 ourInterfaceNumber = streamInterface->getInterfaceNumber ();
         
 		// first, figure out whether the stream is input or output
 		UInt8 direction = usbAudio->GetIsocEndpointDirection(ourInterfaceNumber, newAltSettingID);
@@ -991,7 +991,7 @@ IOAudioStreamDirection EMUUSBAudioEngine::getDirection () {
 
 Boolean EMUUSBAudioEngine::getDescriptorString(char *buffer, UInt8 index) {
     IOReturn	res = kIOReturnSuccess;
-    IOUSBDevice *usbDevice =usbInputStream.streamInterface->GetDevice();
+    IOUSBDevice *usbDevice =usbInputStream.streamInterface->getDevice1();
     
     buffer[0] = 0;
 	if (index != 0) {
@@ -1015,11 +1015,11 @@ OSString * EMUUSBAudioEngine::getGlobalUniqueID () {
     char                locationIDString[kStringBufferSize];
     char                uniqueIDStr[MAX_ID_SIZE];
     
-    IOUSBDevice *usbDevice = usbInputStream.streamInterface->GetDevice();
+    IOUSBDevice *usbDevice = usbInputStream.streamInterface->getDevice1();
     
     getDescriptorString(manufacturerString, usbDevice->GetManufacturerStringIndex ());
     getDescriptorString(productString,usbDevice->GetProductStringIndex ());
-	interfaceNumber = usbInputStream.streamInterface->GetInterfaceNumber ();
+	interfaceNumber = usbInputStream.streamInterface->getInterfaceNumber ();
     usbLocation = OSDynamicCast (OSNumber, usbDevice->getProperty (kUSBDevicePropertyLocationID));
     if (NULL != usbLocation) {
         locationID = usbLocation->unsigned32BitValue ();
@@ -1303,8 +1303,8 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
     
     resultBool = TRUE;
     
-	snprintf (vendorIDCString, sizeof(vendorIDCString),"0x%04X", usbInputStream.streamInterface->GetDevice()->GetVendorID ());
-	snprintf (productIDCString, sizeof(productIDCString),"0x%04X", usbInputStream.streamInterface->GetDevice()->GetProductID ());
+	snprintf (vendorIDCString, sizeof(vendorIDCString),"0x%04X", usbInputStream.streamInterface->getDevice1()->GetVendorID ());
+	snprintf (productIDCString, sizeof(productIDCString),"0x%04X", usbInputStream.streamInterface->getDevice1()->GetProductID ());
 	
 	setupChannelNames();
     

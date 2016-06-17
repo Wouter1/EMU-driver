@@ -386,9 +386,10 @@ void EMUUSBAudioDevice::setupStatusFeedback() {
 			mStatusBufferDesc = IOMemoryDescriptor::withAddress(mDeviceStatusBuffer, kStatusPacketSize, kIODirectionIn);
 			if (mStatusBufferDesc) {
 				mStatusBufferDesc->prepare();
-				mStatusCheckCompletion.target = (void*) this;
-				mStatusCheckCompletion.action = statusHandler;
-				mStatusCheckCompletion.parameter = 0;
+                mStatusCheckCompletion.set((void*) this, statusHandler, 0);
+//				mStatusCheckCompletion.target = (void*) this;
+//				mStatusCheckCompletion.action = statusHandler;
+//				mStatusCheckCompletion.parameter = 0;
 				mStatusCheckTimer = IOTimerEventSource::timerEventSource(this, StatusAction);
 				if (mStatusCheckTimer) {
 					workLoop->addEventSource(mStatusCheckTimer);// add timer action to the workloop
@@ -436,7 +437,7 @@ IOReturn EMUUSBAudioDevice::performPowerStateChange(IOAudioDevicePowerState oldP
 		// [rdar://4234453] Reset the device after waking from sleep just to be safe.
 		FailIf (NULL == mControlInterface, Exit);
 		debugIOLogC("? AppleUSBAudioDevice[%p]::performPowerStateChange () - Resetting port after wake from sleep ...", this);
-		mControlInterface->GetDevice()->ResetDevice();
+		mControlInterface->getDevice1()->ResetDevice();
 		IOSleep (10);
 		
 		// We need to restart the time stamp rate timer now
@@ -545,7 +546,7 @@ UInt8 EMUUSBAudioDevice::getHubSpeed() {
 	UInt8	speed = kUSBDeviceSpeedFull;
 	
 	if (mControlInterface) {
-		IOUSBDevice*			usbDevice = OSDynamicCast(IOUSBDevice, mControlInterface->GetDevice());
+		IOUSBDevice*			usbDevice = OSDynamicCast(IOUSBDevice, mControlInterface->getDevice1());
 		IORegistryEntry*		currentEntry = OSDynamicCast(IORegistryEntry, usbDevice);
 		const IORegistryPlane*	usbPlane = getPlane(kIOUSBPlane);
 		while(currentEntry && usbDevice) {

@@ -37,6 +37,14 @@ public:
     };
     
     /*!
+     @function GetVendorID
+     returns the Vendor ID of the device
+     */
+    UInt16 GetVendorID(void) {
+        return getDeviceDescriptor()->idVendor;
+    }
+    
+    /*!
      @function GetFullConfigurationDescriptor
      return a pointer to all the descriptors for the requested configuration.
      @param configIndex The configuration index (not the configuration value)

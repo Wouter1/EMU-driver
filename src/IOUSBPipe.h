@@ -22,11 +22,8 @@
 
 #include <IOKit/usb/IOUSBHostPipe.h>
 
-class IOUSBPipe {
-    
-private:
-    IOUSBHostPipe *pipe;
-    
+class IOUSBPipe: public IOUSBHostPipe {  
+   
 public:
     /*!
      @function Read

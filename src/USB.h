@@ -76,7 +76,21 @@ public:
 typedef IOUSBEndpointDescriptor EndpointDescriptor;
 typedef IOUSBConfigurationDescriptor  ConfigurationDescriptor;
 typedef IOUSBIsocCompletion IsocCompletion;
-typedef IOUSBCompletion Completion;
+
+class Completion : public IOUSBCompletion {
+public:
+    /*!
+     * set target, action , parameter
+     @param t target / owner
+     @param a action
+     @param p parameter
+     */
+    void set(void *t, IOUSBCompletionAction a, void *p ) {
+        target = t;
+        action = a;
+        parameter = p;
+    }
+};
 
 typedef  IOUSBCompletionAction CompletionAction;
 typedef IOUSBLowLatencyIsocCompletionAction LowLatencyCompletionAction;
@@ -103,6 +117,14 @@ typedef IOUSBLowLatencyIsocCompletionAction LowLatencyCompletionAction;
 #define kUSBClass kRequestTypeClass
 #define kUSBInterface kRequestRecipientInterface
 
+
+#define kUSBControl     kEndpointTypeControl
+#define kUSBIsoc        kEndpointTypeIsochronous
+#define kUSBBulk        kEndpointTypeBulk
+#define kUSBInterrupt   kEndpointTypeInterrupt
+
+// support usbDevice->getProperty()
+#define kUSBDevicePropertyLocationID kUSBHostPropertyLocationID
 
 typedef IOUSBHostIsochronousFrame IsocFrame;
 // CHECK are there no explit low latency versions anymore?
@@ -159,7 +181,23 @@ public:
 // EndpointDescriptor already exists in OSX11, and it is the one we need
 // ConfigurationDescriptor already exists in OSX11, and it is the one we need
 typedef IOUSBHostIsochronousCompletion IsocCompletion;
-typedef IOUSBHostCompletion Completion;
+
+
+class Completion : public IOUSBHostCompletion {
+public:
+    /*!
+     * set target, action , parameter
+     @param t target / owner
+     @param a action
+     @param p parameter
+     */
+    void set(void *t, IOUSBHostCompletionAction a, void *p ) {
+        owner = t;
+        action = a;
+        parameter = p;
+    }
+};
+
 
 
 /*!
