@@ -541,30 +541,55 @@ IOReturn EMUUSBAudioDevice::message(UInt32 type, IOService * provider, void * ar
 	}
 	return kIOReturnSuccess;
 }
+//
+//UInt8 EMUUSBAudioDevice::getHubSpeed() {
+//	//UInt8	speed = kUSBDeviceSpeedFull;
+//	
+//	if (mControlInterface) {
+//		IOUSBDevice1*			usbDevice = OSDynamicCast(IOUSBDevice1, mControlInterface->getDevice1());
+//		IORegistryEntry*		currentEntry = OSDynamicCast(IORegistryEntry, usbDevice);
+//		const IORegistryPlane*	usbPlane = getPlane(kIOUSBPlane);
+//		while(currentEntry && usbDevice) {
+//			//speed = usbDevice->GetSpeed();// look for 1st high speed hub
+////            if(kUSBDeviceSpeedHigh == speed) {
+//            if (usbDevice->isHighSpeed()) {
+//				// Must be connected via USB 2.0 hub
+//				debugIOLogC(" ++EMUUSBAudioDevice::getHubSpeed() = kUSBDeviceSpeedHigh");
+//				break;// found the high speed device now break out of the loop
+//			} else {
+//				// Get parent in USB plane
+//				currentEntry = OSDynamicCast(IORegistryEntry, currentEntry->getParentEntry(usbPlane));
+//				// If the current registry entry is not a device, this will make usbDevice NULL and exit the loop
+//				usbDevice = OSDynamicCast(IOUSBDevice1, currentEntry);
+//			}
+//		} // end while
+//	}
+//	return speed;
+//}
 
-UInt8 EMUUSBAudioDevice::getHubSpeed() {
-	UInt8	speed = kUSBDeviceSpeedFull;
-	
-	if (mControlInterface) {
-		IOUSBDevice*			usbDevice = OSDynamicCast(IOUSBDevice, mControlInterface->getDevice1());
-		IORegistryEntry*		currentEntry = OSDynamicCast(IORegistryEntry, usbDevice);
-		const IORegistryPlane*	usbPlane = getPlane(kIOUSBPlane);
-		while(currentEntry && usbDevice) {
-			speed = usbDevice->GetSpeed();// look for 1st high speed hub
-			if(kUSBDeviceSpeedHigh == speed) {
-				// Must be connected via USB 2.0 hub
-				debugIOLogC(" ++EMUUSBAudioDevice::getHubSpeed() = kUSBDeviceSpeedHigh");
-				break;// found the high speed device now break out of the loop
-			} else {
-				// Get parent in USB plane
-				currentEntry = OSDynamicCast(IORegistryEntry, currentEntry->getParentEntry(usbPlane));
-				// If the current registry entry is not a device, this will make usbDevice NULL and exit the loop
-				usbDevice = OSDynamicCast(IOUSBDevice, currentEntry);
-			}
-		} // end while
-	}
-	return speed;
+bool EMUUSBAudioDevice::isHighHubSpeed() {
+    if (mControlInterface) {
+        IOUSBDevice1*			usbDevice = OSDynamicCast(IOUSBDevice1, mControlInterface->getDevice1());
+        IORegistryEntry*		currentEntry = OSDynamicCast(IORegistryEntry, usbDevice);
+        const IORegistryPlane*	usbPlane = getPlane(kIOUSBPlane);
+        while(currentEntry && usbDevice) {
+            if (usbDevice->isHighSpeed()) {
+                debugIOLogC(" ++EMUUSBAudioDevice::hub speed HIGH");
+                return TRUE;
+            } else {
+                // Get parent in USB plane
+                currentEntry = OSDynamicCast(IORegistryEntry, currentEntry->getParentEntry(usbPlane));
+                // If the current registry entry is not a device, this will make usbDevice NULL and exit the loop
+                usbDevice = OSDynamicCast(IOUSBDevice1, currentEntry);
+            }
+        } // end while
+    }
+    debugIOLogC(" ++EMUUSBAudioDevice::hub speed SLOW");
+
+    return FALSE;
 }
+
+
 
 SInt32 EMUUSBAudioDevice::getEngineInfoIndex(EMUUSBAudioEngine * inAudioEngine) {
 	if(mRegisteredEngines) {

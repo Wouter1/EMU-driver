@@ -361,7 +361,7 @@ protected:
 	UInt8								refreshInterval;
 	UInt8								framesUntilRefresh;
 	UInt8								mAnchorResetCount;
-	UInt8								mHubSpeed;
+	//UInt8								mHubSpeed;
     /*! update frequency for LowLatencyIsocFrame. see the documentation IOUSBPipe.
      1=every microframe (1/8 ms). 2=every 2 microframes 8=every full frame (millisecond) etc */
 	UInt8								mPollInterval;

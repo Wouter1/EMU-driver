@@ -1159,7 +1159,7 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
 	//mOutput.numUSBTimeFrames = mOutput.numUSBFramesPerList / kNumberOfFramesPerMillisecond;
     
 	// Get the hub speed
-	mHubSpeed = usbAudioDevice->getHubSpeed();
+	//mHubSpeed = usbAudioDevice->getHubSpeed();
 	
 	//mOutput.frameQueuedForList = NULL;
 	
@@ -1684,7 +1684,7 @@ IOReturn EMUUSBAudioEngine::SetSampleRate (EMUUSBAudioConfigObject *usbAudio, UI
 		devReq.bRequest = SET_CUR;
 		devReq.wValue = (SAMPLING_FREQ_CONTROL << 8) | 0;
 		devReq.wIndex = usbAudio->GetIsocEndpointAddress (mOutput.interfaceNumber, mOutput.alternateSettingID, mOutput.streamDirection);
-		devReq.wLength = 3 + (kUSBDeviceSpeedHigh == mHubSpeed);// USB 2.0 device has maxPacket size of 4
+        devReq.wLength = 3 + (usbAudioDevice->isHighHubSpeed()?1:0);// USB 2.0 device has maxPacket size of 4
 		devReq.pData = &theSampleRate;
         
 		result = mOutput.streamInterface->GetDevice()->DeviceRequest (&devReq);
@@ -1800,7 +1800,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     // The var is set depending on the hub speed and whether the first write/ read failed with a late error.
     // When a late error is encountered (USB 2.0), increment the var until a max of 16 frames is reached.
     // NB - From testing and observation this work around does not help and has therefore been deleted.
-	usbInputStream.frameOffset = kMinimumFrameOffset + ((kUSBDeviceSpeedHigh == mHubSpeed) * kUSB2FrameOffset);
+    usbInputStream.frameOffset = kMinimumFrameOffset + (usbAudioDevice->isHighHubSpeed()? kUSB2FrameOffset:0);
 	
 	*(UInt64 *) (&(usbInputStream.usbIsocFrames[0].frTimeStamp)) = 0xFFFFFFFFFFFFFFFFull;
     

@@ -16,6 +16,14 @@
 
 #ifdef HAVE_OLD_USB_INTERFACE
 #include <IOKit/usb/IOUSBDevice.h>
+class IOUSBDevice1 : public IOUSBDevice {
+public:
+    inline bool isHighSpeed() {
+        // we never should get superspeed or higher, as this is USB2 device.
+        return GetSpeed() == kUSBDeviceSpeedHigh;
+    }
+};
+
 #else
 
 
@@ -30,9 +38,9 @@
 #include <sys/utfconv.h>
 
 
-class IOUSBDevice: public IOUSBHostDevice {
+class IOUSBDevice1: public IOUSBHostDevice {
 public:
-    UInt8 GetProductStringIndex(void ) {
+    inline UInt8 GetProductStringIndex(void ) {
         return getDeviceDescriptor()->iProduct;
     };
     
@@ -40,7 +48,7 @@ public:
      @function GetVendorID
      returns the Vendor ID of the device
      */
-    UInt16 GetVendorID(void) {
+    inline  UInt16 GetVendorID(void) {
         return getDeviceDescriptor()->idVendor;
     }
     
@@ -50,7 +58,7 @@ public:
      @param configIndex The configuration index (not the configuration value)
      @result Pointer to the descriptors, which are cached in the IOUSBDevice object.
      */
-    const ConfigurationDescriptor * GetFullConfigurationDescriptor(UInt8 configIndex) {
+    inline const ConfigurationDescriptor * GetFullConfigurationDescriptor(UInt8 configIndex) {
         return getConfigurationDescriptor(configIndex);
     }
     
@@ -81,7 +89,7 @@ public:
      Reset the device, returning it to the addressed, unconfigured state.
      This is useful if a device has got badly confused. Note that the AppleUSBComposite driver will automatically reconfigure the device if it is a composite device.
      */
-    IOReturn ResetDevice() {
+    inline IOReturn ResetDevice() {
         return kIOReturnSuccess; //Replacement: none...
     }
     
@@ -89,8 +97,13 @@ public:
      @function GetManufacturerStringIndex
      returns the index of string descriptor describing manufacturer
      */
-    UInt8 GetManufacturerStringIndex() {
+    inline UInt8 GetManufacturerStringIndex() {
         return getDeviceDescriptor()->iManufacturer;
+    }
+    
+    inline bool isHighSpeed() {
+        // we never should get superspeed or higher, as this is USB2 device.
+        return getSpeed() == kUSBHostConnectionSpeedHigh;
     }
 
     

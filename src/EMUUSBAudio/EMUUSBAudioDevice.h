@@ -356,7 +356,10 @@ public:
 	IOReturn		doClockSourceSelectorChange (IOAudioControl *audioControl, SInt32 oldValue, SInt32 newValue);
     
 	void			setMonoState (Boolean state);
-	UInt8			getHubSpeed ();
+	
+    //UInt8			getHubSpeed ();
+    bool isHighHubSpeed();
+
 	inline UInt32			getHardwareSampleRate() {return mCurSampleRate;}
 	inline void				setHardwareSampleRate(UInt32 inSampleRate) { mCurSampleRate = inSampleRate;}
 	//virtual	IOReturn		deviceRequest (IOUSBDevRequest * request, Completion * completion = NULL);			// Depricated, don't use
