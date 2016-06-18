@@ -64,45 +64,6 @@ enum{
 #define kiSubMaxVolume		60
 #define kiSubVolumePercent	92
 
-class EMUUSBAudioLevelControl : public IOAudioLevelControl
-{
-    OSDeclareDefaultStructors(EMUUSBAudioLevelControl);
-    
-    UInt8					unitID;
-    UInt8					interfaceNumber;
-    UInt8					controlSelector;
-    UInt8					channelNumber;
-    SInt16					offset;
-	UInt16					volRes;
-    thread_call_t			setValueThreadCall;
-    USBDeviceRequest		usbDeviceRequest;
-	void *					callerRefCon;
-	Boolean					gExpertMode;
-    UInt32					fMaxVolume;
-    UInt32					fMinVolume;
-	Boolean					fShouldUpdatePRAM;
-    
-public:
-	static EMUUSBAudioLevelControl *create(UInt8 theUnitID, UInt8 theInterfaceNumber, UInt8 theControlSelector, UInt8 theChannelNumber, Boolean shouldUpdatePRAM, USBDeviceRequest theUSBDeviceRequest, void *theCallerRefCon, UInt32 subType, UInt32 usage);
-    
-	virtual bool init(UInt8 theUnitID, UInt8 theInterfaceNumber, UInt8 theControlSelector, UInt8 theChannelNumber, Boolean shouldUpdatePRAM, USBDeviceRequest theUSBDeviceRequest, void *theCallerRefCon, UInt32 subType, UInt32 usage, OSDictionary *properties = NULL);
-	virtual void free() override;
-    
-	virtual IOReturn performValueChange(OSObject * newValue) override;
-	virtual void updateUSBValue();
-	virtual void updateUSBValue(SInt32 newValue);
-    
-	static void updateValueCallback(void *arg1, void *arg2);
-    
-private:
-	IOReturn	GetCurVolume (UInt8 interfaceNumber, UInt8 channelNumber, SInt16 * target);
-	IOReturn	GetMaxVolume (UInt8 interfaceNumber, UInt8 channelNumber, SInt16 * target);
-	IOReturn	GetMinVolume (UInt8 interfaceNumber, UInt8 channelNumber, SInt16 * target);
-	IOReturn	GetVolumeResolution (UInt8 interfaceNumber, UInt8 channelNumber, UInt16 * target);
-	IOReturn	SetCurVolume (UInt8 interfaceNumber, UInt8 channelNumber, SInt16 volume);
-	IOFixed		ConvertUSBVolumeTodB (SInt16 volume);
-    //	IORegistryEntry * FindEntryByNameAndProperty (const IORegistryEntry * start, const char * name, const char * key, UInt32 value);
-};
 
 ////////////////////////////////////////////////////////////////////////////////
 ///
