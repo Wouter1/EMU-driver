@@ -53,6 +53,14 @@ public:
     }
     
     /*!
+     @function GetProductID
+     returns the Product ID of the device
+     */
+    inline UInt16 GetProductID(void) {
+        return getDeviceDescriptor()->idProduct;
+    }
+    
+    /*!
      @function GetFullConfigurationDescriptor
      return a pointer to all the descriptors for the requested configuration.
      @param configIndex The configuration index (not the configuration value)
@@ -105,6 +113,8 @@ public:
         // we never should get superspeed or higher, as this is USB2 device.
         return getSpeed() == kUSBHostConnectionSpeedHigh;
     }
+    
+
 
     
     

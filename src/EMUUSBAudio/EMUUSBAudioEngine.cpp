@@ -991,7 +991,7 @@ IOAudioStreamDirection EMUUSBAudioEngine::getDirection () {
 
 Boolean EMUUSBAudioEngine::getDescriptorString(char *buffer, UInt8 index) {
     IOReturn	res = kIOReturnSuccess;
-    IOUSBDevice *usbDevice =usbInputStream.streamInterface->getDevice1();
+    IOUSBDevice1 *usbDevice =usbInputStream.streamInterface->getDevice1();
     
     buffer[0] = 0;
 	if (index != 0) {
@@ -1015,7 +1015,7 @@ OSString * EMUUSBAudioEngine::getGlobalUniqueID () {
     char                locationIDString[kStringBufferSize];
     char                uniqueIDStr[MAX_ID_SIZE];
     
-    IOUSBDevice *usbDevice = usbInputStream.streamInterface->getDevice1();
+    IOUSBDevice1 *usbDevice = usbInputStream.streamInterface->getDevice1();
     
     getDescriptorString(manufacturerString, usbDevice->GetManufacturerStringIndex ());
     getDescriptorString(productString,usbDevice->GetProductStringIndex ());
@@ -1329,7 +1329,7 @@ void EMUUSBAudioEngine::pluginLoaded (EMUUSBAudioEngine * usbAudioEngineObject) 
 	if (usbAudioEngineObject->mPlugin) {
 		usbAudioEngineObject->mPlugin->open (usbAudioEngineObject);
         
-		IOReturn result = usbAudioEngineObject->mPlugin->pluginInit (usbAudioEngineObject, usbAudioEngineObject->usbInputStream.streamInterface->GetDevice()->GetVendorID (), usbAudioEngineObject->usbInputStream.streamInterface->GetDevice()->GetProductID ());
+		IOReturn result = usbAudioEngineObject->mPlugin->pluginInit (usbAudioEngineObject, usbAudioEngineObject->usbInputStream.streamInterface->getDevice1()->GetVendorID (), usbAudioEngineObject->usbInputStream.streamInterface->getDevice1()->GetProductID ());
 		if (result == kIOReturnSuccess) {
 			debugIOLog ("success initing the plugin");
 			usbAudioEngineObject->mPlugin->pluginSetDirection ((IOAudioStreamDirection) usbAudioEngineObject->usbInputStream.streamDirection);
@@ -1687,7 +1687,7 @@ IOReturn EMUUSBAudioEngine::SetSampleRate (EMUUSBAudioConfigObject *usbAudio, UI
         devReq.wLength = 3 + (usbAudioDevice->isHighHubSpeed()?1:0);// USB 2.0 device has maxPacket size of 4
 		devReq.pData = &theSampleRate;
         
-		result = mOutput.streamInterface->GetDevice()->DeviceRequest (&devReq);
+		result = mOutput.streamInterface->getDevice1()->DeviceRequest (&devReq);
 	}
 	if (kIOReturnSuccess == result)
 		hardwareSampleRate = inSampleRate;// remember the sample rate setting as the averageSampleRate could vary.
@@ -2185,7 +2185,7 @@ UInt32 EMUUSBAudioEngine::getPListNumber( const char *field, UInt32 defaultValue
 //<AC mod>
 void EMUUSBAudioEngine::findAudioStreamInterfaces(IOUSBInterface1 *pAudioControlIfc)
 {
-    IOUSBDevice *pDevice = pAudioControlIfc->GetDevice();
+    IOUSBDevice1 *pDevice = pAudioControlIfc->getDevice1();
     
     IOUSBFindInterfaceRequest req;
     

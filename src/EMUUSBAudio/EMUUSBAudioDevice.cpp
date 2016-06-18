@@ -215,7 +215,7 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
         
 		string[0] = 0;
 		stringIndex = mControlInterface->getInterfaceStringIndex(); // try getting this first
-		IOUSBDevice*	device = mControlInterface->getDevice1();	// this must always work
+		IOUSBDevice1*	device = mControlInterface->getDevice1();	// this must always work
 
         if (!stringIndex)
 			stringIndex = device->GetProductStringIndex();
@@ -350,7 +350,7 @@ Exit:
 
 void EMUUSBAudioDevice::checkUHCI() {
 	const IORegistryPlane*	svcPlane = getPlane(kIOServicePlane);
-	IOUSBDevice* device = mControlInterface->getDevice1();
+	IOUSBDevice1* device = mControlInterface->getDevice1();
 	mUHCI = false;
 	if (device) {
 		IORegistryEntry*	parent = device->getParentEntry(svcPlane);

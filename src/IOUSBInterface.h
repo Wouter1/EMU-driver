@@ -16,6 +16,7 @@
 /******************** 10.9 *********************/
 
 #include <IOKit/usb/IOUSBInterface.h>
+#include "IOUSBDevice.h"
 
 class IOUSBInterface1: public IOUSBInterface {
 public:
@@ -34,8 +35,8 @@ public:
      returns the device the interface is part of.
      @result Pointer to the IOUSBDevice object which is the parent of this IOUSBInterface object.
      */
-    inline IOUSBDevice *getDevice1() {
-        return OSDynamicCast(IOUSBDevice, GetDevice());
+    inline IOUSBDevice1 *getDevice1() {
+        return OSDynamicCast(IOUSBDevice1, GetDevice());
     }
 
     /*!
@@ -74,8 +75,8 @@ public:
      returns the device the interface is part of.
      @result Pointer to the IOUSBDevice object which is the parent of this IOUSBInterface object.
      */
-    inline IOUSBDevice *getDevice1() {
-        return OSDynamicCast(IOUSBDevice ,getDevice());
+    inline IOUSBDevice1 *getDevice1() {
+        return OSDynamicCast(IOUSBDevice1 ,getDevice());
     }
     
     /*!
@@ -151,6 +152,19 @@ public:
         debugIOLog("findPipe: no matching endpoint found");
         return NULL;
     }
+    
+    /*!
+     @function DeviceRequest
+     @abstract Sends a control request to the default control pipe in the device (pipe zero)
+     @param request The parameter block to send to the device
+     @param completion Function to call when request completes. If omitted then
+     DeviceRequest() executes synchronously, blocking until the request is complete.  If the request is asynchronous, the client must make sure that
+     the IOUSBDevRequest is not released until the callback has occurred.
+     */
+    IOReturn DeviceRequest(IOUSBDevRequest *request, Completion *completion = 0) {
+        deviceRequest(StandardUSB::DeviceRequest &request, <#void *dataBuffer#>, <#IOUSBHostCompletion *completion#>)
+    }
+
     
 };
 #endif

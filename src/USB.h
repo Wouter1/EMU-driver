@@ -199,79 +199,14 @@ public:
 };
 
 
-
-/*!
- Used in combination with IOUSBInterface FindNextPipe and we restore that function
- @typedef IOUSBFindEndpointRequest
- @discussion Struct used to find endpoints of an interface
- type and direction are used to match endpoints,
- type, direction, maxPacketSize and interval are updated
- with the properties of the found endpoint.
- @field type Type of endpoint: kUSBControl, kUSBIsoc, kUSBBulk, kUSBInterrupt, kUSBAnyType.  If kUSBAnyType is specified, this field is treated as a don't care.
- @field direction Direction of endpoint: kUSBOut, kUSBIn, kUSBAnyDirn.   If kUSBAnyDirn is specified, this field is treated as a don't care.
- @field maxPacketSize maximum packet size of endpoint.
- @field interval Polling interval in mSec for endpoint.
- */
-typedef struct {
-    UInt8 type;
-    UInt8 direction;
-    UInt16 maxPacketSize;
-    UInt8 interval;
-} IOUSBFindEndpointRequest;
+/* NOTE, NO pData field anymore. */
+typedef StandardUSB::DeviceRequest IOUSBDevRequest;
 
 
 
-/*!
- @struct IOUSBDevRequest
- @discussion Parameter block for control requests, using a simple pointer
- for the data to be transferred.
- @field bmRequestType Request type: kUSBStandard, kUSBClass or kUSBVendor
- @field bRequest Request code
- @field wValue 16 bit parameter for request, host endianess
- @field wIndex 16 bit parameter for request, host endianess
- @field wLength Length of data part of request, 16 bits, host endianess
- @field pData Pointer to data for request - data returned in bus endianess
- @field wLenDone Set by standard completion routine to number of data bytes
-	actually transferred
- */
-typedef struct {
-    UInt8       bmRequestType;
-    UInt8       bRequest;
-    UInt16      wValue;
-    UInt16      wIndex;
-    UInt16      wLength;
-    void *      pData;
-    UInt32      wLenDone;
-} IOUSBDevRequest;
-typedef IOUSBDevRequest * IOUSBDeviceRequestPtr;
 
 
-/*!
- @struct IOUSBDevRequestDesc
- @discussion Parameter block for control requests, using a memory descriptor
- for the data to be transferred.  Only available in the kernel.
- @field bmRequestType Request type: kUSBStandard, kUSBClass or kUSBVendor
- @field bRequest Request code
- @field wValue 16 bit parameter for request, host endianess
- @field wIndex 16 bit parameter for request, host endianess
- @field wLength Length of data part of request, 16 bits, host endianess
- @field pData Pointer to memory descriptor for data for request - data returned in bus endianess
- @field wLenDone Set by standard completion routine to number of data bytes
- actually transferred
- */
-typedef struct {
-    UInt8                   bmRequestType;
-    UInt8                   bRequest;
-    UInt16                  wValue;
-    UInt16                  wIndex;
-    UInt16                  wLength;
-    IOMemoryDescriptor *    pData;
-    UInt32                  wLenDone;
-} IOUSBDevRequestDesc;
-
-
-
-#endif // 10.11+ extras
+#endif // 10.11+
 
 
 #endif /* USB_EXT_h */
