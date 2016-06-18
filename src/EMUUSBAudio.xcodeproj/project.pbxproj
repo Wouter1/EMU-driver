@@ -16,7 +16,6 @@
 		6C2C071619E4578A00F1FD56 /* EMUUSBAudioLevelControl.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C071419E4578A00F1FD56 /* EMUUSBAudioLevelControl.h */; };
 		6C2C071919E4586700F1FD56 /* USBAudioObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C071719E4586700F1FD56 /* USBAudioObject.cpp */; };
 		6C2C071A19E4586700F1FD56 /* USBAudioObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C071819E4586700F1FD56 /* USBAudioObject.h */; };
-		6C2C071E19E4714500F1FD56 /* EMUUSBAudioMuteControl.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C071C19E4714500F1FD56 /* EMUUSBAudioMuteControl.h */; };
 		6C2C072119E4740700F1FD56 /* EMUUSBAudioPlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C071F19E4740700F1FD56 /* EMUUSBAudioPlugin.cpp */; };
 		6C2C072219E4740700F1FD56 /* EMUUSBAudioPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C072019E4740700F1FD56 /* EMUUSBAudioPlugin.h */; };
 		6C2C072619E4755A00F1FD56 /* EMUUSBUserClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C072419E4755A00F1FD56 /* EMUUSBUserClient.h */; };
@@ -34,12 +33,11 @@
 		6C7861F81D03F91D0087FD31 /* IOUSBDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7861F61D03F91D0087FD31 /* IOUSBDevice.h */; };
 		6C7861FB1D03F96C0087FD31 /* IOUSBInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7861F91D03F96C0087FD31 /* IOUSBInterface.cpp */; };
 		6C7861FC1D03F96C0087FD31 /* IOUSBInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7861FA1D03F96C0087FD31 /* IOUSBInterface.h */; };
-		6C7B68831D0436E90059CA4C /* IOUSBController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7B68811D0436E90059CA4C /* IOUSBController.cpp */; settings = {ASSET_TAGS = (); }; };
-		6C7B68841D0436E90059CA4C /* IOUSBController.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7B68821D0436E90059CA4C /* IOUSBController.h */; settings = {ASSET_TAGS = (); }; };
+		6C7B68831D0436E90059CA4C /* IOUSBController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7B68811D0436E90059CA4C /* IOUSBController.cpp */; };
+		6C7B68841D0436E90059CA4C /* IOUSBController.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7B68821D0436E90059CA4C /* IOUSBController.h */; };
 		6C8BF21C1A2507FC00F2052A /* LowPassFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C8BF21A1A2507FC00F2052A /* LowPassFilter.cpp */; };
 		6C8BF21D1A2507FC00F2052A /* LowPassFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C8BF21B1A2507FC00F2052A /* LowPassFilter.h */; };
 		6C97E7F819EDB4C400C376B9 /* EMUUSBAudioLevelControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C071319E4578A00F1FD56 /* EMUUSBAudioLevelControl.cpp */; };
-		6C97E7F919EDB4C900C376B9 /* EMUUSBAudioMuteControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C071B19E4714500F1FD56 /* EMUUSBAudioMuteControl.cpp */; };
 		6CB2722F1A54197B00FA8B61 /* EMUUSBOutputStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CB2722D1A54197B00FA8B61 /* EMUUSBOutputStream.cpp */; };
 		6CB272301A54197B00FA8B61 /* EMUUSBOutputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CB2722E1A54197B00FA8B61 /* EMUUSBOutputStream.h */; };
 		6CE021FE1A5FCE9C00568A82 /* StreamInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CE021FD1A5FCE9C00568A82 /* StreamInfo.cpp */; };
@@ -70,8 +68,6 @@
 		6C2C071419E4578A00F1FD56 /* EMUUSBAudioLevelControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioLevelControl.h; sourceTree = "<group>"; };
 		6C2C071719E4586700F1FD56 /* USBAudioObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = USBAudioObject.cpp; sourceTree = "<group>"; };
 		6C2C071819E4586700F1FD56 /* USBAudioObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = USBAudioObject.h; sourceTree = "<group>"; };
-		6C2C071B19E4714500F1FD56 /* EMUUSBAudioMuteControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBAudioMuteControl.cpp; sourceTree = "<group>"; };
-		6C2C071C19E4714500F1FD56 /* EMUUSBAudioMuteControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioMuteControl.h; sourceTree = "<group>"; };
 		6C2C071F19E4740700F1FD56 /* EMUUSBAudioPlugin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBAudioPlugin.cpp; sourceTree = "<group>"; };
 		6C2C072019E4740700F1FD56 /* EMUUSBAudioPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioPlugin.h; sourceTree = "<group>"; };
 		6C2C072319E4755A00F1FD56 /* EMUUSBUserClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBUserClient.cpp; sourceTree = "<group>"; };
@@ -187,8 +183,6 @@
 				6C2C071419E4578A00F1FD56 /* EMUUSBAudioLevelControl.h */,
 				6C2C071719E4586700F1FD56 /* USBAudioObject.cpp */,
 				6C2C071819E4586700F1FD56 /* USBAudioObject.h */,
-				6C2C071B19E4714500F1FD56 /* EMUUSBAudioMuteControl.cpp */,
-				6C2C071C19E4714500F1FD56 /* EMUUSBAudioMuteControl.h */,
 				6C2C071F19E4740700F1FD56 /* EMUUSBAudioPlugin.cpp */,
 				6C2C072019E4740700F1FD56 /* EMUUSBAudioPlugin.h */,
 				6C2C072319E4755A00F1FD56 /* EMUUSBUserClient.cpp */,
@@ -264,7 +258,6 @@
 				6C2C070D19E4562800F1FD56 /* EMUUSBAudioEngine.h in Headers */,
 				6C2C071219E4572600F1FD56 /* EMUXUCustomControl.h in Headers */,
 				6C5A3B031A290F4800F4DC13 /* EMUUSBInputStream.h in Headers */,
-				6C2C071E19E4714500F1FD56 /* EMUUSBAudioMuteControl.h in Headers */,
 				6C7B68841D0436E90059CA4C /* IOUSBController.h in Headers */,
 				6C2C071A19E4586700F1FD56 /* USBAudioObject.h in Headers */,
 				6C2C070919E4559800F1FD56 /* EMUUSBAudioDevice.h in Headers */,
@@ -355,7 +348,6 @@
 				6CB2722F1A54197B00FA8B61 /* EMUUSBOutputStream.cpp in Sources */,
 				6C7861F71D03F91D0087FD31 /* IOUSBDevice.cpp in Sources */,
 				6C39DF8919F2C3BD00D027FC /* EMUUSBAudioClip.cpp in Sources */,
-				6C97E7F919EDB4C900C376B9 /* EMUUSBAudioMuteControl.cpp in Sources */,
 				6C7861FB1D03F96C0087FD31 /* IOUSBInterface.cpp in Sources */,
 				6C97E7F819EDB4C400C376B9 /* EMUUSBAudioLevelControl.cpp in Sources */,
 				6C2C071919E4586700F1FD56 /* USBAudioObject.cpp in Sources */,
