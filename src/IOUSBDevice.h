@@ -15,14 +15,39 @@
 
 
 #ifdef HAVE_OLD_USB_INTERFACE
+
+#include "USBAudioObject.h"
+
 #include <IOKit/usb/IOUSBDevice.h>
+
 class IOUSBDevice1 : public IOUSBDevice {
 public:
     inline bool isHighSpeed() {
         // we never should get superspeed or higher, as this is USB2 device.
         return GetSpeed() == kUSBDeviceSpeedHigh;
     }
+    
+    /*!
+     * set the sample rate to the device.
+     @param inSampleRate the input samplerate
+     @param endpointAddress the usbAudio->GetIsocEndpointAddress
+     */
+    IOReturn devRequestSampleRate(UInt32 inSampleRate, UInt16 endpointAddress) {
+        IOUSBDevRequest		devReq;
+        UInt32				theSampleRate = OSSwapHostToLittleInt32 (inSampleRate);
+        
+        devReq.bmRequestType = USBmakebmRequestType (kUSBOut, kUSBClass, kUSBEndpoint);
+        devReq.bRequest = SET_CUR;
+        devReq.wValue = (SAMPLING_FREQ_CONTROL << 8) | 0;
+        devReq.wIndex = endpointAddress;
+        // 3 + (usbAudioDevice->isHighHubSpeed()?1:0);// USB 2.0 device has maxPacket size of 4
+        devReq.wLength = 4;
+        devReq.pData = &theSampleRate;
+        return DeviceRequest (&devReq);
+    }
+    
 };
+
 
 #else
 

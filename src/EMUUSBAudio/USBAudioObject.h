@@ -21,7 +21,6 @@
 
 
 #include <libkern/c++/OSArray.h>
-#include <IOUSBInterface.h>
 #include "USB.h"
 
 #include "EMUUSBAudioCommon.h"

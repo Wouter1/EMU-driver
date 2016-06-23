@@ -19,6 +19,7 @@
 #include "IOUSBDevice.h"
 #include "USB.h"
 
+
 class IOUSBInterface1: public IOUSBInterface {
 public:
     inline UInt8 getInterfaceNumber() {
