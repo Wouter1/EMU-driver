@@ -45,20 +45,17 @@ __END_DECLS
 #include "EMUUSBAudioClip.h"
 
 class EMUUSBAudioDevice;
-//typedef struct call_entry *thread_call_t; // Wouter: disabled, already defined in libkern.
 
-typedef IOReturn (*USBDeviceRequest)(IOUSBDevRequest * request, void * refCon , Completion * completion );
-//typedef IOReturn (*USBDeviceRequest)(IOUSBDevRequest * request, void * refCon = 0, Completion * completion = 0);
 
 // PRAM read write values
 enum{
-	kMaximumPRAMVolume 	= 	7,
-	kMinimumPRAMVolume	= 	0,
-	KNumPramVolumeSteps	= 	(kMaximumPRAMVolume - kMinimumPRAMVolume + 1),
-	kPRamVolumeAddr	= 		8,
+    kMaximumPRAMVolume 	= 	7,
+    kMinimumPRAMVolume	= 	0,
+    KNumPramVolumeSteps	= 	(kMaximumPRAMVolume - kMinimumPRAMVolume + 1),
+    kPRamVolumeAddr	= 		8,
     
-	kDefaultVolume	= 0x006E006E,
-	kInvalidVolumeMask	= 0xFE00FE00
+    kDefaultVolume	= 0x006E006E,
+    kInvalidVolumeMask	= 0xFE00FE00
 };
 
 #define kiSubMaxVolume		60
@@ -75,13 +72,13 @@ class EMUUSBAudioSoftLevelControl : public IOAudioLevelControl
     OSDeclareDefaultStructors(EMUUSBAudioSoftLevelControl);
     
     // volumes in gains
-	Float32				mVolume;
-	Float32				mTargetVolume;
-	Float32				mLastVolume;
-	
+    Float32				mVolume;
+    Float32				mTargetVolume;
+    Float32				mLastVolume;
+    
 public:
-	
-	static EMUUSBAudioSoftLevelControl* create(SInt32 initialValue,
+    
+    static EMUUSBAudioSoftLevelControl* create(SInt32 initialValue,
                                                SInt32 minValue,
                                                SInt32 maxValue,
                                                IOFixed minDB,
@@ -91,13 +88,13 @@ public:
                                                UInt32 cntrlID = 0,
                                                UInt32 subType = 0,
                                                UInt32 usage = 0);
-	
-	Float32	GetVolume(void){ return mVolume; }
-	void	SetVolume(Float32 volume){ mVolume = volume; }
-	Float32	GetTargetVolume(void){ return mTargetVolume; }
-	void	SetTargetVolume(Float32 volume){ mTargetVolume = volume; }
-	Float32 GetLastVolume(void){ return	mLastVolume; }
-	void	SetLastVolume(Float32 volume){ mLastVolume = volume; }
+    
+    Float32	GetVolume(void){ return mVolume; }
+    void	SetVolume(Float32 volume){ mVolume = volume; }
+    Float32	GetTargetVolume(void){ return mTargetVolume; }
+    void	SetTargetVolume(Float32 volume){ mTargetVolume = volume; }
+    Float32 GetLastVolume(void){ return	mLastVolume; }
+    void	SetLastVolume(Float32 volume){ mLastVolume = volume; }
     
 };
 
@@ -111,13 +108,13 @@ class EMUUSBAudioHardLevelControl : public IOAudioLevelControl
     OSDeclareDefaultStructors(EMUUSBAudioHardLevelControl);
     
     // volumes in gains
-	Float32				mVolume;
-	Float32				mTargetVolume;
-	Float32				mLastVolume;
-	
+    Float32				mVolume;
+    Float32				mTargetVolume;
+    Float32				mLastVolume;
+    
 public:
-	
-	static EMUUSBAudioHardLevelControl* create(SInt32 initialValue,
+    
+    static EMUUSBAudioHardLevelControl* create(SInt32 initialValue,
                                                SInt32 minValue,
                                                SInt32 maxValue,
                                                IOFixed minDB,
@@ -127,13 +124,13 @@ public:
                                                UInt32 cntrlID = 0,
                                                UInt32 subType = 0,
                                                UInt32 usage = 0);
-	
-	Float32	GetVolume(void){ return mVolume; }
-	void	SetVolume(Float32 volume){ mVolume = volume; }
-	Float32	GetTargetVolume(void){ return mTargetVolume; }
-	void	SetTargetVolume(Float32 volume){ mTargetVolume = volume; }
-	Float32 GetLastVolume(void){ return	mLastVolume; }
-	void	SetLastVolume(Float32 volume){ mLastVolume = volume; }
+    
+    Float32	GetVolume(void){ return mVolume; }
+    void	SetVolume(Float32 volume){ mVolume = volume; }
+    Float32	GetTargetVolume(void){ return mTargetVolume; }
+    void	SetTargetVolume(Float32 volume){ mTargetVolume = volume; }
+    Float32 GetLastVolume(void){ return	mLastVolume; }
+    void	SetLastVolume(Float32 volume){ mLastVolume = volume; }
     
 };
 
