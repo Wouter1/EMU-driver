@@ -58,31 +58,6 @@ public:
         return FindNextPipe(NULL, &request);
     }
     
-    /*!
-     @function DeviceRequest
-     @abstract Sends a control request to the default control pipe in the device (pipe zero)
-     @field bmRequestType Request type: kUSBStandard, kUSBClass or kUSBVendor
-     @field bRequest Request code
-     @field wValue 16 bit parameter for request, host endianess
-     @field wIndex 16 bit parameter for request, host endianess
-     @field wLength Length of data part (#bytes) of request, 16 bits, host endianess
-     @param completion Function to call when request completes. If omitted then
-     DeviceRequest() executes synchronously, blocking until the request is complete.  If the request is asynchronous, the client must make sure that
-     the IOUSBDevRequest is not released until the callback has occurred.
-     */
-    IOReturn devRequest(UInt8 type, UInt8 request, UInt16 wValue, UInt16 wIndex, UInt16 wLength,
-                        void *databuffer, Completion *completion = 0) {
-        IOUSBDevRequest				req;
-        
-        req.bmRequestType = type;
-        req.bRequest = request;
-        req.wValue = wValue;
-        req.wIndex = wIndex;
-        req.wLength = 1;
-        req.pData = databuffer;
-        
-        return DeviceRequest(&req, completion);
-    }
 
 };
 
@@ -181,29 +156,7 @@ public:
         return NULL;
     }
     
-    /*!
-     @function DeviceRequest
-     @abstract Sends a control request to the default control pipe in the device (pipe zero)
-     @field bmRequestType Request type: kUSBStandard, kUSBClass or kUSBVendor
-     @field bRequest Request code
-     @field wValue 16 bit parameter for request, host endianess
-     @field wIndex 16 bit parameter for request, host endianess
-     @field wLength Length of data part (#bytes) of request, 16 bits, host endianess
-     @param completion Function to call when request completes. If omitted then
-     DeviceRequest() executes synchronously, blocking until the request is complete.  If the request is asynchronous, the client must make sure that
-     the IOUSBDevRequest is not released until the callback has occurred.
-     */
-    IOReturn devRequest(UInt8 type, UInt8 request, UInt16 wValue, UInt16 wIndex, UInt16 wLength,
-                        void *databuffer, Completion *completion = 0) {
-        StandardUSB::DeviceRequest req;
-        req.bmRequestType=type;
-        req.bRequest = request;
-        req.wValue = wValue;
-        req.wIndex = wIndex;
-        req.wLength = wLength;
 
-        return deviceRequest(req, databuffer, completion );
-    }
 
 };
 #endif

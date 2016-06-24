@@ -1351,11 +1351,11 @@ void EMUUSBAudioEngine::pluginLoaded (EMUUSBAudioEngine * usbAudioEngineObject) 
 	}
 }
 
-IOReturn EMUUSBAudioEngine::pluginDeviceRequest (IOUSBDevRequest * request, Completion * completion) {
+IOReturn EMUUSBAudioEngine::pluginDeviceRequest (IOUSBDevRequest * request) {
 	IOReturn			result = kIOReturnBadArgument;
     
 	if (request)
-		result = usbAudioDevice->deviceRequest (request, usbAudioDevice, completion);
+		result = usbAudioDevice->deviceRequest (request, usbAudioDevice);
 	
 	return result;
 }

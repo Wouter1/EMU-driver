@@ -200,7 +200,7 @@ public:
 
 
 /* NOTE, NO pData field anymore. */
-typedef StandardUSB::DeviceRequest IOUSBDevRequest;
+typedef StandardUSB::DeviceRequest IOUSBDevRequestDesc;
 
 
 

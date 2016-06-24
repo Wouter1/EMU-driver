@@ -369,8 +369,8 @@ public:
      @param request The parameter block to send to the device (with the pData as an IOMemoryDesriptor)
      @param completion optional on-completion callback. Default/null will execute request synchronously
      */
-	virtual	IOReturn		deviceRequest (IOUSBDevRequestDesc * request, Completion * completion = NULL);
-	static	IOReturn		deviceRequest (IOUSBDevRequest * request, EMUUSBAudioDevice * self, Completion * completion = 0);
+	virtual	IOReturn		deviceRequest (IOUSBDevRequestDesc * request);
+	static	IOReturn		deviceRequest (IOUSBDevRequest * request, EMUUSBAudioDevice * self);
 	static void				StatusAction(OSObject *owner, IOTimerEventSource *sender);
     
     /*! function that is attached to timer, to periodically get USB status. see also setupStatusFeedback */

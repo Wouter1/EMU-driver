@@ -2178,7 +2178,7 @@ const char * EMUUSBAudioDevice::TerminalTypeString(UInt16 terminalType) {
 	return terminalTypeString;
 }
 
-IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequestDesc * request, Completion * completion) {
+IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequestDesc * request) {
 	IOReturn		result = kIOReturnSuccess;
     
 	if (mInterfaceLock) {
@@ -2189,7 +2189,7 @@ IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequestDesc * request, Complet
 			UInt32	timeout = 5;
 			while(timeout && mControlInterface) {
                 //debugIOLogC("EMUUSBAudioDevice::deviceRequest DeviceRequest");
-				result = mControlInterface->DeviceRequest(request, completion);
+				result = mControlInterface->DeviceRequest(request);
                 debugIOLogC("EMUUSBAudioDevice::deviceRequest result=%d",result);
 				if(result != kIOReturnSuccess) {
 					if (kIOUSBPipeStalled == result) {
@@ -2242,7 +2242,7 @@ IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequestDesc * request, Complet
  }
  */
 
-IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequest *request, EMUUSBAudioDevice * self, Completion *completion) {
+IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequest *request, EMUUSBAudioDevice * self) {
 	IOReturn		result = kIOReturnSuccess;
     
 	if (self->mInterfaceLock) {
@@ -2250,7 +2250,7 @@ IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequest *request, EMUUSBAudioD
 		if(FALSE == self->mTerminatingDriver) {
 			UInt32	timeout = 5;
 			while(timeout && self->mControlInterface) {
-				result = self->mControlInterface->DeviceRequest(request, completion);
+				result = self->mControlInterface->DeviceRequest(request);
 				if(result != kIOReturnSuccess) {
 					--timeout;
 					IOSleep(1);
@@ -2261,7 +2261,7 @@ IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequest *request, EMUUSBAudioD
 		}
 		IORecursiveLockUnlock(self->mInterfaceLock);
 	}
-	debugIOLogC("++EMUUSBAudioDevice[%p]::deviceRequest(%p, %p) = %x", self, request, completion, result);
+	debugIOLogC("++EMUUSBAudioDevice[%p]::deviceRequest(%p, %p) = %x", self, request, result);
     
 	return result;
 }
