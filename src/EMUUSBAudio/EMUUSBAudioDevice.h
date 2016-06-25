@@ -362,16 +362,18 @@ public:
 
 	inline UInt32			getHardwareSampleRate() {return mCurSampleRate;}
 	inline void				setHardwareSampleRate(UInt32 inSampleRate) { mCurSampleRate = inSampleRate;}
-	//virtual	IOReturn		deviceRequest (IOUSBDevRequest * request, Completion * completion = NULL);			// Depricated, don't use
+
     
     /*! Send a request to the USB device over mControlInterface (default pipe 0?)
      and get the result. At most 5 attempts will be done if the call does not succeed immediately.
      @param request The parameter block to send to the device (with the pData as an IOMemoryDesriptor)
      @param completion optional on-completion callback. Default/null will execute request synchronously
      */
-	virtual	IOReturn		deviceRequest (IOUSBDevRequestDesc * request);
-	//static	IOReturn		deviceRequest (IOUSBDevRequest * request, EMUUSBAudioDevice * self);
-	static void				StatusAction(OSObject *owner, IOTimerEventSource *sender);
+	//virtual	IOReturn		deviceRequest (IOUSBDevRequestDesc * request);
+
+    IOReturn		deviceRequest (IOUSBDevRequestDesc * request);
+    
+    static void				StatusAction(OSObject *owner, IOTimerEventSource *sender);
     
     /*! function that is attached to timer, to periodically get USB status. see also setupStatusFeedback */
 	static 	void			statusHandler(void* target, void* parameter, IOReturn result, UInt32 bytesLeft);
