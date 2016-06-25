@@ -123,6 +123,8 @@ typedef IOUSBLowLatencyIsocCompletionAction LowLatencyCompletionAction;
 #define kUSBBulk        kEndpointTypeBulk
 #define kUSBInterrupt   kEndpointTypeInterrupt
 
+#define kUSBEndpoint kRequestRecipientEndpoint
+
 // support usbDevice->getProperty()
 #define kUSBDevicePropertyLocationID kUSBHostPropertyLocationID
 

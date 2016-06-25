@@ -58,9 +58,10 @@ public:
 // which one do we really need?
 //#include <IOKit/usb/IOUSBHostHIDDevice.h>
 
-// I suppose we need this, because here many changes wrt 10.9 are explained.
+#include "USB.h"
 #include <IOKit/usb/IOUSBHostDevice.h>
 #include <sys/utfconv.h>
+#include "USBAudioObject.h"
 
 
 class IOUSBDevice1: public IOUSBHostDevice {
@@ -140,6 +141,28 @@ public:
     }
     
 
+    /*!
+     * set the sample rate to the device.
+     @param inSampleRate the input samplerate
+     @param endpointAddress the usbAudio->GetIsocEndpointAddress
+     */
+    IOReturn devRequestSampleRate(UInt32 inSampleRate, UInt16 endpointAddress) {
+        DeviceRequest		devReq;
+        UInt32				theSampleRate = OSSwapHostToLittleInt32 (inSampleRate);
+        
+        devReq.bmRequestType = USBmakebmRequestType (kUSBOut, kUSBClass, kUSBEndpoint);
+        devReq.bRequest = SET_CUR;
+        devReq.wValue = (SAMPLING_FREQ_CONTROL << 8) | 0;
+        devReq.wIndex = endpointAddress;
+        // 3 + (usbAudioDevice->isHighHubSpeed()?1:0);// USB 2.0 device has maxPacket size of 4
+        devReq.wLength = 4;
+        uint32_t bytesTransferred;
+
+        //return DeviceRequest (&devReq);
+        
+        //virtual IOReturn deviceRequest(IOService* forClient, StandardUSB::DeviceRequest& request, void* dataBuffer, udsfdsint32_t& bytesTransferred, uint32_t completionTimeoutMs = kUSBHostDefaultControlCompletionTimeoutMS);
+        return deviceRequest(this, devReq, &theSampleRate, bytesTransferred);
+    }
 
     
     

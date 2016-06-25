@@ -1669,17 +1669,6 @@ IOReturn EMUUSBAudioEngine::SetSampleRate (EMUUSBAudioConfigObject *usbAudio, UI
     } else if (usbAudio->IsocEndpointHasSampleFreqControl (mOutput.interfaceNumber, mOutput.alternateSettingID)) {// use the conventional method
         debugIOLogC("using DeviceRequest");
         
-//		IOUSBDevRequest		devReq;
-//		UInt32				theSampleRate = OSSwapHostToLittleInt32 (inSampleRate);
-//        
-//		devReq.bmRequestType = USBmakebmRequestType (kUSBOut, kUSBClass, kUSBEndpoint);
-//		devReq.bRequest = SET_CUR;
-//		devReq.wValue = (SAMPLING_FREQ_CONTROL << 8) | 0;
-//		devReq.wIndex = usbAudio->GetIsocEndpointAddress (mOutput.interfaceNumber, mOutput.alternateSettingID, mOutput.streamDirection);
-//        devReq.wLength = 3 + (usbAudioDevice->isHighHubSpeed()?1:0);// USB 2.0 device has maxPacket size of 4
-//		devReq.pData = &theSampleRate;
-        
-//result = mOutput.streamInterface->getDevice1()->DeviceRequest (&devReq);
         UInt16 endpoint=usbAudio->GetIsocEndpointAddress (mOutput.interfaceNumber, mOutput.alternateSettingID, mOutput.streamDirection);
         result = mOutput.streamInterface->getDevice1()->devRequestSampleRate(inSampleRate, endpoint);
 	}

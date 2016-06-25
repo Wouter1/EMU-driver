@@ -57,6 +57,8 @@
 #include "EMUUSBUserClient.h"
 
 #include <IOKit/usb/IOUSBLog.h>
+#include "USB.h"
+
 
 #define super IOAudioDevice
 #define	ENABLEHARDCONTROLS	0	// disable exposing hardware volume sliders to the OS

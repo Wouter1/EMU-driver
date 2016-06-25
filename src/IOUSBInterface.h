@@ -189,7 +189,42 @@ public:
     }
     
 
-
+    /*! Send a request to the USB device over mControlInterface (default pipe 0?)
+     block and wait to get the result. At most 5 attempts will be done if the call does not succeed immediately.
+     See IOUSBDevRequestDesc.
+     @discussion Parameter block for control requests, using a memory descriptor
+     for the data to be transferred.  Only available in the kernel.
+     @field bmRequestType Request type: kUSBStandard, kUSBClass or kUSBVendor
+     @field bRequest Request code
+     @field wValue 16 bit parameter for request, host endianess
+     @field wIndex 16 bit parameter for request, host endianess
+     @field wLength Length of data part of request, 16 bits, host endianess
+     @field pData Pointer to memory descriptor for data for request - data returned in bus endianess
+     @field wLenDone Set by standard completion routine to number of data bytes
+     
+     */
+    IOReturn DevRequest(    UInt8                   type,
+                        UInt8                   request,
+                        UInt16                  value,
+                        UInt16                  index,
+                        UInt16                  length,
+                        IOMemoryDescriptor *    data) {
+        StandardUSB::DeviceRequest			devReq;
+        devReq.bmRequestType = type;
+        devReq.bRequest = request;
+        devReq.wValue = value;
+        devReq.wIndex =index;
+        devReq.wLength = length;
+        uint32_t bytesTransferred;
+        
+        return deviceRequest(devReq, data, bytesTransferred);
+        
+    }
+    
+    IOReturn SetAlternateInterface(IOService* forClient, UInt16 alternateSetting) {
+        return selectAlternateSetting(alternateSetting);
+    }
+    
 };
 #endif
 
