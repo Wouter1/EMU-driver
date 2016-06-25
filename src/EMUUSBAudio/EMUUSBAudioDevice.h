@@ -365,13 +365,22 @@ public:
 
     
     /*! Send a request to the USB device over mControlInterface (default pipe 0?)
-     and get the result. At most 5 attempts will be done if the call does not succeed immediately.
+     block and wait to get the result. At most 5 attempts will be done if the call does not succeed immediately.
+     See IOUSBDevRequestDesc.
      @param request The parameter block to send to the device (with the pData as an IOMemoryDesriptor)
      @param completion optional on-completion callback. Default/null will execute request synchronously
      */
-	//virtual	IOReturn		deviceRequest (IOUSBDevRequestDesc * request);
 
-    IOReturn		deviceRequest (IOUSBDevRequestDesc * request);
+    
+    IOReturn deviceRequest(    UInt8                   bmRequestType,
+                           UInt8                   bRequest,
+                           UInt16                  wValue,
+                           UInt16                  wIndex,
+                           UInt16                  wLength,
+                           IOMemoryDescriptor *    pData);
+
+    //IOReturn		deviceRequest (IOUSBDevRequestDesc * request);
+    
     
     static void				StatusAction(OSObject *owner, IOTimerEventSource *sender);
     

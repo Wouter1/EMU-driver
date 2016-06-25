@@ -1450,7 +1450,6 @@ IOReturn EMUUSBAudioDevice::setCurMute(UInt8 unitID, UInt8 channelNumber, SInt16
 
 
 IOReturn EMUUSBAudioDevice::deviceRequestIn(UInt8 unitID, UInt8 controlSelector, UInt8 requestType, UInt8 channelNumber, UInt8* data, UInt32 length) {
-    IOUSBDevRequestDesc			devReq;
     IOBufferMemoryDescriptor *	settingDesc ;
     
     ReturnIf(!data, kIOReturnBadArgument);
@@ -1458,14 +1457,7 @@ IOReturn EMUUSBAudioDevice::deviceRequestIn(UInt8 unitID, UInt8 controlSelector,
     settingDesc = IOBufferMemoryDescriptor::withOptions(kIODirectionIn, length);
     ReturnIf(!settingDesc, kIOReturnNoMemory);
     
-    devReq.bmRequestType = USBmakebmRequestType(kUSBIn, kUSBClass, kUSBInterface);
-    devReq.bRequest = requestType;
-    devReq.wValue =(controlSelector << 8) | channelNumber;
-    devReq.wIndex =(0xFF00 & (unitID << 8)) |(0x00FF & mInterfaceNum);
-    devReq.wLength = length;
-    devReq.pData = settingDesc;
-    
-    IOReturn result = deviceRequest(&devReq);
+    IOReturn result = deviceRequest(USBmakebmRequestType(kUSBIn, kUSBClass, kUSBInterface), requestType, (controlSelector << 8) | channelNumber, (0xFF00 & (unitID << 8)) |(0x00FF & mInterfaceNum), length, settingDesc);
     if (kIOReturnSuccess == result) {
 		memmove(data, settingDesc->getBytesNoCopy(), length);
     }
@@ -1476,7 +1468,6 @@ IOReturn EMUUSBAudioDevice::deviceRequestIn(UInt8 unitID, UInt8 controlSelector,
 
 
 IOReturn EMUUSBAudioDevice::deviceRequestOut(UInt8 unitID, UInt8 controlSelector, UInt8 requestType, UInt8 channelNumber, UInt8* data, UInt32 length) {
-    IOUSBDevRequestDesc		devReq;
     IOBufferMemoryDescriptor*	settingDesc;
     IOReturn result=kIOReturnOffline;
     
@@ -1487,16 +1478,10 @@ IOReturn EMUUSBAudioDevice::deviceRequestOut(UInt8 unitID, UInt8 controlSelector
     settingDesc = IOBufferMemoryDescriptor::withBytes(data, length, kIODirectionOut, true);
     ReturnIf(!settingDesc, kIOReturnNoMemory);
     
-    devReq.bmRequestType = USBmakebmRequestType(kUSBOut, kUSBClass, kUSBInterface);
-    devReq.bRequest = requestType;
-    devReq.wValue =(controlSelector << 8) | channelNumber;
-    devReq.wIndex =(0xFF00 &(unitID << 8)) |(0x00FF & mInterfaceNum);
-    devReq.wLength = length;
-    devReq.pData = settingDesc;
     
     debugIOLogC("EMUUSBAudioDevice::deviceRequest bmRequestType=%x bRequest=%x wValue=%x wIndex=%x wLength=%x", devReq.bmRequestType, devReq.bRequest,devReq.wValue,devReq.wIndex,devReq.wLength);
     if (!isInactive()) {
-        result = deviceRequest(&devReq);
+        result = deviceRequest(USBmakebmRequestType(kUSBOut, kUSBClass, kUSBInterface), requestType, (controlSelector << 8) | channelNumber, (0xFF00 &(unitID << 8)) |(0x00FF & mInterfaceNum), length, settingDesc);
     }
     settingDesc->release();
 	return result;
@@ -1963,15 +1948,7 @@ UInt8 EMUUSBAudioDevice::getSelectorSetting(UInt8 selectorID) {
 	if (mControlInterface) {
 		IOBufferMemoryDescriptor*	settingDesc = IOBufferMemoryDescriptor::withOptions(kIODirectionIn, 1);
 		if (settingDesc) {
-			IOUSBDevRequestDesc		devReq;
-			devReq.bmRequestType = USBmakebmRequestType(kUSBIn, kUSBClass, kUSBInterface);
-			devReq.bRequest = GET_CUR;
-			devReq.wValue = 0;
-			devReq.wIndex =(0xFF00 &(selectorID << 8)) |(0x00FF & mInterfaceNum);
-			devReq.wLength = 1;
-			devReq.pData = settingDesc;
-            
-			if (kIOReturnSuccess == deviceRequest(&devReq))
+            if (kIOReturnSuccess == deviceRequest(USBmakebmRequestType(kUSBIn, kUSBClass, kUSBInterface), GET_CUR, 0, (0xFF00 &(selectorID << 8)) |(0x00FF & mInterfaceNum), 1, settingDesc))
 				memcpy(&setting, settingDesc->getBytesNoCopy(), 1);
 			settingDesc->release();
 		}
@@ -1989,15 +1966,7 @@ IOReturn EMUUSBAudioDevice::setSelectorSetting(UInt8 selectorID, UInt8 setting) 
     settingDesc = IOBufferMemoryDescriptor::withBytes(&setting, 1, kIODirectionIn,true);
     ReturnIf(!settingDesc,kIOReturnError);
     
-    IOUSBDevRequestDesc		devReq;
-    devReq.bmRequestType = USBmakebmRequestType(kUSBOut, kUSBClass, kUSBInterface);
-    devReq.bRequest = SET_CUR;
-    devReq.wValue = 0;
-    devReq.wIndex =(0xFF00 &(selectorID << 8)) |(0x00FF & mInterfaceNum);
-    devReq.wLength = 1;
-    devReq.pData = settingDesc;
-    
-    result = deviceRequest(&devReq);
+    result = deviceRequest(USBmakebmRequestType(kUSBOut, kUSBClass, kUSBInterface), SET_CUR, 0, (0xFF00 &(selectorID << 8)) |(0x00FF & mInterfaceNum), 1, settingDesc);
     settingDesc->release();
     
 	return result;
@@ -2178,7 +2147,23 @@ const char * EMUUSBAudioDevice::TerminalTypeString(UInt16 terminalType) {
 	return terminalTypeString;
 }
 
-IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequestDesc * request) {
+
+IOReturn EMUUSBAudioDevice::deviceRequest(    UInt8                   type,
+                       UInt8                   request,
+                       UInt16                  value,
+                       UInt16                  index,
+                       UInt16                  length,
+                       IOMemoryDescriptor *    data) {
+    
+    IOUSBDevRequestDesc			devReq;
+    devReq.bmRequestType = type;
+    devReq.bRequest = request;
+    devReq.wValue = value;
+    devReq.wIndex =index;
+    devReq.wLength = length;
+    devReq.pData = data;
+
+
 	IOReturn		result = kIOReturnSuccess;
     
 	if (mInterfaceLock) {
@@ -2189,7 +2174,7 @@ IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequestDesc * request) {
 			UInt32	timeout = 5;
 			while(timeout && mControlInterface) {
                 //debugIOLogC("EMUUSBAudioDevice::deviceRequest DeviceRequest");
-				result = mControlInterface->DeviceRequest(request);
+				result = mControlInterface->DeviceRequest(&devReq);
                 debugIOLogC("EMUUSBAudioDevice::deviceRequest result=%d",result);
 				if(result != kIOReturnSuccess) {
 					if (kIOUSBPipeStalled == result) {
