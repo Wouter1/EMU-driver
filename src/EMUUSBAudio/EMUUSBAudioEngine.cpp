@@ -1785,8 +1785,8 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     // NB - From testing and observation this work around does not help and has therefore been deleted.
     usbInputStream.frameOffset = kMinimumFrameOffset + (usbAudioDevice->isHighHubSpeed()? kUSB2FrameOffset:0);
 	
-	*(UInt64 *) (&(usbInputStream.usbIsocFrames[0].frTimeStamp)) = 0xFFFFFFFFFFFFFFFFull;
-    
+	//*(UInt64 *) (&(usbInputStream.usbIsocFrames[0].frTimeStamp)) = 0xFFFFFFFFFFFFFFFFull;
+    usbInputStream.usbIsocFrames[0].resetTime();
     
     resultCode =usbInputRing.init(usbInputStream.bufferSize, this, sampleRate.whole * usbInputStream.multFactor);
     FailIf( kIOReturnSuccess != resultCode, Exit);
@@ -1827,7 +1827,8 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     // NB - From testing and observation this work around does not help and has therefore been deleted.
 	mOutput.frameOffset = 8; // HACK kMinimumFrameOffset + ((kUSBDeviceSpeedHigh == mHubSpeed) * kUSB2FrameOffset);
 	//mOutput.usbFrameToQueueAt = 0; // INIT as late as possible. mBus->GetFrameNumber() + mOutput.frameOffset;	// start on an offset usb frame
-	*(UInt64 *) (&(mOutput.usbIsocFrames[0].frTimeStamp)) = 0xFFFFFFFFFFFFFFFFull;
+    mOutput.usbIsocFrames[0].resetTime();
+	//*(UInt64 *) (&(mOutput.usbIsocFrames[0].frTimeStamp)) = 0xFFFFFFFFFFFFFFFFull;
     
     setRunEraseHead(true); // need it to avoid stutter at start&end and to allow multiple simultaneous playback.
     

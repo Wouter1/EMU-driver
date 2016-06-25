@@ -48,6 +48,11 @@ public:
         return frActCount;
     }
     
+    /*! set the timestamp to -1 */
+    inline void resetTime() {
+        frTimeStamp = 0xFFFFFFFFFFFFFFFFull;
+    }
+    
 };
 
 
@@ -160,6 +165,11 @@ public:
     /*! @return nr of actually completed frames */
     inline uint32_t getCompleteCount() {
         return completeCount;
+    }
+    
+    /*! set the timestamp to -1 */
+    inline void resetTime() {
+        timeStamp = 0xFFFFFFFFFFFFFFFFull;
     }
 };
 typedef IOUSBHostIsochronousCompletionAction LowLatencyCompletionAction;
