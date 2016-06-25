@@ -2155,14 +2155,6 @@ IOReturn EMUUSBAudioDevice::deviceRequest(    UInt8                   type,
                        UInt16                  length,
                        IOMemoryDescriptor *    data) {
     
-    IOUSBDevRequestDesc			devReq;
-    devReq.bmRequestType = type;
-    devReq.bRequest = request;
-    devReq.wValue = value;
-    devReq.wIndex =index;
-    devReq.wLength = length;
-    devReq.pData = data;
-
 
 	IOReturn		result = kIOReturnSuccess;
     
@@ -2171,10 +2163,10 @@ IOReturn EMUUSBAudioDevice::deviceRequest(    UInt8                   type,
 		IORecursiveLockLock(mInterfaceLock);
         
 		if(FALSE == mTerminatingDriver) {
-			UInt32	timeout = 5;
-			while(timeout && mControlInterface) {
+			UInt32	remainingAttempts = 5;
+			while(remainingAttempts && mControlInterface) {
                 //debugIOLogC("EMUUSBAudioDevice::deviceRequest DeviceRequest");
-				result = mControlInterface->DeviceRequest(&devReq);
+                result = mControlInterface->DevRequest(type, request, value, index, length, data);
                 debugIOLogC("EMUUSBAudioDevice::deviceRequest result=%d",result);
 				if(result != kIOReturnSuccess) {
 					if (kIOUSBPipeStalled == result) {
@@ -2189,7 +2181,7 @@ IOReturn EMUUSBAudioDevice::deviceRequest(    UInt8                   type,
 							break;
 						}
 					}
-					--timeout;
+					--remainingAttempts;
 					IOSleep(1);
 				} else {
 					break;// out of time and there is something wrong with the device

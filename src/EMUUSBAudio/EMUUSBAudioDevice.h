@@ -379,9 +379,6 @@ public:
                            UInt16                  wLength,
                            IOMemoryDescriptor *    pData);
 
-    //IOReturn		deviceRequest (IOUSBDevRequestDesc * request);
-    
-    
     static void				StatusAction(OSObject *owner, IOTimerEventSource *sender);
     
     /*! function that is attached to timer, to periodically get USB status. see also setupStatusFeedback */

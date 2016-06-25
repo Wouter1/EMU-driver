@@ -47,6 +47,7 @@ public:
      starting from the beginning of the interface's pipe list
      @param request Requirements for pipe to match, updated with the found pipe's
      properties.
+     
      @result Pointer to the pipe, or NULL if no pipe matches the request.
      */
     IOUSBPipe* findPipe(uint8_t direction, uint8_t type) {
@@ -56,6 +57,37 @@ public:
         request.interval = 0xFF;
         request.maxPacketSize = 0;
         return FindNextPipe(NULL, &request);
+    }
+    
+     /*! Send a request to the USB device over mControlInterface (default pipe 0?)
+     block and wait to get the result. At most 5 attempts will be done if the call does not succeed immediately.
+     See IOUSBDevRequestDesc. 
+      @discussion Parameter block for control requests, using a memory descriptor
+      for the data to be transferred.  Only available in the kernel.
+      @field bmRequestType Request type: kUSBStandard, kUSBClass or kUSBVendor
+      @field bRequest Request code
+      @field wValue 16 bit parameter for request, host endianess
+      @field wIndex 16 bit parameter for request, host endianess
+      @field wLength Length of data part of request, 16 bits, host endianess
+      @field pData Pointer to memory descriptor for data for request - data returned in bus endianess
+      @field wLenDone Set by standard completion routine to number of data bytes
+
+      */
+    IOReturn DevRequest(    UInt8                   type,
+                  UInt8                   request,
+                  UInt16                  value,
+                  UInt16                  index,
+                  UInt16                  length,
+                  IOMemoryDescriptor *    data) {
+        IOUSBDevRequestDesc			devReq;
+        devReq.bmRequestType = type;
+        devReq.bRequest = request;
+        devReq.wValue = value;
+        devReq.wIndex =index;
+        devReq.wLength = length;
+        devReq.pData = data;
+        return DeviceRequest(&devReq);
+        
     }
     
 
