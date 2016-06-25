@@ -370,7 +370,7 @@ public:
      @param completion optional on-completion callback. Default/null will execute request synchronously
      */
 	virtual	IOReturn		deviceRequest (IOUSBDevRequestDesc * request);
-	static	IOReturn		deviceRequest (IOUSBDevRequest * request, EMUUSBAudioDevice * self);
+	//static	IOReturn		deviceRequest (IOUSBDevRequest * request, EMUUSBAudioDevice * self);
 	static void				StatusAction(OSObject *owner, IOTimerEventSource *sender);
     
     /*! function that is attached to timer, to periodically get USB status. see also setupStatusFeedback */

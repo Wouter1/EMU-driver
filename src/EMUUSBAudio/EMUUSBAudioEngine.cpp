@@ -1351,14 +1351,15 @@ void EMUUSBAudioEngine::pluginLoaded (EMUUSBAudioEngine * usbAudioEngineObject) 
 	}
 }
 
-IOReturn EMUUSBAudioEngine::pluginDeviceRequest (IOUSBDevRequest * request) {
-	IOReturn			result = kIOReturnBadArgument;
-    
-	if (request)
-		result = usbAudioDevice->deviceRequest (request, usbAudioDevice);
-	
-	return result;
-}
+//IOReturn EMUUSBAudioEngine::pluginDeviceRequest (IOUSBDevRequest * request) {
+//	IOReturn			result = kIOReturnBadArgument;
+//    
+//	if (request)
+//		//result = usbAudioDevice->deviceRequest (request, usbAudioDevice);
+//        result = usbAudioDevice->deviceRequest (request);
+//
+//	return result;
+//}
 
 void EMUUSBAudioEngine::pluginSetConfigurationApp (const char * bundleID) {
 	if (bundleID)

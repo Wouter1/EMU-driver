@@ -2242,29 +2242,29 @@ IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequestDesc * request) {
  }
  */
 
-IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequest *request, EMUUSBAudioDevice * self) {
-	IOReturn		result = kIOReturnSuccess;
-    
-	if (self->mInterfaceLock) {
-		IORecursiveLockLock(self->mInterfaceLock);
-		if(FALSE == self->mTerminatingDriver) {
-			UInt32	timeout = 5;
-			while(timeout && self->mControlInterface) {
-				result = self->mControlInterface->DeviceRequest(request);
-				if(result != kIOReturnSuccess) {
-					--timeout;
-					IOSleep(1);
-				} else {
-					break;// out of time and there is something wrong with the device
-				}
-			}
-		}
-		IORecursiveLockUnlock(self->mInterfaceLock);
-	}
-	debugIOLogC("++EMUUSBAudioDevice[%p]::deviceRequest(%p, %p) = %x", self, request, result);
-    
-	return result;
-}
+//IOReturn EMUUSBAudioDevice::deviceRequest(IOUSBDevRequest *request, EMUUSBAudioDevice * self) {
+//	IOReturn		result = kIOReturnSuccess;
+//    
+//	if (self->mInterfaceLock) {
+//		IORecursiveLockLock(self->mInterfaceLock);
+//		if(FALSE == self->mTerminatingDriver) {
+//			UInt32	timeout = 5;
+//			while(timeout && self->mControlInterface) {
+//				result = self->mControlInterface->DeviceRequest(request);
+//				if(result != kIOReturnSuccess) {
+//					--timeout;
+//					IOSleep(1);
+//				} else {
+//					break;// out of time and there is something wrong with the device
+//				}
+//			}
+//		}
+//		IORecursiveLockUnlock(self->mInterfaceLock);
+//	}
+//	debugIOLogC("++EMUUSBAudioDevice[%p]::deviceRequest(%p, %p) = %x", self, request, result);
+//    
+//	return result;
+//}
 
 bool EMUUSBAudioDevice::willTerminate(IOService * provider, IOOptionBits options) {
 	debugIOLogC("+EMUUSBAudioDevice[%p]::willTerminate(%p)", this, provider);

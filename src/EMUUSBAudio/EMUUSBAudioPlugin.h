@@ -70,7 +70,7 @@ public:
 	virtual	bool		start (IOService * provider);
 	virtual	void		stop (IOService * provider);
     
-	IOReturn			pluginDeviceRequest (IOUSBDevRequest * request);
+	//IOReturn			pluginDeviceRequest (IOUSBDevRequest * request);
 	void				pluginSetConfigurationApp (const char * bundleID);
     
 	virtual	IOReturn	pluginInit (IOService * provider, UInt16 vendorID, UInt16 modelID);

@@ -245,7 +245,7 @@ public:
 	
     //static void sampleRateHandler (void * target, void * parameter, IOReturn result, IOUSBIsocFrame * pFrames);
     
-	virtual IOReturn pluginDeviceRequest (IOUSBDevRequest * request);
+	//virtual IOReturn pluginDeviceRequest (IOUSBDevRequest * request);
 	virtual void pluginSetConfigurationApp (const char * bundleID);
 	virtual void registerPlugin (EMUUSBAudioPlugin * thePlugin);
 	static void	pluginLoaded (EMUUSBAudioEngine * usbAudioEngineObject);
