@@ -532,10 +532,7 @@ protected:
      @param defaultValue the value to use if the plist does not specify this field. */
     UInt32 getPListNumber( const char *field, UInt32 defaultValue);
     
-    /* Not used
-     IOReturn hardwareSampleRateChangedAux(const IOAudioSampleRate *sampleRate, StreamInfo &info);
-     */
-    
+    /*! initialize the mStreamInterfaces list */
 	void				findAudioStreamInterfaces(IOUSBInterface1 *pAudioControlIfc); // AC mod
     
 	void                setupChannelNames();

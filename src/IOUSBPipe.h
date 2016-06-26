@@ -62,11 +62,25 @@ public:
      @function GetEndpointDescriptor
      returns the endpoint descriptor for the pipe.
      */
-    const EndpointDescriptor *	GetEndpointDescriptor();
+    const EndpointDescriptor *	GetEndpointDescriptor() {
+        return getEndpointDescriptor();
+    }
     
-    void release();
+    //void release();
     
-    
+    IOReturn SetPipePolicy(UInt16 maxPacketSize, UInt8 maxInterval) {
+        
+        const EndpointDescriptor *currentDescriptor = getEndpointDescriptor();
+        
+        EndpointDescriptor endpointDescriptor=*currentDescriptor;
+        endpointDescriptor.wMaxPacketSize=0;
+        SuperSpeedEndpointCompanionDescriptor ssDesc;
+        // no idea what it is, let's hope all 0 will do the job...
+        bzero(&ssDesc, sizeof(SuperSpeedEndpointCompanionDescriptor));
+
+        return adjustPipe(&endpointDescriptor, &ssDesc);
+    }
+
     
 };
 #endif

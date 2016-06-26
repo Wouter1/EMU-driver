@@ -1834,7 +1834,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     
     // Ok, all set, go!
     // plan startFrameNr well in the future, so that we have time to start both streams before that point.
-    startFrameNr = usbInputStream.streamInterface->GetDevice()->GetBus()->GetFrameNumber() + 64;
+    startFrameNr = usbInputStream.streamInterface->getDevice1()->getFrameNumber() + 64;
     resultCode = usbInputStream.start(startFrameNr);
     FailIf (kIOReturnSuccess != resultCode, Exit)
     
@@ -2178,14 +2178,14 @@ void EMUUSBAudioEngine::findAudioStreamInterfaces(IOUSBInterface1 *pAudioControl
     req.bInterfaceProtocol = 0;
     req.bAlternateSetting = 0;
     
-    IOUSBInterface *pInterface = NULL;
+    IOUSBInterface1 *pInterface = NULL;
     
     // Create array from stream interfaces, we're expecting 2 of them.
     mStreamInterfaces = OSArray::withCapacity(2);
     
-    for (pInterface = pDevice->FindNextInterface(pInterface, &req);
-         pInterface;
-         pInterface = pDevice->FindNextInterface(pInterface, &req)) {
+    for (pInterface = (IOUSBInterface1*)pDevice->FindNextInterface(pInterface, &req);
+         pInterface; // repeat until next=NULL
+         pInterface = (IOUSBInterface1*)pDevice->FindNextInterface(pInterface, &req)) {
         mStreamInterfaces->setObject(pInterface);
     }
 }

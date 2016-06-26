@@ -46,8 +46,15 @@ public:
         return DeviceRequest (&devReq);
     }
     
+    UInt64 getFrameNumber() {
+        return GetBus()->GetFrameNumber();
+    }
+    
 };
 
+class FindInterfaceRequest: public IOUSBFindInterfaceRequest {
+    
+};
 
 #else
 
@@ -59,9 +66,10 @@ public:
 //#include <IOKit/usb/IOUSBHostHIDDevice.h>
 
 #include "USB.h"
-#include <IOKit/usb/IOUSBHostDevice.h>
+#include <IOUSBInterface.h>
 #include <sys/utfconv.h>
 #include "USBAudioObject.h"
+#include <IOKit/usb/USBSpec.h>
 
 
 class IOUSBDevice1: public IOUSBHostDevice {
@@ -164,7 +172,43 @@ public:
         return deviceRequest(this, devReq, &theSampleRate, bytesTransferred);
     }
 
-    
+    /*!
+     Search first interface (after current, if it's not NULL) that  matches the request.
+     The request probably should have bInterfaceClass==kUSBHubClass.
+     */
+    IOUSBInterface1* FindNextInterface(IOUSBInterface1*        current,
+                                          FindInterfaceRequest* request) {
+        OSIterator* iterator = getChildIterator(gIOServicePlane);
+        if (iterator==NULL) {
+            debugIOLog("ERR can't create an interface iterator to find the device!");
+            return NULL;
+        }
+        
+        OSObject* candidate = NULL;
+        IOUSBInterface1 *found=NULL;
+        bool searchCurrent = (current!=NULL);
+        
+        while( (candidate = iterator->getNextObject()) != NULL)
+        {
+            IOUSBInterface1* interfaceCandidate = OSDynamicCast(IOUSBInterface1, candidate);
+            if (interfaceCandidate==NULL) continue;
+            
+            if (searchCurrent) {
+                if (candidate == current)  {
+                    searchCurrent=false; // found current!
+                }
+            } else {
+                // next matching one is the one we want
+                if (request->matches(interfaceCandidate->getInterfaceDescriptor())) {
+                    found=interfaceCandidate;
+                    break;
+                }
+            }
+            
+        }
+        OSSafeReleaseNULL(iterator);
+        return found;
+    }
     
 };
 #endif

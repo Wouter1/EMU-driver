@@ -98,7 +98,9 @@ public:
 
 /******************** 10.11 and higher *********************/
 #include <IOKit/usb/IOUSBHostInterface.h>
-#include <IOUSBDevice.h>
+//#include <IOUSBDevice.h> super class, can't include here.
+class IOUSBDevice1; // declare that it's a known class
+
 #include "EMUUSBLogging.h"
 #include "IOUSBPipe.h"
 //#include <IOKit/usb/USBSpec.h> deprecated. But where is USBAnyrDir?
@@ -111,22 +113,23 @@ public:
      @result Pointer to the IOUSBDevice object which is the parent of this IOUSBInterface object.
      */
     inline IOUSBDevice1 *getDevice1() {
-        return OSDynamicCast(IOUSBDevice1 ,getDevice());
+        // can't do OSDynamicCast because IOUSBDevice1 is parent and not completely defined.
+        return (IOUSBDevice1 *)getDevice();
     }
     
-    /*!
-     * @brief Return the current frame number of the USB bus
-     *
-     * @description This method will return the current frame number of the USB bus.  This is most useful for
-     * scheduling future isochronous requests.
-     *
-     * @param theTime If not NULL, this will be updated with the current system time
-     *
-     * @result The current frame number
-     */
-    inline uint64_t getFrameNumber(AbsoluteTime* theTime = NULL) const {
-        return getFrameNumber();
-    }
+//    /*!
+//     * @brief Return the current frame number of the USB bus
+//     *
+//     * @description This method will return the current frame number of the USB bus.  This is most useful for
+//     * scheduling future isochronous requests.
+//     *
+//     * @param theTime If not NULL, this will be updated with the current system time
+//     *
+//     * @result The current frame number
+//     */
+//    inline uint64_t getFrameNumber(AbsoluteTime* theTime = NULL) const {
+//        return getFrameNumber();
+//    }
     
     inline UInt8 getInterfaceNumber() {
         return getInterfaceDescriptor()->bInterfaceNumber;

@@ -215,6 +215,29 @@ public:
 typedef StandardUSB::DeviceRequest IOUSBDevRequestDesc;
 
 
+/*!
+ @struct IOUSBFindInterfaceRequest copy of the 10.9 structure, enhanced with match
+ @discussion Structure used with FindNextInterface.
+ */
+class FindInterfaceRequest {
+public:
+    UInt16	bInterfaceClass;		// requested class
+    UInt16 	bInterfaceSubClass;		// requested subclass
+    UInt16 	bInterfaceProtocol;		// requested protocol
+    UInt16	bAlternateSetting;		// requested alt setting
+
+    /*!
+     @return true if this request matches the given descriptor.
+     */
+    bool matches(const InterfaceDescriptor *descriptor) {
+        return
+            descriptor->bInterfaceClass == bInterfaceClass &&
+            descriptor->bInterfaceSubClass == bInterfaceSubClass &&
+            descriptor->bInterfaceProtocol == bInterfaceProtocol &&
+            descriptor->bAlternateSetting == bAlternateSetting;
+    }
+};
+
 
 
 
