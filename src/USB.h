@@ -100,13 +100,16 @@ public:
 typedef  IOUSBCompletionAction CompletionAction;
 typedef IOUSBLowLatencyIsocCompletionAction LowLatencyCompletionAction;
 
+typedef IOUSBFindInterfaceRequest FindInterfaceRequest;
+
 #else
 /********************* 10.11 DEFINITIONS **********************/
 
 // SEE ALSO IOUSBHostInterface for the new functionality compared to 10.9
 
+
 #include <IOKit/usb/StandardUSB.h>
-// replaces IOKit/usb/USB.h
+#include <IOKit/usb/USB.h>
 #include <IOKit/usb/IOUSBHostIOSource.h>
 
 //definitions that were removed in 10.11 but that we still need
@@ -212,7 +215,7 @@ public:
 
 
 /* NOTE, NO pData field anymore. */
-typedef StandardUSB::DeviceRequest IOUSBDevRequestDesc;
+//typedef StandardUSB::DeviceRequest IOUSBDevRequestDesc;
 
 
 /*!

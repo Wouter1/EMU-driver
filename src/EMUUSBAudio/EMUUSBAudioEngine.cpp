@@ -2171,7 +2171,7 @@ void EMUUSBAudioEngine::findAudioStreamInterfaces(IOUSBInterface1 *pAudioControl
 {
     IOUSBDevice1 *pDevice = pAudioControlIfc->getDevice1();
     
-    IOUSBFindInterfaceRequest req;
+    FindInterfaceRequest req;
     
     req.bInterfaceClass = 255; // 255 == vendor-specific interface class
     req.bInterfaceSubClass = 2; // 2 == AudioStream Interface

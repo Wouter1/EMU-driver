@@ -71,7 +71,7 @@ public:
       @field wLength Length of data part of request, 16 bits, host endianess
       @field pData Pointer to memory descriptor for data for request - data returned in bus endianess
       @field wLenDone Set by standard completion routine to number of data bytes
-
+      @return kIOUSBPipeStalled if pipe stalled. Maybe other return values. 
       */
     IOReturn DevRequest(    UInt8                   type,
                   UInt8                   request,

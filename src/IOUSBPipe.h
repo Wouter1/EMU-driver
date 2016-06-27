@@ -81,6 +81,21 @@ public:
         return adjustPipe(&endpointDescriptor, &ssDesc);
     }
 
+    /*!
+     @function ClearPipeStall
+     AVAILABLE ONLY IN VERSION 1.9 AND ABOVE
+     This method causes all outstanding I/O on a pipe to complete with return code kIOUSBTransactionReturned. It also clears both the halted bit and the
+     toggle bit on the endpoint in the controller. The driver may need to reset the data toggle within the device to avoid losing any data. If the
+     device correctly handles the ClearFeature(ENDPOINT_HALT) device request, then this API will handle that by sending the correct request to the
+     device.
+     @param withDeviceRequest if true, a ClearFeature(ENDPOINT_HALT) is sent to the appropriate endpoint on the device after the transactions on the
+     controllers endpoint are returned and the toggle bit on the controllers endpoint is cleared. if this parameter is false, then this is equivalent
+     to the pre-1.9 API. This means that the endpoint on the controller is cleared, but no DeviceRequest is sent to the device's endpoint.
+     */
+    IOReturn ClearPipeStall(bool withDeviceRequest) {
+        return clearStall(withDeviceRequest);
+    }
+    
     
 };
 #endif

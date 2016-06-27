@@ -52,9 +52,6 @@ public:
     
 };
 
-class FindInterfaceRequest: public IOUSBFindInterfaceRequest {
-    
-};
 
 #else
 
@@ -69,7 +66,7 @@ class FindInterfaceRequest: public IOUSBFindInterfaceRequest {
 #include <IOUSBInterface.h>
 #include <sys/utfconv.h>
 #include "USBAudioObject.h"
-#include <IOKit/usb/USBSpec.h>
+
 
 
 class IOUSBDevice1: public IOUSBHostDevice {
