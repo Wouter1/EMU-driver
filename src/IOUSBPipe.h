@@ -96,6 +96,11 @@ public:
         return clearStall(withDeviceRequest);
     }
     
+    IOReturn Read(IOMemoryDescriptor* buffer, Completion* completion = 0, UInt64 *bytesRead = 0) {
+        // arg2 must be dataBufferLength. Strange, isn't that just getLength???
+        return io(buffer, (int)buffer->getLength(), completion);
+    }
+    
     
 };
 #endif

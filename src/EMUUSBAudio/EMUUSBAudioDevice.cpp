@@ -2263,7 +2263,8 @@ void EMUUSBAudioDevice::StatusAction(OSObject *owner, IOTimerEventSource *sender
 	}
 }
 
-void EMUUSBAudioDevice::doStatusCheck(IOTimerEventSource *timer) {// routine to read the interrupt
+void EMUUSBAudioDevice::doStatusCheck(IOTimerEventSource *timer) {
+    // routine to read the interrupt
 	// read the status from the interrupt pipe. If there is something to look out for
 	if (mStatusPipe)
 		mStatusPipe->Read(mStatusBufferDesc,  &mStatusCheckCompletion);
@@ -2440,11 +2441,11 @@ IOReturn EMUUSBAudioDevice::getAnchorFrameAndTimeStamp(UInt64 *frame, AbsoluteTi
 	nanoseconds_to_absolutetime(1100000, &offset);
 	clock_get_uptime(&finishTime);
 	ADD_ABSOLUTETIME(&finishTime, &offset);	// finishTime is when we timeout
-	thisFrame = mControlInterface->GetDevice()->GetBus()->GetFrameNumber();
+	thisFrame = mControlInterface->getDevice1()->getFrameNumber();
 	// spin until the frame changes
 	do {
 		clock_get_uptime (&curTime);
-	} while ((thisFrame == mControlInterface->GetDevice()->GetBus()->GetFrameNumber ())
+	} while ((thisFrame == mControlInterface->getDevice1()->getFrameNumber ())
              && (CMP_ABSOLUTETIME (&finishTime, &curTime) > 0));
     
 	FailIf (CMP_ABSOLUTETIME (&finishTime, &curTime) < 0, Exit);		// if we timed out
@@ -2462,9 +2463,9 @@ IOReturn EMUUSBAudioDevice::getFrameAndTimeStamp(UInt64 *frame, AbsoluteTime *ti
 	IOReturn	result = kIOReturnError;
 	if (mControlInterface) {
 		do {
-			*frame = mControlInterface->GetDevice()->GetBus()->GetFrameNumber();
+			*frame = mControlInterface->getDevice1()->getFrameNumber();
 			clock_get_uptime (EmuAbsoluteTimePtr(time));
-		} while (*frame != mControlInterface->GetDevice()->GetBus()->GetFrameNumber());// get the frame number from the bus
+		} while (*frame != mControlInterface->getDevice1()->getFrameNumber());
         // Wouter: why is this loop, we just SET *frame, why would it have changed?
 		result = kIOReturnSuccess;
 	}

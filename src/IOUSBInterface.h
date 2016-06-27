@@ -227,6 +227,15 @@ public:
     IOReturn SetAlternateInterface(IOService* forClient, UInt16 alternateSetting) {
         return selectAlternateSetting(alternateSetting);
     }
+    /*!
+     @param index value from zero to kUSBMaxPipes-1
+     @return a (already retained) handle to the IOUSBPipe at the corresponding index
+     */
+    IOUSBPipe* GetPipeObj(UInt8 index) {
+        return (IOUSBPipe *)copyPipe(index);
+    }
+    
+    
     
 };
 #endif
