@@ -17,11 +17,7 @@ IOReturn StreamInfo::init() {
 }
 
 IOReturn StreamInfo::start(UInt64 startUsbFrame) {
-#ifdef HAVE_OLD_USB_INTERFACE
-    ReturnIf(startUsbFrame < streamInterface->GetDevice()->GetBus()->GetFrameNumber() + 10, kIOReturnTimeout);
-#else
-    ReturnIf(startUsbFrame < streamInterface->getFrameNumber() + 10, kIOReturnTimeout);
-#endif
+    ReturnIf(startUsbFrame < streamInterface->getDevice1()->getFrameNumber() + 10, kIOReturnTimeout);
     
     nextUsableUsbFrameNr = startUsbFrame;
     
