@@ -52,33 +52,33 @@ do { printf ( message ); printf ("\n" ); } while (0)
 // only messages that ALWAYS must print do use doLog.
 
 // parse configuration descriptor log messages.define as debugIOLog(message) to turn on.
-#define debugIOLogPC(message...) debugIOLog(message);
+#define debugIOLogPC(message...);// debugIOLog(message);
 
 // audio streaming interface log messages. define as debugIOLog(message) to turn on.
-#define debugIOLogAS(message...) debugIOLog(message);
+#define debugIOLogAS(message...);// debugIOLog(message);
 
 // DOC
-#define debugIOLog2(message...) debugIOLog(message);
+#define debugIOLog2(message...);// debugIOLog(message);
 
 // framelist write debug messages
-#define debugIOLogW(message...) debugIOLog(message);
+#define debugIOLogW(message...);// debugIOLog(message);
 
 // debug time stamps.
-#define debugIOLogT(message...) debugIOLog(message);
+#define debugIOLogT(message...);// debugIOLog(message);
 
 // debug timing details for each handler call (large number of messages)
-#define debugIOLogTD(message...) debugIOLog(message);
+#define debugIOLogTD(message...);// debugIOLog(message);
 
 
 // debug USB speed estimator and jitter filter timestamps.
-#define debugIOLogTT(message...)  debugIOLog(message);
+#define debugIOLogTT(message...);//  debugIOLog(message);
 
 // debug USB read messages
-#define debugIOLogR(message...) debugIOLog(message);
+#define debugIOLogR(message...);// debugIOLog(message);
 
 // debug USB read messages details
-#define debugIOLogRD(message...) debugIOLog(message);
+#define debugIOLogRD(message...);// debugIOLog(message);
 
 // debug all control-level messages (setup, initialization, takedown).
-#define debugIOLogC(message...) debugIOLog(message);
+#define debugIOLogC(message...);// debugIOLog(message);
 #endif
