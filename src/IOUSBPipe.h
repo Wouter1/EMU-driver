@@ -34,12 +34,14 @@ public:
      @param frameStart USB frame number of the frame to start transfer. For SuperSpeed Isoc devices, if the frameStart is kAppleUSBSSIsocContinuousFrame, then just continue after the last transfer which was called.
      @param numFrames Number of frames to transfer
      @param frameList Bytes to transfer, result, and time stamp for each frame
-     @param completion describes action to take when buffer has been filled
+     @param completion describes action to take when buffer has been filled. MUST NOT BE NULL.
      @param updateFrequency describes how often (in milliseconds) should the frame list be processed
      */
     virtual IOReturn Read(IOMemoryDescriptor *	buffer,
                           UInt64 frameStart, UInt32 numFrames, LowLatencyIsocFrame *frameList,
-                          LowLatencyCompletion *	completion = 0, UInt32 updateFrequency = 0);
+                          LowLatencyCompletion *	completion, UInt32 updateFrequency = 0) {
+        return io(buffer, frameList, numFrames, frameStart, completion);
+    }
     
     
     
@@ -51,12 +53,16 @@ public:
      @param frameStart USB frame number of the frame to start transfer. For SuperSpeed Isoc devices, if the frameStart is kAppleUSBSSIsocContinuousFrame, then just continue after the last transfer which was called.
      @param numFrames Number of frames to transfer
      @param frameList Pointer to list of frames indicating bytes to transfer and result for each frame
-     @param completion describes action to take when buffer has been emptied
+     @param completion describes action to take when buffer has been emptied. MUST NOT BE NULL.
      @param updateFrequency describes how often (in milliseconds) should the frame list be processed
      */
     IOReturn Write(IOMemoryDescriptor *	buffer,
                    UInt64 frameStart, UInt32 numFrames, LowLatencyIsocFrame *frameList,
-                   LowLatencyCompletion * completion = 0, UInt32 updateFrequency = 0);
+                   LowLatencyCompletion * completion, UInt32 updateFrequency = 0) {
+        // io is replacing both read and write! I guess buffer->getDirection determines if it's read or write,
+        // but I could not find this documented...
+        return io(buffer, frameList, numFrames, frameStart, completion);
+    }
     
     /*!
      @function GetEndpointDescriptor
