@@ -135,7 +135,7 @@ bool EMUUSBAudioDevice::start(IOService * provider) {
 	bool			result = FALSE;
 	
     debugIOLogC("+ EMUUSBAudioDevice[%p]::start(%p)", this, provider);
-	mControlInterface = OSDynamicCast(IOUSBInterface1, provider);
+    mControlInterface = (IOUSBInterface1 *)provider;//OSDynamicCast(IOUSBInterface1, provider);
 	FailIf(FALSE == mControlInterface->open(this), Exit);
 	mCurSampleRate = mNumEngines = 0;
 	mInitHardwareThread = thread_call_allocate((thread_call_func_t)EMUUSBAudioDevice::initHardwareThread,(thread_call_param_t)this);
@@ -190,7 +190,7 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 	if (mControlInterface) {//FailIf(NULL == mControlInterface, Exit);
 		checkUHCI();// see whether we're attached via a UHCI controller
 		mInterfaceNum = mControlInterface->getInterfaceNumber();
-		debugIOLogC("There are %d configurations on this device", mControlInterface->GetDevice()->GetNumConfigurations());
+		//debugIOLogC("There are %d configurations on this device", mControlInterface->getDevice1()->GetNumConfigurations());
 		debugIOLogC("Our control interface number is %d", mInterfaceNum);
 		mUSBAudioConfig = EMUUSBAudioConfigObject::create(mControlInterface->getDevice1()->GetFullConfigurationDescriptor(0), mInterfaceNum);
 		FailIf(NULL == mUSBAudioConfig, Exit);
@@ -1481,7 +1481,7 @@ IOReturn EMUUSBAudioDevice::deviceRequestOut(UInt8 unitID, UInt8 controlSelector
     ReturnIf(!settingDesc, kIOReturnNoMemory);
     
     
-    debugIOLogC("EMUUSBAudioDevice::deviceRequest bmRequestType=%x bRequest=%x wValue=%x wIndex=%x wLength=%x", devReq.bmRequestType, devReq.bRequest,devReq.wValue,devReq.wIndex,devReq.wLength);
+    debugIOLogC("EMUUSBAudioDevice::deviceRequest bmRequestType=%x", requestType);
     if (!isInactive()) {
         result = deviceRequest(USBmakebmRequestType(kUSBOut, kUSBClass, kUSBInterface), requestType, (controlSelector << 8) | channelNumber, (0xFF00 &(unitID << 8)) |(0x00FF & mInterfaceNum), length, settingDesc);
     }
@@ -2192,7 +2192,7 @@ IOReturn EMUUSBAudioDevice::deviceRequest(    UInt8                   type,
 		}
 		IORecursiveLockUnlock(mInterfaceLock);
 	}
-	debugIOLogC("++EMUUSBAudioDevice[%p]::deviceRequest(%p, %p) = %x", this, request, completion, result);
+	debugIOLogC("++EMUUSBAudioDevice[%p]::deviceRequest( %d) = %d", this, request, result);
 	return result;
 }
 

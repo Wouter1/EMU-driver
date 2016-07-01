@@ -2006,7 +2006,7 @@ IOReturn EMUUSBAudioEngine::initBuffers() {
 		//UInt32 outputSize = mOutput.maxFrameSize;
 		//UInt32	samplesPerFrame = inputSize / usbInputStream.multFactor;
 		debugIOLogC("inputSize= %d multFactor= %d", inputSize, usbInputStream.multFactor);
-		debugIOLogC("outputSize= %d multFactor= %d", outputSize, mOutput.multFactor);
+		//debugIOLogC("outputSize= %d multFactor= %d", outputSize, mOutput.multFactor);
 		
         //	FailIf(samplesPerFrame != outputSize / mOutput.multFactor, Exit); - JH allocated size may be off 1 such as with AC3
 		

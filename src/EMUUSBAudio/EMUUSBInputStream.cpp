@@ -238,7 +238,7 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
                                        IOReturn result, LowLatencyIsocFrame * pFrames) {
     
     // HACK we have numUSBFramesPerList frames, which one to check?? Print frame 0 info.
-    debugIOLogR("+ readCompleted framelist %d  result %x ", currentFrameList, result);
+    debugIOLogR("+ readCompleted framelist %p  result %x ", frameListNrPtr, result);
     
     
     startingEngine = FALSE; // HACK this is old code...
@@ -284,7 +284,7 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
     //        CheckForAssociatedEndpoint( interfaceNumber, alternateSettingID);
     //    }
     
-	debugIOLogR("- readCompleted currentFrameList=%d",currentFrameList);
+	debugIOLogR("- readCompleted currentFrameList=%p",frameListNrPtr);
 	return;
 }
 

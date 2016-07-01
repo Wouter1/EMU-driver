@@ -41,7 +41,7 @@
 		6CB2722F1A54197B00FA8B61 /* EMUUSBOutputStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CB2722D1A54197B00FA8B61 /* EMUUSBOutputStream.cpp */; };
 		6CB272301A54197B00FA8B61 /* EMUUSBOutputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CB2722E1A54197B00FA8B61 /* EMUUSBOutputStream.h */; };
 		6CE021FE1A5FCE9C00568A82 /* StreamInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CE021FD1A5FCE9C00568A82 /* StreamInfo.cpp */; };
-		6CF9CB271D26D53200719B95 /* EMUUSBAudio-Info-11.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6CF9CB261D26D53200719B95 /* EMUUSBAudio-Info-11.plist */; settings = {ASSET_TAGS = (); }; };
+		6CF9CB271D26D53200719B95 /* EMUUSBAudio-Info-11.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6CF9CB261D26D53200719B95 /* EMUUSBAudio-Info-11.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -461,16 +461,16 @@
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "EMUUSBAudio/EMUUSBAudio-Prefix.pch";
-				INFOPLIST_FILE = "EMUUSBAudio/EMUUSBAudio-Info-11.plist";
+				INFOPLIST_FILE = "EMUUSBAudio/EMUUSBAudio-Info.plist";
 				INFOPLIST_PREPROCESS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MODULE_NAME = com.emu.driver.EMUUSBAudio;
 				MODULE_START = 0;
 				MODULE_STOP = 0;
 				MODULE_VERSION = 1.0.0d1;
 				"OTHER_CFLAGS[arch=*]" = "-DDEBUGLOGGING";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.11;
+				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -483,15 +483,15 @@
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "EMUUSBAudio/EMUUSBAudio-Prefix.pch";
-				INFOPLIST_FILE = "EMUUSBAudio/EMUUSBAudio-Info-11.plist";
+				INFOPLIST_FILE = "EMUUSBAudio/EMUUSBAudio-Info.plist";
 				INFOPLIST_PREPROCESS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MODULE_NAME = com.emu.driver.EMUUSBAudio;
 				MODULE_START = 0;
 				MODULE_STOP = 0;
 				MODULE_VERSION = 1.0.0d1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.11;
+				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;
