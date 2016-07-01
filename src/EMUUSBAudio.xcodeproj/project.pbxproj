@@ -41,6 +41,7 @@
 		6CB2722F1A54197B00FA8B61 /* EMUUSBOutputStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CB2722D1A54197B00FA8B61 /* EMUUSBOutputStream.cpp */; };
 		6CB272301A54197B00FA8B61 /* EMUUSBOutputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CB2722E1A54197B00FA8B61 /* EMUUSBOutputStream.h */; };
 		6CE021FE1A5FCE9C00568A82 /* StreamInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CE021FD1A5FCE9C00568A82 /* StreamInfo.cpp */; };
+		6CF9CB271D26D53200719B95 /* EMUUSBAudio-Info-11.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6CF9CB261D26D53200719B95 /* EMUUSBAudio-Info-11.plist */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -107,6 +108,7 @@
 		6CBB771E1D044C8900FED26D /* USB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = USB.h; sourceTree = "<group>"; };
 		6CE021FD1A5FCE9C00568A82 /* StreamInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StreamInfo.cpp; sourceTree = "<group>"; };
 		6CF65DF71D06085D0063C123 /* osxversion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = osxversion.h; sourceTree = "<group>"; };
+		6CF9CB261D26D53200719B95 /* EMUUSBAudio-Info-11.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "EMUUSBAudio-Info-11.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,6 +211,7 @@
 			isa = PBXGroup;
 			children = (
 				6C7735F419E320A000ED3FAA /* EMUUSBAudio-Info.plist */,
+				6CF9CB261D26D53200719B95 /* EMUUSBAudio-Info-11.plist */,
 				6C7735F519E320A000ED3FAA /* InfoPlist.strings */,
 				6C7735FA19E320A000ED3FAA /* EMUUSBAudio-Prefix.pch */,
 			);
@@ -322,6 +325,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6CF9CB271D26D53200719B95 /* EMUUSBAudio-Info-11.plist in Resources */,
 				6C7735F719E320A000ED3FAA /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -457,7 +461,7 @@
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "EMUUSBAudio/EMUUSBAudio-Prefix.pch";
-				INFOPLIST_FILE = "EMUUSBAudio/EMUUSBAudio-Info.plist";
+				INFOPLIST_FILE = "EMUUSBAudio/EMUUSBAudio-Info-11.plist";
 				INFOPLIST_PREPROCESS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MODULE_NAME = com.emu.driver.EMUUSBAudio;
@@ -479,7 +483,7 @@
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "EMUUSBAudio/EMUUSBAudio-Prefix.pch";
-				INFOPLIST_FILE = "EMUUSBAudio/EMUUSBAudio-Info.plist";
+				INFOPLIST_FILE = "EMUUSBAudio/EMUUSBAudio-Info-11.plist";
 				INFOPLIST_PREPROCESS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MODULE_NAME = com.emu.driver.EMUUSBAudio;
