@@ -112,15 +112,16 @@ public:
     IOReturn GetStringDescriptor(UInt8 index, char* buf, int maxLen, UInt16 lang = 0x409) {
         size_t utf8len = 0;
         const StringDescriptor* stringDescriptor = getStringDescriptor(index, lang);
-        if (stringDescriptor != NULL && stringDescriptor->bLength > StandardUSB::kDescriptorSize)
-        {
-            utf8_encodestr(reinterpret_cast<const u_int16_t*>(stringDescriptor->bString),
-                    stringDescriptor->bLength - kDescriptorSize,
-                    reinterpret_cast<u_int8_t*>(buf), &utf8len, maxLen,
-                    '/', UTF_LITTLE_ENDIAN);
-            return kIOReturnSuccess;
+        if (!stringDescriptor || stringDescriptor->bLength <= kDescriptorSize) {
+            return kIOReturnError;
         }
-        return kIOReturnError;
+    
+        utf8_encodestr(reinterpret_cast<const u_int16_t*>(stringDescriptor->bString),
+                stringDescriptor->bLength - kDescriptorSize,
+                reinterpret_cast<u_int8_t*>(buf), &utf8len, maxLen,
+                '/', UTF_LITTLE_ENDIAN);
+        
+        return kIOReturnSuccess;
     }
     
     /*!
