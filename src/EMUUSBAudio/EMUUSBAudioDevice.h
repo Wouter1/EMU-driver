@@ -255,7 +255,16 @@ public:
     virtual bool			terminate(IOOptionBits options = 0);
 	virtual void			close(IOService *forClient, IOOptionBits options = 0);
 	virtual	bool			initHardware (IOService * provider);
+    /*!
+     * Function that we start on a separate IOCommandGate (sort of thread) when the device is started.
+     @param aua ptr to our EMUUSBAudioDevice as it came in 
+     */
 	static	void			initHardwareThread (EMUUSBAudioDevice * aua, void * provider);
+    /*!
+     @param owner ptr to our EMUUSBAudioDevice
+     @param provider the IOService* coming in when start() is called.
+     @return kIOReturnError if failure, kIOReturnSuccess if ok. Notice that we actually ignore the return result...
+     */
 	static	IOReturn		initHardwareThreadAction (OSObject * owner, void * provider, void * arg2, void * arg3, void * arg4);
 	virtual	IOReturn		protectedInitHardware (IOService * provider);
     virtual	IOReturn		message (UInt32 type, IOService * provider, void * arg);
