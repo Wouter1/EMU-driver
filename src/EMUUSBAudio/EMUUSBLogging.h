@@ -26,7 +26,7 @@
 #define DEBUGTIMESTAMPS			TRUE
 
 //#include <IOKit/usb/IOUSBLog.h>
-//  sleeptime for debug logging. Set between 0 and 20
+//  sleeptime for debug logging. Set between 0 and 20 and call IOSleep in doLog
 #define sleepTime 1
 
 // the log-always function. NOT for DEBUG messages. goes to system.log (check the console)
