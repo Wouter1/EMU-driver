@@ -15,7 +15,7 @@
 			<key>IOClass</key>
 			<string>EMUUSBAudioDevice</string>
 			<key>IOProviderClass</key>
-			<string>IOUSBInterface</string>
+			<string>IOUSBHostInterface</string>
 			<key>IOUserClientClass</key>
 			<string>EMUUSBUserClient</string>
 			<key>SafetyOffsetMicroSec</key>
@@ -75,7 +75,7 @@
 			<key>IOClass</key>
 			<string>EMUUSBAudioDevice</string>
 			<key>IOProviderClass</key>
-			<string>IOUSBInterface</string>
+			<string>IOUSBHostInterface</string>
 			<key>IOUserClientClass</key>
 			<string>EMUUSBUserClient</string>
 			<key>SafetyOffsetMicroSec</key>
@@ -149,7 +149,7 @@
 			<key>IOClass</key>
 			<string>EMUUSBAudioDevice</string>
 			<key>IOProviderClass</key>
-			<string>IOUSBInterface</string>
+			<string>IOUSBHostInterface</string>
 			<key>IOUserClientClass</key>
 			<string>EMUUSBUserClient</string>
 			<key>SafetyOffsetMicroSec</key>
@@ -239,7 +239,7 @@
 			<key>IOClass</key>
 			<string>EMUUSBAudioDevice</string>
 			<key>IOProviderClass</key>
-			<string>IOUSBInterface</string>
+			<string>IOUSBHostInterface</string>
 			<key>IOUserClientClass</key>
 			<string>EMUUSBUserClient</string>
 			<key>TransportTypeOverride</key>
