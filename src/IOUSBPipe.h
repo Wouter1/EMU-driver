@@ -37,7 +37,7 @@ public:
      @param completion describes action to take when buffer has been filled. MUST NOT BE NULL.
      @param updateFrequency describes how often (in milliseconds) should the frame list be processed
      */
-    virtual IOReturn Read(IOMemoryDescriptor *	buffer,
+    IOReturn Read(IOMemoryDescriptor *	buffer,
                           UInt64 frameStart, UInt32 numFrames, LowLatencyIsocFrame *frameList,
                           LowLatencyCompletion *	completion, UInt32 updateFrequency = 0) {
         return io(buffer, frameList, numFrames, frameStart, completion);

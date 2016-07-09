@@ -21,8 +21,10 @@ typedef IOUSBIsocFrame IsocFrame;
 class LowLatencyIsocFrame: public  IOUSBLowLatencyIsocFrame {
 public:
     /*!
-     TODO DOC
-     FIXME remove unused params
+     * @param status value for frStatus field
+     * @param reqCount value for frReqCount field
+     * @param actCount the value for frActCount field
+     * @param t the value for frTimeStamp
      */
     void set(IOReturn status, UInt16 reqCount, UInt16 actCount, AbsoluteTime t) {
         frStatus = status;

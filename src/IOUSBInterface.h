@@ -183,8 +183,8 @@ public:
                     return NULL;
                 }
                 debugIOLog("-findpipe: success");
-                pipe->release();
-                return (IOUSBPipe *)pipe;
+                //pipe->release(); //  FIXME HACK should be consistent with 10.9safdsfs
+                return OSDynamicCast(IOUSBPipe, pipe);
             }
         }
         debugIOLog("findPipe: no matching endpoint found");
