@@ -183,7 +183,7 @@ public:
                     return NULL;
                 }
                 debugIOLog("-findpipe: success");
-                //pipe->release(); //  FIXME HACK should be consistent with 10.9safdsfs
+                //pipe->release(); //  FIXME HACK should be consistent with 10.9
                 return OSDynamicCast(IOUSBPipe, pipe);
             }
         }
