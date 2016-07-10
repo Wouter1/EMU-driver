@@ -48,7 +48,7 @@ public:
      @param request Requirements for pipe to match, updated with the found pipe's
      properties.
      
-     @result Pointer to the pipe, or NULL if no pipe matches the request.
+     @result Pointer to the retained pipe, or NULL if no pipe matches the request.
      */
     IOUSBPipe* findPipe(uint8_t direction, uint8_t type) {
         IOUSBFindEndpointRequest request;
@@ -56,7 +56,11 @@ public:
         request.type = type;
         request.interval = 0xFF;
         request.maxPacketSize = 0;
-        return FindNextPipe(NULL, &request);
+        IOUSBPipe* pipe= FindNextPipe(NULL, &request);
+        if (pipe!=NULL) {
+            pipe->retain();
+        }
+        return pipe;
     }
     
      /*! Send a request to the USB device over mControlInterface (default pipe 0?)
@@ -147,7 +151,7 @@ public:
      starting from the beginning of the interface's pipe list
      @param direction the direction for the required pipe. eg kUSBInterrupt or kUSBIsoc or kUSBAnyType
      @param type the type of the required pipe: kUSBIn or kUSBOut
-     @result Pointer to the pipe, or NULL if no pipe matches the request.
+     @result Pointer to the retained pipe, or NULL if no pipe matches the request.
      */
     IOUSBPipe* findPipe(uint8_t direction, uint8_t type) {
         debugIOLog("+findPipe: dir=%d, type = %d", direction, type);
@@ -183,7 +187,6 @@ public:
                     return NULL;
                 }
                 debugIOLog("-findpipe: success");
-                //pipe->release(); //  FIXME HACK should be consistent with 10.9
                 return OSDynamicCast(IOUSBPipe, pipe);
             }
         }

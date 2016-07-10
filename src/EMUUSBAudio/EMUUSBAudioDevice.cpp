@@ -320,8 +320,6 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 		mAnchorResetCount = kRefreshCount;
 		mUpdateTimer = IOTimerEventSource::timerEventSource(this, TimerAction);
 		FailIf(NULL == mUpdateTimer, Exit);
-		// TURNED OFF HACK to turn off this update timer.
-        //workLoop->addEventSource(mUpdateTimer);
 		TimerAction(this, mUpdateTimer);
 		
         // CHECK This bundle was removed as it is not clear what it is for.
@@ -329,8 +327,8 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 		IOService::registerService();
 		//<AC mod>
 		// init engine - see what happens
-#if 1
-		// need to make sure we're not crossing paths with a terminating driver (hey, it happens)
+
+        // need to make sure we're not crossing paths with a terminating driver (hey, it happens)
 		if (FALSE == mTerminatingDriver) {
 			EMUUSBAudioEngine *audioEngine = NULL;
 			audioEngine = new EMUUSBAudioEngine;
@@ -345,7 +343,6 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 			audioEngine->release();
 			mAudioEngine = audioEngine; //used for releasing at end
 		}
-#endif
 		//</AC mod>
 	}
 Exit:
@@ -378,27 +375,15 @@ void EMUUSBAudioDevice::checkUHCI() {
 
 
 void EMUUSBAudioDevice::setupStatusFeedback() {
-//	IOUSBFindEndpointRequest	statusEndpoint;
-	
-//	statusEndpoint.type = kUSBInterrupt;
-//	statusEndpoint.direction = kUSBIn;
-//	statusEndpoint.maxPacketSize = kStatusPacketSize; // is this sizeof(UInt16)
-//	statusEndpoint.interval = 0xFF;
-    
-    //mStatusPipe = mControlInterface->findPipe(&statusEndpoint);
     
     mStatusPipe = mControlInterface->findPipe(kUSBIn,kUSBInterrupt);
 	if (mStatusPipe) {// the endpoint exists
-		mStatusPipe->retain();// retain until tear down
 		mDeviceStatusBuffer = (UInt16*) IOMalloc(sizeof(UInt16)); // Is this kStatusPacketSize?
 		if (mDeviceStatusBuffer) {
 			mStatusBufferDesc = IOMemoryDescriptor::withAddress(mDeviceStatusBuffer, kStatusPacketSize, kIODirectionIn);
 			if (mStatusBufferDesc) {
 				mStatusBufferDesc->prepare();
                 mStatusCheckCompletion.set((void*) this, statusHandler, 0);
-//				mStatusCheckCompletion.target = (void*) this;
-//				mStatusCheckCompletion.action = statusHandler;
-//				mStatusCheckCompletion.parameter = 0;
 				mStatusCheckTimer = IOTimerEventSource::timerEventSource(this, StatusAction);
 				if (mStatusCheckTimer) {
 					workLoop->addEventSource(mStatusCheckTimer);// add timer action to the workloop

@@ -41,7 +41,6 @@
 		6CB2722F1A54197B00FA8B61 /* EMUUSBOutputStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CB2722D1A54197B00FA8B61 /* EMUUSBOutputStream.cpp */; };
 		6CB272301A54197B00FA8B61 /* EMUUSBOutputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CB2722E1A54197B00FA8B61 /* EMUUSBOutputStream.h */; };
 		6CE021FE1A5FCE9C00568A82 /* StreamInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CE021FD1A5FCE9C00568A82 /* StreamInfo.cpp */; };
-		6CF9CB271D26D53200719B95 /* EMUUSBAudio-Info-11.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6CF9CB261D26D53200719B95 /* EMUUSBAudio-Info-11.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -325,7 +324,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6CF9CB271D26D53200719B95 /* EMUUSBAudio-Info-11.plist in Resources */,
 				6C7735F719E320A000ED3FAA /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

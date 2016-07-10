@@ -1761,15 +1761,11 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	FailIf (kIOReturnSuccess != resultCode, Exit);
 	
 	// Acquire a PIPE for the isochronous stream.
-	//audioIsochEndpoint.type = kUSBIsoc;
-	//audioIsochEndpoint.direction = usbInputStream.streamDirection;
 	{
 		debugIOLogC("createInputPipe");
-//        usbInputStream.pipe = usbInputStream.streamInterface->findPipe ( &audioIsochEndpoint);
         usbInputStream.pipe =
             usbInputStream.streamInterface->findPipe (usbInputStream.streamDirection,  kUSBIsoc);
 		FailIf (NULL == usbInputStream.pipe, Exit);
-		usbInputStream.pipe->retain ();
 	}
 	
 	address = usbAudio->GetIsocEndpointAddress(usbInputStream.interfaceNumber, usbInputStream.alternateSettingID, usbInputStream.streamDirection);
@@ -1803,15 +1799,9 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
 	FailIf (kIOReturnSuccess != resultCode, Exit);
     
     debugIOLog("create output pipe ");
-	//bzero(&audioIsochEndpoint,sizeof(audioIsochEndpoint));
-	//audioIsochEndpoint.type = kUSBIsoc;
-	//audioIsochEndpoint.direction = mOutput.streamDirection;
-    //mOutput.pipe = mOutput.streamInterface->findPipe ( &audioIsochEndpoint);
     mOutput.pipe = mOutput.streamInterface->findPipe (mOutput.streamDirection, kUSBIsoc);
 	FailIf (NULL == mOutput.pipe, Exit);
-	mOutput.pipe->retain ();
 	debugIOLog("check for associated endpoint");
-	//CheckForAssociatedEndpoint (usbAudio,mOutput.interfaceNumber,mOutput.alternateSettingID);// result is ignored
     
 	address = usbAudio->GetIsocEndpointAddress(mOutput.interfaceNumber, mOutput.alternateSettingID, mOutput.streamDirection);
 	maxPacketSize = usbAudio->GetEndpointMaxPacketSize(mOutput.interfaceNumber, mOutput.alternateSettingID, address);
@@ -1826,9 +1816,7 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
     // When a late error is encountered (USB 2.0), increment the var until a max of 16 frames is reached.
     // NB - From testing and observation this work around does not help and has therefore been deleted.
 	mOutput.frameOffset = 8; // HACK kMinimumFrameOffset + ((kUSBDeviceSpeedHigh == mHubSpeed) * kUSB2FrameOffset);
-	//mOutput.usbFrameToQueueAt = 0; // INIT as late as possible. mBus->GetFrameNumber() + mOutput.frameOffset;	// start on an offset usb frame
     mOutput.usbIsocFrames[0].resetTime();
-	//*(UInt64 *) (&(mOutput.usbIsocFrames[0].frTimeStamp)) = 0xFFFFFFFFFFFFFFFFull;
     
     setRunEraseHead(true); // need it to avoid stutter at start&end and to allow multiple simultaneous playback.
     
