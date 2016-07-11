@@ -3,7 +3,8 @@
 //  EMUUSBAudio
 //
 //  Created by Wouter Pasman on 05/06/16.
-//  Copyright (c) 2016 com.emu. All rights reserved.
+// This is a stub for IOUSBInterface, to make the old code run on
+// the new IOUSBHostInterface.
 //
 
 #ifndef __EMUUSBAudio__IOUSBInterface__
@@ -22,24 +23,18 @@
 
 class IOUSBInterface1: public IOUSBInterface {
 public:
-    inline UInt8 getInterfaceNumber() {
-        return GetInterfaceNumber();
-    }
-
+    UInt8 getInterfaceNumber();
+    
     /*! @result the index of the string descriptor describing the interface
      */
-    inline UInt8  getInterfaceStringIndex() {
-        return GetInterfaceStringIndex();
-    };
+    UInt8  getInterfaceStringIndex();
     
     /*!
      @function GetDevice
      returns the device the interface is part of.
      @result Pointer to the IOUSBDevice object which is the parent of this IOUSBInterface object.
      */
-    inline IOUSBDevice1 *getDevice1() {
-        return OSDynamicCast(IOUSBDevice1, GetDevice());
-    }
+    IOUSBDevice1 *getDevice1();
 
     /*!
      @function findPipe
@@ -50,18 +45,7 @@ public:
      
      @result Pointer to the retained pipe, or NULL if no pipe matches the request.
      */
-    IOUSBPipe* findPipe(uint8_t direction, uint8_t type) {
-        IOUSBFindEndpointRequest request;
-        request.direction = direction;
-        request.type = type;
-        request.interval = 0xFF;
-        request.maxPacketSize = 0;
-        IOUSBPipe* pipe= FindNextPipe(NULL, &request);
-        if (pipe!=NULL) {
-            pipe->retain();
-        }
-        return pipe;
-    }
+    IOUSBPipe* findPipe(uint8_t direction, uint8_t type);
     
      /*! Send a request to the USB device over mControlInterface (default pipe 0?)
      block and wait to get the result. At most 5 attempts will be done if the call does not succeed immediately.
@@ -82,32 +66,17 @@ public:
                   UInt16                  value,
                   UInt16                  index,
                   UInt16                  length,
-                  IOMemoryDescriptor *    data) {
-        IOUSBDevRequestDesc			devReq;
-        devReq.bmRequestType = type;
-        devReq.bRequest = request;
-        devReq.wValue = value;
-        devReq.wIndex =index;
-        devReq.wLength = length;
-        devReq.pData = data;
-        return DeviceRequest(&devReq);
-        
-    }
+                        IOMemoryDescriptor *    data) ;
+
     
-
-};
-
-
 #else
 
 /******************** 10.11 and higher *********************/
 #include <IOKit/usb/IOUSBHostInterface.h>
-//#include <IOUSBDevice.h> super class, can't include here.
 class IOUSBDevice1; // declare that it's a known class
 
-#include "EMUUSBLogging.h"
 #include "IOUSBPipe.h"
-//#include <IOKit/usb/USBSpec.h> deprecated. But where is USBAnyrDir?
+    
 
 class IOUSBInterface1: public IOUSBHostInterface {
 public:
@@ -116,21 +85,13 @@ public:
      returns the device the interface is part of.
      @result Pointer to the IOUSBDevice object which is the parent of this IOUSBInterface object.
      */
-    inline IOUSBDevice1 *getDevice1() {
-        // can't do OSDynamicCast because IOUSBDevice1 is parent and not completely defined.
-        return (IOUSBDevice1 *)getDevice();
-    }
+    IOUSBDevice1 *getDevice1();
     
-    
-    inline UInt8 getInterfaceNumber() {
-        return getInterfaceDescriptor()->bInterfaceNumber;
-    }
+    UInt8 getInterfaceNumber();
     
     /*! @result the index of the string descriptor describing the interface
      */
-    inline UInt8  getInterfaceStringIndex() {
-        return getInterfaceDescriptor()->iInterface;
-    };
+    UInt8  getInterfaceStringIndex() ;
     
     /*!
      @function findPipe
@@ -140,47 +101,7 @@ public:
      @param type the type of the required pipe: kUSBIn or kUSBOut
      @result Pointer to the retained pipe, or NULL if no pipe matches the request.
      */
-    IOUSBPipe* findPipe(uint8_t direction, uint8_t type) {
-        debugIOLog("+findPipe: dir=%d, type = %d", direction, type);
-
-        const StandardUSB::ConfigurationDescriptor* configDesc = getConfigurationDescriptor();
-        if (configDesc==NULL)
-        {
-            debugIOLog("-findpipe: fail, no config descriptor available!");
-            return NULL;
-        }
-        const StandardUSB::InterfaceDescriptor* ifaceDesc = getInterfaceDescriptor();
-        if (ifaceDesc==NULL)
-        {
-            debugIOLog("-findpipe: fail, no interface descriptor available!");
-            return NULL;
-        }
-        
-        const EndpointDescriptor* ep = NULL;
-        while ((ep = StandardUSB::getNextEndpointDescriptor(configDesc, ifaceDesc, ep)))
-        {
-            // check if endpoint matches type and direction
-            uint8_t epDirection = StandardUSB::getEndpointDirection(ep);
-            uint8_t epType = StandardUSB::getEndpointType(ep);
-            
-            debugIOLog("endpoint found: epDirection = %d, epType = %d", epDirection, epType);
-            
-            if ( direction == epDirection && type == epType )
-            {
-                IOUSBHostPipe* pipe = copyPipe(StandardUSB::getEndpointAddress(ep));
-                if (pipe == NULL)
-                {
-                    debugIOLog("-findpipe: found matching pipe but copyPipe failed");
-                    return NULL;
-                }
-                debugIOLog("-findpipe: success");
-                return OSDynamicCast(IOUSBPipe, pipe);
-            }
-        }
-        debugIOLog("findPipe: no matching endpoint found");
-        return NULL;
-    }
-    
+    IOUSBPipe* findPipe(uint8_t direction, uint8_t type) ;
 
     /*! Send a request to the USB device over mControlInterface (default pipe 0?)
      block and wait to get the result. At most 5 attempts will be done if the call does not succeed immediately.
@@ -201,29 +122,15 @@ public:
                         UInt16                  value,
                         UInt16                  index,
                         UInt16                  length,
-                        IOMemoryDescriptor *    data) {
-        StandardUSB::DeviceRequest			devReq;
-        devReq.bmRequestType = type;
-        devReq.bRequest = request;
-        devReq.wValue = value;
-        devReq.wIndex =index;
-        devReq.wLength = length;
-        uint32_t bytesTransferred;
-        
-        return deviceRequest(devReq, data, bytesTransferred);
-        
-    }
+                        IOMemoryDescriptor *    data);
     
-    IOReturn SetAlternateInterface(IOService* forClient, UInt16 alternateSetting) {
-        return selectAlternateSetting(alternateSetting);
-    }
+    IOReturn SetAlternateInterface(IOService* forClient, UInt16 alternateSetting);
+    
     /*!
      @param index value from zero to kUSBMaxPipes-1
      @return a (already retained) handle to the IOUSBPipe at the corresponding index
      */
-    IOUSBPipe* GetPipeObj(UInt8 index) {
-        return (IOUSBPipe *)copyPipe(index);
-    }
+    IOUSBPipe* GetPipeObj(UInt8 index);
     
     
     

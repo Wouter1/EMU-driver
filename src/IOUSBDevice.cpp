@@ -3,7 +3,6 @@
 //  EMUUSBAudio
 //
 //  Created by Wouter Pasman on 05/06/16.
-//  Copyright (c) 2016 com.emu. All rights reserved.
 //
 
 #include "IOUSBDevice.h"
@@ -11,7 +10,6 @@
 #ifdef HAVE_OLD_USB_INTERFACE
 
 #include "USBAudioObject.h"
-
 #include <IOKit/usb/IOUSBDevice.h>
 
 bool IOUSBDevice1::isHighSpeed() {
@@ -43,14 +41,12 @@ UInt64 getFrameNumber() {
 
 
 /********* 10.11 *************/
-#include <IOUSBController.h>
 
 // which one do we really need?
-//#include <IOKit/usb/IOUSBHostHIDDevice.h>
 
+#include <sys/utfconv.h>
 #include "USB.h"
 #include <IOUSBInterface.h>
-#include <sys/utfconv.h>
 #include "USBAudioObject.h"
 
 
@@ -95,7 +91,7 @@ UInt8 IOUSBDevice1::GetManufacturerStringIndex() {
 }
 
 bool IOUSBDevice1::isHighSpeed() {
-    // we never should get superspeed or higher, as this is USB2 device.
+    // we never should get superspeed or higher, as EMU is USB2 device.
     return getSpeed() == kUSBHostConnectionSpeedHigh;
 }
 
@@ -115,8 +111,9 @@ IOReturn IOUSBDevice1::devRequestSampleRate(UInt32 inSampleRate, UInt16 endpoint
     return deviceRequest(this, devReq, &theSampleRate, bytesTransferred);
 }
 
-IOUSBInterface1* IOUSBDevice1::FindNextInterface(IOUSBInterface1*        current,
-                                   FindInterfaceRequest* request) {
+
+IOUSBInterface1* IOUSBDevice1::FindNextInterface(
+        IOUSBInterface1* current, FindInterfaceRequest* request) {
     OSIterator* iterator = getChildIterator(gIOServicePlane);
     if (iterator==NULL) {
         debugIOLog("ERR can't create an interface iterator to find the device!");

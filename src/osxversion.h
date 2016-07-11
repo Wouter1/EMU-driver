@@ -3,7 +3,7 @@
 //  EMUUSBAudio
 //
 //  Created by wouter on 06/06/16.
-//  Copyright © 2016 com.emu. All rights reserved.
+// macros to determine the OSX version we run on. 
 //
 
 #ifndef osxversion_h
