@@ -19,11 +19,11 @@
 	<key>CFBundlePackageType</key>
 	<string>KEXT</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.5.5</string>
+	<string>4.0.0</string>
 	<key>CFBundleSignature</key>
 	<string>EMUU</string>
 	<key>CFBundleVersion</key>
-	<string>3.5.5</string>
+	<string>4.0.0</string>
 	<key>DTCompiler</key>
 	<string>com.apple.compilers.llvm.clang.1_0</string>
 	<key>DTPlatformBuild</key>
@@ -297,7 +297,7 @@
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2015 com.emu &amp; W.Pasman</string>
+	<string>Copyright © 2016 W.Pasman</string>
 	<key>OSBundleLibraries</key>
 	<dict>
 		<key>com.apple.iokit.IOAudioFamily</key>
