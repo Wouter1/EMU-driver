@@ -19,13 +19,12 @@ After that the kExtInstall script is ready for use (see Installation)
 
 Tech notes
 ==========
-The current version compiles with Xcode 5.1.1.
-Original comes from source forge revision 7. http://sourceforge.net/projects/zaudiodrivermac/
-But it did not compile on OSX 10.9 Mavericks. So I dumped part of the code, cleaned up, documented, 
-refactored and wrote new code to get it working.
+The current version of the 10.9 driver compiles with Xcode 5.1.1; the 10.11 driver compiles with XCode 7.0.1
+Original comes from source forge revision 7. http://sourceforge.net/projects/zaudiodrivermac/.
+But it did not compile on OSX 10.9 Mavericks. Many hours have been spent on refactoring, documenting, rewriting, cleaning up and adding new code to get it working and to make it work again on El Capitan after Apple messed up their old USB communication layer.
 
-The present version is in a pretty bad shape. I did a major effort to refactor the input side of the code,
-it's on the way but not yet polished. The rest of the code is still in original state.
+The present version is not in a great shape. I did a major effort to refactor the input side of the code,
+it's on the way but not yet polished. Much of the code is still in original state. 
 Audio input and output (record and playback) are now working fine.
 There are a few small loose ends and I'd like to clean up the code further.
 
