@@ -9,9 +9,8 @@
 
 #ifdef HAVE_OLD_USB_INTERFACE
 /******************** 10.9 *********************/
-
+#include "IOUSBInterface.h"
 #include <IOKit/usb/IOUSBInterface.h>
-#include "IOUSBDevice.h"
 #include "USB.h"
 
 

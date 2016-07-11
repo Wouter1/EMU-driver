@@ -31,7 +31,7 @@ IOReturn IOUSBDevice1::devRequestSampleRate(UInt32 inSampleRate, UInt16 endpoint
     return DeviceRequest (&devReq);
 }
 
-UInt64 getFrameNumber() {
+UInt64 IOUSBDevice1::getFrameNumber() {
     return GetBus()->GetFrameNumber();
 }
     

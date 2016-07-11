@@ -67,7 +67,7 @@ public:
                   UInt16                  index,
                   UInt16                  length,
                         IOMemoryDescriptor *    data) ;
-
+};
     
 #else
 

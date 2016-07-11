@@ -23,7 +23,7 @@
 
 class IOUSBDevice1 : public IOUSBDevice {
 public:
-    inline bool isHighSpeed();
+    bool isHighSpeed();
     
     /*!
      * set the sample rate to the device.

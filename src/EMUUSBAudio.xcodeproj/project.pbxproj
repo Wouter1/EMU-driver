@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6C0C68C91D340977002B242E /* USB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C0C68C81D340977002B242E /* USB.cpp */; settings = {ASSET_TAGS = (); }; };
+		6C0C68C91D340977002B242E /* USB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C0C68C81D340977002B242E /* USB.cpp */; };
 		6C2C070819E4559800F1FD56 /* EMUUSBAudioDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C070619E4559800F1FD56 /* EMUUSBAudioDevice.cpp */; };
 		6C2C070919E4559800F1FD56 /* EMUUSBAudioDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C070719E4559800F1FD56 /* EMUUSBAudioDevice.h */; };
 		6C2C070C19E4562800F1FD56 /* EMUUSBAudioEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C070A19E4562800F1FD56 /* EMUUSBAudioEngine.cpp */; };
@@ -455,16 +455,16 @@
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "EMUUSBAudio/EMUUSBAudio-Prefix.pch";
-				INFOPLIST_FILE = "EMUUSBAudio/EMUUSBAudio-Info-11.plist";
+				INFOPLIST_FILE = "EMUUSBAudio/EMUUSBAudio-Info.plist";
 				INFOPLIST_PREPROCESS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MODULE_NAME = com.emu.driver.EMUUSBAudio;
 				MODULE_START = 0;
 				MODULE_STOP = 0;
 				MODULE_VERSION = 1.0.0d1;
 				"OTHER_CFLAGS[arch=*]" = "-DDEBUGLOGGING";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.11;
+				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -477,15 +477,15 @@
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "EMUUSBAudio/EMUUSBAudio-Prefix.pch";
-				INFOPLIST_FILE = "EMUUSBAudio/EMUUSBAudio-Info-11.plist";
+				INFOPLIST_FILE = "EMUUSBAudio/EMUUSBAudio-Info.plist";
 				INFOPLIST_PREPROCESS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MODULE_NAME = com.emu.driver.EMUUSBAudio;
 				MODULE_START = 0;
 				MODULE_STOP = 0;
 				MODULE_VERSION = 1.0.0d1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.11;
+				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;
