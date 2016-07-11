@@ -121,19 +121,6 @@ public:
         return (IOUSBDevice1 *)getDevice();
     }
     
-//    /*!
-//     * @brief Return the current frame number of the USB bus
-//     *
-//     * @description This method will return the current frame number of the USB bus.  This is most useful for
-//     * scheduling future isochronous requests.
-//     *
-//     * @param theTime If not NULL, this will be updated with the current system time
-//     *
-//     * @result The current frame number
-//     */
-//    inline uint64_t getFrameNumber(AbsoluteTime* theTime = NULL) const {
-//        return getFrameNumber();
-//    }
     
     inline UInt8 getInterfaceNumber() {
         return getInterfaceDescriptor()->bInterfaceNumber;

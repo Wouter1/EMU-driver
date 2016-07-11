@@ -39,11 +39,11 @@ public:
      */
     IOReturn Read(IOMemoryDescriptor *	buffer,
                           UInt64 frameStart, UInt32 numFrames, LowLatencyIsocFrame *frameList,
-                          LowLatencyCompletion *	completion, UInt32 updateFrequency = 0) {
-        return io(buffer, frameList, numFrames, frameStart, completion);
-    }
+                  LowLatencyCompletion *	completion, UInt32 updateFrequency = 0);
     
     
+    IOReturn Read(IOMemoryDescriptor* buffer, Completion* completion = 0, UInt64 *bytesRead = 0);
+
     
     /*!
      @function Write
@@ -58,35 +58,16 @@ public:
      */
     IOReturn Write(IOMemoryDescriptor *	buffer,
                    UInt64 frameStart, UInt32 numFrames, LowLatencyIsocFrame *frameList,
-                   LowLatencyCompletion * completion, UInt32 updateFrequency = 0) {
-        // io is replacing both read and write! I guess buffer->getDirection determines if it's read or write,
-        // but I could not find this documented...
-        return io(buffer, frameList, numFrames, frameStart, completion);
-    }
-    
+                   LowLatencyCompletion * completion, UInt32 updateFrequency = 0);
     /*!
      @function GetEndpointDescriptor
      returns the endpoint descriptor for the pipe.
      */
-    const EndpointDescriptor *	GetEndpointDescriptor() {
-        return getEndpointDescriptor();
-    }
-    
-    //void release();
-    
-    IOReturn SetPipePolicy(UInt16 maxPacketSize, UInt8 maxInterval) {
-        
-        const EndpointDescriptor *currentDescriptor = getEndpointDescriptor();
-        
-        EndpointDescriptor endpointDescriptor=*currentDescriptor;
-        endpointDescriptor.wMaxPacketSize=0;
-        SuperSpeedEndpointCompanionDescriptor ssDesc;
-        // no idea what it is, let's hope all 0 will do the job...
-        bzero(&ssDesc, sizeof(SuperSpeedEndpointCompanionDescriptor));
+    const EndpointDescriptor *	GetEndpointDescriptor();
 
-        return adjustPipe(&endpointDescriptor, &ssDesc);
-    }
-
+    
+    IOReturn SetPipePolicy(UInt16 maxPacketSize, UInt8 maxInterval) ;
+    
     /*!
      @function ClearPipeStall
      AVAILABLE ONLY IN VERSION 1.9 AND ABOVE
@@ -98,14 +79,7 @@ public:
      controllers endpoint are returned and the toggle bit on the controllers endpoint is cleared. if this parameter is false, then this is equivalent
      to the pre-1.9 API. This means that the endpoint on the controller is cleared, but no DeviceRequest is sent to the device's endpoint.
      */
-    IOReturn ClearPipeStall(bool withDeviceRequest) {
-        return clearStall(withDeviceRequest);
-    }
-    
-    IOReturn Read(IOMemoryDescriptor* buffer, Completion* completion = 0, UInt64 *bytesRead = 0) {
-        // arg2 must be dataBufferLength. Strange, isn't that just getLength???
-        return io(buffer, (int)buffer->getLength(), completion);
-    }
+    IOReturn ClearPipeStall(bool withDeviceRequest);
     
     
 };
