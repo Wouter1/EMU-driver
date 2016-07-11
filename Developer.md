@@ -6,7 +6,7 @@ Building from source code
 1. Open the project in Xcode (double click src/EMUUSBAudio.xcodeproj)
 2. Set up the build settings: select the project (the blue EMUUSBAudio icon in top left) and select the "Build Settings" tab
  * select "OSX 10.9" or "OSX 10.11" in the Architectures/Base SDK
- * select the same in the Deployment/InOSX Deployment target
+ * select the same in the Deployment/OSX Deployment target
  * in the Packaging/Info.plist file set "EMUUSBAudio/EMUUSBAudio-Info.plist" if you selected 10.9, or "EMUUSBAudio/EMUUSBAudio-Info-11.plist" if you selected 10.11.
 3. Select Product/Build menu item
 4. Select View/Navigators/Project Navigator menu item
