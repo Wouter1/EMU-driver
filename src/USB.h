@@ -26,34 +26,20 @@ public:
      * @param actCount the value for frActCount field
      * @param t the value for frTimeStamp
      */
-    void set(IOReturn status, UInt16 reqCount, UInt16 actCount, AbsoluteTime t) {
-        frStatus = status;
-        frReqCount = reqCount;
-        frActCount = actCount;
-        frTimeStamp = t;
-    }
-    
+    void set(IOReturn status, UInt16 reqCount, UInt16 actCount, AbsoluteTime t) ;
     
     
     /*! @return true if the the status has been set, which means the transfer was completed.
      */
-    inline bool isDone() {
-        return -1 != frStatus && kUSBLowLatencyIsochTransferKey != frStatus;
-    }
+    bool isDone() ;
     
-    inline AbsoluteTime getTime() {
-        return frTimeStamp;
-    }
+    AbsoluteTime getTime();
     
     /*! @return nr of actually completed frames */
-    inline uint32_t getCompleteCount() {
-        return frActCount;
-    }
+    uint32_t getCompleteCount();
     
     /*! set the timestamp to -1 */
-    inline void resetTime() {
-        frTimeStamp = 0xFFFFFFFFFFFFFFFFull;
-    }
+    void resetTime();
     
 };
 
@@ -70,12 +56,7 @@ public:
      * @param a the action
      * @param p the parameter
      */
-    void set(void * t, LowLatencyCompletionAction a , void *p) {
-        target = t;
-        action = a;
-        parameter = p;
-    }
-    
+    void set(void * t, LowLatencyCompletionAction a , void *p) ;
     
 };
 
@@ -92,11 +73,8 @@ public:
      @param a action
      @param p parameter
      */
-    void set(void *t, IOUSBCompletionAction a, void *p ) {
-        target = t;
-        action = a;
-        parameter = p;
-    }
+    void set(void *t, IOUSBCompletionAction a, void *p ) ;
+    
 };
 
 typedef  IOUSBCompletionAction CompletionAction;
@@ -150,32 +128,19 @@ public:
      * @param actualcc the actual CompleteCount = #bytes actual read
      * @param t the AbsoluteTime
      */
-    void set(IOReturn s, uint32_t requestc, uint32_t actualcc, AbsoluteTime t) {
-        status=s;
-        requestCount=requestc;
-        completeCount=actualcc;
-        timeStamp=t;
-    }
+    void set(IOReturn s, uint32_t requestc, uint32_t actualcc, AbsoluteTime t);
     
     /*! @return true if the the status has been set properly, which means the transfer was completed.
      */
-    inline bool isDone() {
-        return -1 != status && kIOReturnInvalid != status;
-    }
+    bool isDone() ;
     
-    inline AbsoluteTime getTime() {
-        return timeStamp;
-    }
+    AbsoluteTime getTime();
     
     /*! @return nr of actually completed frames */
-    inline uint32_t getCompleteCount() {
-        return completeCount;
-    }
+    uint32_t getCompleteCount() ;
     
     /*! set the timestamp to -1 */
-    inline void resetTime() {
-        timeStamp = 0xFFFFFFFFFFFFFFFFull;
-    }
+    void resetTime() ;
 };
 typedef IOUSBHostIsochronousCompletionAction LowLatencyCompletionAction;
 
@@ -188,13 +153,9 @@ public:
      * @param p the parameter
      */
     
-    void set(void * t, LowLatencyCompletionAction a , void *p) {
-        owner = t;
-        action = a;
-        parameter = p;
-        
-    }
+    void set(void * t, LowLatencyCompletionAction a , void *p);
 };
+
 // EndpointDescriptor already exists in OSX11, and it is the one we need
 // ConfigurationDescriptor already exists in OSX11, and it is the one we need
 typedef IOUSBHostIsochronousCompletion IsocCompletion;
@@ -208,11 +169,7 @@ public:
      @param a action
      @param p parameter
      */
-    void set(void *t, IOUSBHostCompletionAction a, void *p ) {
-        owner = t;
-        action = a;
-        parameter = p;
-    }
+    void set(void *t, IOUSBHostCompletionAction a, void *p );
 };
 
 
@@ -234,13 +191,7 @@ public:
     /*!
      @return true if this request matches the given descriptor.
      */
-    bool matches(const InterfaceDescriptor *descriptor) {
-        return
-            descriptor->bInterfaceClass == bInterfaceClass &&
-            descriptor->bInterfaceSubClass == bInterfaceSubClass &&
-            descriptor->bInterfaceProtocol == bInterfaceProtocol &&
-            descriptor->bAlternateSetting == bAlternateSetting;
-    }
+    bool matches(const InterfaceDescriptor *descriptor);
 };
 
 

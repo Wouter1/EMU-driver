@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6C0C68C91D340977002B242E /* USB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C0C68C81D340977002B242E /* USB.cpp */; settings = {ASSET_TAGS = (); }; };
 		6C2C070819E4559800F1FD56 /* EMUUSBAudioDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C070619E4559800F1FD56 /* EMUUSBAudioDevice.cpp */; };
 		6C2C070919E4559800F1FD56 /* EMUUSBAudioDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C070719E4559800F1FD56 /* EMUUSBAudioDevice.h */; };
 		6C2C070C19E4562800F1FD56 /* EMUUSBAudioEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C070A19E4562800F1FD56 /* EMUUSBAudioEngine.cpp */; };
@@ -55,6 +56,7 @@
 
 /* Begin PBXFileReference section */
 		6C022C8719E3AA090090651E /* CoreAudioKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudioKit.framework; path = System/Library/Frameworks/CoreAudioKit.framework; sourceTree = SDKROOT; };
+		6C0C68C81D340977002B242E /* USB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = USB.cpp; sourceTree = "<group>"; };
 		6C2C070619E4559800F1FD56 /* EMUUSBAudioDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBAudioDevice.cpp; sourceTree = "<group>"; };
 		6C2C070719E4559800F1FD56 /* EMUUSBAudioDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioDevice.h; sourceTree = "<group>"; };
 		6C2C070A19E4562800F1FD56 /* EMUUSBAudioEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBAudioEngine.cpp; sourceTree = "<group>"; };
@@ -232,6 +234,7 @@
 				6C7861F91D03F96C0087FD31 /* IOUSBInterface.cpp */,
 				6C7861FA1D03F96C0087FD31 /* IOUSBInterface.h */,
 				6CBB771E1D044C8900FED26D /* USB.h */,
+				6C0C68C81D340977002B242E /* USB.cpp */,
 				6CF65DF71D06085D0063C123 /* osxversion.h */,
 			);
 			name = USBAdapter;
@@ -340,6 +343,7 @@
 			files = (
 				6C7861F31D03F7110087FD31 /* IOUSBPipe.cpp in Sources */,
 				6C5464221A15606C003C251B /* EMUUSBUserClient.cpp in Sources */,
+				6C0C68C91D340977002B242E /* USB.cpp in Sources */,
 				6CB2722F1A54197B00FA8B61 /* EMUUSBOutputStream.cpp in Sources */,
 				6C7861F71D03F91D0087FD31 /* IOUSBDevice.cpp in Sources */,
 				6C39DF8919F2C3BD00D027FC /* EMUUSBAudioClip.cpp in Sources */,
