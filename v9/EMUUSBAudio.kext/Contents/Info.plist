@@ -2,20 +2,52 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BuildMachineOSBuild</key>
+	<string>13F34</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleDisplayName</key>
+	<string></string>
+	<key>CFBundleExecutable</key>
+	<string>EMUUSBAudio</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.emu.driver.EMUUSBAudio</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>EMUUSBAudio</string>
+	<key>CFBundlePackageType</key>
+	<string>KEXT</string>
+	<key>CFBundleShortVersionString</key>
+	<string>4.0.0</string>
+	<key>CFBundleSignature</key>
+	<string>EMUU</string>
+	<key>CFBundleVersion</key>
+	<string>4.0.0</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>DTPlatformBuild</key>
+	<string>5B1008</string>
+	<key>DTPlatformVersion</key>
+	<string>GM</string>
+	<key>DTSDKBuild</key>
+	<string>13C64</string>
+	<key>DTSDKName</key>
+	<string>macosx10.9</string>
+	<key>DTXcode</key>
+	<string>0511</string>
+	<key>DTXcodeBuild</key>
+	<string>5B1008</string>
 	<key>IOKitPersonalities</key>
 	<dict>
 		<key>EMUSBAudioTrackerPre</key>
 		<dict>
-			<key>latencyADC</key>
-			<integer>53</integer>
-			<key>latencyDAC</key>
-			<integer>15</integer>
 			<key>CFBundleIdentifier</key>
 			<string>com.emu.driver.EMUUSBAudio</string>
 			<key>IOClass</key>
 			<string>EMUUSBAudioDevice</string>
 			<key>IOProviderClass</key>
-			<string>IOUSBHostInterface</string>
+			<string>IOUSBInterface</string>
 			<key>IOUserClientClass</key>
 			<string>EMUUSBUserClient</string>
 			<key>SafetyOffsetMicroSec</key>
@@ -30,13 +62,13 @@
 			<integer>16138</integer>
 			<key>idVendor</key>
 			<integer>1054</integer>
-		</dict>
-		<key>EMUUSBAudioControl02</key>
-		<dict>
 			<key>latencyADC</key>
 			<integer>53</integer>
 			<key>latencyDAC</key>
 			<integer>15</integer>
+		</dict>
+		<key>EMUUSBAudioControl02</key>
+		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.emu.driver.EMUUSBAudio</string>
 			<key>IOAudioEngineChannelCategoryNames</key>
@@ -75,7 +107,7 @@
 			<key>IOClass</key>
 			<string>EMUUSBAudioDevice</string>
 			<key>IOProviderClass</key>
-			<string>IOUSBHostInterface</string>
+			<string>IOUSBInterface</string>
 			<key>IOUserClientClass</key>
 			<string>EMUUSBUserClient</string>
 			<key>SafetyOffsetMicroSec</key>
@@ -92,13 +124,13 @@
 			<integer>16130</integer>
 			<key>idVendor</key>
 			<integer>1054</integer>
-		</dict>
-		<key>EMUUSBAudioControl0204</key>
-		<dict>
 			<key>latencyADC</key>
 			<integer>53</integer>
 			<key>latencyDAC</key>
 			<integer>15</integer>
+		</dict>
+		<key>EMUUSBAudioControl0204</key>
+		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.emu.driver.EMUUSBAudio</string>
 			<key>IOAudioEngineChannelCategoryNames</key>
@@ -149,7 +181,7 @@
 			<key>IOClass</key>
 			<string>EMUUSBAudioDevice</string>
 			<key>IOProviderClass</key>
-			<string>IOUSBHostInterface</string>
+			<string>IOUSBInterface</string>
 			<key>IOUserClientClass</key>
 			<string>EMUUSBUserClient</string>
 			<key>SafetyOffsetMicroSec</key>
@@ -168,15 +200,13 @@
 			<integer>16153</integer>
 			<key>idVendor</key>
 			<integer>1054</integer>
-		</dict>
-		<key>EMUUSBAudioControl04</key>
-		<dict>
 			<key>latencyADC</key>
 			<integer>53</integer>
 			<key>latencyDAC</key>
-			<integer>38</integer>
-			<key>SafetyOffsetMicroSec</key>
-			<integer>4200</integer>
+			<integer>15</integer>
+		</dict>
+		<key>EMUUSBAudioControl04</key>
+		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.emu.driver.EMUUSBAudio</string>
 			<key>IOAudioEngineChannelCategoryNames</key>
@@ -239,9 +269,11 @@
 			<key>IOClass</key>
 			<string>EMUUSBAudioDevice</string>
 			<key>IOProviderClass</key>
-			<string>IOUSBHostInterface</string>
+			<string>IOUSBInterface</string>
 			<key>IOUserClientClass</key>
 			<string>EMUUSBUserClient</string>
+			<key>SafetyOffsetMicroSec</key>
+			<integer>4200</integer>
 			<key>TransportTypeOverride</key>
 			<integer>1</integer>
 			<key>bConfigurationValue</key>
@@ -256,48 +288,28 @@
 			<integer>16132</integer>
 			<key>idVendor</key>
 			<integer>1054</integer>
+			<key>latencyADC</key>
+			<integer>53</integer>
+			<key>latencyDAC</key>
+			<integer>38</integer>
 		</dict>
 	</dict>
-	<key>CFBundleDisplayName</key>
-	<string></string>
 	<key>LSApplicationCategoryType</key>
 	<string></string>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
-	<key>CFBundleExecutable</key>
-	<string>${EXECUTABLE_NAME}</string>
-	<key>CFBundleIconFile</key>
-	<string></string>
-	<key>CFBundleIdentifier</key>
-	<string>com.emu.driver.EMUUSBAudio</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>${PRODUCT_NAME}</string>
-	<key>CFBundlePackageType</key>
-	<string>KEXT</string>
-	<key>CFBundleShortVersionString</key>
-	<string>4.0.0</string>
-	<key>CFBundleSignature</key>
-	<string>EMUU</string>
-	<key>CFBundleVersion</key>
-	<string>4.0.0</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2016 W.Pasman</string>
 	<key>OSBundleLibraries</key>
 	<dict>
 		<key>com.apple.iokit.IOAudioFamily</key>
 		<string>1.9.7f2</string>
-		<key>com.apple.iokit.IOUSBHostFamily</key>
-		<string>1.0.1</string>
+		<key>com.apple.iokit.IOUSBFamily</key>
+		<string>683.4</string>
 		<key>com.apple.kpi.iokit</key>
 		<string>13.4</string>
 		<key>com.apple.kpi.libkern</key>
 		<string>13.4</string>
 		<key>com.apple.kpi.mach</key>
 		<string>13.4</string>
-		<key>com.apple.kpi.bsd</key>
-		<string>15.4.0</string>
 	</dict>
 </dict>
 </plist>

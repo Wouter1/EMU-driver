@@ -3,9 +3,6 @@
 
 Installation
 ========
-If you need a low-latency driver, first check the  <a href="Latency.md">latency</a> section.
-This can not be used on El Capitan (issue #65).
-
 
 <h4>Prepare the machine</h4>
 
@@ -31,14 +28,12 @@ After preparation, you can install the driver:
 
 1. Turn off the EMU device
 2. Download (click on "Download ZIP") and unzip the driver
-3. If on El Capitan: run the highLatency script
-4. Run the kextInstall script 
-5. enter your admin password at the prompt
+3. Run the install script (e.g. double click it) and follow the instructions.
 
 
 If you like you can also copy the control panel into your applications directory. You also have to copy the Skins folder along with the app.
 
-NOTE: After the install, it takes OSX about a minute to incorporate the driver into the kernel.
+NOTE: After the install, it takes OSX up to a few minutes to incorporate the driver into the kernel.
 
 <h4>Using the control panel</h4>
 You may have to eenable running 3rd-party applications before you can run the Control Panel:

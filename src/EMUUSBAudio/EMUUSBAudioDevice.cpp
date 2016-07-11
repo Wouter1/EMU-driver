@@ -130,18 +130,24 @@ bool EMUUSBAudioDevice::ControlsStreamNumber(UInt8 streamNumber) {
 	return doesControl;
 }
 
+void* p(void* ptr) {
+    return (void*) ((long)ptr & 0xffffffffffff);
+}
+
 // CHECK the OSX manuals recommend using start(IOService *, IOAudioDevice *)
 bool EMUUSBAudioDevice::start(IOService * provider) {
 	bool			result = FALSE;
 	
-    debugIOLogC("+ EMUUSBAudioDevice[%p]::start(%p)", this, provider);
-    mControlInterface = (IOUSBInterface1 *)provider;//OSDynamicCast(IOUSBInterface1, provider);
+    debugIOLogC("+ EMUUSBAudioDevice[%p]::start(%p)", p(this), p(provider));
+    mControlInterface = OSDynamicCast(IOUSBInterface1, provider);
+    debugIOLogC("mControlInterface=%p",p(mControlInterface));
+    FailIf (mControlInterface ==NULL, Exit);
 	FailIf(FALSE == mControlInterface->open(this), Exit);
 	mCurSampleRate = mNumEngines = 0;
 	mInitHardwareThread = thread_call_allocate((thread_call_func_t)EMUUSBAudioDevice::initHardwareThread,(thread_call_param_t)this);
 	FailIf(NULL == mInitHardwareThread, Exit);
     
-    debugIOLogC("- EMUUSBAudioDevice[%p]::start(%p)", this, provider);
+    debugIOLogC("- EMUUSBAudioDevice[%p]::start(%p)", p(this), p(provider));
     
 	result = super::start(provider);				// Causes our initHardware routine to be called.
 	debugIOLogC("EMUUSBAudioDevice started about to registerService result is %d\n", result);
@@ -150,6 +156,7 @@ Exit:
 }
 
 bool EMUUSBAudioDevice::initHardware(IOService * provider) {
+    debugIOLogC("+initHardware %p",p(provider));
 	bool		result = FALSE;
 	mStatusPipe = NULL;
 	FailIf(NULL == mInitHardwareThread, Exit);
@@ -185,7 +192,7 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
     IOReturn						resultCode = kIOReturnError;
 	UInt8 *							streamNumbers;
 	UInt8							numStreams;
-	debugIOLogC("+EMUUSBAudioDevice[%p]::protectedInitHardware(%p)", this, provider);
+	debugIOLogC("+EMUUSBAudioDevice[%p]::protectedInitHardware(%p)", p(this), p(provider));
 	mTerminatingDriver = FALSE;
 	if (mControlInterface) {//FailIf(NULL == mControlInterface, Exit);
 		checkUHCI();// see whether we're attached via a UHCI controller
@@ -226,7 +233,7 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 			UInt32	i = 0;
 			while (i < 2 && (kIOReturnSuccess != resultCode)) {
 				if(kIOReturnSuccess != (resultCode = device->GetStringDescriptor(stringIndex, string, kStringBufferSize))) {// try again
-					debugIOLogC(" ++EMUUSBAudioDevice[%p]::protectedInitHardware - couldn't get string descriptor. Retrying ...", this);
+					debugIOLogC(" ++EMUUSBAudioDevice[%p]::protectedInitHardware - couldn't get string descriptor. Retrying ...", p(this));
 					if (kIOReturnSuccess != (resultCode = device->GetStringDescriptor(stringIndex, string, kStringBufferSize)) && (i< 1)) {
 						device->ResetDevice();
 						IOSleep(50);
@@ -313,8 +320,6 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 		mAnchorResetCount = kRefreshCount;
 		mUpdateTimer = IOTimerEventSource::timerEventSource(this, TimerAction);
 		FailIf(NULL == mUpdateTimer, Exit);
-		// TURNED OFF HACK to turn off this update timer.
-        //workLoop->addEventSource(mUpdateTimer);
 		TimerAction(this, mUpdateTimer);
 		
         // CHECK This bundle was removed as it is not clear what it is for.
@@ -322,8 +327,8 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 		IOService::registerService();
 		//<AC mod>
 		// init engine - see what happens
-#if 1
-		// need to make sure we're not crossing paths with a terminating driver (hey, it happens)
+
+        // need to make sure we're not crossing paths with a terminating driver (hey, it happens)
 		if (FALSE == mTerminatingDriver) {
 			EMUUSBAudioEngine *audioEngine = NULL;
 			audioEngine = new EMUUSBAudioEngine;
@@ -338,11 +343,10 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 			audioEngine->release();
 			mAudioEngine = audioEngine; //used for releasing at end
 		}
-#endif
 		//</AC mod>
 	}
 Exit:
-	debugIOLogC("-EMUUSBAudioDevice[%p]::start(%p)", this, provider);
+	debugIOLogC("-EMUUSBAudioDevice[%p]::start(%p)", p(this), p(provider));
 	if (mInitHardwareThread) {
 		thread_call_free(mInitHardwareThread);
 		mInitHardwareThread = NULL;
@@ -358,7 +362,7 @@ void EMUUSBAudioDevice::checkUHCI() {
 		IORegistryEntry*	parent = device->getParentEntry(svcPlane);
 		if (parent) {// only anticipate iterating one level up - with the current IOKit
 			IOService*	currentEntry = OSDynamicCast(IOService, parent);
-			debugIOLogC("checkUHCI currentEntry %p", currentEntry);
+			debugIOLogC("checkUHCI currentEntry %p", p(currentEntry));
 			if (currentEntry) {
 				mUHCI = !strcmp(currentEntry->getName(svcPlane), "AppleUSBUHCI");
 			}
@@ -371,27 +375,15 @@ void EMUUSBAudioDevice::checkUHCI() {
 
 
 void EMUUSBAudioDevice::setupStatusFeedback() {
-//	IOUSBFindEndpointRequest	statusEndpoint;
-	
-//	statusEndpoint.type = kUSBInterrupt;
-//	statusEndpoint.direction = kUSBIn;
-//	statusEndpoint.maxPacketSize = kStatusPacketSize; // is this sizeof(UInt16)
-//	statusEndpoint.interval = 0xFF;
-    
-    //mStatusPipe = mControlInterface->findPipe(&statusEndpoint);
     
     mStatusPipe = mControlInterface->findPipe(kUSBIn,kUSBInterrupt);
 	if (mStatusPipe) {// the endpoint exists
-		mStatusPipe->retain();// retain until tear down
 		mDeviceStatusBuffer = (UInt16*) IOMalloc(sizeof(UInt16)); // Is this kStatusPacketSize?
 		if (mDeviceStatusBuffer) {
 			mStatusBufferDesc = IOMemoryDescriptor::withAddress(mDeviceStatusBuffer, kStatusPacketSize, kIODirectionIn);
 			if (mStatusBufferDesc) {
 				mStatusBufferDesc->prepare();
                 mStatusCheckCompletion.set((void*) this, statusHandler, 0);
-//				mStatusCheckCompletion.target = (void*) this;
-//				mStatusCheckCompletion.action = statusHandler;
-//				mStatusCheckCompletion.parameter = 0;
 				mStatusCheckTimer = IOTimerEventSource::timerEventSource(this, StatusAction);
 				if (mStatusCheckTimer) {
 					workLoop->addEventSource(mStatusCheckTimer);// add timer action to the workloop
@@ -407,7 +399,7 @@ IOReturn EMUUSBAudioDevice::performPowerStateChange(IOAudioDevicePowerState oldP
 {
 	IOReturn	result = super::performPowerStateChange(oldPowerState, newPowerState, microSecsUntilComplete);
     
-	debugIOLogC("+EMUUSBAudioDevice[%p]::performPowerStateChange(%d, %d, %p)", this, oldPowerState, newPowerState, microSecsUntilComplete);
+	debugIOLogC("+EMUUSBAudioDevice[%p]::performPowerStateChange(%d, %d, %p)", p(this), oldPowerState, newPowerState, microSecsUntilComplete);
 	
     
 	// Ripped of from Apple USB reference (hey, it might actually work) [AC]
@@ -416,7 +408,7 @@ IOReturn EMUUSBAudioDevice::performPowerStateChange(IOAudioDevicePowerState oldP
          &&	(kIOAudioDeviceSleep == newPowerState))
 	{
 		// Stop the timer and reset the anchor.
-		debugIOLogC("? AppleUSBAudioDevice[%p]::performPowerStateChange () - Going to sleep - stopping the rate timer.", this);
+		debugIOLogC("? AppleUSBAudioDevice[%p]::performPowerStateChange () - Going to sleep - stopping the rate timer.", p(this));
 		mUpdateTimer->cancelTimeout ();
 		// mUpdateTimer->disable();
 		
@@ -509,20 +501,20 @@ bool EMUUSBAudioDevice::terminate(IOOptionBits options) {
 }
 
 void EMUUSBAudioDevice::detach(IOService *provider) {
-	debugIOLogC("+EMUUSBAudioDevice[%p]: detaching %p, rc=%d",this,provider,getRetainCount());
+	debugIOLogC("+EMUUSBAudioDevice[%p]: detaching %p, rc=%d",p(this),provider,getRetainCount());
 	super::detach(provider);
-	debugIOLogC("-EMUUSBAudioDevice[%p]: detaching %p, rc=%d",this,provider,getRetainCount());
+	debugIOLogC("-EMUUSBAudioDevice[%p]: detaching %p, rc=%d",p(this),provider,getRetainCount());
 	
 }
 
 void EMUUSBAudioDevice::close(IOService *forClient, IOOptionBits options) {
-	debugIOLogC("EMUUSBAudioDevice[%p]: closing for %p",this,forClient);
+	debugIOLogC("EMUUSBAudioDevice[%p]: closing for %p",p(this),forClient);
 	super::close(forClient,options);
 }
 
 
 IOReturn EMUUSBAudioDevice::message(UInt32 type, IOService * provider, void * arg) {
-	debugIOLogC("+EMUUSBAudioDevice[%p]::message(0x%x, %p) - rc=%d", this, type, provider, getRetainCount());
+	debugIOLogC("+EMUUSBAudioDevice[%p]::message(0x%x, %p) - rc=%d", p(this), type, provider, getRetainCount());
     
 	if ((kIOMessageServiceIsTerminated == type) || (kIOMessageServiceIsRequestingClose == type)) {
 		if (mStatusCheckTimer) {
