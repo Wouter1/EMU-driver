@@ -38,5 +38,5 @@ Before releasing, the acceptance test should have been run succesfully.
 1. Determine and update the version number in the plist.
 2. Commit and push the driver to git
 3. push a tag to git, as follows 
- * ```git tag -a v3.5.1 9fceb02 -m "Message here"``` or just ```git tag "Message here"``` to tag the current branch
+ * ```git tag "Message"``` to tag the current branch
  * ```git push --tags```
