@@ -77,7 +77,8 @@ cd /System/Library/Extensions
 sudo chgrp -R wheel EMUUSBAudio.kext
 
 #load new kext
-sudo kextload -v EMUUSBAudio.kext
+sudo kextload -v 0 EMUUSBAudio.kext
 
-echo "Installation done."
-echo "System will complete installation automatically in a few minutes."
+echo "Waiting for the system to finish installation. Can take several minutes."
+tail -f /var/log/system.log | awk '/Rescanning kernel extensions/ { print "Rebuilding the kernel" } /locked; waiting for lock/ { print "Waiting for lock to replace the old kernel" } /Lock acquired; proceeding/ { print "Inserting the new kernel"} /no supported helper partitions|helper partitions appear up to date/ { print "Driver is installed and ready for use!"; exit } '
+
