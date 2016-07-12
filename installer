@@ -52,6 +52,7 @@ if [ "$lowlatency" == "y" ] ; then
 	cd "$pathname/EMUUSBAudio.kext/Contents/"
 	cat Info.plist  | sed -e 's/<integer>4200<\/integer>/<integer>1000<\/integer>/' > Info1.plist
 	mv Info1.plist Info.plist
+	cd "$pathname"
 fi
 
 echo "(Re)placing EMU kernel extension. We need the admin password for this."; echo
