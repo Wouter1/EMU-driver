@@ -14,6 +14,16 @@ Only run this script if you want to use the low latency version of the driver. Y
 
 The total latency is the sum of (1) the driver latency, (2) your application's latency (buffer setting) and (3) the EMU internal latency. The EMU one-way internal latency typically is 1.3 ms (96k) to 1.8 ms (44k), the exact value depends on the selected sample rate and the type of EMU device that you have. The roundtrip will be twice this. If you select the low latency driver and e.g. a 64 sample buffer in your application, this gives you around 5.9 ms (96k) to 8.5 ms (44k) total roundtrip latency. The driver reports the estimated latency to the system, and eg reaper shows it in its menu bar (including its own buffer latency). 
 
+Here is a table with measured roundtrip latencies in milliseconds. The values N=128 and N=64 show the DAW buffer size. 
+
+|rate|latency N=128|latency N=64|
+|---|------|------|
+|44k|11.6|8.5|
+|48k|10.8|8.1|
+|96k|7.3|6.0|
+|176k|5.6|4.9|
+|192k|5.5|4.9|
+
 How is it measured?
 ===================
 To measure roundtrip latency you need reaper (free trial download from http://www.reaper.fm/ ) and a loopback cable for the EMU. The cable loops the EMU output (either TS jack or 1/8" stereo TRS jack) into a line input ( 1/4" TS jack)
