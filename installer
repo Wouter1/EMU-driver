@@ -9,7 +9,7 @@
 # Ask user 
 #
 clear;echo;echo;echo "EMU USB Installer by W.Pasman"
-pathname=`dirname "$0"`
+pathname=$PWD
 cd "$pathname"
 
 
