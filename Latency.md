@@ -5,13 +5,11 @@ Latency
 The default latency of the driver is set to 4.2ms. This is the 'high quality' setting, 
 to ensure that not even the highest jitter in the USB system affects the audio quality.
 However for some applications, low latency is more important than an occasional click in 
-the audio. Therefore, the latency can be adjusted to 1.0ms (good low latency value) as follows:
+the audio. To adjust the latency to 1.0ms (good low latency value) you just select "y" when the installer asks
+```Use low latency setting?```.
 
-1. Run (double click) the lowLatency script.
-2. Run the installation procedure.
-
-Only run this script if you want to use the low latency version of the driver. You can use this low-latency version of the driver and increase your application's buffer size to get a more flexible way of adjusting the latency.
-
+Latency Details
+---------------
 The total latency is the sum of (1) the driver latency, (2) your application's latency (buffer setting) and (3) the EMU internal latency. The EMU one-way internal latency typically is 1.3 ms (96k) to 1.8 ms (44k), the exact value depends on the selected sample rate and the type of EMU device that you have. The roundtrip will be twice this. If you select the low latency driver and e.g. a 64 sample buffer in your application, this gives you around 5.9 ms (96k) to 8.5 ms (44k) total roundtrip latency. The driver reports the estimated latency to the system, and eg reaper shows it in its menu bar (including its own buffer latency). 
 
 Here is a table with measured roundtrip latencies in milliseconds. The driver was installed with the low latency setting. The values N=128 and N=64 show the DAW buffer size. 
@@ -51,8 +49,8 @@ It can help to see the latency by selecting a time period by dragging with the m
 You can set the time display units by right clicking on the time display at the bottom right of the screen.
 
 Further optimization
-=======
-If you really need the lowest possible latencies, you might consider hacking the lowLatency script before running it and replace the 1000 (microseconds) in there with an even lower value. You may have to do you own measurements (see #40) to see how far you can go without distortions. For the 0404 these seem absolute minimum values:
+--------------------
+If you really need the lowest possible latencies, you might consider hacking the installer before running it and replace the 1000 (microseconds) in there with an even lower value. You may have to do you own measurements (see #40) to see how far you can go without distortions. For the 0404 these seem absolute minimum values:
 
 | rate | min latency |
 | --- | --- |
@@ -65,7 +63,7 @@ If you really need the lowest possible latencies, you might consider hacking the
 
 
 Comparison with other cards
-========
+--------------------------
 
 The following table shows the EMU performance. All values with 128sample DAW buffer. All latencies are the total roundtrip latency in milliseconds.
 
