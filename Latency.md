@@ -70,15 +70,17 @@ The following table shows the EMU performance. All values with 128sample DAW buf
 | device | latency @44k | latency @48k | latency @96k | latency @192k |
 |---|---|---|---|---|
 | Windows7 EMU0404 PCIe | 6.1 | - | - | - | 
+| EMU0404 (low latency, *64 sample DAW*) | 8.5 | 8.1 | 6.02 | 4.9 | 
 | RME Fireface 800| 9.7 | 8.9 | 6.0 | 5.5 |
 | Windows M-Audio 1010lt | 10.3 | 9.5 | 4.7 | - |
 | Windows7 Presonus Firestudio Mobile| 10.3 | 9.6 | 6.1 | - |
 | Alesis Photon 25 | 10.34 | 10.33 | - | - |
-| EMU0404 | 11.5 | 10.8 | 7.2 | 5.4 | 
+| EMU0404 (default latency) | 11.5 | 10.8 | 7.2 | 5.4 | 
 | Scarlett 2i2 | 11.1 | 12.5 | - | - | 
 | Native instr Kore 1| 12.4 | 11.9 | 7.1 | - |
 | Behringer FCA202 | 13.5 | 12.0 | 7.7 | - |
 | PreSonus Studio 192 | 14 | - | - | - |
 | Windows7 Line 6 GX | 19.3 | 18.1 | - | - |
 | Windows7 Creative Sound Blaster X-Fi pci-e | 20.4 | 19.2 | 19.4 | - |
+
 
