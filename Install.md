@@ -54,11 +54,6 @@ Uninstall
 =======
 Download and install the  <a href="http://support.creative.com/Products/ProductDetails.aspx?catID=237&catName=USB+Audio%2fMIDI+Interfaces&subCatID=611&subCatName=USB+Audio%2fMIDI+Interfaces&prodID=15185&prodName=0404+USB+2.0&bTopTwenty=1&VARSET=prodfaq:PRODFAQ_15185,VARSET=CategoryID:237">original EMU driver provided by E-MU</a>
 
-OR
-
-1. rename EMUUSBAudio original.kext to EMUUSBAudio.kext
-2. Turn off your EMU device
-3. run the kextInstall script
 
 Complete Removal
 ============
