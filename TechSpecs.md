@@ -1,7 +1,7 @@
 <img align="right" width="400" src="E-MU_0404_USB.jpg"/>
 
 
-Technical Specifications
+Technical Specifications (0404)
 ========================
 
 
