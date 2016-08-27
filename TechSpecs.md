@@ -99,5 +99,5 @@ System Requirements
 ------
 
  * Apple Macintosh 
- * Apple Macintosh OS X Mavericks (10.9) 64 bits
+ * Apple Macintosh OS X Mavericks (10.9) 64 bits or higher
  * 1 available (Hi-speed) USB 2.0 port
