@@ -27,8 +27,9 @@ On Yosemite and earlier:
 After preparation, you can install the driver:
 
 1. Turn off the EMU device
-2. Download (click on "Download ZIP") and unzip the driver
-3. Run the install script (e.g. double click it) and follow the instructions.
+2. Download from the main page (click on the green combobox "Clone or downlod" and select "Download ZIP") 
+3. Unzip the driver (double click)
+4. Run the install script (e.g. double click it) and follow the instructions.
 
 
 If you like you can also copy the control panel into your applications directory. You also have to copy the Skins folder along with the app.
@@ -36,7 +37,7 @@ If you like you can also copy the control panel into your applications directory
 NOTE: After the install, it takes OSX up to a few minutes to incorporate the driver into the kernel.
 
 <h4>Using the control panel</h4>
-You may have to eenable running 3rd-party applications before you can run the Control Panel:
+You may have to enable running 3rd-party applications before you can run the Control Panel:
 
 1. Go into System Preferences->Security&Privacy
 2. Under the General tab, change Allow Downloaded Apps From to Anywhere
