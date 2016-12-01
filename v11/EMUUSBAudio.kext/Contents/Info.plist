@@ -309,7 +309,7 @@
 		<key>com.apple.iokit.IOUSBHostFamily</key>
 		<string>1.0.1</string>
 		<key>com.apple.kpi.bsd</key>
-		<string>15.4.0</string>
+		<string>15.0.0</string>
 		<key>com.apple.kpi.iokit</key>
 		<string>13.4</string>
 		<key>com.apple.kpi.libkern</key>
