@@ -8,7 +8,7 @@ Installation
 
 First time installation only: prepare your machine to take developer kernel extensions.
 
-On El Capitan:
+On El Capitan and later:
 
 1. reboot in recovery mode (hold cmd-R while booting)
 2. go to utilities-terminal
