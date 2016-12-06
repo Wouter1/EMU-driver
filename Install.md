@@ -23,11 +23,12 @@ On Yosemite and earlier:
 2. reboot your machine. 
 
 <h4>Allow apps to run</h4>
-On El Capitan and above you may have to enable running 3rd-party applications before you can run the Control Panel:
+On El Capitan and above you may have to enable running 3rd-party applications before you can run the Installer and the Control Panel:
+
 1. On Sierra you may first have to enable the "Allow" button below. Execute ```sudo spctl --master-disable``` in a terminal.
-1. Go into System Preferences->Security&Privacy
-2. Under the General tab, change Allow Downloaded Apps From to Anywhere
-3. Start the Control Panel
+2. Go into System Preferences->Security&Privacy
+3. Under the General tab, change Allow Downloaded Apps From to Anywhere
+4. Start the installer or  Control Panel
 
 
 <h4>Install the driver</h4>
