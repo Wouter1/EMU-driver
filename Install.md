@@ -22,6 +22,14 @@ On Yosemite and earlier:
     ```sudo nvram boot-args="kext-dev-mode=1"```
 2. reboot your machine. 
 
+<h4>Allow apps to run</h4>
+On El Capitan and above you may have to enable running 3rd-party applications before you can run the Control Panel:
+1. On Sierra you may first have to enable the "Allow" button below. Execute ```sudo spctl --master-disable``` in a terminal.
+1. Go into System Preferences->Security&Privacy
+2. Under the General tab, change Allow Downloaded Apps From to Anywhere
+3. Start the Control Panel
+
+
 <h4>Install the driver</h4>
 
 After preparation, you can install the driver:
@@ -36,12 +44,6 @@ If you like you can also copy the control panel into your applications directory
 
 NOTE: After the install, it takes OSX up to a few minutes to incorporate the driver into the kernel.
 
-<h4>Using the control panel</h4>
-You may have to enable running 3rd-party applications before you can run the Control Panel:
-
-1. Go into System Preferences->Security&Privacy
-2. Under the General tab, change Allow Downloaded Apps From to Anywhere
-3. Start the Control Panel
 
 Usage
 ======
