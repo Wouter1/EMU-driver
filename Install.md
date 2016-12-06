@@ -25,7 +25,7 @@ On Yosemite and earlier:
 <h4>Allow apps to run</h4>
 On El Capitan and above you may have to enable running 3rd-party applications before you can run the Installer and the Control Panel:
 
-1. On Sierra you may first have to enable the "Allow" button below. Execute ```sudo spctl --master-disable``` in a terminal.
+1. On Sierra you may first have to enable the "Anywhere" button in the Security&Privacy panel. Execute ```sudo spctl --master-disable``` in a terminal.
 2. Go into System Preferences->Security&Privacy
 3. Under the General tab, change Allow Downloaded Apps From to Anywhere
 4. Start the installer or  Control Panel
