@@ -3,7 +3,7 @@
 Building from source code
 ===================
 
-1. Open the project in Xcode 5.1.1 (to compile the driver for 10.9) or 7.0.1 (for 10.11)
+1. Open the project in Xcode 5.1.1 (to compile the driver for 10.9 and 10.10) or 7.0.1 (for 10.11 and higher)
 2. Set up the build settings: select the project (the blue EMUUSBAudio icon in top left) and select the "Build Settings" tab
  * select "OSX 10.9" or "OSX 10.11" in the Architectures/Base SDK
  * select the same in the Deployment/OSX Deployment target
