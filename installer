@@ -80,5 +80,12 @@ sudo chgrp -R wheel EMUUSBAudio.kext
 sudo kextload -v 0 EMUUSBAudio.kext
 
 echo "Waiting for the system to finish installation. Can take several minutes."
-tail -f /var/log/system.log | awk '/Rescanning kernel extensions/ { print "Rebuilding the kernel" } /locked; waiting for lock/ { print "Waiting for lock to replace the old kernel" } /Lock acquired; proceeding/ { print "Inserting the new kernel"} /no supported helper partitions|helper partitions appear up to date/ { print "Driver is installed and ready for use!"; exit } '
-
+SCRIPT='/Rescanning kernel extensions/ { print "Rebuilding the kernel" } /locked; waiting for lock/ { print "Waiting for lock to replace the old kernel" } /Lock acquired; proceeding/ { print "Inserting the new kernel"} /no supported helper partitions|helper partitions appear up to date/ { print "Driver is installed and ready for use!"; exit } '
+if [ "$osversion" -gt "11" ] ; then
+  # sierra. Use log system
+  log stream | awk "$SCRIPT"
+else
+  # pre-sierra, use system.log file.
+  tail -f /var/log/system.log | awk "$SCRIPT"
+fi
+echo "You can close this window."
