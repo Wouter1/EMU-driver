@@ -28,7 +28,7 @@ To measure roundtrip latency you need reaper (free trial download from http://ww
 
  1. Attach the loopback cable.
 
- 2. The direct monitor must be off
+ 2. The direct monitor must be off. Phantom power must be off.
  
  3. The input and output volumes adjusted so that the signal comes back in approximately with the same volume.
 
