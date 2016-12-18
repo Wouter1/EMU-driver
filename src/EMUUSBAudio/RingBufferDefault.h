@@ -34,6 +34,8 @@ public:
     UInt32 size=0; // number of elements in buffer.
     UInt32 readhead; // index of next read. range [0,SIZE>
     UInt32 writehead; // index of next write. range [0,SIZE>
+    // true if someone recently called pop. if false, suppresses overrun warnings.
+    Boolean isPopped=false;
     
 public:
     
@@ -84,11 +86,27 @@ public:
         return kIOReturnSuccess;
 	}
     
+    IOReturn push(TYPE *objects, UInt32 num, AbsoluteTime time) override{
+        if (!buffer) {
+            return kIOReturnNotReady;
+        }
+        
+        if (num > vacant() && isPopped) {
+            doLog("RingBufferDefault<%s>::push warning. Ignoring overrun",typeName);
+            isPopped=false;
+        }
+        for ( UInt32 n = 0; n<num; n++) {
+            buffer[writehead++] = objects[n];
+            if (writehead == size) { writehead = 0; notifyWrap(time); }
+        }
+        return kIOReturnSuccess;
+    }
+    
     IOReturn pop(TYPE * data) override{
         if (!buffer) {
             return kIOReturnNotReady;
         }
-
+        isPopped=true;
         if (readhead == writehead) {
             return kIOReturnUnderrun;
         }
@@ -97,31 +115,12 @@ public:
         if (readhead == size) readhead=0;
         return kIOReturnSuccess;
     }
-    
-    
-    IOReturn push(TYPE *objects, UInt32 num, AbsoluteTime time) override{
-        if (!buffer) {
-            return kIOReturnNotReady;
-        }
-
-        if (num > vacant()) {
-            
-            doLog("RingBufferDefault<%s>::push warning. Ignoring overrun",typeName);
-            //return kIOReturnOverrun ; }
-        }
-        for ( UInt32 n = 0; n<num; n++) {
-            buffer[writehead++] = objects[n];
-            if (writehead == size) { writehead = 0; notifyWrap(time); }
-        }
-        return kIOReturnSuccess;
-    }
-
 
     IOReturn pop(TYPE *objects, UInt32 num) override{
         if (!buffer) {
             return kIOReturnNotReady;
         }
-
+        ifPopped=true;
         if (num > available()) { return kIOReturnUnderrun; }
         
         for (UInt32 n = 0; n < num ; n++) {
