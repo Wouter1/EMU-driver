@@ -3,7 +3,6 @@
 //  EMUUSBAudio
 //
 //  Created by Wouter Pasman on 28/11/14.
-//  Copyright (c) 2014 com.emu. All rights reserved.
 //
 
 #include "EMUUSBInputStream.h"
@@ -119,9 +118,6 @@ IOReturn       EMUUSBInputStream::gatherFromReadList() {
         debugIOLogR("BUG EMUUSBAudioEngine::GatherInputSamples wrong offset");
     }
     while(frameIndex < RECORD_NUM_USB_FRAMES_PER_LIST && pFrames[frameIndex].isDone())
-//          && -1 != pFrames[frameIndex].frStatus // no transport at all
-//          && kUSBLowLatencyIsochTransferKey != pFrames[frameIndex].frStatus // partially transported
-//          )
     {
         UInt16 size = pFrames[frameIndex].getCompleteCount();
         UInt8 *source = (UInt8*) readBuffer + (currentReadList * readUSBFrameListSize) + maxFrameSize * frameIndex;
@@ -133,11 +129,6 @@ IOReturn       EMUUSBInputStream::gatherFromReadList() {
         
         if (mDropStartingFrames <= 0)
         {
-            // for debug wraps
-            //UInt32 remaining = usbRing->size - usbRing->writehead;
-            //if (size >= usbRing->size - usbRing->writehead  ) {
-            //debugIOLog("input wrap in list %d at frame %d byte %d",currentReadList,frameIndex, remaining);
-            //}
             
             // FIXME. We should not call from inside locked area.
             usbRing-> push(source, size , pFrames[frameIndex].getTime() );
@@ -184,16 +175,9 @@ IOReturn EMUUSBInputStream::readFrameList (UInt32 frameListNum) {
 	if (pipe) {
 		UInt32		firstFrame = frameListNum * numUSBFramesPerList;
         usbCompletion[frameListNum].set((void*) this, (LowLatencyCompletionAction)readCompletedStatic, (void*) (UInt64)frameListNum);
-//		usbCompletion[frameListNum].target = (void*) this;
-//		usbCompletion[frameListNum].action = (LowLatencyCompletionAction)readCompletedStatic;
-//		usbCompletion[frameListNum].parameter = (void*) (UInt64)frameListNum; // remember the frameListNum
         
 		for (int i = 0; i < numUSBFramesPerList; ++i) {
             usbIsocFrames[firstFrame+i].set(-1, maxFrameSize, 0, 0);
-//			usbIsocFrames[firstFrame+i].frStatus = -1; // used to check if this frame was already received
-//			usbIsocFrames[firstFrame+i].frActCount = 0; // actual #bytes transferred
-//			usbIsocFrames[firstFrame+i].frReqCount = maxFrameSize; // #bytes to read.
-//			*(UInt64 *)(&(usbIsocFrames[firstFrame + i].frTimeStamp)) = 	0ul; //time when frame was procesed
 		}
         
         
@@ -278,11 +262,6 @@ void EMUUSBInputStream::readCompleted ( void * frameListNrPtr,
         notifyClosed();
     }
     
-    // HACK attempt to read feedback from device.
-    //    if (counter++==100) {
-    //
-    //        CheckForAssociatedEndpoint( interfaceNumber, alternateSettingID);
-    //    }
     
 	debugIOLogR("- readCompleted currentFrameList=%p",frameListNrPtr);
 	return;
