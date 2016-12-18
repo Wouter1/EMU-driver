@@ -3,15 +3,16 @@
 Building from source code
 ===================
 
-1. Open the project in Xcode 5.1.1 (to compile the driver for 10.9 and 10.10) or 7.0.1 (for 10.11 and higher)
+1. Make the architecture choice: "v9" when you target OSX 9  or 10 (pre-Capitan), or "v11" when targeting 11 (El Capitan) and higher.
+2. Open the project in Xcode: use XCode 5.1.1 for v9, or XCode 7.0.1 for v11.
 2. Set up the build settings: select the project (the blue EMUUSBAudio icon in top left) and select the "Build Settings" tab
- * select "OSX 10.9" or "OSX 10.11" in the Architectures/Base SDK
+ * in the Architectures/Base SDK select "OSX 10.9"for v9, or "OSX 10.11" for v11 
  * select the same in the Deployment/OSX Deployment target
- * in the Packaging/Info.plist file set "EMUUSBAudio/EMUUSBAudio-Info.plist" if you selected 10.9, or "EMUUSBAudio/EMUUSBAudio-Info-11.plist" if you selected 10.11.
+ * in the Packaging/Info.plist file set "EMUUSBAudio/EMUUSBAudio-Info.plist" for v9, or "EMUUSBAudio/EMUUSBAudio-Info-11.plist" for v11.
 3. Select Product/Build menu item
 4. Select View/Navigators/Project Navigator menu item
 5. right click on the  EMUUSBAudio.kext and click "Show in finder"
-6. Copy the kext into the directory where the kextInstall script is
+6. Copy the kext into the EMU-driver/v9 or EMU-driver/v11.
 
 After that the kExtInstall script is ready for use (see Installation)
 
