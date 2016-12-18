@@ -9,7 +9,7 @@ This describes the procedure to check that the driver is playing and recording c
 
 The following tests should succeed for all available rates and all driver versions but in practice I often skip the 88k and 176k rates because of time constraints (the full test takes more than an hour).
 
-There are two ways to do this. One is with reaper, one with Audacity. Both tests need the loopback cable (see <a href="Latency.md">latency test</a> attached and volume adjusted.
+There are two ways to do this. One is with reaper, one with Audacity. Both tests need the loopback cable (see <a href="Latency.md">latency test</a> attached and volume adjusted. Make sure phantom power is off.
 
 The Audacity version goes as follows
 
