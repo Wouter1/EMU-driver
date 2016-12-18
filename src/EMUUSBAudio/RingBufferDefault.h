@@ -120,7 +120,7 @@ public:
         if (!buffer) {
             return kIOReturnNotReady;
         }
-        ifPopped=true;
+        isPopped=true;
         if (num > available()) { return kIOReturnUnderrun; }
         
         for (UInt32 n = 0; n < num ; n++) {
