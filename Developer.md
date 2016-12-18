@@ -36,7 +36,7 @@ Release with tag
 ================
 Before releasing, the acceptance test should have been run succesfully.
 
-1. Determine and update the version number in the plist.
+1. Determine and update the version number in the plist (both the v9 and v11 version).
 2. Commit and push the driver to git
 3. push a tag to git, as follows 
  * ```git tag "Message"``` to tag the current branch
