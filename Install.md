@@ -64,6 +64,7 @@ WARNING. Be very careful with the ```rm -rf```, if you give it the wrong argumen
 1. Turn off the EMU.
 2. ```sudo rm -rf /System/Library/Extensions/EMUUSBAudio.kext``` (you need admin password).
 3. ```sudo rm -rf /Library/Audio/MIDI\ Drivers/EMUMIDIDriver.plugin``` (you need admin password).
+4. delete the control panel (if you installed it).
 
 Revert to original (Creative) driver
 =======
