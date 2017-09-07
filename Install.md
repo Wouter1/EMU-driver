@@ -36,7 +36,7 @@ On El Capitan and above you may have to enable running 3rd-party applications be
 After preparation, you can install the driver:
 
 1. Turn off the EMU device
-2. Download from the main page (click on the green combobox "Clone or downlod" and select "Download ZIP") 
+2. Download from the main page (click on the green combobox "Clone or download" and select "Download ZIP"). DO NOT RENAME the downloaded file (bug in some un-zippers #100).
 3. Unzip the driver (double click)
 4. Run the install script (e.g. double click it) and follow the instructions.
 
