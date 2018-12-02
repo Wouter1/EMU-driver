@@ -10,6 +10,8 @@ OSX driver for Creative Labs EMU USB
 * I can only test on EMU0404 USB as I have no other EMU devices. But users reported it works also on EMU0202, EMU0204 and Tracker Pre USB.
 * Midi support.
 
+There is a known issue with the 0204 (control panel not working and device switching to 4 channels out which does not work); For now please check issue #115 for workarounds. 
+
 Please notify me how my driver works on other EMU USB devices.
 
 Topics
