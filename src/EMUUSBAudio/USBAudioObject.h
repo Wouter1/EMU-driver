@@ -942,6 +942,12 @@ public:
     
 	Boolean							ChannelHasMuteControl (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 featureUnitID, UInt8 channelNum);
 	Boolean							ChannelHasVolumeControl (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 featureUnitID, UInt8 channelNum);
+    /*!
+     @param interfaceNum the interface (in or out)
+     @param startingAltInterface the first interface number to be considered
+     @param numChannelsRequested the required #channels
+     @return the first interface >= startingAltInterface that has the given nuChannelsRequested
+     */
 	UInt8							FindNextAltInterfaceWithNumChannels (UInt8 interfaceNum, UInt8 startingAltInterface, UInt8 numChannelsRequested);
 	UInt8							FindNextAltInterfaceWithSampleSize (UInt8 interfaceNum, UInt8 startingAltInterface, UInt8 sampleSizeRequested);
 	UInt8							FindNextAltInterfaceWithSampleRate (UInt8 interfaceNum, UInt8 startingAltInterface, UInt32 sampleRateRequested);
