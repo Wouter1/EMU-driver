@@ -36,7 +36,7 @@ On El Capitan and above you may have to enable running 3rd-party applications be
 After preparation, you can install the driver:
 
 1. Turn off the EMU device
-2. Download from the main page (click on the green combobox "Clone or downlod" and select "Download ZIP") 
+2. Download from the main page (click on the green combobox "Clone or download" and select "Download ZIP"). DO NOT RENAME the downloaded file (bug in some un-zippers #100).
 3. Unzip the driver (double click)
 4. Run the install script (e.g. double click it) and follow the instructions.
 
@@ -54,17 +54,20 @@ Usage
 3. Select the EMU input in your favourite tool (e.g., Audacity)
 4. Make your recording
 
+
+
 Uninstall
-=======
-Download and install the  <a href="http://support.creative.com/Products/ProductDetails.aspx?catID=237&catName=USB+Audio%2fMIDI+Interfaces&subCatID=611&subCatName=USB+Audio%2fMIDI+Interfaces&prodID=15185&prodName=0404+USB+2.0&bTopTwenty=1&VARSET=prodfaq:PRODFAQ_15185,VARSET=CategoryID:237">original EMU driver provided by E-MU</a>
-
-
-Complete Removal
 ============
-
+This is the procedure to completely remove the driver.
 WARNING. Be very careful with the ```rm -rf```, if you give it the wrong arguments you may remove essential system files.
 
 1. Turn off the EMU.
 2. ```sudo rm -rf /System/Library/Extensions/EMUUSBAudio.kext``` (you need admin password).
 3. ```sudo rm -rf /Library/Audio/MIDI\ Drivers/EMUMIDIDriver.plugin``` (you need admin password).
+4. delete the control panel (if you installed it).
+
+Revert to original (Creative) driver
+=======
+Download and install the  <a href="http://support.creative.com/Products/ProductDetails.aspx?catID=237&catName=USB+Audio%2fMIDI+Interfaces&subCatID=611&subCatName=USB+Audio%2fMIDI+Interfaces&prodID=15185&prodName=0404+USB+2.0&bTopTwenty=1&VARSET=prodfaq:PRODFAQ_15185,VARSET=CategoryID:237">original EMU driver provided by E-MU</a>.
+Notice that this driver is not working on modern OSX.
 
