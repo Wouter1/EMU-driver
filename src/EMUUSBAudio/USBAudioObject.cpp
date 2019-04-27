@@ -332,10 +332,6 @@ UInt8 EMUUSBAudioConfigObject::GetEndpointPollInterval(UInt8 interfaceNum, UInt8
 }
 
 
-/*! Use GetTerminalLink to get the unit number of the input or output terminal that the
- endpoint is associated with. With that terminal, you can figure out if it's an
- input or output terminal, and the direction of the endpoint.
- */
 UInt8 EMUUSBAudioConfigObject::GetIsocEndpointDirection(UInt8 interfaceNum, UInt8 altInterfaceNum) {
     EMUUSBAudioStreamObject * 				thisStream = GetStreamObject(interfaceNum, altInterfaceNum);
     EMUUSBAudioControlObject * 			thisControl = GetControlObject(theControlInterfaceNum, 0);

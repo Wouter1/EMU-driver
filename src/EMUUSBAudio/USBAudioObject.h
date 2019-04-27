@@ -970,8 +970,14 @@ public:
 	UInt8							GetEndpointPollInt(UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 address);
 	UInt8							GetIsocEndpointAddress (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 direction);
     
-    /*! Use GetTerminalLink to get the unit number of the input or output terminal that the endpoint is associated with.
-     With that terminal, you can figure out if it's an input or output terminal, and the direction of the endpoint. */
+    /*! Get direction of an endpoint? 
+     Use GetTerminalLink to get the unit number of the input or output terminal that the
+     endpoint is associated with. With that terminal, you can figure out if it's an
+     input or output terminal, and the direction of the endpoint.
+     @param interfaceNum the USB interfacenumber
+     @param altInterfaceNum I assume this is the subtype if the interface.
+     @return 0xFF for unknown direction, seems kUSBOut=0 , kUSBIn=1 (at the computer's side). A conversion is already done as what the EMU indicates as "out" is actually "in" at the computer side and vice versa.  
+     */
 	UInt8							GetIsocEndpointDirection (UInt8 interfaceNum, UInt8 altInterfaceNum);
 	UInt8							GetIsocEndpointSyncType (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 address);
 	UInt8							GetIndexedFeatureUnitID (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 featureUnitIndex);
