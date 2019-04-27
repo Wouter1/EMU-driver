@@ -52,7 +52,7 @@ do { printf ( message ); printf ("\n" ); } while (0)
 // only messages that ALWAYS must print do use doLog.
 
 // parse configuration descriptor log messages.define as debugIOLog(message) to turn on.
-#define debugIOLogPC(message...) //debugIOLog(message);
+#define debugIOLogPC(message...) debugIOLog(message);
 
 // audio streaming interface log messages. define as debugIOLog(message) to turn on.
 #define debugIOLogAS(message...) //debugIOLog(message);
@@ -80,5 +80,5 @@ do { printf ( message ); printf ("\n" ); } while (0)
 #define debugIOLogRD(message...) //debugIOLog(message);
 
 // debug all control-level messages (setup, initialization, takedown).
-#define debugIOLogC(message...) //debugIOLog(message);
+#define debugIOLogC(message...) debugIOLog(message);
 #endif
