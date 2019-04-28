@@ -1488,25 +1488,25 @@ IOReturn EMUUSBAudioEngine::performFormatChangeInternal (IOAudioStream *audioStr
     
     if (audioStream == usbInputStream.audioStream || sampleRateChanged)
     {
-        UInt8	newDirection = usbAudio->GetIsocEndpointDirection (usbInputStream.interfaceNumber, newAlternateSettingID);
-        if (FALSE == usbAudio->VerifySampleRateIsSupported(usbInputStream.interfaceNumber, newAlternateSettingID, sampleRate.whole)) {
-            // find an alternative if requested rate not supported.
+        UInt8	newDirection;
+        if (usbAudio->VerifySampleRateIsSupported(usbInputStream.interfaceNumber, newAlternateSettingID, sampleRate.whole)) {
+            newDirection = usbAudio->GetIsocEndpointDirection (usbInputStream.interfaceNumber, newAlternateSettingID);
+            ReturnIf (newDirection != usbInputStream.streamDirection, kIOReturnError);
+        } else {
+            // sample rate is not supported on input side. Find alternative.
             // #112 it seems this code is for 0204 if someone switches to output 4 channels,
             // in which case there is no 4 channels input. So let's just try 2 channels here
+            newDirection = usbInputStream.streamDirection;
             newAlternateSettingID = usbAudio->FindAltInterfaceWithSettings (usbInputStream.interfaceNumber, 2, newFormat->fBitDepth, sampleRate.whole);
             mPollInterval = (UInt32) (1 << ((UInt32) usbAudio->GetEndpointPollInterval(usbInputStream.interfaceNumber, newAlternateSettingID, newDirection) -1));
-            if ((1 != mPollInterval) && (8 != mPollInterval)) {
+            ReturnIf ( (1 != mPollInterval) && (8 != mPollInterval), kIOReturnError);
                 // disallow selection of endpoints with sub ms polling interval
                 //NB - assumes that sub ms device will not use a poll interval of 1 (every microframe)
-                newAlternateSettingID = 255;
-            }
-            debugIOLog ("%d channel %d bit @ %d Hz is not supported. Suggesting alternate setting %d", newFormat->fNumChannels,
+
+            debugIOLog ("direction %d, %d channel %d bit @ %d Hz is not supported. Suggesting alternate setting %d", newDirection, newFormat->fNumChannels,
                         newFormat->fBitDepth, sampleRate.whole, newAlternateSettingID);
-            
-            ReturnIf (255 == newAlternateSettingID, kIOReturnError);
         }
         
-        ReturnIf (newDirection != usbInputStream.streamDirection, kIOReturnError);
         debugIOLog ("++about to set input : ourInterfaceNumber = %d & newAlternateSettingID = %d", usbInputStream.interfaceNumber, newAlternateSettingID);
         beginConfigurationChange();
         
@@ -1538,7 +1538,9 @@ IOReturn EMUUSBAudioEngine::performFormatChangeInternal (IOAudioStream *audioStr
         if (FALSE == usbAudio->VerifySampleRateIsSupported(mOutput.interfaceNumber, newAlternateSettingID, sampleRate.whole)) {
             newAlternateSettingID = usbAudio->FindAltInterfaceWithSettings (mOutput.interfaceNumber, newFormat->fNumChannels, newFormat->fBitDepth, sampleRate.whole);
             mPollInterval = (UInt32) (1 << ((UInt32) usbAudio->GetEndpointPollInterval(mOutput.interfaceNumber, newAlternateSettingID, newDirection) -1));
-            if ((1 != mPollInterval) || (8 != mPollInterval)) {// disallow selection of endpoints with sub ms polling interval NB - assumes that sub ms device will not use a poll interval of 1 (every microframe)
+            if ((1 != mPollInterval) && (8 != mPollInterval)) {
+                // disallow selection of endpoints with sub ms polling interval NB -
+                // assumes that sub ms device will not use a poll interval of 1 (every microframe)
                 newAlternateSettingID = 255;
             }
             debugIOLog ("%d channel %d bit @ %d Hz is not supported. Suggesting alternate setting %d", newFormat->fNumChannels,

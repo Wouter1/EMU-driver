@@ -147,9 +147,10 @@ UInt8 EMUUSBAudioConfigObject::FindAltInterfaceWithSettings(UInt8 interfaceNum, 
 	UInt8			potentialAltInterface = 1;
 	UInt8			theAltInterface = 255;
     
+	debugIOLogPC("Searching for alternative for interface %d, %d channels, rate %d", interfaceNum, numChannels, sampleRate);
     // clumsy loop, straightforward write-out is lot smaller and readable. FIXME?
 	while(potentialAltInterface != 255) {
-		if((GetFormat(interfaceNum, potentialAltInterface) & 0x0FFF) != 0) {	// Make sure it's not an undefined format
+		if((GetFormat(interfaceNum, potentialAltInterface) & 0x0FFF) != 0) {	// Make sure it's a defined format
 			potentialAltInterface = FindNextAltInterfaceWithNumChannels(interfaceNum, potentialAltInterface, numChannels);
 			if(255 == potentialAltInterface) {
 				debugIOLogPC("Undefined format! No alternate setting ID for interface %d, %d channels", interfaceNum, numChannels);
@@ -316,14 +317,14 @@ UInt8 EMUUSBAudioConfigObject::GetEndpointPollInterval(UInt8 interfaceNum, UInt8
 	EMUUSBAudioStreamObject*	stream = GetStreamObject(interfaceNum, altInterfaceNum);
     if (!stream) {
         IOLog("Bug? EMUUSBAudioConfigObject::GetEndpointPollInterval stream not opening");
-        return 1; // can we cancel the whole thing?
+        return 255;
     }
     
     UInt8	address = stream->GetIsocEndpointAddress(direction);
     EMUUSBEndpointObject*	endpoint = stream->GetEndpointByAddress(address);
     if (!endpoint) {
         IOLog("Bug? EMUUSBAudioConfigObject::GetEndpointPollInterval no endpoint");
-        return 1; // can we cancel the whole thing?
+        return 255;
     }
     
     pollInterval = endpoint->GetPollInt();

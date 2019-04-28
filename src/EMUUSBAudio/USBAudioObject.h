@@ -960,7 +960,9 @@ public:
 	UInt16							GetFormat (UInt8 interfaceNum, UInt8 altInterfaceNum);
 	UInt32							GetHighestSampleRate (UInt8 interfaceNum, UInt8 altInterfaceNum);
 	UInt32							GetEndpointMaxPacketSize(UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 address);
-    /*! get endpoint poll interval (bInterval), 1=every microframe, 2=every 2 microframes, 3=every 4 microframes, 4=every frame, etc */
+    /*! @return endpoint poll interval (bInterval), 1=every microframe, 2=every 2 microframes, 3=every 4 microframes, 4=8micro=1 full frame, etc.
+     Nomally the endpoint interval is computed as 1<<(pollinterval-1). If an error occurs, this returns 255.
+     */
 	UInt8							GetEndpointPollInterval(UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 direction);
     
 	UInt8							GetIsocAssociatedEndpointAddress (UInt8 interfaceNum, UInt8 altInterfaceNum, UInt8 address);
