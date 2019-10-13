@@ -37,7 +37,7 @@ The Audacity-only version goes as follows
 3. Generate a 10 minute stereo 440Hz sine tone, amplitude 0.8 (tracks/add new/stereo; Generate/Tone)
 4. Tracks/add/new stereo track
 5. Select in the new empty stereo track the exact 10 minutes as in the generated track 
-6. select the EMU as input in audacity 
+6. select the EMU as input and output in audacity 
 7. start recording in audacity
 8. If recorded channels are not around 0.9 of max, adjust  input and output volume to around 0.9, stop recording and go back to 7
 9. When the track is fully played after 10 minutes, stop audacity recording
