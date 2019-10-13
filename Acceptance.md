@@ -12,6 +12,7 @@ The following tests should succeed for all available rates and all driver versio
 There are two ways to do this. One is with reaper, one with Audacity. Both tests need the loopback cable (see <a href="Latency.md">latency test</a> attached and volume adjusted. Make sure phantom power is off.
 
 The Audacity+Quicktime version goes as follows
+
 0. Make sure preferences/Devices/Buffer length =10ms and Latency compensation =0ms
 1. Set the test rate in the EMU Control Panel
 2. Set audacity project rate to the test rate
@@ -29,6 +30,7 @@ The Audacity+Quicktime version goes as follows
 14. Check if there are any clicks between the moment of start and end of the quicktime playing. Zoom in a few times to make sure you do not miss clicks.
 
 The Audacity-only version goes as follows
+
 0. Make sure preferences/Devices/Buffer length =10ms and Latency compensation =0ms
 1. Set the test rate in the EMU control panel
 2. Set the audio project rate to the thest rate
