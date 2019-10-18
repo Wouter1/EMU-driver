@@ -11,11 +11,12 @@ The following tests should succeed for all available rates and all driver versio
 
 There are two ways to do this. One is with reaper, one with Audacity. Both tests need the loopback cable (see <a href="Latency.md">latency test</a> attached and volume adjusted. Make sure phantom power is off.
 
-The Audacity version goes as follows
+The Audacity+Quicktime version goes as follows
 
+0. Make sure preferences/Devices/Buffer length =10ms and Latency compensation =0ms
 1. Set the test rate in the EMU Control Panel
 2. Set audacity project rate to the test rate
-3. Generate a 10 minute 440Hz sine tone, amplitude 0.8 (Generate/Tone)
+3. Generate a 10 minute stereo 440Hz sine tone, amplitude 0.8 (tracks/add new/stereo; Generate/Tone)
 4. export the project as wav
 5. open the wav in quicktime 7
 6. in system preferences/audio select the EMU as OUTPUT
@@ -28,6 +29,20 @@ The Audacity version goes as follows
 13. Apply in Audacity the Effect/Notch Filter. Set 440Hz and Q=11. 
 14. Check if there are any clicks between the moment of start and end of the quicktime playing. Zoom in a few times to make sure you do not miss clicks.
 
+The Audacity-only version goes as follows
+
+0. Make sure preferences/Devices/Buffer length =10ms and Latency compensation =0ms
+1. Set the test rate in the EMU control panel
+2. Set the audio project rate to the thest rate
+3. Generate a 10 minute stereo 440Hz sine tone, amplitude 0.8 (tracks/add new/stereo; Generate/Tone)
+4. Tracks/add/new stereo track
+5. Select in the new empty stereo track the exact 10 minutes as in the generated track 
+6. select the EMU as input and output in audacity 
+7. start recording in audacity
+8. If recorded channels are not around 0.9 of max, adjust  input and output volume to around 0.9, stop recording and go back to 7
+9. When the track is fully played after 10 minutes, stop audacity recording
+10. Apply in Audacity the Effect/Notch Filter. Set 440Hz and Q=11. 
+11. Check if there are any clicks between the moment of start and end of the quicktime playing. Zoom in a few times to make sure you do not miss clicks.
 
 The reaper version goes as follows:
 
