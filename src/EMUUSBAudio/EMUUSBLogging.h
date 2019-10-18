@@ -24,6 +24,8 @@
 #define DEBUGZEROTIME			TRUE
 #define DEBUGLOADING			TRUE
 #define DEBUGTIMESTAMPS			TRUE
+//#define DEBUGLOGGING          TRUE
+
 
 //#include <IOKit/usb/IOUSBLog.h>
 //  sleeptime for debug logging. Set between 0 and 20 and call IOSleep in doLog
@@ -31,8 +33,9 @@
 
 // the log-always function. NOT for DEBUG messages. goes to system.log (check the console)
 // the debugIOLog will be mapped into this when debugging is enabled.
+// WARNING Logging is broken since Sierra, because OSX logging randomly misses log events.
 #define doLog( message... ) \
-do { printf ( message ); printf ("\n" ); } while (0)
+do { printf ( message ); } while (0)
 
 // you may consider using this do { printf ( message ); printf ("\n" ); IOSleep(sleepTime); } while (0)
 
