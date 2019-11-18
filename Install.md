@@ -23,7 +23,9 @@ On Yosemite and earlier:
 2. reboot your machine. 
 
 <h4>Allow apps to run</h4>
+
 On Catalina you additionally need a few extra steps
+
 1. under "System Preferences > Security and Privacy > Privacy" grant full disk access to terminal and the driver installer
 2. In a terminal do ```sudo mount -uw /```
 
