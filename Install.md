@@ -23,12 +23,19 @@ On Yosemite and earlier:
 2. reboot your machine. 
 
 <h4>Allow apps to run</h4>
+On Catalina you additionally need a few extra steps
+1. under "System Preferences > Security and Privacy > Privacy" grant full disk access to terminal and the driver installer
+2. In a terminal do ```sudo mount -uw /```
+
+
 On El Capitan and above you may have to enable running 3rd-party applications before you can run the Installer and the Control Panel:
 
 1. On Sierra you may first have to enable the "Anywhere" button in the Security&Privacy panel. Execute ```sudo spctl --master-disable``` in a terminal.
 2. Go into System Preferences->Security&Privacy
 3. Under the General tab, change Allow Downloaded Apps From to Anywhere
 4. Start the installer or  Control Panel
+
+
 
 
 <h4>Install the driver</h4>
