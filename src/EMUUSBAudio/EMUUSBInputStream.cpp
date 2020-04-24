@@ -129,10 +129,13 @@ IOReturn       EMUUSBInputStream::gatherFromReadList() {
         
         if (mDropStartingFrames <= 0)
         {
-            
+            UInt64 wrapTimeNs;
+            absolutetime_to_nanoseconds(pFrames[frameIndex].getTime(),&wrapTimeNs);
             // FIXME. We should not call from inside locked area.
-            usbRing-> push(source, size , pFrames[frameIndex].getTime() );
-            frameSizeQueue-> push(size , pFrames[frameIndex].getTime());
+            // -0.5/1ms: we need start instead of end of frame. Frame size depends on
+            // usb microinterval but we don't (yet) have access to that here.
+            usbRing-> push(source, size ,wrapTimeNs- (sampleRate>96000? 500000: 1000000), 1000000000l/(sampleRate * multFactor) );
+            frameSizeQueue-> push(size , wrapTimeNs);
             
             // if (frameIndex == 1) {
             //   debugIOLogC("latency %d",usbRing->available());

@@ -922,6 +922,7 @@ IOReturn EMUUSBAudioEngine::GetDefaultSettings(IOUSBInterface1  *streamInterface
         } else {
             info = &mOutput;
         }
+        info -> sampleRate = sampleRate.whole;
 		info->interfaceNumber = ourInterfaceNumber;
 		info->streamDirection = direction;
 		info->streamInterface = streamInterface;
@@ -1192,7 +1193,9 @@ bool EMUUSBAudioEngine::initHardware (IOService *provider) {
 	
 	CalculateSamplesPerFrame (sampleRate.whole, &averageFrameSamples, &additionalSampleFrameFreq);
 	// this calcs (frame size, etc.) could probably be simplified, but I'm leaving them this way for now (AC)
+    usbInputStream.sampleRate = sampleRate.whole;
 	usbInputStream.multFactor = usbInputStream.numChannels * (mChannelWidth / 8);
+    mOutput.sampleRate = sampleRate.whole;
 	mOutput.multFactor = mOutput.numChannels * (mChannelWidth / 8);
 	usbInputStream.maxFrameSize = (averageFrameSamples + 1) * usbInputStream.multFactor;
 	mOutput.maxFrameSize = (averageFrameSamples + 1) * mOutput.multFactor;
@@ -1517,6 +1520,7 @@ IOReturn EMUUSBAudioEngine::performFormatChangeInternal (IOAudioStream *audioStr
         //}
         usbInputStream.alternateSettingID = newAlternateSettingID;
         mChannelWidth = newFormat->fBitWidth;
+        usbInputStream.sampleRate = sampleRate.whole;
         usbInputStream.multFactor = usbInputStream.numChannels * (mChannelWidth / 8);
         debugIOLogC("alternateFrameSize is %d", alternateFrameSize);
         if (usbInputStream.maxFrameSize != alternateFrameSize) {
@@ -1556,6 +1560,7 @@ IOReturn EMUUSBAudioEngine::performFormatChangeInternal (IOAudioStream *audioStr
         //}
         mOutput.alternateSettingID = newAlternateSettingID;
         mChannelWidth = newFormat->fBitWidth;
+        mOutput.sampleRate = sampleRate.whole;
         mOutput.multFactor = mOutput.numChannels * (mChannelWidth / 8);
         debugIOLogC("alternateFrameSize is %d", alternateFrameSize);
         if (mOutput.maxFrameSize != alternateFrameSize) {
@@ -1742,7 +1747,9 @@ IOReturn EMUUSBAudioEngine::startUSBStream() {
                     usbInputStream.multFactor,newInputMultFactor,mOutput.multFactor,newOutputMultFactor);
         usbInputStream.maxFrameSize = altFrameSampleSize * newInputMultFactor;
         mOutput.maxFrameSize = altFrameSampleSize * newOutputMultFactor;
+        usbInputStream.sampleRate = sampleRate.whole;
         usbInputStream.multFactor = newInputMultFactor;
+        mOutput.sampleRate = sampleRate.whole;
         mOutput.multFactor = newOutputMultFactor;
         debugIOLogC("pre initBuffers");
         beginConfigurationChange();

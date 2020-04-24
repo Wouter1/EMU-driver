@@ -126,7 +126,10 @@ public:
     /*! The point where the next raw USB byte can be written in bufferPtr. Always in [0, bufferSize> */
     UInt32		bufferOffset;
     
-    /*! =numChannels * #bytes per sample for this stream =  frame size.
+    /*! the current sample rate (sampleframes per second) */
+    UInt32 sampleRate;
+    
+    /*! sampleframe size in bytes =numChannels * #bytes per sample for this stream.
      this will be 6 for stereo 24 bit audio. */
     UInt32		multFactor;
     

@@ -22,8 +22,8 @@
 // to avoid the deviations grow above 1ms, yet as slow as possible
 // to maximize the stability of the estimation.
 #define K 1     // spring constant for filter
-#define M 10000 // mass for the filter
-#define DA 200  // 2 Sqrt[M K] for critical damping.
+#define M 1000 // mass for the filter
+#define DA 63  // 2 Sqrt[M K] for critical damping.
 
 
 //  where is math.h ?

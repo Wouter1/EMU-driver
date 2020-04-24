@@ -214,7 +214,7 @@ IOReturn EMUUSBOutputStream::PrepareWriteFrameList (UInt32 listNr) {
         
         if (frameSizeQueue->pop(&thisFrameSize) != kIOReturnSuccess) {
             debugIOLog("frameSizeQueue empty, guessing some queue size. May need fix..");
-            thisFrameSize = stockSamplesInFrame  * multFactor ;
+            thisFrameSize = (stockSamplesInFrame+1)  * multFactor ;
         }
         
         if (thisFrameSize >= numBytesToBufferEnd) {

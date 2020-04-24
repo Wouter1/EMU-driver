@@ -24,7 +24,7 @@
 #define DEBUGZEROTIME			TRUE
 #define DEBUGLOADING			TRUE
 #define DEBUGTIMESTAMPS			TRUE
-//#define DEBUGLOGGING          TRUE
+#define DEBUGLOGGING          TRUE
 
 
 //#include <IOKit/usb/IOUSBLog.h>

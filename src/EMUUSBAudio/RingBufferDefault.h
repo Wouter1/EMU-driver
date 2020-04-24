@@ -71,7 +71,7 @@ public:
     }
     
     
-    IOReturn push(TYPE object, AbsoluteTime time) override{
+    IOReturn push(TYPE object, UInt64 time) override{
         if (!buffer) {
             return kIOReturnNotReady;
         }
@@ -86,7 +86,7 @@ public:
         return kIOReturnSuccess;
 	}
     
-    IOReturn push(TYPE *objects, UInt32 num, AbsoluteTime time) override{
+    IOReturn push(TYPE *objects, UInt32 num, UInt64 time, UInt32 time_per_obj) override{
         if (!buffer) {
             return kIOReturnNotReady;
         }
@@ -97,7 +97,7 @@ public:
         }
         for ( UInt32 n = 0; n<num; n++) {
             buffer[writehead++] = objects[n];
-            if (writehead == size) { writehead = 0; notifyWrap(time); }
+            if (writehead == size) { writehead = 0; notifyWrap(time + n * time_per_obj); }
         }
         return kIOReturnSuccess;
     }

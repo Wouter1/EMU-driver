@@ -36,17 +36,18 @@ public:
      eg a timestamp from a USB frame.
      @return kIOReturnSuccess if ok, possibly  kIOReturnOverrun */
 
-	virtual IOReturn push( T object, AbsoluteTime time) = 0;
+	virtual IOReturn push( T object, UInt64 time) = 0;
     
     /*! puts num objects in the ring. prints error and continues if overflow. 
      @param objects array[num] of num objects to push
      @param num the number of objects in the array
-     @param time the time stamp associated with the objects.
+     @param time the time stamp associated with the first object, in system time ns.
      This is typically the lowest level timestamp you can get our hands on,
      eg a timestamp from a USB frame.
+     @param time_per_obj the time per object of type T (ns)
      @return kIOReturnSuccess if ok, possibly  kIOReturnOverrun */
 
-    virtual IOReturn push(T *objects, UInt32 num, AbsoluteTime time) = 0 ;
+    virtual IOReturn push(T *objects, UInt32 num, UInt64 time, UInt32 time_per_obj) = 0 ;
     
     /* Get one object from the ring. 
      @param pointer to mem block to contain the object
@@ -71,10 +72,9 @@ public:
     
     /*! called when the write head wraps back to 0. Overwrite to get notification. 
      @param time the time associated with the push of the object that caused the wrap.
-    
      */
     
-    virtual void notifyWrap(AbsoluteTime time) = 0 ;
+    virtual void notifyWrap(UInt64 time) = 0 ;
     
     /*! set the current read head position. CoreAudio may start reading at weird positions.
      returns kIOReturnUnderrun if the head was repositioned (by lack of better return possibility). */
