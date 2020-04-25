@@ -12,7 +12,7 @@ OSX driver for Creative Labs EMU USB
 
 There is a known issue with the 0204 (control panel not working and device switching to 4 channels out which does not work); For now please check  [issue 115](https://github.com/Wouter1/EMU-driver/issues/115) for workarounds. 
 
-Please notify me how my driver works on other EMU USB devices.
+Proper workings and thanks can be reported on #109. Reports on the other devices like 0204 are especially welcome as I can not test or fix those.
 
 Topics
 ========
