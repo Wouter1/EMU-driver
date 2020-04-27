@@ -9,8 +9,8 @@
 # Ask user 
 #
 clear;echo;echo;echo "EMU USB Installer by W.Pasman"
-pathname=$( cd $(dirname $0) ; pwd -P ) 
-cd "$pathname"
+cd "$(dirname "$0")"
+pathname= pwd -P 
 
 
 # os version returns something like 10.11.4. We need 2nd number.
