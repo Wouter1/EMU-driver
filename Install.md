@@ -6,6 +6,7 @@ Installation
 
 <h4>Download</h4>
 1. Download from the main page (click on the green combobox "Clone or download" and select "Download ZIP"). DO NOT RENAME the downloaded file (bug in some un-zippers #100).
+
 2. Unzip the driver (double click)
 
 <h4>Prepare the machine</h4>
