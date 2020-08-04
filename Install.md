@@ -4,6 +4,10 @@
 Installation
 ========
 
+<h4>Download</h4>
+1. Download from the main page (click on the green combobox "Clone or download" and select "Download ZIP"). DO NOT RENAME the downloaded file (bug in some un-zippers #100).
+2. Unzip the driver (double click)
+
 <h4>Prepare the machine</h4>
 
 First time installation only: prepare your machine to take developer kernel extensions.
@@ -43,13 +47,10 @@ On El Capitan and above you may have to enable running 3rd-party applications be
 
 <h4>Install the driver</h4>
 
-After preparation, you can install the driver:
+After download and preparation, you can install the driver:
 
 1. Turn off the EMU device
-2. Download from the main page (click on the green combobox "Clone or download" and select "Download ZIP"). DO NOT RENAME the downloaded file (bug in some un-zippers #100).
-3. Unzip the driver (double click)
-4. Run the install script (e.g. double click it) and follow the instructions.
-
+2. Run the install script (e.g. double click it) and follow the instructions.
 
 If you like you can also copy the control panel into your applications directory. You also have to copy the Skins folder along with the app.
 
