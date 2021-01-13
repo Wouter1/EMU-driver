@@ -14,6 +14,9 @@ Installation
 
 First time installation only: prepare your machine to take developer kernel extensions.
 
+On Big Sur:
+Check https://github.com/Wouter1/EMU-driver/issues/132#issuecomment-759326762
+
 On Catalina:
 1. reboot in recovery mode (hold cmd-R while booting)
 2. go to utilities-terminal
