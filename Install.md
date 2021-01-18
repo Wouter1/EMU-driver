@@ -87,3 +87,9 @@ Revert to original (Creative) driver
 Download and install the  <a href="http://support.creative.com/Products/ProductDetails.aspx?catID=237&catName=USB+Audio%2fMIDI+Interfaces&subCatID=611&subCatName=USB+Audio%2fMIDI+Interfaces&prodID=15185&prodName=0404+USB+2.0&bTopTwenty=1&VARSET=prodfaq:PRODFAQ_15185,VARSET=CategoryID:237">original EMU driver provided by E-MU</a>.
 Notice that this driver is not working on modern OSX.
 
+
+Hackintosh Notes
+======
+The notes here are from users, I can not verify these myself.
+
+The serial port has to be disabled in the bios. If enabled, the system detects wrong IRQ directions, the driver entries in conflict, which results in system malfunction when you power on your audio interface. (#134)
