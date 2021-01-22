@@ -22,7 +22,7 @@ On Big Sur:
 4. reboot your machine
 5. run the installer
 6. A popup appears, click on "open Securiy Preferences"
-7. In security & privacy preferences that opened, at the bottom "System software from developer 'Unidentified - EMUUSBAudio' has been updated, click on "Allow"
+7. In security & privacy preferences that opened, at the bottom "System software from developer 'Unidentified - EMUUSBAudio' has been updated". click on "Allow"
 
 On Catalina::
 1. reboot in recovery mode (hold cmd-R while booting)
