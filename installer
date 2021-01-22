@@ -16,12 +16,20 @@ pathname= pwd -P
 # os version returns something like 10.11.4. We need 2nd number.
 IFS="."
 read -ra values  <<< "$(sw_vers -productVersion)"
-osversion="${values[1]}"
+# 10.7 = OSX7 ... 10.14=OSX14 mojave , 10.15=osx15 catalina 11.1=OSX16=big sur 
+let osversion="( ${values[0]} - 10 ) * 15 + ${values[1]}"
+echo $osversion
 # determine the driver version for this os
 if [ "$osversion" -lt "7" ] ; then
 	echo "WARNING: This driver may not work correctly on OSX 10.6 and before."
 fi
 
+# determine kext directory
+if [ "$osversion" -lt "16" ] ; then
+  kextdir="/System/Library/Extensions/"
+else
+  kextdir="/Library/Extensions/"
+fi
 
 #ensure device has been turned off
 IFS=" "
@@ -44,6 +52,9 @@ if [ "$osversion" -gt "10" ] ; then
 else
 	driverversion="v9"
 fi
+
+
+# make copy of the correct driver and adjust latency setting
 cp -r "$driverversion/EMUUSBAudio.kext" .
 
 if [ "$lowlatency" == "y" ] ; then
@@ -58,11 +69,11 @@ fi
 echo "(Re)placing EMU kernel extension. We need the admin password for this."; echo
 
 # here the user will have to enter his password
-sudo kextunload -q /System/Library/Extensions/EMUUSBAudio.kext
-sudo rm -r /System/Library/Extensions/EMUUSBAudio.kext
+sudo kextunload -q "$kextdir/EMUUSBAudio.kext"
+sudo rm -r "$kextdir/EMUUSBAudio.kext"
 # Install new kernel extension
 cd "$pathname"
-sudo cp -r EMUUSBAudio.kext /System/Library/Extensions
+sudo cp -r EMUUSBAudio.kext "$kextdir"
 
 # delete old midi plugin
 sudo rm -rf /Library/Audio/MIDI\ Drivers/EMUMIDIDriver.plugin 
@@ -73,7 +84,7 @@ sudo cp -R EMUMIDIDriver\ orig.plugin /Library/Audio/MIDI\ Drivers/EMUMIDIDriver
 #do permissions stuff
 cd /Library/Audio/MIDI\ Drivers/
 sudo chgrp -R wheel EMUMIDIDriver.plugin
-cd /System/Library/Extensions
+cd "$kextdir"
 sudo chgrp -R wheel EMUUSBAudio.kext
 
 #load new kext
