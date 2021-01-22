@@ -15,9 +15,16 @@ Installation
 First time installation only: prepare your machine to take developer kernel extensions.
 
 On Big Sur:
-Check https://github.com/Wouter1/EMU-driver/issues/132#issuecomment-759326762
+1. reboot in recovery mode (hold cmd-R while booting)
+2. go to utilities-terminal
+3. enter this command:
+    ```csrutil disable```
+4. reboot your machine
+5. run the installer
+6. A popup appears, click on "open Securiy Preferences"
+7. In security & privacy preferences that opened, at the bottom "System software from developer 'Unidentified - EMUUSBAudio' has been updated, click on "Allow"
 
-On Catalina:
+On Catalina::
 1. reboot in recovery mode (hold cmd-R while booting)
 2. go to utilities-terminal
 3. enter this command:
