@@ -88,4 +88,4 @@ The following table shows the EMU performance. All values with 128sample DAW buf
 | Windows7 Creative Sound Blaster X-Fi pci-e | 20.4 | 19.2 | 19.4 | - |
 | Novation Audio Hub 2x4 ("FocusRite technology") | 24.8 | - | - | - |
 
-part of this data comes from http://blog.ultimateoutsider.com/2018/04/comparing-usb-audio-interface-latency.html. Other data collected from various sources on the web.
+part of this data comes from http://blog.ultimateoutsider.com/2018/04/comparing-usb-audio-interface-latency.html. Other data collected from various sources on the web. Some more on latency with also USB3 and PCI-E cards can be found  https://www.gearslutz.com/board/music-computers/618474-audio-interface-low-latency-performance-data-base.html
