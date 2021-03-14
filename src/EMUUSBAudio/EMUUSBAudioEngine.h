@@ -227,21 +227,21 @@ class EMUUSBAudioEngine : public IOAudioEngine {
     OSDeclareDefaultStructors (EMUUSBAudioEngine);
     
 public:
-    virtual bool init (OSDictionary *properties);
-    virtual void free ();
-    virtual bool initHardware (IOService *provider);
-    virtual bool start (IOService *provider);
-    virtual void stop (IOService *provider);
-	virtual bool requestTerminate (IOService * provider, IOOptionBits options);
-    virtual bool terminate (IOOptionBits options = 0);
-	virtual void detach (IOService *provider) ;
-	virtual void close(IOService *forClient, IOOptionBits options = 0);
+    virtual bool init (OSDictionary *properties) override;
+    virtual void free () override;
+    virtual bool initHardware (IOService *provider) override;
+    virtual bool start (IOService *provider) override;
+    virtual void stop (IOService *provider) override;
+	virtual bool requestTerminate (IOService * provider, IOOptionBits options) override;
+    virtual bool terminate (IOOptionBits options = 0) override;
+	virtual void detach (IOService *provider)  override;
+	virtual void close(IOService *forClient, IOOptionBits options = 0) override;
     
-    virtual IOReturn performAudioEngineStart ();
-    virtual IOReturn performAudioEngineStop ();
+    virtual IOReturn performAudioEngineStart () override;
+    virtual IOReturn performAudioEngineStop () override;
     /*! called from EMUUSBAudioDevice when rate changes. Apparently there can be multiple audio engines
      and the others are informed through this when one engine detects changes. */
-	virtual IOReturn hardwareSampleRateChanged(const IOAudioSampleRate *sampleRate);
+	virtual IOReturn hardwareSampleRateChanged(const IOAudioSampleRate *sampleRate) override;
 	
     //static void sampleRateHandler (void * target, void * parameter, IOReturn result, IOUSBIsocFrame * pFrames);
     
@@ -400,7 +400,7 @@ protected:
     static bool audioDevicePublished (EMUUSBAudioEngine *audioEngine, void *ref, IOService *newService);
     
     
-	virtual bool willTerminate (IOService * provider, IOOptionBits options);
+	virtual bool willTerminate (IOService * provider, IOOptionBits options) override;
     
     /**
      Get stringDescriptor into buffer. Buffer has to be kStringBufferSize
@@ -409,7 +409,7 @@ protected:
      */
     virtual Boolean getDescriptorString(char *buffer, UInt8 index);
     
-	virtual OSString * getGlobalUniqueID ();
+	virtual OSString * getGlobalUniqueID () override;
     
     
     
@@ -427,7 +427,7 @@ protected:
      before the hardware has a chance to play it.
      
      @return the current safe playback erase point. See getCurrentSampleFrame(offset) */
-    virtual UInt32 getCurrentSampleFrame (void);
+    virtual UInt32 getCurrentSampleFrame (void) override;
     
     /*!
      * @param offset in ns relative to true estimation of head position.
@@ -443,7 +443,7 @@ protected:
      This code is referring to pFrames which is void inside convertInputSamples. Therefore this
      code seems not safe to use. */
 	void CoalesceInputSamples(SInt32 numBytesToCoalesce, LowLatencyIsocFrame * pFrames);
-	virtual void resetClipPosition (IOAudioStream *audioStream, UInt32 clipSampleFrame);
+	virtual void resetClipPosition (IOAudioStream *audioStream, UInt32 clipSampleFrame) override;
     
     /*! implements the IOAudioEngine interface. Called by the HAL, who does timing according to our
      timestamps when it thinks we are ready to process more data.
@@ -465,7 +465,7 @@ protected:
      @param streamFormat
      @param audioStream
      */
-    virtual IOReturn clipOutputSamples (const void *mixBuf, void *sampleBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream);
+    virtual IOReturn clipOutputSamples (const void *mixBuf, void *sampleBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream) override;
     
 	/*!
      @abstract convert numSampleFrames samples from mInput into the destBuf. Implements IOAudioInterface input handler. Called from IOAudioStream::readInputSamples.
@@ -485,14 +485,17 @@ protected:
      
      @returns kIOReturnSuccess. I noticed that if you just return without putting data in destBuf that audacity will keep waiting for the start of the music without actually storing. It's not clear if this part of the protocol with HAL.
      */
-    virtual IOReturn convertInputSamples (const void *sampleBuf, void *destBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream);
+    virtual IOReturn convertInputSamples (const void *sampleBuf, void *destBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream) override;
 	
     /*! This gets called when the HAL wants to select one of the different formats that we made available via mainStream->addAvailableFormat
      @param audioStream
      @param newformat the details for the requested format.
      @param newSampleRate the requested sample rate.  Note that this is not part of the IOAudioStreamFormat.
      */
-    virtual IOReturn performFormatChange (IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate);
+//    virtual IOReturn performFormatChange (IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate) override;
+    
+    virtual IOReturn performFormatChange(IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioStreamFormatExtension *formatExtension, const IOAudioSampleRate *newSampleRate ) override;
+
     
     /*! Internal call to change format. The audio engine MUST have been stopped before calling this.
      @param audioStream
@@ -525,7 +528,8 @@ protected:
      */
     //	AbsoluteTime generateTimeStamp (UInt32 usbFrameIndex, UInt32 preWrapBytes, UInt32 byteCount);
     
-	IOReturn eraseOutputSamples(const void *mixBuf, void *sampleBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream);
+    
+	IOReturn eraseOutputSamples(const void *mixBuf, void *sampleBuf, UInt32 firstSampleFrame, UInt32 numSampleFrames, const IOAudioStreamFormat *streamFormat, IOAudioStream *audioStream) override;
     
     /*! get the value for given field in the plist. see IORegistryEntry::getProperty
      @param field the name of the symbol to look up in the plist
@@ -542,6 +546,10 @@ protected:
     
     /*! buffer to temporarily store ring buffer data  for conversion to float */
     UInt8 *             buf;
+    
+#if TARGET_OS_OSX && TARGET_CPU_ARM64
+    virtual bool    driverDesiresHiResSampleIntervals(void) override;
+#endif
     
 };
 

@@ -8,7 +8,6 @@
 #ifndef USB_EXT_h
 #define USB_EXT_h
 
-
 #include "osxversion.h"
 
 /********************* 10.9 DEFINITIONS **********************/
@@ -87,16 +86,16 @@ typedef IOUSBFindInterfaceRequest FindInterfaceRequest;
 
 // SEE ALSO IOUSBHostInterface for the new functionality compared to 10.9
 
-
+#include <TargetConditionals.h>
 #include <IOKit/usb/StandardUSB.h>
 #include <IOKit/usb/USB.h>
 #include <IOKit/usb/IOUSBHostIOSource.h>
 
 //definitions that were removed in 10.11 but that we still need
-#define USBToHostWord OSSwapLittleToHostInt16
-#define HostToUSBWord OSSwapHostToLittleInt16
-#define USBToHostLong OSSwapLittleToHostInt32
-#define HostToUSBLong OSSwapHostToLittleInt32
+//#define USBToHostWord OSSwapLittleToHostInt16
+//#define HostToUSBWord OSSwapHostToLittleInt16
+//#define USBToHostLong OSSwapLittleToHostInt32
+//#define HostToUSBLong OSSwapHostToLittleInt32
 
 // map the old USBmakebmRequestType and its variables into the new type
 #define USBmakebmRequestType makeDeviceRequestbmRequestType

@@ -27,6 +27,7 @@
  the configutation and stream descriptors to come in any order and not be contiguous.
  */
 
+#include <TargetConditionals.h>
 #include <libkern/c++/OSArray.h>
 
 #include <IOKit/audio/IOAudioTypes.h>

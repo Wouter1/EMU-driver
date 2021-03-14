@@ -11,6 +11,7 @@
 #ifndef EMUUSBAudio_EMUUSBLogging_h
 #define EMUUSBAudio_EMUUSBLogging_h
 
+#include <TargetConditionals.h>
 #include <IOKit/IOLib.h>
 
 

@@ -97,7 +97,7 @@ bool IOUSBDevice1::isHighSpeed() {
 
 
 IOReturn IOUSBDevice1::devRequestSampleRate(UInt32 inSampleRate, UInt16 endpointAddress) {
-    DeviceRequest		devReq;
+    struct DeviceRequest		devReq;
     UInt32				theSampleRate = OSSwapHostToLittleInt32 (inSampleRate);
     
     devReq.bmRequestType = USBmakebmRequestType (kUSBOut, kUSBClass, kUSBEndpoint);

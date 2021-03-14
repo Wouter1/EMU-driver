@@ -23,7 +23,7 @@
 // $Revision: 1.5 $  $Date: 2007/08/08 17:31:30 $
 //
 ////////////////////////////////////////////////////////////////////////////////
-
+#include <TargetConditionals.h>
 #include <IOKit/audio/IOAudioEngine.h>
 
 #include "EMUUSBUserClient.h"

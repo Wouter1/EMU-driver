@@ -1396,7 +1396,7 @@ IOReturn EMUUSBAudioEngine::performAudioEngineStop() {
     return kIOReturnSuccess;
 }
 
-IOReturn EMUUSBAudioEngine::performFormatChange (IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioSampleRate *newSampleRate) {
+IOReturn EMUUSBAudioEngine::performFormatChange(IOAudioStream *audioStream, const IOAudioStreamFormat *newFormat, const IOAudioStreamFormatExtension *formatExtension, const IOAudioSampleRate *newSampleRate ) {
 	if (!newFormat)
 		return kIOReturnSuccess;
     
@@ -2346,3 +2346,10 @@ void EMUUSBAudioEngine::OurUSBOutputStream::notifyClosed() {
         theEngine->mOutput.streamInterface = NULL;
     }
 }
+
+#if TARGET_OS_OSX && TARGET_CPU_ARM64
+bool EMUUSBAudioEngine::driverDesiresHiResSampleIntervals(void) {
+    return false;
+}
+#endif
+

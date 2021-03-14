@@ -56,7 +56,7 @@
 #include "EMUUSBDeviceDefines.h"
 #include "EMUUSBUserClient.h"
 
-#include <IOKit/usb/IOUSBLog.h>
+//#include <IOKit/usb/IOUSBLog.h>
 #include "USB.h"
 
 
@@ -332,7 +332,7 @@ IOReturn EMUUSBAudioDevice::protectedInitHardware(IOService * provider) {
 		if (FALSE == mTerminatingDriver) {
 			EMUUSBAudioEngine *audioEngine = NULL;
 			audioEngine = new EMUUSBAudioEngine;
-			FailIf(NULL == audioEngine->init(NULL), Exit);
+			FailIf(!audioEngine->init(NULL), Exit);
 			debugIOLogC("activate audio engine");
 			if (activateAudioEngine(audioEngine)) {
 				debugIOLogC("failed to activate audio engine");

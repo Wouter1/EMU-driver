@@ -38,10 +38,6 @@
 #define	CUSTOMDEVICE	1
 
 #include <libkern/OSTypes.h>
-#if DEBUGLOGGING
-#include <IOKit/usb/IOUSBLog.h>
-//#include <IOKit/firewire/IOFireLog.h>
-#endif
 enum {
 	kCtrlUsage      = 'Xtrl',
 	kEMUXUControl	= 'XemU'

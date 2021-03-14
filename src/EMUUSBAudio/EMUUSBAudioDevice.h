@@ -246,7 +246,7 @@ protected:
 public:
 	UInt8					mInterfaceNum;
     
-	bool					hasSampleRateXU() {return (NULL != mClockRateXU);}
+	bool					hasSampleRateXU() {return (0 != mClockRateXU);}
 	// all other methods
 	virtual	bool			start (IOService * provider);
     virtual	void			free ();
