@@ -25,21 +25,19 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* IOSyncer.cpp created by wgulland on 2000-02-02 */
+/* IOSyncer2.cpp created by wgulland on 2000-02-02 */
 
-// THIS IS A COPY OF AN OLD VERSION OF IOSyncer
-// http://www.opensource.apple.com/source/xnu/xnu-1456.1.26/iokit/Kernel/IOSyncer.cpp?txt
+// THIS IS A COPY OF AN OLD VERSION OF IOSyncer2
+//http://www.opensource.apple.com/source/xnu/xnu-1456.1.26/iokit/Kernel/IOSyncer2.cpp?txt
 
 #include <IOKit/IOLib.h>
-#include <IOSyncer.h>
+#include "IOSyncer2.h"
 
-THIS FILE IS NOT UDESD???
+OSDefineMetaClassAndStructors(IOSyncer2, OSObject)
 
-OSDefineMetaClassAndStructors(IOSyncer, OSObject)
-
-IOSyncer * IOSyncer::create(bool twoRetains)
+IOSyncer2 * IOSyncer2::create(bool twoRetains)
 {
-    IOSyncer * me = new IOSyncer;
+    IOSyncer2 * me = new IOSyncer2;
     
     if (me && !me->init(twoRetains)) {
         me->release();
@@ -49,7 +47,7 @@ IOSyncer * IOSyncer::create(bool twoRetains)
     return me;
 }
 
-bool IOSyncer::init(bool twoRetains)
+bool IOSyncer2::init(bool twoRetains)
 {
     if (!OSObject::init())
         return false;
@@ -69,14 +67,14 @@ bool IOSyncer::init(bool twoRetains)
     return true;
 }
 
-void IOSyncer::reinit()
+void IOSyncer2::reinit()
 {
     IOInterruptState is = IOSimpleLockLockDisableInterrupt(guardLock);
     threadMustStop = true;
     IOSimpleLockUnlockEnableInterrupt(guardLock, is);
 }
 
-void IOSyncer::free()
+void IOSyncer2::free()
 {
     // just in case a thread is blocked here:
     privateSignal();
@@ -87,7 +85,7 @@ void IOSyncer::free()
     OSObject::free();
 }
 
-IOReturn IOSyncer::wait(bool autoRelease)
+IOReturn IOSyncer2::wait(bool autoRelease)
 {
     IOInterruptState is = IOSimpleLockLockDisableInterrupt(guardLock);
     
@@ -107,7 +105,7 @@ IOReturn IOSyncer::wait(bool autoRelease)
     return result;
 }
 
-void IOSyncer::signal(IOReturn res, bool autoRelease)
+void IOSyncer2::signal(IOReturn res, bool autoRelease)
 {
     fResult = res;
     privateSignal();
@@ -115,7 +113,7 @@ void IOSyncer::signal(IOReturn res, bool autoRelease)
         release();
 }
 
-void IOSyncer::privateSignal()
+void IOSyncer2::privateSignal()
 {
     if (threadMustStop) {
         IOInterruptState is = IOSimpleLockLockDisableInterrupt(guardLock);

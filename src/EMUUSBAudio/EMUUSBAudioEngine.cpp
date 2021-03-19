@@ -185,7 +185,7 @@ bool EMUUSBAudioEngine::init (OSDictionary *properties) {
 	// Change this to use defines from the IOAudioFamily when they are available
 	setProperty ("IOAudioStreamSampleFormatByteOrder", "Little Endian");
 	usbInputStream.readBuffer = usbInputStream.bufferPtr = mOutput.bufferPtr = NULL;// initialize both the read, input and output to NULL
-	mSyncer = IOSyncer::create (FALSE);
+	mSyncer = IOSyncer2::create (FALSE);
 	result = TRUE;
     mPlugin = NULL;
 	usbInputStream.associatedPipe = mOutput.associatedPipe = NULL; // (AC mod)

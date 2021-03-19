@@ -37,8 +37,9 @@
 
 #include <IOKit/IOLib.h>
 // CRAP! https://developer.apple.com/Library/mac/releasenotes/General/APIDiffsMacOSX10_8/Kernel.html
-// IOKit/IOSyncer.h has been removed!
-#include <IOSyncer.h>
+// IOKit/IOSyncer.h has been removed! The C code is still somewhere
+// in kernel on intel machines but not on M1 platform...
+#include "IOSyncer2.h"
 #include <IOKit/IOService.h>
 #include <IOKit/IOMessage.h>
 #include <IOKit/IOMemoryCursor.h>
@@ -75,7 +76,7 @@
 class EMUUSBAudioDevice;
 
 
-class IOSyncer;
+class IOSyncer2;
 class EMUUSBAudioEngine;
 class EMUUSBAudioPlugin;
 
@@ -328,7 +329,7 @@ protected:
     
     
 	// engine data (i.e., not stream-specific)
-	IOSyncer *							mSyncer;
+	IOSyncer2 *							mSyncer;
 	EMUUSBAudioDevice *					usbAudioDevice;
     
 	IOMemoryDescriptor *				neededSampleRateDescriptor;

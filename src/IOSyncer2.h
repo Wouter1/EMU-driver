@@ -26,11 +26,11 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-// copy of old version of IOSyncer.h
-// http://www.opensource.apple.com/source/xnu/xnu-1456.1.26/iokit/IOKit/IOSyncer.h?txt
+// copy of old version of IOSyncer2.h
+// http://www.opensource.apple.com/source/xnu/xnu-1456.1.26/iokit/IOKit/IOSyncer2.h?txt
 
-#ifndef __EMUUSBAudio__IOSyncer__
-#define __EMUUSBAudio__IOSyncer__
+#ifndef __EMUUSBAudio__IOSyncer2__
+#define __EMUUSBAudio__IOSyncer2__
 
 
 
@@ -38,9 +38,9 @@
 #include <IOKit/IOTypes.h>
 #include <IOKit/IOLocks.h>
 
-class IOSyncer : public OSObject
+class IOSyncer2 : public OSObject
 {
-    OSDeclareDefaultStructors(IOSyncer)
+    OSDeclareDefaultStructors(IOSyncer2)
     
 private:
     // The spin lock that is used to guard the 'threadMustStop' variable.
@@ -52,7 +52,7 @@ private:
     
 public:
     
-    static IOSyncer * create(bool twoRetains = true)
+    static IOSyncer2 * create(bool twoRetains = true)
 	APPLE_KEXT_DEPRECATED;
     
     virtual bool init(bool twoRetains)
@@ -66,4 +66,4 @@ public:
 	APPLE_KEXT_DEPRECATED;
 };
 
-#endif /* defined(__EMUUSBAudio__IOSyncer__) */
+#endif /* defined(__EMUUSBAudio__IOSyncer2__) */

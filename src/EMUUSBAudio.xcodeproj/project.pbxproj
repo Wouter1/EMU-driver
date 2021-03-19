@@ -20,7 +20,7 @@
 		6C2C072119E4740700F1FD56 /* EMUUSBAudioPlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C071F19E4740700F1FD56 /* EMUUSBAudioPlugin.cpp */; };
 		6C2C072219E4740700F1FD56 /* EMUUSBAudioPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C072019E4740700F1FD56 /* EMUUSBAudioPlugin.h */; };
 		6C2C072619E4755A00F1FD56 /* EMUUSBUserClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C072419E4755A00F1FD56 /* EMUUSBUserClient.h */; };
-		6C2C072D19E4864D00F1FD56 /* IOSyncer.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C072B19E4864D00F1FD56 /* IOSyncer.h */; };
+		6C2C072D19E4864D00F1FD56 /* IOSyncer2.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C2C072B19E4864D00F1FD56 /* IOSyncer2.h */; };
 		6C39DF8919F2C3BD00D027FC /* EMUUSBAudioClip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C77361F19E3234900ED3FAA /* EMUUSBAudioClip.cpp */; };
 		6C5464221A15606C003C251B /* EMUUSBUserClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C072319E4755A00F1FD56 /* EMUUSBUserClient.cpp */; };
 		6C5A3AF31A285C0200F4DC13 /* RingBufferT.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C5A3AF11A285C0200F4DC13 /* RingBufferT.h */; };
@@ -39,6 +39,7 @@
 		6C97E7F819EDB4C400C376B9 /* EMUUSBAudioLevelControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C2C071319E4578A00F1FD56 /* EMUUSBAudioLevelControl.cpp */; };
 		6CB2722F1A54197B00FA8B61 /* EMUUSBOutputStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CB2722D1A54197B00FA8B61 /* EMUUSBOutputStream.cpp */; };
 		6CB272301A54197B00FA8B61 /* EMUUSBOutputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CB2722E1A54197B00FA8B61 /* EMUUSBOutputStream.h */; };
+		6CB3B2332604AE0200F27D21 /* IOSyncer2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CB3B2322604AE0200F27D21 /* IOSyncer2.cpp */; };
 		6CE021FE1A5FCE9C00568A82 /* StreamInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CE021FD1A5FCE9C00568A82 /* StreamInfo.cpp */; };
 /* End PBXBuildFile section */
 
@@ -74,7 +75,7 @@
 		6C2C072419E4755A00F1FD56 /* EMUUSBUserClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EMUUSBUserClient.h; sourceTree = "<group>"; };
 		6C2C072719E475B700F1FD56 /* EMUUSBPlatform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EMUUSBPlatform.h; sourceTree = "<group>"; };
 		6C2C072819E475EE00F1FD56 /* EMUUSBAudioDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EMUUSBAudioDefines.h; sourceTree = "<group>"; };
-		6C2C072B19E4864D00F1FD56 /* IOSyncer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOSyncer.h; sourceTree = "<group>"; };
+		6C2C072B19E4864D00F1FD56 /* IOSyncer2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOSyncer2.h; sourceTree = "<group>"; };
 		6C5A3AF11A285C0200F4DC13 /* RingBufferT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RingBufferT.h; sourceTree = "<group>"; };
 		6C5A3AFF1A28DF9700F4DC13 /* RingBufferDefault.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RingBufferDefault.h; sourceTree = "<group>"; };
 		6C5A3B001A290F4800F4DC13 /* EMUUSBInputStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBInputStream.cpp; sourceTree = "<group>"; };
@@ -102,6 +103,7 @@
 		6C966C7F19ED9E5000DBF618 /* EMUUSBDeviceDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EMUUSBDeviceDefines.h; sourceTree = "<group>"; };
 		6CB2722D1A54197B00FA8B61 /* EMUUSBOutputStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EMUUSBOutputStream.cpp; sourceTree = "<group>"; };
 		6CB2722E1A54197B00FA8B61 /* EMUUSBOutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EMUUSBOutputStream.h; sourceTree = "<group>"; };
+		6CB3B2322604AE0200F27D21 /* IOSyncer2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IOSyncer2.cpp; sourceTree = "<group>"; };
 		6CBB771E1D044C8900FED26D /* USB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = USB.h; sourceTree = "<group>"; };
 		6CE021FD1A5FCE9C00568A82 /* StreamInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StreamInfo.cpp; sourceTree = "<group>"; };
 		6CF65DF71D06085D0063C123 /* osxversion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = osxversion.h; sourceTree = "<group>"; };
@@ -122,7 +124,8 @@
 		6C2C072919E4862C00F1FD56 /* oldiokit */ = {
 			isa = PBXGroup;
 			children = (
-				6C2C072B19E4864D00F1FD56 /* IOSyncer.h */,
+				6CB3B2322604AE0200F27D21 /* IOSyncer2.cpp */,
+				6C2C072B19E4864D00F1FD56 /* IOSyncer2.h */,
 			);
 			name = oldiokit;
 			sourceTree = "<group>";
@@ -262,7 +265,7 @@
 				6C7861F41D03F7110087FD31 /* IOUSBPipe.h in Headers */,
 				6C7861FC1D03F96C0087FD31 /* IOUSBInterface.h in Headers */,
 				6C2C072619E4755A00F1FD56 /* EMUUSBUserClient.h in Headers */,
-				6C2C072D19E4864D00F1FD56 /* IOSyncer.h in Headers */,
+				6C2C072D19E4864D00F1FD56 /* IOSyncer2.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -350,6 +353,7 @@
 				6C39DF8919F2C3BD00D027FC /* EMUUSBAudioClip.cpp in Sources */,
 				6C7861FB1D03F96C0087FD31 /* IOUSBInterface.cpp in Sources */,
 				6C97E7F819EDB4C400C376B9 /* EMUUSBAudioLevelControl.cpp in Sources */,
+				6CB3B2332604AE0200F27D21 /* IOSyncer2.cpp in Sources */,
 				6C2C071919E4586700F1FD56 /* USBAudioObject.cpp in Sources */,
 				6C2C070819E4559800F1FD56 /* EMUUSBAudioDevice.cpp in Sources */,
 				6C2C070C19E4562800F1FD56 /* EMUUSBAudioEngine.cpp in Sources */,
