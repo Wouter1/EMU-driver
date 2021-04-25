@@ -5,7 +5,7 @@ EMU-USB driver
 
 OSX driver for Creative Labs EMU USB
 
-* Tested on Mavericks, Yosemite, El Capitan, Sierra, High Sierra, Mojave, Catalina and Big Sur.
+* Tested on Mavericks, Yosemite, El Capitan, Sierra, High Sierra, Mojave, Catalina and Big Sur. M1 is NOT supported because I don't have a M1 machine #136
 * All sample rates are supported both for record and playback: 44.1, 48, 88.2, 96, 176.4 and 192 kHz
 * I can only test on EMU0404 USB as I have no other EMU devices. But users reported it works also on EMU0202, EMU0204 and Tracker Pre USB.
 * Midi support.
