@@ -24,3 +24,9 @@ Topics
  * <a href="Acceptance.md">Acceptance Test procedure</a>
 
 
+End Of Support
+==============
+I moved away from the Apple MacOS platform to Linux.
+Therefore my support for this driver has stopped.
+
+
